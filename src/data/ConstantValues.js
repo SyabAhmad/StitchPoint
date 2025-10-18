@@ -15,7 +15,7 @@ const APP_DATA = {
       { text: "Best Sellers", href: "/best-sellers" },
       { text: "About", href: "/about" },
       { text: "Contact", href: "/contact" },
-      { text: "Sell on MenteE", href: "/sell", primary: true }, // 👈 Key CTA for artisans
+      { text: "Sell on Naqsh Couture", href: "/sell", primary: true }, // 👈 Key CTA for artisans
       { text: "Login", href: "/login", primary: false }, // Keep as secondary CTA
     ],
     afterSignin: [
@@ -82,3 +82,5 @@ const APP_DATA = {
 function getData(path) {
   return path.split(".").reduce((obj, key) => obj?.[key], APP_DATA);
 }
+
+export { APP_DATA, getData };
