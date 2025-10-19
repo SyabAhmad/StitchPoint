@@ -39,13 +39,13 @@ const TestimonialsSection = () => {
   ];
 
   return (
-    <section className="py-16 px-6 lg:px-12 bg-gray-50">
+    <section className="py-16 px-6 lg:px-12" style={{ backgroundColor: palette.primaryHeader }}>
       <div className="max-w-7xl mx-auto">
         <div className="mb-12 text-center">
-          <h2 className="text-3xl lg:text-4xl font-bold mb-2" style={{ color: palette.primaryHeader }}>
+          <h2 className="text-3xl lg:text-4xl font-bold mb-2 text-white">
             Customer Love Stories
           </h2>
-          <p className="text-gray-600">See what our customers are saying</p>
+          <p className="text-gray-300">See what our customers are saying</p>
         </div>
 
         {/* Testimonials Grid */}
@@ -53,7 +53,7 @@ const TestimonialsSection = () => {
           {testimonials.map((testimonial) => (
             <div
               key={testimonial.id}
-              className="bg-white rounded-xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300"
+              className="bg-white/10 backdrop-blur-sm rounded-xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 border border-white/20"
             >
               {/* Stars */}
               <div className="flex mb-3">
@@ -61,7 +61,7 @@ const TestimonialsSection = () => {
                   <span
                     key={i}
                     className={`text-lg ${
-                      i < testimonial.rating ? "text-yellow-400" : "text-gray-300"
+                      i < testimonial.rating ? "text-yellow-400" : "text-gray-500"
                     }`}
                   >
                     ★
@@ -70,20 +70,20 @@ const TestimonialsSection = () => {
               </div>
 
               {/* Message */}
-              <p className="text-gray-700 text-sm mb-4 italic">"{testimonial.message}"</p>
+              <p className="text-white text-sm mb-4 italic">"{testimonial.message}"</p>
 
               {/* Customer Info */}
-              <div className="flex items-center gap-3 border-t pt-4">
+              <div className="flex items-center gap-3 border-t border-white/20 pt-4">
                 <img
                   src={testimonial.image}
                   alt={testimonial.name}
                   className="w-10 h-10 rounded-full object-cover"
                 />
                 <div>
-                  <p className="font-semibold text-sm" style={{ color: palette.primaryHeader }}>
+                  <p className="font-semibold text-sm text-white">
                     {testimonial.name}
                   </p>
-                  <p className="text-xs text-gray-500">{testimonial.role}</p>
+                  <p className="text-xs text-gray-300">{testimonial.role}</p>
                 </div>
               </div>
             </div>

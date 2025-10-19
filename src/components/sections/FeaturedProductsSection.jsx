@@ -9,7 +9,8 @@ const FeaturedProductsSection = () => {
       id: 1,
       title: "New Arrivals",
       description: "Latest Collections",
-      bgColor: "from-purple-500 to-pink-500",
+      bgGradient: "from-yellow-500 via-yellow-600 to-gray-900",
+      icon: "✨",
       products: [
         {
           id: 101,
@@ -46,7 +47,8 @@ const FeaturedProductsSection = () => {
       id: 2,
       title: "Best Sellers",
       description: "Customer Favorites",
-      bgColor: "from-blue-500 to-cyan-500",
+      bgGradient: "from-gray-800 via-gray-900 to-yellow-700",
+      icon: "⭐",
       products: [
         {
           id: 201,
@@ -83,7 +85,8 @@ const FeaturedProductsSection = () => {
       id: 3,
       title: "Trending Now",
       description: "This Season's Must-Have",
-      bgColor: "from-orange-500 to-red-500",
+      bgGradient: "from-yellow-600 via-yellow-700 to-gray-800",
+      icon: "🔥",
       products: [
         {
           id: 301,
@@ -119,7 +122,7 @@ const FeaturedProductsSection = () => {
   ];
 
   return (
-    <section className="py-16 px-6 lg:px-12 bg-gray-50">
+    <section className="py-16 px-6 lg:px-12" style={{ backgroundColor: palette.background }}>
       <div className="max-w-7xl mx-auto">
         {/* Section Title */}
         <div className="mb-12">
@@ -134,20 +137,24 @@ const FeaturedProductsSection = () => {
           {featuredCategories.map((category) => (
             <div
               key={category.id}
-              className={`bg-gradient-to-br ${category.bgColor} rounded-xl p-6 text-white cursor-pointer hover:shadow-2xl transition-all duration-300 group relative overflow-hidden h-64`}
+              className={`bg-gradient-to-br ${category.bgGradient} rounded-2xl p-8 text-white cursor-pointer hover:shadow-2xl transition-all duration-500 group relative overflow-hidden h-72 border border-yellow-400/30`}
             >
-              {/* Background effect */}
-              <div className="absolute inset-0 opacity-20 group-hover:opacity-40 transition-opacity duration-300" />
+              {/* Premium background effect */}
+              <div className="absolute inset-0 bg-black/10 group-hover:bg-black/20 transition-all duration-500" />
+              
+              {/* Decorative corner accent */}
+              <div className="absolute top-0 right-0 w-40 h-40 bg-yellow-400/20 rounded-full blur-3xl -mr-20 -mt-20 group-hover:scale-110 transition-transform duration-500" />
 
               {/* Content */}
               <div className="relative z-10 flex flex-col justify-between h-full">
                 <div>
-                  <p className="text-sm opacity-90 mb-2">{category.description}</p>
-                  <h3 className="text-2xl lg:text-3xl font-bold">{category.title}</h3>
+                  <div className="text-4xl mb-3">{category.icon}</div>
+                  <p className="text-sm font-semibold opacity-80 mb-2 tracking-wider uppercase">{category.description}</p>
+                  <h3 className="text-3xl lg:text-4xl font-bold leading-tight">{category.title}</h3>
                 </div>
                 <button
-                  className="self-start px-6 py-2.5 bg-white rounded-full font-semibold transition-all duration-300 group-hover:scale-105"
-                  style={{ color: category.bgColor.split(" ")[0] }}
+                  className="self-start px-8 py-3 bg-white rounded-full font-bold transition-all duration-300 group-hover:scale-105 group-hover:shadow-lg"
+                  style={{ color: palette.primaryHeader }}
                 >
                   Explore →
                 </button>

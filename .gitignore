@@ -37,3 +37,23 @@ __pycache__/
 *.pyo
 *.pyd
 *.sqlite3
+
+commands to follow.txt
+*.log
+*.pot
+*.mo
+*.sqlite3
+.venv/
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+.venv
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.sqlite3
+instance/
+.webassets-cache

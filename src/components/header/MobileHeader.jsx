@@ -4,13 +4,7 @@ import COLOR_PALETTES from "../../../theme";
 import { getData } from "../../data/ConstantValues";
 
 const MobileHeader = ({ isLoggedIn = false }) => {
-  const palette = COLOR_PALETTES.luxuryCouture || {
-    primaryHeader: "#151515",
-    background: "#FFFFFF",
-    accentButton: "#D4AF37",
-    text: "#151515",
-    hoverHighlight: "#F5F5F5",
-  };
+  const palette = COLOR_PALETTES.luxuryCouture;
   const navItems = isLoggedIn
     ? getData("navbars.afterSignin")
     : getData("navbars.beforeSignin");

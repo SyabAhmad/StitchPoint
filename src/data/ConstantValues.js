@@ -15,12 +15,12 @@ const APP_DATA = {
       { text: "Best Sellers", href: "/best-sellers" },
       { text: "About", href: "/about" },
       { text: "Contact", href: "/contact" },
-      { text: "Sell on Naqsh Couture", href: "/sell", primary: true }, // 👈 Key CTA for artisans
-      { text: "Login", href: "/login", primary: false }, // Keep as secondary CTA
+      { text: "Sell on Naqsh Couture", href: "/auth", primary: true }, // 👈 Link to seller signup
+      { text: "Login", href: "/auth", primary: false }, // Link to auth page
     ],
     afterSignin: [
       { text: "Dashboard", href: "/dashboard" },
-      { text: "Profile", href: "/profile" },
+      { text: "Profile", href: "/seller/profile" },
       { text: "Settings", href: "/settings" },
       { text: "Logout", href: "/logout", danger: true },
     ],
@@ -83,4 +83,11 @@ function getData(path) {
   return path.split(".").reduce((obj, key) => obj?.[key], APP_DATA);
 }
 
-export { APP_DATA, getData };
+// Color palettes for luxury couture
+const COLOR_PALETTES = {
+  black: '#151515',
+  gold: '#D4AF37',
+  white: '#FFFFFF',
+};
+
+export { APP_DATA, getData, COLOR_PALETTES };
