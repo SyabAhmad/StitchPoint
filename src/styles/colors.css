@@ -1,0 +1,108 @@
+:root {
+  --gold-500: #d4af37;
+  --gold-600: #b8860b;
+  --black-silk: #000000;
+  --black-naqsh: #1d1d1d;
+  --gray-silk: #2d2d2d;
+  --gray-600: #1f1f1f; /* darker fallback for hover */
+}
+
+/* Navbar base */
+.navbar {
+  background-color: var(--black-silk);
+  color: white;
+  padding: 1rem;
+}
+
+/* Logo hover (keeps behavior from index.css) */
+.nc-logo:hover img {
+  filter: drop-shadow(0 0 2px rgba(212, 175, 55, 0.5));
+  transform: scale(1.02);
+  transition: all 0.3s ease;
+}
+
+/* Navigation links */
+.nav-link {
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.18s ease;
+}
+.nav-link:hover {
+  color: var(--gold-500);
+}
+
+/* Buttons */
+.btn-gold {
+  background-color: var(--gold-500);
+  color: black;
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.18s ease, transform 0.08s ease;
+}
+.btn-gold:hover {
+  background-color: var(--gold-600);
+  transform: translateY(-1px);
+}
+
+.btn-gray {
+  background-color: var(--gray-silk);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.18s ease, transform 0.08s ease;
+}
+.btn-gray:hover {
+  background-color: var(--gray-600);
+  transform: translateY(-1px);
+}
+
+/* Small helper to space nav items when Tailwind isn't available */
+.nav-items {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* Make sure container uses full width by default; keep utility classes if Tailwind is present */
+.container-inline {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Footer styles */
+.footer {
+  background-color: var(--black-silk);
+  color: #ffffff;
+  padding: 1.25rem 1rem;
+}
+.footer .footer-links {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  padding: 0.5rem 0 0.75rem 0;
+  margin: 0 0 0.5rem 0;
+}
+.footer .footer-links a {
+  color: rgba(255, 255, 255, 0.85);
+  text-decoration: none;
+  transition: color 0.18s ease;
+}
+.footer .footer-links a:hover {
+  color: var(--gold-500);
+}
+.footer .footer-note {
+  text-align: center;
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.7);
+}
