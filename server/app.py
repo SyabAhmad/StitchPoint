@@ -13,6 +13,7 @@ from config import Config
 from models import db
 from routes.auth import auth_bp
 from routes.products import products_bp
+from routes.dashboard import dashboard_bp
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
@@ -28,6 +29,7 @@ CORS(app)
 # Register blueprints
 app.register_blueprint(auth_bp, url_prefix='/api/auth')
 app.register_blueprint(products_bp, url_prefix='/api')
+app.register_blueprint(dashboard_bp, url_prefix='/api/dashboard')
 
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')

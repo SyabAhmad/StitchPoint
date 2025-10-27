@@ -70,10 +70,12 @@ export default function Collections() {
 
   if (loading) {
     return (
-      <div className="collections-page">
-        <div className="collections-title-section">
-          <h1 className="collections-title">Collections</h1>
-          <p className="collections-subtitle">
+      <div className="min-h-screen">
+        <div className="py-16 px-4 text-center bg-gradient-to-br from-gold-500/2 to-white/98">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold font-serif text-gold-500 mb-4">
+            Collections
+          </h1>
+          <p className="text-lg md:text-xl text-black/70">
             Loading our exquisite pieces...
           </p>
         </div>
@@ -83,10 +85,12 @@ export default function Collections() {
 
   if (error) {
     return (
-      <div className="collections-page">
-        <div className="collections-title-section">
-          <h1 className="collections-title">Collections</h1>
-          <p className="collections-subtitle">
+      <div className="min-h-screen">
+        <div className="py-16 px-4 text-center bg-gradient-to-br from-gold-500/2 to-white/98">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold font-serif text-gold-500 mb-4">
+            Collections
+          </h1>
+          <p className="text-lg md:text-xl text-black/70">
             Error loading collections: {error}
           </p>
         </div>
@@ -95,43 +99,51 @@ export default function Collections() {
   }
 
   return (
-    <div className="collections-page">
+    <div className="min-h-screen">
       {/* Title Section */}
-      <div className="collections-title-section">
-        <h1 className="collections-title">Our Collections</h1>
-        <p className="collections-subtitle">
+      <div className="py-16 px-4 text-center bg-gradient-to-br from-gold-500/2 to-white/98">
+        <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold font-serif text-gold-500 mb-4">
+          Our Collections
+        </h1>
+        <p className="text-lg md:text-xl text-black/70 max-w-2xl mx-auto leading-relaxed">
           Discover timeless elegance in our curated selection of couture pieces,
           crafted with passion and precision.
         </p>
       </div>
 
       {/* Main Layout */}
-      <div className="collections-layout">
+      <div className="flex gap-8 px-4 py-8 max-w-7xl mx-auto">
         {/* Filters Sidebar */}
-        <aside className="collections-filters">
-          <div className="filters-header">
-            <h3>Filters</h3>
+        <aside className="w-80 bg-white rounded-2xl shadow-lg border border-gold-500/10 p-6 h-fit sticky top-8">
+          <div className="mb-6">
+            <h3 className="text-xl font-serif font-bold text-gold-500">
+              Filters
+            </h3>
           </div>
 
           {/* Search */}
-          <div className="filter-group">
-            <label className="filter-label">Search</label>
+          <div className="mb-6">
+            <label className="block mb-2 font-semibold text-black/80 text-sm">
+              Search
+            </label>
             <input
               type="text"
               placeholder="Search products..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="filter-search-input"
+              className="w-full px-3 py-2 border border-gold-500/30 rounded-lg focus:outline-none focus:border-gold-500 focus:ring-2 focus:ring-gold-500/20 transition-colors"
             />
           </div>
 
           {/* Category */}
-          <div className="filter-group">
-            <label className="filter-label">Category</label>
+          <div className="mb-6">
+            <label className="block mb-2 font-semibold text-black/80 text-sm">
+              Category
+            </label>
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="filter-select"
+              className="w-full px-3 py-2 border border-gold-500/30 rounded-lg bg-white cursor-pointer focus:outline-none focus:border-gold-500 focus:ring-2 focus:ring-gold-500/20 transition-colors"
             >
               <option value="">All Categories</option>
               {categories.map((category) => (
@@ -143,9 +155,11 @@ export default function Collections() {
           </div>
 
           {/* Price Range */}
-          <div className="filter-group">
-            <label className="filter-label">Price Range</label>
-            <div className="price-inputs">
+          <div className="mb-6">
+            <label className="block mb-2 font-semibold text-black/80 text-sm">
+              Price Range
+            </label>
+            <div className="flex items-center gap-2">
               <input
                 type="number"
                 min="0"
@@ -154,10 +168,10 @@ export default function Collections() {
                 onChange={(e) =>
                   setPriceRange([parseInt(e.target.value) || 0, priceRange[1]])
                 }
-                className="price-input"
+                className="flex-1 px-2 py-2 border border-gold-500/30 rounded-lg text-center focus:outline-none focus:border-gold-500 focus:ring-2 focus:ring-gold-500/20 transition-colors"
                 placeholder="Min"
               />
-              <span className="price-separator">-</span>
+              <span className="text-gold-500 font-semibold">-</span>
               <input
                 type="number"
                 min="0"
@@ -169,18 +183,18 @@ export default function Collections() {
                     parseInt(e.target.value) || 1000,
                   ])
                 }
-                className="price-input"
+                className="flex-1 px-2 py-2 border border-gold-500/30 rounded-lg text-center focus:outline-none focus:border-gold-500 focus:ring-2 focus:ring-gold-500/20 transition-colors"
                 placeholder="Max"
               />
             </div>
-            <div className="price-display">
+            <div className="mt-2 text-sm text-black/60 text-center">
               ${priceRange[0]} - ${priceRange[1]}
             </div>
           </div>
 
           {/* Clear Filters */}
           <button
-            className="clear-filters-btn"
+            className="w-full py-2 bg-gray-200 text-black/80 border border-gold-500/30 rounded-lg font-semibold hover:bg-gold-500 hover:text-white transition-all duration-300 hover:-translate-y-1 shadow-md hover:shadow-lg"
             onClick={() => {
               setSearchTerm("");
               setSelectedCategory("");
@@ -192,18 +206,20 @@ export default function Collections() {
         </aside>
 
         {/* Products Main */}
-        <main className="collections-main">
-          <div className="products-header">
-            <p className="products-count">
+        <main className="flex-1">
+          <div className="flex justify-between items-center mb-8 flex-wrap gap-4">
+            <p className="text-black/70">
               {filteredProducts.length}{" "}
               {filteredProducts.length === 1 ? "product" : "products"} found
             </p>
-            <div className="sort-group">
-              <label className="sort-label">Sort by:</label>
+            <div className="flex items-center gap-2">
+              <label className="font-semibold text-black/80 text-sm">
+                Sort by:
+              </label>
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="sort-select"
+                className="px-3 py-1 border border-gold-500/30 rounded-lg bg-white cursor-pointer focus:outline-none focus:border-gold-500 focus:ring-2 focus:ring-gold-500/20 transition-colors text-sm"
               >
                 <option value="name">Name</option>
                 <option value="price-low">Price: Low to High</option>
@@ -213,38 +229,47 @@ export default function Collections() {
             </div>
           </div>
 
-          <div className="arrivals-grid">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredProducts.length > 0 ? (
               filteredProducts.map((product) => (
-                <div key={product.id} className="arrival-card">
+                <div
+                  key={product.id}
+                  className="rounded-2xl overflow-hidden bg-white shadow-lg border border-gold-500/10 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300"
+                >
                   <div
-                    className="arrival-image"
+                    className="h-64 bg-cover bg-center"
                     style={{
                       backgroundImage: `url(${
                         product.image_url || "/placeholder.jpg"
                       })`,
                     }}
                   />
-                  <div className="arrival-info">
-                    <div className="product-details">
-                      <strong className="product-name">{product.name}</strong>
-                      <p className="product-description">
+                  <div className="p-6 flex flex-col gap-4">
+                    <div className="flex-1">
+                      <strong className="text-lg font-semibold text-black mb-2 block">
+                        {product.name}
+                      </strong>
+                      <p className="text-black/70 mb-2 leading-relaxed text-sm">
                         {product.description}
                       </p>
-                      <p className="product-price">${product.price}</p>
-                      <p className="product-stock">
+                      <p className="text-gold-500 font-bold text-lg mb-1">
+                        ${product.price}
+                      </p>
+                      <p className="text-black/60 text-sm">
                         Stock: {product.stock_quantity}
                       </p>
                     </div>
-                    <button className="btn-gold product-btn">
+                    <button className="w-full bg-gold-500 text-white px-4 py-2 rounded-lg font-semibold hover:bg-gold-600 transition-colors duration-300 shadow-md hover:shadow-lg hover:-translate-y-1">
                       Add to Cart
                     </button>
                   </div>
                 </div>
               ))
             ) : (
-              <div className="no-products">
-                <p>No products found matching your criteria.</p>
+              <div className="col-span-full text-center py-16 text-black/60">
+                <p className="text-lg mb-2">
+                  No products found matching your criteria.
+                </p>
                 <p>Try adjusting your filters or search terms.</p>
               </div>
             )}

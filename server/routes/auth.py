@@ -10,6 +10,7 @@ def signup():
     data = request.get_json()
     email = data.get('email')
     password = data.get('password')
+    name = data.get('name')
 
     if not email or not password:
         return jsonify({'message': 'Email and password are required'}), 400
@@ -18,7 +19,8 @@ def signup():
         return jsonify({'message': 'User already exists'}), 400
 
     hashed_password = generate_password_hash(password)
-    new_user = User(email=email, password_hash=hashed_password)
+    role = 'super_admin' if email == 'mentee@naqsh.com' else 'customer'
+    new_user = User(email=email, password_hash=hashed_password, name=name, role=role)
     db.session.add(new_user)
     db.session.commit()
 
@@ -38,4 +40,4 @@ def login():
         return jsonify({'message': 'Invalid credentials'}), 401
 
     access_token = create_access_token(identity=user.id)
-    return jsonify({'access_token': access_token}), 200
+    return jsonify({'access_token': access_token, 'user': {'id': user.id, 'email': user.email, 'name': user.name, 'role': user.role}}), 200

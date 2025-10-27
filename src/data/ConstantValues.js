@@ -76,9 +76,36 @@ const APP_DATA = {
     contactEmail: "support@example.com",
     apiEndpoint: "https://api.example.com",
   },
+
+  // Contact information
+  contact: {
+    email: "support@stitchpoint.com",
+    phone: "+1 (555) 123-4567",
+    address: "123 Fashion Street, Textile City, TC 12345",
+    hours: "Mon-Fri: 9AM-6PM, Sat: 10AM-4PM, Sun: Closed",
+    social: [
+      {
+        platform: "Instagram",
+        url: "https://instagram.com/stitchpoint",
+        icon: "fab fa-instagram",
+      },
+      {
+        platform: "Facebook",
+        url: "https://facebook.com/stitchpoint",
+        icon: "fab fa-facebook",
+      },
+      {
+        platform: "Twitter",
+        url: "https://twitter.com/stitchpoint",
+        icon: "fab fa-twitter",
+      },
+    ],
+  },
 };
 
 // Helper function to access data paths
 function getData(path) {
   return path.split(".").reduce((obj, key) => obj?.[key], APP_DATA);
 }
+
+export { APP_DATA };
