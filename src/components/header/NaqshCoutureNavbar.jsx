@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 const NaqshCoutureNavbar = () => {
   return (
@@ -14,24 +15,24 @@ const NaqshCoutureNavbar = () => {
         </div>
         <ul className="nav-items font-sans">
           <li>
-            <a href="#" className="nav-link">
+            <Link to="/" className="nav-link">
               Home
-            </a>
+            </Link>
           </li>
           <li>
-            <a href="#" className="nav-link">
+            <Link to="/about" className="nav-link">
               About
-            </a>
+            </Link>
           </li>
           <li>
-            <a href="#" className="nav-link">
+            <Link to="/collections" className="nav-link">
               Collections
-            </a>
+            </Link>
           </li>
           <li>
-            <a href="#" className="nav-link">
+            <Link to="/contact" className="nav-link">
               Contact
-            </a>
+            </Link>
           </li>
         </ul>
         <div className="flex" style={{ gap: "0.75rem" }}>

@@ -12,6 +12,7 @@ import os
 from config import Config
 from models import db
 from routes.auth import auth_bp
+from routes.products import products_bp
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
@@ -26,6 +27,7 @@ CORS(app)
 
 # Register blueprints
 app.register_blueprint(auth_bp, url_prefix='/api/auth')
+app.register_blueprint(products_bp, url_prefix='/api')
 
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
@@ -37,6 +39,9 @@ def serve(path):
 	"""
 	if path != '' and os.path.exists(os.path.join(ROOT, path)):
 		return send_from_directory(ROOT, path)
+	# Do not serve index.html for API routes
+	if path.startswith('api/'):
+		return {'error': 'Not found'}, 404
 	return send_from_directory(ROOT, 'index.html')
 
 
