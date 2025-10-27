@@ -66,6 +66,9 @@ const Login = () => {
           setIsLoading(false);
           if (data.access_token) {
             localStorage.setItem("token", data.access_token);
+            if (data.refresh_token) {
+              localStorage.setItem("refreshToken", data.refresh_token);
+            }
             localStorage.setItem("user", JSON.stringify(data.user));
             const user = data.user;
             toast.success("Login successful!");

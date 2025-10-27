@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_jwt_extended import create_access_token
+from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required, get_jwt_identity
 from models import db, User
 
 auth_bp = Blueprint('auth', __name__)
@@ -39,5 +39,18 @@ def login():
     if not user or not check_password_hash(user.password_hash, password):
         return jsonify({'message': 'Invalid credentials'}), 401
 
-    access_token = create_access_token(identity=user.id)
-    return jsonify({'access_token': access_token, 'user': {'id': user.id, 'email': user.email, 'name': user.name, 'role': user.role}}), 200
+    # Ensure the JWT "sub"/identity is a string to satisfy PyJWT validation
+    access_token = create_access_token(identity=str(user.id))
+    refresh_token = create_refresh_token(identity=str(user.id))
+    return jsonify({'access_token': access_token, 'refresh_token': refresh_token, 'user': {'id': user.id, 'email': user.email, 'name': user.name, 'role': user.role}}), 200
+
+
+
+@auth_bp.route('/refresh', methods=['POST'])
+@jwt_required(refresh=True)
+def refresh():
+    # Issue a new access token using a valid refresh token
+    identity = get_jwt_identity()
+    # identity stored as string; return access token with same identity
+    new_access = create_access_token(identity=identity)
+    return jsonify({'access_token': new_access}), 200
