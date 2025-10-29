@@ -41,6 +41,12 @@ const ProductDetails = ({
   const [submittingReview, setSubmittingReview] = useState(false);
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState(0);
+  const [comments, setComments] = useState([]);
+  const [commentForm, setCommentForm] = useState({
+    comment: "",
+    user_name: "",
+  });
+  const [submittingComment, setSubmittingComment] = useState(false);
 
   const fetchRecommendations = useCallback(async (prodId) => {
     try {
@@ -148,6 +154,78 @@ const ProductDetails = ({
     }
   };
 
+  const submitComment = async (e) => {
+    e.preventDefault();
+    if (!product || !product.id) return;
+
+    const token = localStorage.getItem("token");
+    const user = localStorage.getItem("user")
+      ? JSON.parse(localStorage.getItem("user"))
+      : null;
+
+    // Validate comment form
+    const comment = (commentForm.comment || "").trim();
+    const user_name = (
+      commentForm.user_name ||
+      (user && user.name) ||
+      ""
+    ).trim();
+
+    if (!comment) {
+      toast.error("Please enter a comment");
+      return;
+    }
+    if (!token && !user_name) {
+      toast.error("Please provide your name to post a comment");
+      return;
+    }
+
+    setSubmittingComment(true); // New loading state
+    try {
+      const url = `http://127.0.0.1:5000/api/products/${product.id}/comments`;
+      const body = { comment };
+      if (!token) body.user_name = user_name;
+
+      const headers = { "Content-Type": "application/json" };
+      if (token) headers["Authorization"] = `Bearer ${token}`;
+
+      const res = await fetch(url, {
+        method: "POST",
+        headers,
+        body: JSON.stringify(body),
+      });
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(text || "Failed to submit comment");
+      }
+
+      await res.json();
+      toast.success("Comment submitted");
+      // Clear form and refresh comments
+      setCommentForm({ comment: "", user_name: "" });
+      fetchComments(product.id);
+    } catch (err) {
+      console.error("Submit comment error", err);
+      toast.error("Failed to submit comment");
+    } finally {
+      setSubmittingComment(false);
+    }
+  };
+
+  const fetchComments = async (productId) => {
+    try {
+      const res = await fetch(
+        `http://127.0.0.1:5000/api/products/${productId}/comments`
+      );
+      if (res.ok) {
+        const data = await res.json();
+        setComments(data.comments || []);
+      }
+    } catch (err) {
+      console.error("Fetch comments error", err);
+    }
+  };
+
   const submitReview = async (e) => {
     e.preventDefault();
     if (!product || !product.id) return;
@@ -252,54 +330,69 @@ const ProductDetails = ({
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white shadow-sm border-b">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+      {/* Enhanced Header */}
+      <div className="bg-white shadow-lg border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <button
               onClick={() => navigate("/collections")}
-              className="flex items-center text-gray-600 hover:text-gray-900 transition-colors"
+              className="flex items-center text-gray-700 hover:text-gray-900 transition-all duration-300 text-sm font-medium hover:bg-gray-50 px-3 py-2 rounded-lg"
             >
               <FaArrowLeft className="mr-2" />
               Back to Collections
             </button>
-            <button className="text-gray-600 hover:text-gray-900 transition-colors">
-              <FaShare size={20} />
-            </button>
+            <div className="flex items-center space-x-3">
+              <button className="text-gray-600 hover:text-gray-900 transition-all duration-300 p-2 rounded-full hover:bg-gray-50">
+                <FaShare size={18} />
+              </button>
+              <button
+                onClick={handleAddToWishlist}
+                className={`p-2 rounded-full transition-all duration-300 ${
+                  inWishlist
+                    ? "bg-red-50 text-red-600 hover:bg-red-100"
+                    : "text-gray-600 hover:bg-gray-50"
+                }`}
+              >
+                <FaHeart size={18} />
+              </button>
+            </div>
           </div>
         </div>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          {/* Product Images */}
-          <div className="space-y-4">
-            <div className="aspect-square bg-white rounded-2xl shadow-lg overflow-hidden">
+          {/* Enhanced Product Images Gallery */}
+          <div className="space-y-6">
+            <div className="relative aspect-square bg-white rounded-3xl shadow-2xl overflow-hidden group">
               <img
                 src={
-                  product.image_url
+                  images[selectedImage]
+                    ? `http://127.0.0.1:5000${images[selectedImage]}`
+                    : product.image_url
                     ? `http://127.0.0.1:5000${product.image_url}`
                     : "/placeholder-image.jpg"
                 }
                 alt={product.name}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                 onError={(e) => {
                   e.target.src = "/placeholder-image.jpg";
                 }}
               />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
             </div>
+
             {images.length > 1 && (
-              <div className="flex gap-2">
+              <div className="flex gap-3 overflow-x-auto pb-2">
                 {images.map((img, i) => (
                   <div
                     key={i}
-                    className={`w-24 h-24 rounded-lg overflow-hidden cursor-pointer transition-all duration-200 ${
-                      selectedImage === i ? "ring-2 ring-yellow-500" : ""
+                    className={`flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden cursor-pointer transition-all duration-300 border-2 ${
+                      selectedImage === i
+                        ? "border-yellow-500 ring-4 ring-yellow-500/20 scale-110"
+                        : "border-gray-200 hover:border-gray-300"
                     }`}
-                    style={{
-                      opacity: selectedImage === i ? 1 : 0.7,
-                    }}
                     onClick={() => setSelectedImage(i)}
                   >
                     <img
@@ -311,419 +404,547 @@ const ProductDetails = ({
                 ))}
               </div>
             )}
+
+            {/* Zoom indicator */}
+            <div className="text-center">
+              <span className="text-sm text-gray-500 bg-white px-3 py-1 rounded-full shadow-sm">
+                Click images to zoom • {images.length} image
+                {images.length !== 1 ? "s" : ""}
+              </span>
+            </div>
           </div>
 
-          {/* Product Details */}
+          {/* Enhanced Product Details */}
           <div className="space-y-6">
-            <div>
-              <h1 className="text-4xl font-bold text-gray-900 mb-4">
-                {product.name}
-              </h1>
+            <div className="bg-white rounded-3xl p-8 shadow-xl">
+              <div className="mb-6">
+                <h1 className="text-3xl font-bold text-gray-900 mb-4 leading-tight">
+                  {product.name}
+                </h1>
 
-              {/* Rating */}
-              <div className="flex items-center space-x-4 mb-6">
-                <div className="flex items-center">
-                  {[...Array(5)].map((_, i) => (
-                    <FaStar key={i} className="text-yellow-500" size={20} />
-                  ))}
-                </div>
-                <span className="text-lg text-gray-600 font-medium">
-                  4.5 (24 reviews)
-                </span>
-              </div>
-
-              {/* Price */}
-              <div
-                className="text-3xl font-bold text-gray-900 mb-6"
-                style={{ color: "#d4af37" }}
-              >
-                ${product.price}
-              </div>
-
-              {/* Stock Status */}
-              <div className="flex items-center space-x-4 mb-6">
-                <span
-                  className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-medium ${
-                    product.stock_quantity > 0
-                      ? "bg-green-100 text-green-800"
-                      : "bg-red-100 text-red-800"
-                  }`}
-                >
-                  {product.stock_quantity > 0 ? "In Stock" : "Out of Stock"}
-                </span>
-                {product.stock_quantity > 0 && (
-                  <span className="text-gray-600">
-                    {product.stock_quantity} available
+                {/* Enhanced Rating */}
+                <div className="flex items-center space-x-4 mb-6">
+                  <div className="flex items-center bg-yellow-50 px-3 py-2 rounded-full">
+                    {[...Array(5)].map((_, i) => (
+                      <FaStar key={i} className="text-yellow-500" size={18} />
+                    ))}
+                  </div>
+                  <span className="text-sm text-gray-600 font-semibold">
+                    4.5 (24 reviews)
                   </span>
-                )}
-              </div>
+                  <span className="text-sm text-gray-400">•</span>
+                  <span className="text-sm text-gray-600">Highly rated</span>
+                </div>
 
-              {/* Quantity Selector */}
-              <div className="flex items-center space-x-4 mb-8">
-                <label className="text-gray-700 font-medium">Quantity:</label>
-                <div className="flex items-center border border-gray-300 rounded-lg">
-                  <button
-                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                    className="px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                {/* Enhanced Price */}
+                <div className="mb-6">
+                  <div
+                    className="text-4xl font-bold mb-2"
+                    style={{ color: "#d4af37" }}
                   >
-                    <FaMinus size={14} />
-                  </button>
-                  <span className="px-4 py-2 border-x border-gray-300">
-                    {quantity}
-                  </span>
-                  <button
-                    onClick={() => setQuantity(quantity + 1)}
-                    className="px-3 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                    ${product.price}
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <span className="text-sm text-gray-500 line-through">
+                      $299.99
+                    </span>
+                    <span className="text-sm font-semibold text-green-600 bg-green-50 px-2 py-1 rounded">
+                      Save 20%
+                    </span>
+                  </div>
+                </div>
+
+                {/* Enhanced Stock Status */}
+                <div className="flex items-center space-x-4 mb-6">
+                  <span
+                    className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold ${
+                      product.stock_quantity > 0
+                        ? "bg-green-100 text-green-800 border border-green-200"
+                        : "bg-red-100 text-red-800 border border-red-200"
+                    }`}
                   >
-                    <FaPlus size={14} />
-                  </button>
-                </div>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="flex space-x-4 mb-8">
-                <button
-                  onClick={handleAddToCart}
-                  disabled={product.stock_quantity === 0}
-                  className="flex-1 px-8 py-4 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
-                  style={{
-                    backgroundColor:
-                      product.stock_quantity > 0 ? "#d4af37" : "#9ca3af",
-                    color: "#000000",
-                  }}
-                  onMouseEnter={(e) => {
-                    if (product.stock_quantity > 0) {
-                      e.currentTarget.style.backgroundColor = "#b8860b";
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (product.stock_quantity > 0) {
-                      e.currentTarget.style.backgroundColor = "#d4af37";
-                    }
-                  }}
-                >
-                  <FaShoppingCart size={20} />
-                  <span>Add to Cart</span>
-                </button>
-
-                <button
-                  onClick={handleAddToWishlist}
-                  className={`px-8 py-4 rounded-xl font-semibold transition-all duration-300 flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl transform hover:-translate-y-1 ${
-                    inWishlist
-                      ? "bg-red-500 text-white hover:bg-red-600"
-                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                  }`}
-                >
-                  <FaHeart size={20} />
-                  <span>{inWishlist ? "In Wishlist" : "Add to Wishlist"}</span>
-                </button>
-              </div>
-
-              {/* Product Features */}
-              <div className="grid grid-cols-3 gap-4 mb-8">
-                <div className="text-center p-4 bg-white rounded-lg shadow-sm">
-                  <FaTruck className="mx-auto mb-2 text-yellow-500" size={24} />
-                  <p className="text-sm text-gray-600">Free Shipping</p>
-                </div>
-                <div className="text-center p-4 bg-white rounded-lg shadow-sm">
-                  <FaShieldAlt
-                    className="mx-auto mb-2 text-yellow-500"
-                    size={24}
-                  />
-                  <p className="text-sm text-gray-600">2 Year Warranty</p>
-                </div>
-                <div className="text-center p-4 bg-white rounded-lg shadow-sm">
-                  <FaUndo className="mx-auto mb-2 text-yellow-500" size={24} />
-                  <p className="text-sm text-gray-600">30 Day Returns</p>
-                </div>
-              </div>
-
-              {/* Tabs: Description / Images / Reviews */}
-              <div className="mt-6">
-                <div className="flex space-x-3 border-b mb-6">
-                  {[
-                    { key: "description", label: "Description" },
-                    { key: "images", label: "Images" },
-                    { key: "reviews", label: "Reviews" },
-                  ].map((t) => (
-                    <button
-                      key={t.key}
-                      onClick={() => setActiveTab(t.key)}
-                      className={`px-4 py-2 -mb-px font-medium transition-colors duration-200 ${
-                        activeTab === t.key
-                          ? "border-b-2 border-yellow-500 text-yellow-600"
-                          : "text-gray-600 hover:text-gray-900"
+                    <div
+                      className={`w-2 h-2 rounded-full mr-2 ${
+                        product.stock_quantity > 0
+                          ? "bg-green-500"
+                          : "bg-red-500"
                       }`}
-                    >
-                      {t.label}
-                    </button>
-                  ))}
+                    ></div>
+                    {product.stock_quantity > 0 ? "In Stock" : "Out of Stock"}
+                  </span>
+                  {product.stock_quantity > 0 && (
+                    <span className="text-gray-600 text-sm font-medium">
+                      {product.stock_quantity} available
+                    </span>
+                  )}
                 </div>
 
-                {/* Tab content */}
-                <div>
-                  {activeTab === "description" && (
-                    <div className="prose text-gray-700">
-                      <p>{product.description}</p>
-                      {/* Show some product specs if available */}
-                      <dl className="mt-4 grid grid-cols-1 gap-2 text-sm text-gray-600">
+                {/* Enhanced Quantity Selector */}
+                <div className="flex items-center space-x-4 mb-8">
+                  <label className="text-gray-700 font-semibold">
+                    Quantity:
+                  </label>
+                  <div className="flex items-center border-2 border-gray-200 rounded-xl overflow-hidden">
+                    <button
+                      onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                      className="px-4 py-3 text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors duration-200"
+                      disabled={quantity <= 1}
+                    >
+                      <FaMinus size={14} />
+                    </button>
+                    <span className="px-6 py-3 text-lg font-semibold border-x border-gray-200">
+                      {quantity}
+                    </span>
+                    <button
+                      onClick={() => setQuantity(quantity + 1)}
+                      className="px-4 py-3 text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors duration-200"
+                      disabled={quantity >= product.stock_quantity}
+                    >
+                      <FaPlus size={14} />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Enhanced Action Buttons */}
+                <div className="flex flex-col sm:flex-row gap-4 mb-8">
+                  <button
+                    onClick={handleAddToCart}
+                    disabled={product.stock_quantity === 0}
+                    className="flex-1 px-8 py-4 rounded-xl font-bold transition-all duration-300 flex items-center justify-center space-x-3 shadow-lg hover:shadow-xl transform hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed"
+                    style={{
+                      backgroundColor:
+                        product.stock_quantity > 0 ? "#d4af37" : "#9ca3af",
+                      color: "#000000",
+                    }}
+                    onMouseEnter={(e) => {
+                      if (product.stock_quantity > 0) {
+                        e.currentTarget.style.backgroundColor = "#b8860b";
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (product.stock_quantity > 0) {
+                        e.currentTarget.style.backgroundColor = "#d4af37";
+                      }
+                    }}
+                  >
+                    <FaShoppingCart size={20} />
+                    <span className="text-lg">Add to Cart</span>
+                  </button>
+
+                  <button
+                    onClick={handleAddToWishlist}
+                    className={`px-8 py-4 rounded-xl font-bold transition-all duration-300 flex items-center justify-center space-x-3 shadow-lg hover:shadow-xl transform hover:-translate-y-1 ${
+                      inWishlist
+                        ? "bg-red-500 text-white hover:bg-red-600"
+                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                    }`}
+                  >
+                    <FaHeart size={20} />
+                    <span className="text-lg">
+                      {inWishlist ? "In Wishlist" : "Add to Wishlist"}
+                    </span>
+                  </button>
+                </div>
+
+                {/* Product Features */}
+                <div className="grid grid-cols-3 gap-3 mb-6">
+                  <div className="text-center p-3 bg-white rounded-lg shadow-sm">
+                    <FaTruck
+                      className="mx-auto mb-1 text-yellow-500"
+                      size={20}
+                    />
+                    <p className="text-xs text-gray-600">Free Shipping</p>
+                  </div>
+                  <div className="text-center p-3 bg-white rounded-lg shadow-sm">
+                    <FaShieldAlt
+                      className="mx-auto mb-1 text-yellow-500"
+                      size={20}
+                    />
+                    <p className="text-xs text-gray-600">2 Year Warranty</p>
+                  </div>
+                  <div className="text-center p-3 bg-white rounded-lg shadow-sm">
+                    <FaUndo
+                      className="mx-auto mb-1 text-yellow-500"
+                      size={20}
+                    />
+                    <p className="text-xs text-gray-600">30 Day Returns</p>
+                  </div>
+                </div>
+
+                {/* Enhanced Tabs: Description / Specifications */}
+                <div className="mt-8">
+                  <div className="flex space-x-1 border-b border-gray-200 mb-6">
+                    {[
+                      { key: "description", label: "Description" },
+                      { key: "specifications", label: "Specifications" },
+                    ].map((t) => (
+                      <button
+                        key={t.key}
+                        onClick={() => setActiveTab(t.key)}
+                        className={`px-5 py-3 font-medium text-sm rounded-t-lg transition-all duration-300 ${
+                          activeTab === t.key
+                            ? "bg-yellow-500 text-white shadow-md"
+                            : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                        }`}
+                      >
+                        {t.label}
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Tab content */}
+                  <div className="bg-gray-50 rounded-2xl p-6 min-h-[200px]">
+                    {activeTab === "description" && (
+                      <div className="prose text-gray-700 max-w-none">
+                        <p className="text-lg leading-relaxed">
+                          {product.description}
+                        </p>
+                      </div>
+                    )}
+
+                    {activeTab === "specifications" && (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {product.artisan_name && (
-                          <div>
-                            <dt className="font-medium">Artisan</dt>
-                            <dd>{product.artisan_name}</dd>
+                          <div className="bg-white p-4 rounded-xl shadow-sm">
+                            <dt className="font-semibold text-gray-900 mb-1">
+                              Artisan
+                            </dt>
+                            <dd className="text-gray-600">
+                              {product.artisan_name}
+                            </dd>
                           </div>
                         )}
                         {product.materials && (
-                          <div>
-                            <dt className="font-medium">Materials</dt>
-                            <dd>{product.materials}</dd>
+                          <div className="bg-white p-4 rounded-xl shadow-sm">
+                            <dt className="font-semibold text-gray-900 mb-1">
+                              Materials
+                            </dt>
+                            <dd className="text-gray-600">
+                              {product.materials}
+                            </dd>
                           </div>
                         )}
                         {product.dimensions && (
-                          <div>
-                            <dt className="font-medium">Dimensions</dt>
-                            <dd>{product.dimensions}</dd>
+                          <div className="bg-white p-4 rounded-xl shadow-sm">
+                            <dt className="font-semibold text-gray-900 mb-1">
+                              Dimensions
+                            </dt>
+                            <dd className="text-gray-600">
+                              {product.dimensions}
+                            </dd>
                           </div>
                         )}
                         {product.weight && (
-                          <div>
-                            <dt className="font-medium">Weight</dt>
-                            <dd>{product.weight}</dd>
+                          <div className="bg-white p-4 rounded-xl shadow-sm">
+                            <dt className="font-semibold text-gray-900 mb-1">
+                              Weight
+                            </dt>
+                            <dd className="text-gray-600">{product.weight}</dd>
                           </div>
                         )}
                         {product.care_instructions && (
-                          <div>
-                            <dt className="font-medium">Care</dt>
-                            <dd>{product.care_instructions}</dd>
+                          <div className="bg-white p-4 rounded-xl shadow-sm md:col-span-2">
+                            <dt className="font-semibold text-gray-900 mb-1">
+                              Care Instructions
+                            </dt>
+                            <dd className="text-gray-600">
+                              {product.care_instructions}
+                            </dd>
                           </div>
                         )}
-                      </dl>
-                    </div>
-                  )}
-
-                  {activeTab === "images" && (
-                    <div className="space-y-4">
-                      <div className="w-full bg-white rounded-xl overflow-hidden shadow">
-                        <img
-                          src={
-                            images[0]
-                              ? `http://127.0.0.1:5000${images[0]}`
-                              : "/placeholder-image.jpg"
-                          }
-                          alt={product.name}
-                          className="w-full h-96 object-cover"
-                        />
+                        {!product.artisan_name &&
+                          !product.materials &&
+                          !product.dimensions &&
+                          !product.weight &&
+                          !product.care_instructions && (
+                            <p className="text-gray-600 col-span-full text-center py-4">
+                              No specifications available for this product.
+                            </p>
+                          )}
                       </div>
-                      {images.length > 1 && (
-                        <div className="flex gap-2">
-                          {images.map((img, i) => (
-                            <img
-                              key={i}
-                              src={`http://127.0.0.1:5000${img}`}
-                              alt={`img-${i}`}
-                              className="w-24 h-24 object-cover rounded"
-                            />
-                          ))}
-                        </div>
-                      )}
-                      {images.length === 0 && (
-                        <p className="text-gray-600">
-                          No images available for this product.
-                        </p>
-                      )}
-                    </div>
-                  )}
+                    )}
+                  </div>
+                </div>
 
-                  {activeTab === "reviews" && (
-                    <div>
-                      {/* Review submission form */}
-                      <form onSubmit={submitReview} className="mb-6">
-                        <div className="bg-white p-4 rounded-lg shadow-sm mb-4">
-                          <div className="flex items-center gap-4 mb-3">
-                            <label className="text-sm font-medium text-gray-700">
-                              Rating
-                            </label>
-                            <select
-                              value={reviewForm.rating}
-                              onChange={(e) =>
-                                setReviewForm((s) => ({
-                                  ...s,
-                                  rating: e.target.value,
-                                }))
-                              }
-                              className="px-2 py-1 border border-gray-300 rounded"
-                            >
-                              <option value={5}>5</option>
-                              <option value={4}>4</option>
-                              <option value={3}>3</option>
-                              <option value={2}>2</option>
-                              <option value={1}>1</option>
-                            </select>
-                            {!localStorage.getItem("token") && (
-                              <input
-                                type="text"
-                                placeholder="Your name"
-                                value={reviewForm.user_name}
-                                onChange={(e) =>
-                                  setReviewForm((s) => ({
-                                    ...s,
-                                    user_name: e.target.value,
-                                  }))
-                                }
-                                className="ml-4 px-2 py-1 border border-gray-300 rounded flex-1"
-                              />
-                            )}
-                          </div>
-                          <textarea
-                            placeholder="Write your review..."
-                            value={reviewForm.comment}
+                {/* Reviews Section */}
+                <div className="mt-8">
+                  <h3 className="text-xl font-bold text-gray-900 mb-6">
+                    Customer Reviews
+                  </h3>
+                  <div className="bg-gray-50 rounded-2xl p-6">
+                    <form onSubmit={submitReview}>
+                      <div className="mb-4">
+                        <div className="flex items-center space-x-4 mb-3">
+                          <label className="text-gray-700 font-semibold">
+                            Rating:
+                          </label>
+                          <select
+                            value={reviewForm.rating}
                             onChange={(e) =>
                               setReviewForm((s) => ({
                                 ...s,
-                                comment: e.target.value,
+                                rating: e.target.value,
                               }))
                             }
-                            className="w-full px-3 py-2 border border-gray-300 rounded mb-3"
-                          />
-                          <div className="text-right">
-                            <button
-                              type="submit"
-                              disabled={submittingReview}
-                              className="px-4 py-2 rounded-lg disabled:opacity-60 transition-all duration-200"
-                              style={{
-                                backgroundColor: "#d4af37",
-                                color: "#000000",
-                              }}
-                              onMouseEnter={(e) => {
-                                e.currentTarget.style.backgroundColor =
-                                  "#b8860b";
-                              }}
-                              onMouseLeave={(e) => {
-                                e.currentTarget.style.backgroundColor =
-                                  "#d4af37";
-                              }}
-                            >
-                              {submittingReview
-                                ? "Submitting..."
-                                : "Submit Review"}
-                            </button>
-                          </div>
+                            className="px-2 py-1 border border-gray-300 rounded"
+                          >
+                            <option value={5}>5</option>
+                            <option value={4}>4</option>
+                            <option value={3}>3</option>
+                            <option value={2}>2</option>
+                            <option value={1}>1</option>
+                          </select>
+                          {!localStorage.getItem("token") && (
+                            <input
+                              type="text"
+                              placeholder="Your name"
+                              value={reviewForm.user_name}
+                              onChange={(e) =>
+                                setReviewForm((s) => ({
+                                  ...s,
+                                  user_name: e.target.value,
+                                }))
+                              }
+                              className="ml-4 px-2 py-1 border border-gray-300 rounded flex-1"
+                            />
+                          )}
                         </div>
-                      </form>
+                        <textarea
+                          placeholder="Write your review..."
+                          value={reviewForm.comment}
+                          onChange={(e) =>
+                            setReviewForm((s) => ({
+                              ...s,
+                              comment: e.target.value,
+                            }))
+                          }
+                          className="w-full px-3 py-2 border border-gray-300 rounded mb-3"
+                        />
+                        <div className="text-right">
+                          <button
+                            type="submit"
+                            disabled={submittingReview}
+                            className="px-4 py-2 rounded-lg disabled:opacity-60 transition-all duration-200"
+                            style={{
+                              backgroundColor: "#d4af37",
+                              color: "#000000",
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.backgroundColor = "#b8860b";
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.backgroundColor = "#d4af37";
+                            }}
+                          >
+                            {submittingReview
+                              ? "Submitting..."
+                              : "Submit Review"}
+                          </button>
+                        </div>
+                      </div>
+                    </form>
 
-                      {reviews.length === 0 ? (
-                        <p className="text-gray-600">
-                          No reviews yet. Be the first to review this product.
-                        </p>
-                      ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                          {reviews.map((review) => (
-                            <div
-                              key={review.id}
-                              className="bg-white p-6 rounded-xl shadow-sm border"
-                            >
-                              <div className="flex items-center justify-between mb-4">
-                                <div className="flex items-center space-x-3">
-                                  <div className="w-10 h-10 bg-yellow-500 rounded-full flex items-center justify-center">
-                                    <FaUser className="text-white" size={16} />
-                                  </div>
-                                  <div>
-                                    <p className="font-semibold text-gray-900">
-                                      {review.user_name || "Anonymous"}
-                                    </p>
-                                    <p className="text-sm text-gray-500">
-                                      {review.created_at
-                                        ? new Date(
-                                            review.created_at
-                                          ).toLocaleDateString()
-                                        : ""}
-                                    </p>
-                                  </div>
+                    {reviews.length === 0 ? (
+                      <p className="text-gray-600">
+                        No reviews yet. Be the first to review this product.
+                      </p>
+                    ) : (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {reviews.map((review) => (
+                          <div
+                            key={review.id}
+                            className="bg-white p-6 rounded-xl shadow-sm border"
+                          >
+                            <div className="flex items-center justify-between mb-4">
+                              <div className="flex items-center space-x-3">
+                                <div className="w-10 h-10 bg-yellow-500 rounded-full flex items-center justify-center">
+                                  <FaUser className="text-white" size={16} />
                                 </div>
-                                <div className="flex items-center">
-                                  {[...Array(review.rating)].map((_, i) => (
-                                    <FaStar
-                                      key={i}
-                                      className="text-yellow-500"
-                                      size={14}
-                                    />
-                                  ))}
+                                <div>
+                                  <p className="font-semibold text-gray-900">
+                                    {review.user_name || "Anonymous"}
+                                  </p>
+                                  <p className="text-sm text-gray-500">
+                                    {review.created_at
+                                      ? new Date(
+                                          review.created_at
+                                        ).toLocaleDateString()
+                                      : ""}
+                                  </p>
                                 </div>
                               </div>
-                              <p className="text-gray-700">{review.comment}</p>
+                              <div className="flex items-center">
+                                {[...Array(review.rating)].map((_, i) => (
+                                  <FaStar
+                                    key={i}
+                                    className="text-yellow-500"
+                                    size={14}
+                                  />
+                                ))}
+                              </div>
                             </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  )}
+                            <p className="text-gray-700">{review.comment}</p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
 
-              {/* Store Info */}
-              {product.store_name && (
-                <div className="bg-white p-6 rounded-xl shadow-sm border mt-6">
-                  <h3 className="font-semibold text-gray-900 mb-3">
-                    Store Information
+                {/* Comments Section */}
+                <div className="mt-8">
+                  <h3 className="text-xl font-bold text-gray-900 mb-6">
+                    Comments
                   </h3>
-                  <p className="text-gray-600 mb-2">
-                    <strong>Store:</strong> {product.store_name}
-                  </p>
-                  <p className="text-gray-600">
-                    <strong>Category:</strong> {product.category || "General"}
-                  </p>
+                  <div className="bg-gray-50 rounded-2xl p-6">
+                    <form onSubmit={submitComment}>
+                      <div className="mb-4">
+                        {!localStorage.getItem("token") && (
+                          <input
+                            type="text"
+                            placeholder="Your name"
+                            value={commentForm.user_name}
+                            onChange={(e) =>
+                              setCommentForm((s) => ({
+                                ...s,
+                                user_name: e.target.value,
+                              }))
+                            }
+                            className="mb-3 px-2 py-1 border border-gray-300 rounded w-full"
+                          />
+                        )}
+                        <textarea
+                          placeholder="Write your comment..."
+                          value={commentForm.comment}
+                          onChange={(e) =>
+                            setCommentForm((s) => ({
+                              ...s,
+                              comment: e.target.value,
+                            }))
+                          }
+                          className="w-full px-3 py-2 border border-gray-300 rounded mb-3"
+                        />
+                        <div className="text-right">
+                          <button
+                            type="submit"
+                            disabled={submittingComment}
+                            className="px-4 py-2 rounded-lg disabled:opacity-60 transition-all duration-200"
+                            style={{
+                              backgroundColor: "#d4af37",
+                              color: "#000000",
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.backgroundColor = "#b8860b";
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.backgroundColor = "#d4af37";
+                            }}
+                          >
+                            {submittingComment
+                              ? "Submitting..."
+                              : "Post Comment"}
+                          </button>
+                        </div>
+                      </div>
+                    </form>
+
+                    {/* Display comments */}
+                    {comments.length === 0 ? (
+                      <p className="text-gray-600">
+                        No comments yet. Be the first to share your thoughts!
+                      </p>
+                    ) : (
+                      <div className="grid grid-cols-1 gap-4">
+                        {comments.map((comment) => (
+                          <div
+                            key={comment.id}
+                            className="bg-gray-50 p-4 rounded-lg border border-gray-200"
+                          >
+                            <div className="flex items-center justify-between mb-2">
+                              <div className="flex items-center space-x-3">
+                                <div className="w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center">
+                                  <FaUser className="text-white" size={14} />
+                                </div>
+                                <div>
+                                  <p className="font-semibold text-gray-900 text-sm">
+                                    {comment.user_name || "Anonymous"}
+                                  </p>
+                                  <p className="text-xs text-gray-500">
+                                    {comment.created_at
+                                      ? new Date(
+                                          comment.created_at
+                                        ).toLocaleDateString()
+                                      : ""}
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+                            <p className="text-gray-700">{comment.comment}</p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
-              )}
+
+                {/* Store Info */}
+                {product.store_name && (
+                  <div className="bg-white p-6 rounded-xl shadow-sm border mt-6">
+                    <h3 className="font-semibold text-gray-900 mb-3">
+                      Store Information
+                    </h3>
+                    <p className="text-gray-600 mb-2">
+                      <strong>Store:</strong> {product.store_name}
+                    </p>
+                    <p className="text-gray-600">
+                      <strong>Category:</strong> {product.category || "General"}
+                    </p>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Comments Section - Now below product details */}
-        <div className="mt-12">
-          <div className="bg-white rounded-xl shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Comments</h2>
-            <p className="text-gray-600">
-              Comments are not supported yet. Coming soon.
-            </p>
-          </div>
-        </div>
-
-        {/* Recommendations Section */}
-        <div className="mt-16">
-          <h2 className="text-3xl font-bold text-gray-900 mb-8">
-            You Might Also Like
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {recommendations.map((rec) => (
-              <div
-                key={rec.id}
-                className="bg-white rounded-xl shadow-sm border overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer transform hover:-translate-y-1"
-                onClick={() => navigate(`/product/${rec.id}`)}
-              >
-                <div className="aspect-square bg-gray-100">
-                  <img
-                    src={
-                      rec.image_url
-                        ? `http://127.0.0.1:5000${rec.image_url}`
-                        : "/placeholder-image.jpg"
-                    }
-                    alt={rec.name}
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      e.target.src = "/placeholder-image.jpg";
-                    }}
-                  />
+          {/* Recommendations Section */}
+          <div className="mt-12">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">
+              You Might Also Like
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {recommendations.map((rec) => (
+                <div
+                  key={rec.id}
+                  className="bg-white rounded-lg shadow-sm border overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer transform hover:-translate-y-1"
+                  onClick={() => navigate(`/product/${rec.id}`)}
+                >
+                  <div className="aspect-square bg-gray-100">
+                    <img
+                      src={
+                        rec.image_url
+                          ? `http://127.0.0.1:5000${rec.image_url}`
+                          : "/placeholder-image.jpg"
+                      }
+                      alt={rec.name}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        e.target.src = "/placeholder-image.jpg";
+                      }}
+                    />
+                  </div>
+                  <div className="p-4">
+                    <h3 className="font-semibold text-gray-900 mb-1 text-sm">
+                      {rec.name}
+                    </h3>
+                    <p
+                      className="font-bold text-base"
+                      style={{ color: "#d4af37" }}
+                    >
+                      ${rec.price}
+                    </p>
+                  </div>
                 </div>
-                <div className="p-6">
-                  <h3 className="font-semibold text-gray-900 mb-2">
-                    {rec.name}
-                  </h3>
-                  <p className="font-bold text-lg" style={{ color: "#d4af37" }}>
-                    ${rec.price}
-                  </p>
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       </div>

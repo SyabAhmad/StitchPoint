@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { FaEdit, FaTrash, FaPlus, FaTimes } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 const ManagerProducts = () => {
   const [products, setProducts] = useState([]);
@@ -25,6 +26,12 @@ const ManagerProducts = () => {
     care_instructions: "",
   });
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const [productsPerPage] = useState(10); // Number of products per page
+  const [totalProducts, setTotalProducts] = useState(0);
+
+  const navigate = useNavigate();
+
   useEffect(() => {
     const userData = JSON.parse(localStorage.getItem("user"));
     if (!userData || userData.role !== "manager") {
@@ -32,18 +39,21 @@ const ManagerProducts = () => {
       return;
     }
     setUser(userData);
-    fetchProducts();
+    fetchProducts(currentPage, productsPerPage);
     fetchCategories();
-  }, []);
+  }, [currentPage, productsPerPage]);
 
-  const fetchProducts = async () => {
+  const fetchProducts = async (page, perPage) => {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch("http://localhost:5000/api/products", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await fetch(
+        `http://localhost:5000/api/products?page=${page}&per_page=${perPage}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
       const data = await response.json();
       // Filter products to only show those from the manager's store
       const userData = JSON.parse(localStorage.getItem("user"));
@@ -52,8 +62,10 @@ const ManagerProducts = () => {
           (product) => product.store_name === userData.store_name
         );
         setProducts(storeProducts || []);
+        setTotalProducts(data.total_products); // Assuming API returns total_products
       } else {
         setProducts(data.products || []);
+        setTotalProducts(data.total_products); // Assuming API returns total_products
       }
     } catch (error) {
       console.error("Error fetching products:", error);
@@ -120,7 +132,7 @@ const ManagerProducts = () => {
       }
 
       if (response.ok) {
-        fetchProducts();
+        fetchProducts(currentPage, productsPerPage);
         setShowAddForm(false);
         setEditingProduct(null);
         setFormData({
@@ -186,7 +198,7 @@ const ManagerProducts = () => {
       );
 
       if (response.ok) {
-        fetchProducts();
+        fetchProducts(currentPage, productsPerPage);
         alert("Product deleted!");
       } else {
         alert("Error deleting product");
@@ -195,6 +207,14 @@ const ManagerProducts = () => {
       console.error("Error deleting product:", error);
       alert("Error deleting product");
     }
+  };
+
+  // Calculate total pages
+  const totalPages = Math.ceil(totalProducts / productsPerPage);
+
+  // Handle page change
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
   };
 
   if (loading) {
@@ -784,8 +804,9 @@ const ManagerProducts = () => {
                   }}
                 >
                   <td
-                    className="px-6 py-4 whitespace-nowrap text-sm font-medium"
+                    className="px-6 py-4 whitespace-nowrap text-sm font-medium cursor-pointer hover:underline"
                     style={{ color: "#ffffff" }}
+                    onClick={() => navigate(`/product/${product.id}`)}
                   >
                     {product.name}
                   </td>
@@ -849,6 +870,81 @@ const ManagerProducts = () => {
           )}
         </div>
       </div>
+
+      {/* Pagination Controls */}
+      {totalPages > 1 && (
+        <div className="flex justify-center mt-6 space-x-2">
+          <button
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+            className="px-4 py-2 rounded transition-colors duration-200"
+            style={{
+              backgroundColor: currentPage === 1 ? "#555555" : "#d4af37",
+              color: currentPage === 1 ? "#999999" : "#000000",
+              cursor: currentPage === 1 ? "not-allowed" : "pointer",
+            }}
+            onMouseEnter={(e) => {
+              if (currentPage !== 1) {
+                e.currentTarget.style.backgroundColor = "#b8860b";
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (currentPage !== 1) {
+                e.currentTarget.style.backgroundColor = "#d4af37";
+              }
+            }}
+          >
+            Previous
+          </button>
+          {[...Array(totalPages)].map((_, i) => (
+            <button
+              key={i + 1}
+              onClick={() => handlePageChange(i + 1)}
+              className="px-4 py-2 rounded transition-colors duration-200"
+              style={{
+                backgroundColor: currentPage === i + 1 ? "#d4af37" : "#2d2d2d",
+                color: currentPage === i + 1 ? "#000000" : "#ffffff",
+                border: "1px solid #3d3d3d",
+              }}
+              onMouseEnter={(e) => {
+                if (currentPage !== i + 1) {
+                  e.currentTarget.style.backgroundColor = "#3d3d3d";
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (currentPage !== i + 1) {
+                  e.currentTarget.style.backgroundColor = "#2d2d2d";
+                }
+              }}
+            >
+              {i + 1}
+            </button>
+          ))}
+          <button
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}
+            className="px-4 py-2 rounded transition-colors duration-200"
+            style={{
+              backgroundColor:
+                currentPage === totalPages ? "#555555" : "#d4af37",
+              color: currentPage === totalPages ? "#999999" : "#000000",
+              cursor: currentPage === totalPages ? "not-allowed" : "pointer",
+            }}
+            onMouseEnter={(e) => {
+              if (currentPage !== totalPages) {
+                e.currentTarget.style.backgroundColor = "#b8860b";
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (currentPage !== totalPages) {
+                e.currentTarget.style.backgroundColor = "#d4af37";
+              }
+            }}
+          >
+            Next
+          </button>
+        </div>
+      )}
     </div>
   );
 };

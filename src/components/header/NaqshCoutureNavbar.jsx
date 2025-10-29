@@ -53,37 +53,47 @@ const NaqshCoutureNavbar = () => {
           </li>
         </ul>
         <div className="flex items-center" style={{ gap: "2.95rem" }}>
-          <Link to="/cart" className="btn-icon">
-            <FaShoppingCart />
-          </Link>
-          <Link to="/wishlist" className="btn-icon">
-            <FaHeart />
-          </Link>
           {user ? (
             <div className="flex items-center space-x-4">
-              {user.role === "customer" && (
-                <Link to="/dashboard" className="btn-icon">
-                  <FaUser />
-                </Link>
-              )}
-              {user.role === "manager" && (
-                <Link to="/manager-dashboard" className="btn-icon">
-                  <FaUser />
-                </Link>
-              )}
-              {user.role === "super_admin" && (
-                <Link to="/super-admin-dashboard" className="btn-icon">
-                  <FaUser />
-                </Link>
-              )}
+              {/* User Profile */}
+              <Link
+                to={
+                  user.role === "customer"
+                    ? "/dashboard"
+                    : user.role === "manager"
+                    ? "/manager-dashboard"
+                    : "/super-admin-dashboard"
+                }
+                className="flex items-center space-x-2 text-white hover:text-gold-500 transition-colors duration-300"
+              >
+                <div className="w-8 h-8 rounded-full bg-gold-500 flex items-center justify-center text-black font-bold text-sm">
+                  {user.username ? user.username.charAt(0).toUpperCase() : "U"}
+                </div>
+                <span className="hidden md:block">{user.username}</span>
+              </Link>
+
+              {/* Cart Icon */}
+              <Link to="/cart" className="btn-icon">
+                <FaShoppingCart />
+              </Link>
+              {/* Wishlist Icon */}
+              <Link to="/wishlist" className="btn-icon">
+                <FaHeart />
+              </Link>
+              {/* Logout Button */}
               <button onClick={handleLogout} className="btn-icon">
                 <FaSignOutAlt />
               </button>
             </div>
           ) : (
-            <Link to="/login" className="btn-gold">
-              Login
-            </Link>
+            <div className="flex items-center space-x-4">
+              <Link to="/login" className="btn-gold">
+                Login
+              </Link>
+              <Link to="/signup" className="btn-gold">
+                Signup
+              </Link>
+            </div>
           )}
         </div>
       </div>
