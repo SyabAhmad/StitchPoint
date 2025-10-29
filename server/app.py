@@ -14,6 +14,7 @@ from models import db
 from routes.auth import auth_bp
 from routes.products import products_bp
 from routes.dashboard import dashboard_bp
+from routes.categories import categories_bp
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
@@ -56,6 +57,27 @@ def custom_revoked_token(jwt_header, jwt_payload):
 app.register_blueprint(auth_bp, url_prefix='/api/auth')
 app.register_blueprint(products_bp, url_prefix='/api')
 app.register_blueprint(dashboard_bp, url_prefix='/api/dashboard')
+app.register_blueprint(categories_bp, url_prefix='/api')
+
+@app.route('/uploads/<path:filename>')
+def serve_uploaded_file(filename):
+	"""Serve uploaded files from the uploads directory."""
+	# Prefer project-root uploads folder, but fall back to server/uploads
+	project_uploads = os.path.join(ROOT, 'uploads')
+	server_uploads = os.path.join(os.path.dirname(__file__), 'uploads')
+
+	# Serve from project root uploads if present
+	candidate = os.path.join(project_uploads, filename)
+	if os.path.exists(candidate):
+		return send_from_directory(project_uploads, filename)
+
+	# Fallback: serve from server/uploads (legacy location)
+	candidate = os.path.join(server_uploads, filename)
+	if os.path.exists(candidate):
+		return send_from_directory(server_uploads, filename)
+
+	# Not found in either location
+	return {'error': 'File not found'}, 404
 
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')

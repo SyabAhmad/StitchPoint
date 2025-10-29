@@ -59,17 +59,33 @@ def admin_dashboard():
     if not user or user.role not in ['manager', 'super_admin']:
         return jsonify({'message': 'Unauthorized'}), 403
 
-    # Total users
-    total_users = User.query.count()
+    # Filter data by store for managers, global for super_admin
+    store_filter = None
+    if user.role == 'manager':
+        if not user.store:
+            return jsonify({'message': 'Manager has no associated store'}), 403
+        store_filter = user.store.id
 
-    # Total products
-    total_products = Product.query.count()
+    # Total users (global for super_admin, store-specific for manager)
+    total_users = User.query.count() if user.role == 'super_admin' else None
 
-    # Total orders
-    total_orders = Order.query.count()
+    # Total products (global for super_admin, store-specific for manager)
+    if user.role == 'super_admin':
+        total_products = Product.query.count()
+    else:
+        total_products = Product.query.filter_by(store_id=store_filter).count()
 
-    # Recent orders
-    recent_orders = Order.query.order_by(Order.created_at.desc()).limit(10).all()
+    # Total orders (global for super_admin, store-specific for manager)
+    if user.role == 'super_admin':
+        total_orders = Order.query.count()
+    else:
+        total_orders = Order.query.filter_by(store_id=store_filter).count()
+
+    # Recent orders (global for super_admin, store-specific for manager)
+    if user.role == 'super_admin':
+        recent_orders = Order.query.order_by(Order.created_at.desc()).limit(10).all()
+    else:
+        recent_orders = Order.query.filter_by(store_id=store_filter).order_by(Order.created_at.desc()).limit(10).all()
     orders_data = [{
         'id': order.id,
         'user_email': order.user.email,
@@ -78,18 +94,26 @@ def admin_dashboard():
         'created_at': order.created_at.isoformat()
     } for order in recent_orders]
 
-    # Analytics data
-    page_views_today = PageView.query.filter(func.date(PageView.viewed_at) == func.date(func.now())).count()
-    button_clicks_today = ButtonClick.query.filter(func.date(ButtonClick.clicked_at) == func.date(func.now())).count()
+    # Analytics data (global for super_admin, store-specific for manager)
+    if user.role == 'super_admin':
+        page_views_today = PageView.query.filter(func.date(PageView.viewed_at) == func.date(func.now())).count()
+        button_clicks_today = ButtonClick.query.filter(func.date(ButtonClick.clicked_at) == func.date(func.now())).count()
+    else:
+        # For managers, analytics are store-specific (simplified for now)
+        page_views_today = 0  # Placeholder
+        button_clicks_today = 0  # Placeholder
+
+    analytics = {
+        'total_products': total_products,
+        'total_orders': total_orders,
+        'page_views_today': page_views_today,
+        'button_clicks_today': button_clicks_today
+    }
+    if user.role == 'super_admin':
+        analytics['total_users'] = total_users
 
     return jsonify({
-        'analytics': {
-            'total_users': total_users,
-            'total_products': total_products,
-            'total_orders': total_orders,
-            'page_views_today': page_views_today,
-            'button_clicks_today': button_clicks_today
-        },
+        'analytics': analytics,
         'recent_orders': orders_data
     }), 200
 
@@ -105,13 +129,19 @@ def get_users():
     if not user or user.role != 'super_admin':
         return jsonify({'message': 'Unauthorized'}), 403
 
-    users = User.query.all()
+    users = User.query.filter(User.role == 'manager').all()
     users_data = [{
         'id': u.id,
         'name': u.name,
         'email': u.email,
         'role': u.role,
-        'created_at': u.created_at.isoformat()
+        'created_at': u.created_at.isoformat(),
+        'store': {
+            'id': u.store.id,
+            'name': u.store.name,
+            'address': u.store.address,
+            'contact_number': u.store.contact_number
+        } if u.store else None
     } for u in users]
 
     return jsonify({'users': users_data}), 200
@@ -148,6 +178,30 @@ def create_user():
     hashed = generate_password_hash(password)
     new_user = User(email=email, password_hash=hashed, name=name, role=role)
     db.session.add(new_user)
+
+    # If creating a manager, also create their store
+    if role == 'manager':
+        store_name = data.get('store_name')
+        store_address = data.get('store_address')
+        store_logo_url = data.get('store_logo_url')
+        store_contact_number = data.get('store_contact_number')
+        store_description = data.get('store_description')
+
+        if not store_name:
+            db.session.rollback()
+            return jsonify({'message': 'Store name is required for managers'}), 400
+
+        from models import Store
+        new_store = Store(
+            name=store_name,
+            address=store_address,
+            logo_url=store_logo_url,
+            contact_number=store_contact_number,
+            description=store_description,
+            manager_id=new_user.id
+        )
+        db.session.add(new_store)
+
     db.session.commit()
 
     return jsonify({'message': 'User created successfully', 'user': {'id': new_user.id, 'email': new_user.email, 'name': new_user.name, 'role': new_user.role}}), 201
@@ -244,3 +298,65 @@ def update_user_role(user_id):
     db.session.commit()
 
     return jsonify({'message': 'Role updated successfully'}), 200
+
+@dashboard_bp.route('/store', methods=['GET'])
+@jwt_required()
+def get_store():
+    try:
+        user_id = int(get_jwt_identity())
+    except (TypeError, ValueError):
+        return jsonify({'message': 'Invalid token identity'}), 422
+    user = User.query.get(user_id)
+
+    if not user or user.role != 'manager':
+        return jsonify({'message': 'Unauthorized'}), 403
+
+    if not user.store:
+        return jsonify({'message': 'Store not found'}), 404
+
+    store = user.store
+    return jsonify({
+        'store': {
+            'id': store.id,
+            'name': store.name,
+            'address': store.address,
+            'logo_url': store.logo_url,
+            'contact_number': store.contact_number,
+            'description': store.description,
+            'created_at': store.created_at.isoformat(),
+            'updated_at': store.updated_at.isoformat()
+        }
+    }), 200
+
+@dashboard_bp.route('/store', methods=['PUT'])
+@jwt_required()
+def update_store():
+    try:
+        user_id = int(get_jwt_identity())
+    except (TypeError, ValueError):
+        return jsonify({'message': 'Invalid token identity'}), 422
+    user = User.query.get(user_id)
+
+    if not user or user.role != 'manager':
+        return jsonify({'message': 'Unauthorized'}), 403
+
+    if not user.store:
+        return jsonify({'message': 'Store not found'}), 404
+
+    data = request.get_json() or {}
+    store = user.store
+
+    if 'name' in data:
+        store.name = data['name']
+    if 'address' in data:
+        store.address = data['address']
+    if 'logo_url' in data:
+        store.logo_url = data['logo_url']
+    if 'contact_number' in data:
+        store.contact_number = data['contact_number']
+    if 'description' in data:
+        store.description = data['description']
+
+    db.session.commit()
+
+    return jsonify({'message': 'Store updated successfully'}), 200

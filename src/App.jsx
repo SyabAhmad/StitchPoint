@@ -6,6 +6,7 @@ import Layout from "./components/Layout.jsx";
 import HomePage from "./pages/HomePage.jsx";
 import About from "./pages/About.jsx";
 import Collections from "./pages/Collections.jsx";
+import ProductDetails from "./pages/ProductDetails.jsx";
 import Contact from "./pages/Contact.jsx";
 import Cart from "./pages/Cart.jsx";
 import Wishlist from "./pages/Wishlist.jsx";
@@ -13,6 +14,10 @@ import Login from "./pages/Login.jsx";
 import Signup from "./pages/Signup.jsx";
 import CustomerDashboard from "./pages/customer/Dashboard.jsx";
 import ManagerDashboard from "./pages/manager/Dashboard.jsx";
+import ManagerProfile from "./pages/manager/Profile.jsx";
+import ManagerProducts from "./pages/manager/Products.jsx";
+import ManagerOrders from "./pages/manager/Orders.jsx";
+import ManagerCategories from "./pages/manager/Categories.jsx";
 import SuperAdminDashboard from "./pages/super_admin/Dashboard.jsx";
 import Analytics from "./pages/super_admin/Analytics.jsx";
 import UserManagement from "./pages/super_admin/UserManagement.jsx";
@@ -28,13 +33,20 @@ function App() {
           <Route index element={<HomePage />} />
           <Route path="about" element={<About />} />
           <Route path="collections" element={<Collections />} />
+          <Route path="product/:id" element={<ProductDetails />} />
           <Route path="contact" element={<Contact />} />
           <Route path="cart" element={<Cart />} />
           <Route path="wishlist" element={<Wishlist />} />
           <Route path="login" element={<Login />} />
           <Route path="signup" element={<Signup />} />
           <Route path="dashboard" element={<CustomerDashboard />} />
-          <Route path="manager-dashboard" element={<ManagerDashboard />} />
+          <Route path="manager-dashboard" element={<ManagerDashboard />}>
+            <Route index element={<div />} />
+            <Route path="products" element={<ManagerProducts />} />
+            <Route path="orders" element={<ManagerOrders />} />
+            <Route path="categories" element={<ManagerCategories />} />
+            <Route path="profile" element={<ManagerProfile />} />
+          </Route>
           <Route path="super-admin-dashboard" element={<SuperAdminDashboard />}>
             <Route index element={<Analytics />} />
             <Route path="analytics" element={<Analytics />} />

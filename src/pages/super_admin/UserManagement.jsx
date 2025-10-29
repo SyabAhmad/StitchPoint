@@ -15,6 +15,11 @@ const UserManagement = () => {
     email: "",
     password: "",
     role: "customer",
+    store_name: "",
+    store_address: "",
+    store_logo_url: "",
+    store_contact_number: "",
+    store_description: "",
   });
   const [roleFilter, setRoleFilter] = useState("all");
 
@@ -176,6 +181,11 @@ const UserManagement = () => {
               email: "",
               password: "",
               role: "customer",
+              store_name: "",
+              store_address: "",
+              store_logo_url: "",
+              store_contact_number: "",
+              store_description: "",
             });
             alert("User created successfully");
           } else {
@@ -210,6 +220,11 @@ const UserManagement = () => {
               email: "",
               password: "",
               role: "customer",
+              store_name: "",
+              store_address: "",
+              store_logo_url: "",
+              store_contact_number: "",
+              store_description: "",
             });
           } else {
             throw new Error(data.message || "Error creating user");
@@ -303,7 +318,7 @@ const UserManagement = () => {
             {showCreateForm && (
               <form
                 onSubmit={handleCreateUser}
-                className="mt-4 grid grid-cols-1 md:grid-cols-4 gap-3"
+                className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-3"
               >
                 <input
                   required
@@ -367,28 +382,143 @@ const UserManagement = () => {
                     e.currentTarget.style.borderColor = "#3d3d3d";
                   }}
                 />
+                <select
+                  value={newUserData.role}
+                  onChange={(e) =>
+                    setNewUserData((p) => ({ ...p, role: e.target.value }))
+                  }
+                  className="px-3 py-2 rounded transition-colors duration-200"
+                  style={{
+                    backgroundColor: "#2d2d2d",
+                    color: "#ffffff",
+                    border: "1px solid #3d3d3d",
+                  }}
+                >
+                  <option value="customer">Customer</option>
+                  {/* only super_admin can create manager or super_admin */}
+                  {currentUser && currentUser.role === "super_admin" && (
+                    <>
+                      <option value="manager">Manager</option>
+                      <option value="super_admin">Super Admin</option>
+                    </>
+                  )}
+                </select>
+                {newUserData.role === "manager" && (
+                  <>
+                    <input
+                      required
+                      value={newUserData.store_name}
+                      onChange={(e) =>
+                        setNewUserData((p) => ({
+                          ...p,
+                          store_name: e.target.value,
+                        }))
+                      }
+                      placeholder="Store Name"
+                      className="px-3 py-2 rounded transition-colors duration-200"
+                      style={{
+                        backgroundColor: "#2d2d2d",
+                        color: "#ffffff",
+                        border: "1px solid #3d3d3d",
+                      }}
+                      onFocus={(e) => {
+                        e.currentTarget.style.borderColor = "#d4af37";
+                      }}
+                      onBlur={(e) => {
+                        e.currentTarget.style.borderColor = "#3d3d3d";
+                      }}
+                    />
+                    <input
+                      value={newUserData.store_address}
+                      onChange={(e) =>
+                        setNewUserData((p) => ({
+                          ...p,
+                          store_address: e.target.value,
+                        }))
+                      }
+                      placeholder="Store Address"
+                      className="px-3 py-2 rounded transition-colors duration-200"
+                      style={{
+                        backgroundColor: "#2d2d2d",
+                        color: "#ffffff",
+                        border: "1px solid #3d3d3d",
+                      }}
+                      onFocus={(e) => {
+                        e.currentTarget.style.borderColor = "#d4af37";
+                      }}
+                      onBlur={(e) => {
+                        e.currentTarget.style.borderColor = "#3d3d3d";
+                      }}
+                    />
+                    <input
+                      value={newUserData.store_logo_url}
+                      onChange={(e) =>
+                        setNewUserData((p) => ({
+                          ...p,
+                          store_logo_url: e.target.value,
+                        }))
+                      }
+                      placeholder="Store Logo URL"
+                      className="px-3 py-2 rounded transition-colors duration-200"
+                      style={{
+                        backgroundColor: "#2d2d2d",
+                        color: "#ffffff",
+                        border: "1px solid #3d3d3d",
+                      }}
+                      onFocus={(e) => {
+                        e.currentTarget.style.borderColor = "#d4af37";
+                      }}
+                      onBlur={(e) => {
+                        e.currentTarget.style.borderColor = "#3d3d3d";
+                      }}
+                    />
+                    <input
+                      value={newUserData.store_contact_number}
+                      onChange={(e) =>
+                        setNewUserData((p) => ({
+                          ...p,
+                          store_contact_number: e.target.value,
+                        }))
+                      }
+                      placeholder="Store Contact Number"
+                      className="px-3 py-2 rounded transition-colors duration-200"
+                      style={{
+                        backgroundColor: "#2d2d2d",
+                        color: "#ffffff",
+                        border: "1px solid #3d3d3d",
+                      }}
+                      onFocus={(e) => {
+                        e.currentTarget.style.borderColor = "#d4af37";
+                      }}
+                      onBlur={(e) => {
+                        e.currentTarget.style.borderColor = "#3d3d3d";
+                      }}
+                    />
+                    <input
+                      value={newUserData.store_description}
+                      onChange={(e) =>
+                        setNewUserData((p) => ({
+                          ...p,
+                          store_description: e.target.value,
+                        }))
+                      }
+                      placeholder="Store Description"
+                      className="px-3 py-2 rounded transition-colors duration-200"
+                      style={{
+                        backgroundColor: "#2d2d2d",
+                        color: "#ffffff",
+                        border: "1px solid #3d3d3d",
+                      }}
+                      onFocus={(e) => {
+                        e.currentTarget.style.borderColor = "#d4af37";
+                      }}
+                      onBlur={(e) => {
+                        e.currentTarget.style.borderColor = "#3d3d3d";
+                      }}
+                    />
+                  </>
+                )}
                 <div className="flex items-center space-x-2">
-                  <select
-                    value={newUserData.role}
-                    onChange={(e) =>
-                      setNewUserData((p) => ({ ...p, role: e.target.value }))
-                    }
-                    className="px-3 py-2 rounded transition-colors duration-200"
-                    style={{
-                      backgroundColor: "#2d2d2d",
-                      color: "#ffffff",
-                      border: "1px solid #3d3d3d",
-                    }}
-                  >
-                    <option value="customer">Customer</option>
-                    {/* only super_admin can create manager or super_admin */}
-                    {currentUser && currentUser.role === "super_admin" && (
-                      <>
-                        <option value="manager">Manager</option>
-                        <option value="super_admin">Super Admin</option>
-                      </>
-                    )}
-                  </select>
                   <button
                     disabled={creating}
                     type="submit"
@@ -535,6 +665,12 @@ const UserManagement = () => {
                     className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
                     style={{ color: "#d4af37" }}
                   >
+                    Store
+                  </th>
+                  <th
+                    className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
+                    style={{ color: "#d4af37" }}
+                  >
                     Current Role
                   </th>
                   <th
@@ -632,6 +768,12 @@ const UserManagement = () => {
                         ) : (
                           user.email
                         )}
+                      </td>
+                      <td
+                        className="px-6 py-4 whitespace-nowrap text-sm"
+                        style={{ color: "#cccccc" }}
+                      >
+                        {user.store ? user.store.name : "N/A"}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         {editingUser === user.id ? (

@@ -38,5 +38,6 @@ __pycache__/
 *.pyd
 *.sqlite3
 
-
+uploads
+Scripts
 TODO.md

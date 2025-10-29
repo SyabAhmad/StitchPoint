@@ -17,9 +17,28 @@ class User(db.Model):
     orders = db.relationship('Order', backref='user', lazy=True)
     page_views = db.relationship('PageView', backref='user', lazy=True)
     button_clicks = db.relationship('ButtonClick', backref='user', lazy=True)
+    store = db.relationship('Store', backref='manager', uselist=False, lazy=True)
 
     def __repr__(self):
         return f'<User {self.email}>'
+
+class Store(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(200), nullable=False)
+    address = db.Column(db.Text, nullable=True)
+    logo_url = db.Column(db.String(500), nullable=True)
+    contact_number = db.Column(db.String(20), nullable=True)
+    description = db.Column(db.Text, nullable=True)
+    manager_id = db.Column(db.Integer, db.ForeignKey('user.id'), unique=True, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    # Relationships
+    products = db.relationship('Product', backref='store', lazy=True)
+    orders = db.relationship('Order', backref='store', lazy=True)
+
+    def __repr__(self):
+        return f'<Store {self.name}>'
 
 class Product(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -29,6 +48,7 @@ class Product(db.Model):
     stock_quantity = db.Column(db.Integer, default=0)
     image_url = db.Column(db.String(500), nullable=True)
     category = db.Column(db.String(100), nullable=True)
+    store_id = db.Column(db.Integer, db.ForeignKey('store.id'), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
@@ -36,6 +56,7 @@ class Product(db.Model):
     cart_items = db.relationship('CartItem', backref='product', lazy=True)
     wishlist_items = db.relationship('WishlistItem', backref='product', lazy=True)
     order_items = db.relationship('OrderItem', backref='product', lazy=True)
+    reviews = db.relationship('Review', backref='product', lazy=True)
 
     def __repr__(self):
         return f'<Product {self.name}>'
@@ -86,6 +107,7 @@ class WishlistItem(db.Model):
 class Order(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    store_id = db.Column(db.Integer, db.ForeignKey('store.id'), nullable=False)
     total_amount = db.Column(db.Float, nullable=False)
     status = db.Column(db.String(50), default='pending')  # pending, processing, shipped, delivered, cancelled
     shipping_address = db.Column(db.Text, nullable=True)
@@ -133,6 +155,16 @@ class PageView(db.Model):
     def __repr__(self):
         return f'<PageView {self.page_url}>'
 
+class Category(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False, unique=True)
+    description = db.Column(db.Text, nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    def __repr__(self):
+        return f'<Category {self.name}>'
+
 class ButtonClick(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)  # Anonymous users allowed
@@ -143,3 +175,16 @@ class ButtonClick(db.Model):
 
     def __repr__(self):
         return f'<ButtonClick {self.button_name}>'
+
+
+class Review(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    product_id = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+    user_name = db.Column(db.String(120), nullable=True)
+    rating = db.Column(db.Integer, nullable=False, default=5)
+    comment = db.Column(db.Text, nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def __repr__(self):
+        return f'<Review {self.id} for product {self.product_id}>'

@@ -19,7 +19,8 @@ def signup():
         return jsonify({'message': 'User already exists'}), 400
 
     hashed_password = generate_password_hash(password)
-    role = 'super_admin' if email == 'mentee@naqsh.com' else 'customer'
+    # Remove auto super_admin assignment; managers are created via dashboard only
+    role = 'customer'
     new_user = User(email=email, password_hash=hashed_password, name=name, role=role)
     db.session.add(new_user)
     db.session.commit()
@@ -42,7 +43,31 @@ def login():
     # Ensure the JWT "sub"/identity is a string to satisfy PyJWT validation
     access_token = create_access_token(identity=str(user.id))
     refresh_token = create_refresh_token(identity=str(user.id))
-    return jsonify({'access_token': access_token, 'refresh_token': refresh_token, 'user': {'id': user.id, 'email': user.email, 'name': user.name, 'role': user.role}}), 200
+
+    # Prepare user payload; include store details for managers so the frontend
+    # can filter products by store_name/store_address without an extra request.
+    user_payload = {
+        'id': user.id,
+        'email': user.email,
+        'name': user.name,
+        'role': user.role,
+    }
+
+    # If the user has an associated store, include simple store fields
+    try:
+        if hasattr(user, 'store') and user.store:
+            user_payload['store_id'] = user.store.id
+            user_payload['store_name'] = user.store.name
+            user_payload['store_address'] = user.store.address
+    except Exception:
+        # Be defensive: if lazy-loaded relationship fails, skip enriching payload
+        pass
+
+    return jsonify({
+        'access_token': access_token,
+        'refresh_token': refresh_token,
+        'user': user_payload
+    }), 200
 
 
 
