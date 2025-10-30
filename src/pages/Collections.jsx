@@ -300,7 +300,7 @@ export default function Collections() {
                 />
               </div>
               <div className="mt-2 text-sm text-black/60 text-center font-medium">
-                ${priceRange[0]} - ${priceRange[1]}
+                PKR {priceRange[0]} - PKR {priceRange[1]}
               </div>
             </div>
 
@@ -429,7 +429,7 @@ export default function Collections() {
 
                       <div className="flex items-center justify-between mb-3">
                         <p className="text-gold-600 font-bold text-xl">
-                          ${product.price}
+                          PKR {product.price}
                         </p>
                         <div className="text-right">
                           <p className="text-black/70 text-xs font-medium">
