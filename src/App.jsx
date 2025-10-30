@@ -18,6 +18,7 @@ import ManagerProfile from "./pages/manager/Profile.jsx";
 import ManagerProducts from "./pages/manager/Products.jsx";
 import ManagerOrders from "./pages/manager/Orders.jsx";
 import ManagerCategories from "./pages/manager/Categories.jsx";
+import ManagerAnalytics from "./pages/manager/Analytics.jsx";
 import SuperAdminDashboard from "./pages/super_admin/Dashboard.jsx";
 import Analytics from "./pages/super_admin/Analytics.jsx";
 import UserManagement from "./pages/super_admin/UserManagement.jsx";
@@ -45,6 +46,7 @@ function App() {
             <Route path="products" element={<ManagerProducts />} />
             <Route path="orders" element={<ManagerOrders />} />
             <Route path="categories" element={<ManagerCategories />} />
+            <Route path="analytics" element={<ManagerAnalytics />} />
             <Route path="profile" element={<ManagerProfile />} />
           </Route>
           <Route path="super-admin-dashboard" element={<SuperAdminDashboard />}>
