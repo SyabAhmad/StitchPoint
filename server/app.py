@@ -15,6 +15,8 @@ from routes.auth import auth_bp
 from routes.products import products_bp
 from routes.dashboard import dashboard_bp
 from routes.categories import categories_bp
+from routes.analytics import analytics_bp
+from logger import setup_logger
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 
@@ -26,6 +28,9 @@ db.init_app(app)
 migrate = Migrate(app, db)
 jwt = JWTManager(app)
 CORS(app)
+
+# Set up logger
+logger = setup_logger()
 
 
 # JWT error handlers to return consistent JSON messages and helpful logs
@@ -58,6 +63,7 @@ app.register_blueprint(auth_bp, url_prefix='/api/auth')
 app.register_blueprint(products_bp, url_prefix='/api')
 app.register_blueprint(dashboard_bp, url_prefix='/api/dashboard')
 app.register_blueprint(categories_bp, url_prefix='/api')
+app.register_blueprint(analytics_bp, url_prefix='/api/analytics')
 
 @app.route('/uploads/<path:filename>')
 def serve_uploaded_file(filename):

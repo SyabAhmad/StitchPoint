@@ -188,3 +188,19 @@ class Review(db.Model):
 
     def __repr__(self):
         return f'<Review {self.id} for product {self.product_id}>'
+
+class ProductAnalytics(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    product_id = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)  # Anonymous users allowed
+    action = db.Column(db.String(50), nullable=False)  # 'view', 'click', 'add_to_cart', etc.
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    time_spent = db.Column(db.Float, nullable=True)  # Time spent on page in seconds
+    referrer = db.Column(db.String(500), nullable=True)
+    user_agent = db.Column(db.Text, nullable=True)
+
+    # Relationships
+    product = db.relationship('Product', backref='analytics', lazy=True)
+
+    def __repr__(self):
+        return f'<ProductAnalytics {self.action} on product {self.product_id}>'

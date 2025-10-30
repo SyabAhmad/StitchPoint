@@ -1,9 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { FaShoppingCart, FaHeart, FaUser, FaSignOutAlt } from "react-icons/fa";
+import {
+  FaShoppingCart,
+  FaHeart,
+  FaUser,
+  FaSignOutAlt,
+  FaTachometerAlt,
+  FaBars,
+} from "react-icons/fa";
 
 const NaqshCoutureNavbar = () => {
   const [user, setUser] = useState(null);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   useEffect(() => {
     const userData = localStorage.getItem("user");
@@ -19,6 +27,10 @@ const NaqshCoutureNavbar = () => {
     window.location.href = "/";
   };
 
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
+
   return (
     <nav className="navbar !bg-(--black-naqsh)">
       <div className="container mx-auto container-inline">
@@ -30,7 +42,17 @@ const NaqshCoutureNavbar = () => {
             Naqsh Couture
           </h1>
         </div>
-        <ul className="nav-items font-sans">
+        {/* Hamburger Menu for Mobile */}
+        <button
+          className="md:hidden text-white hover:text-gold-500 transition-colors duration-300"
+          onClick={toggleMenu}
+          aria-label="Toggle menu"
+        >
+          <FaBars size={24} />
+        </button>
+
+        {/* Desktop Nav Items */}
+        <ul className="hidden md:flex nav-items font-sans">
           <li>
             <Link to="/" className="nav-link">
               Home
@@ -52,10 +74,36 @@ const NaqshCoutureNavbar = () => {
             </Link>
           </li>
         </ul>
+
+        {/* Mobile Menu */}
+        {isMenuOpen && (
+          <ul className="md:hidden absolute top-full left-0 w-full bg-black-naqsh text-white flex flex-col items-center space-y-4 py-4 font-sans">
+            <li>
+              <Link to="/" className="nav-link" onClick={toggleMenu}>
+                Home
+              </Link>
+            </li>
+            <li>
+              <Link to="/about" className="nav-link" onClick={toggleMenu}>
+                About
+              </Link>
+            </li>
+            <li>
+              <Link to="/collections" className="nav-link" onClick={toggleMenu}>
+                Collections
+              </Link>
+            </li>
+            <li>
+              <Link to="/contact" className="nav-link" onClick={toggleMenu}>
+                Contact
+              </Link>
+            </li>
+          </ul>
+        )}
         <div className="flex items-center" style={{ gap: "2.95rem" }}>
           {user ? (
             <div className="flex items-center space-x-4">
-              {/* User Profile */}
+              {/* Dashboard Link */}
               <Link
                 to={
                   user.role === "customer"
@@ -65,23 +113,26 @@ const NaqshCoutureNavbar = () => {
                     : "/super-admin-dashboard"
                 }
                 className="flex items-center space-x-2 text-white hover:text-gold-500 transition-colors duration-300"
+                title="Go to Dashboard"
               >
-                <div className="w-8 h-8 rounded-full bg-gold-500 flex items-center justify-center text-black font-bold text-sm">
-                  {user.username ? user.username.charAt(0).toUpperCase() : "U"}
-                </div>
-                <span className="hidden md:block">{user.username}</span>
+                <FaTachometerAlt />
+                <span className="hidden md:block">Dashboard</span>
               </Link>
 
               {/* Cart Icon */}
-              <Link to="/cart" className="btn-icon">
+              <Link to="/cart" className="btn-icon" title="View Cart">
                 <FaShoppingCart />
               </Link>
               {/* Wishlist Icon */}
-              <Link to="/wishlist" className="btn-icon">
+              <Link to="/wishlist" className="btn-icon" title="View Wishlist">
                 <FaHeart />
               </Link>
               {/* Logout Button */}
-              <button onClick={handleLogout} className="btn-icon">
+              <button
+                onClick={handleLogout}
+                className="btn-icon"
+                title="Logout"
+              >
                 <FaSignOutAlt />
               </button>
             </div>
