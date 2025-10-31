@@ -9,6 +9,10 @@ import {
   FaCog,
   FaStore,
   FaUserCog,
+  FaChartBar,
+  FaStoreAlt,
+  FaComments,
+  FaStar,
 } from "react-icons/fa";
 import { Link, Outlet, useLocation } from "react-router-dom";
 
@@ -220,6 +224,78 @@ const SuperAdminDashboard = () => {
                   >
                     <FaShoppingCart className="mr-3 h-5 w-5" />
                     Orders
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to="/super-admin-dashboard/product-analytics"
+                    className="flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200"
+                    style={{ color: "#ffffff" }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = "#2d2d2d";
+                      e.currentTarget.style.color = "#d4af37";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = "transparent";
+                      e.currentTarget.style.color = "#ffffff";
+                    }}
+                  >
+                    <FaChartBar className="mr-3 h-5 w-5" />
+                    Product Analytics
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to="/super-admin-dashboard/store-analytics"
+                    className="flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200"
+                    style={{ color: "#ffffff" }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = "#2d2d2d";
+                      e.currentTarget.style.color = "#d4af37";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = "transparent";
+                      e.currentTarget.style.color = "#ffffff";
+                    }}
+                  >
+                    <FaStoreAlt className="mr-3 h-5 w-5" />
+                    Store Analytics
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to="/super-admin-dashboard/comments"
+                    className="flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200"
+                    style={{ color: "#ffffff" }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = "#2d2d2d";
+                      e.currentTarget.style.color = "#d4af37";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = "transparent";
+                      e.currentTarget.style.color = "#ffffff";
+                    }}
+                  >
+                    <FaComments className="mr-3 h-5 w-5" />
+                    Comments
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to="/super-admin-dashboard/reviews"
+                    className="flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200"
+                    style={{ color: "#ffffff" }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = "#2d2d2d";
+                      e.currentTarget.style.color = "#d4af37";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = "transparent";
+                      e.currentTarget.style.color = "#ffffff";
+                    }}
+                  >
+                    <FaStar className="mr-3 h-5 w-5" />
+                    Reviews
                   </Link>
                 </li>
               </ul>

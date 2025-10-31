@@ -9,6 +9,8 @@ import {
   FaCog,
   FaStore,
   FaUserCog,
+  FaComment,
+  FaStar,
 } from "react-icons/fa";
 import { Link, Outlet, useLocation } from "react-router-dom";
 
@@ -183,6 +185,42 @@ const ManagerDashboard = () => {
                 </li>
                 <li>
                   <Link
+                    to="/manager-dashboard/comments"
+                    className="flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200"
+                    style={{ color: "#ffffff" }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = "#2d2d2d";
+                      e.currentTarget.style.color = "#d4af37";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = "transparent";
+                      e.currentTarget.style.color = "#ffffff";
+                    }}
+                  >
+                    <FaComment className="mr-3 h-5 w-5" />
+                    Comments
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to="/manager-dashboard/reviews"
+                    className="flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200"
+                    style={{ color: "#ffffff" }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = "#2d2d2d";
+                      e.currentTarget.style.color = "#d4af37";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = "transparent";
+                      e.currentTarget.style.color = "#ffffff";
+                    }}
+                  >
+                    <FaStar className="mr-3 h-5 w-5" />
+                    Reviews
+                  </Link>
+                </li>
+                <li>
+                  <Link
                     to="/manager-dashboard/profile"
                     className="flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200"
                     style={{ color: "#ffffff" }}
@@ -300,7 +338,7 @@ const ManagerDashboard = () => {
                             color: "#000000",
                           }}
                         >
-                          <span className="font-bold">V</span>
+                          <span className="font-bold">R</span>
                         </div>
                       </div>
                       <div className="ml-5 w-0 flex-1">
@@ -309,13 +347,13 @@ const ManagerDashboard = () => {
                             className="text-sm font-medium truncate"
                             style={{ color: "#cccccc" }}
                           >
-                            Page Views Today
+                            Total Reviews
                           </dt>
                           <dd
                             className="text-lg font-medium"
                             style={{ color: "#ffffff" }}
                           >
-                            {analytics.page_views_today}
+                            {analytics.total_reviews || 0}
                           </dd>
                         </dl>
                       </div>
@@ -335,7 +373,7 @@ const ManagerDashboard = () => {
                             color: "#000000",
                           }}
                         >
-                          <span className="font-bold">R</span>
+                          <span className="font-bold">$</span>
                         </div>
                       </div>
                       <div className="ml-5 w-0 flex-1">
@@ -354,6 +392,76 @@ const ManagerDashboard = () => {
                           </dd>
                         </dl>
                       </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Top Rated Products Card */}
+                <div className="mb-8">
+                  <div
+                    className="shadow rounded-lg p-6"
+                    style={{ backgroundColor: "#1d1d1d" }}
+                  >
+                    <h3
+                      className="text-lg leading-6 font-medium mb-4"
+                      style={{ color: "#ffffff" }}
+                    >
+                      Top Rated Products
+                    </h3>
+                    <div className="space-y-3">
+                      {analytics.top_rated_products &&
+                      analytics.top_rated_products.length > 0 ? (
+                        analytics.top_rated_products
+                          .slice(0, 5)
+                          .map((product, index) => (
+                            <div
+                              key={product.product_id}
+                              className="flex items-center justify-between"
+                            >
+                              <div className="flex items-center">
+                                <span
+                                  className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold mr-3"
+                                  style={{
+                                    backgroundColor: "#d4af37",
+                                    color: "#000000",
+                                  }}
+                                >
+                                  {index + 1}
+                                </span>
+                                <span
+                                  style={{ color: "#cccccc" }}
+                                  className="truncate"
+                                >
+                                  {product.product_name}
+                                </span>
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <span
+                                  className="px-2 py-1 rounded-full text-xs font-semibold"
+                                  style={{
+                                    backgroundColor: "#2d2d2d",
+                                    color: "#d4af37",
+                                  }}
+                                >
+                                  {product.avg_rating} ⭐
+                                </span>
+                                <span
+                                  className="px-2 py-1 rounded-full text-xs font-semibold"
+                                  style={{
+                                    backgroundColor: "#2d2d2d",
+                                    color: "#cccccc",
+                                  }}
+                                >
+                                  {product.review_count} reviews
+                                </span>
+                              </div>
+                            </div>
+                          ))
+                      ) : (
+                        <p style={{ color: "#999999" }} className="text-sm">
+                          No review data available
+                        </p>
+                      )}
                     </div>
                   </div>
                 </div>

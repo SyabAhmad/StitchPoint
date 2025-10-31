@@ -1,4 +1,11 @@
 import React, { useState, useEffect } from "react";
+import OverviewStats from "../../components/analytics/OverviewStats";
+import AnalyticsPieChart from "../../components/analytics/AnalyticsPieChart";
+import TopProductsList from "../../components/analytics/TopProductsList";
+import ProductViewsChart from "../../components/analytics/ProductViewsChart";
+import ProductClicksChart from "../../components/analytics/ProductClicksChart";
+import ReviewTrendsChart from "../../components/analytics/ReviewTrendsChart";
+import CommentTrendsChart from "../../components/analytics/CommentTrendsChart";
 import {
   FaUsers,
   FaBox,
@@ -12,35 +19,72 @@ import {
 const Analytics = () => {
   const [analytics, setAnalytics] = useState({});
   const [recentOrders, setRecentOrders] = useState([]);
+  const [overviewData, setOverviewData] = useState({});
+  const [reviewsTrends, setReviewsTrends] = useState([]);
+  const [commentsTrends, setCommentsTrends] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedPeriod, setSelectedPeriod] = useState("today");
+  const [filterDays, setFilterDays] = useState(30);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    fetchAnalyticsData();
+  }, [filterDays]);
 
-    fetch("http://localhost:5000/api/dashboard/admin", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+  const fetchAnalyticsData = async () => {
+    try {
+      const token = localStorage.getItem("token");
+
+      // Fetch basic analytics
+      const basicResponse = await fetch(
+        "http://localhost:5000/api/dashboard/admin",
+        {
+          headers: { Authorization: `Bearer ${token}` },
         }
-        return response.json();
-      })
-      .then((data) => {
-        setAnalytics(data.analytics || {});
-        setRecentOrders(data.recent_orders || []);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error("Error fetching analytics data:", error);
-        setAnalytics({});
-        setRecentOrders([]);
-        setLoading(false);
-      });
-  }, []);
+      );
+      const basicData = await basicResponse.json();
+
+      // Fetch detailed analytics
+      const overviewResponse = await fetch(
+        `http://localhost:5000/api/analytics/overview?days=${filterDays}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      const overviewData = await overviewResponse.json();
+
+      // Fetch trends
+      const reviewsTrendsResponse = await fetch(
+        `http://localhost:5000/api/analytics/reviews-trends?days=${filterDays}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      const reviewsTrendsData = await reviewsTrendsResponse.json();
+
+      const commentsTrendsResponse = await fetch(
+        `http://localhost:5000/api/analytics/comments-trends?days=${filterDays}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      const commentsTrendsData = await commentsTrendsResponse.json();
+
+      setAnalytics(basicData.analytics || {});
+      setRecentOrders(basicData.recent_orders || []);
+      setOverviewData(overviewData.overview || {});
+      setReviewsTrends(reviewsTrendsData.reviews_trends || []);
+      setCommentsTrends(commentsTrendsData.comments_trends || []);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching analytics data:", error);
+      setAnalytics({});
+      setRecentOrders([]);
+      setOverviewData({});
+      setReviewsTrends([]);
+      setCommentsTrends([]);
+      setLoading(false);
+    }
+  };
 
   if (loading) {
     return (

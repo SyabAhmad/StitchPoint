@@ -1,7 +1,8 @@
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from models import db, ProductAnalytics, Product, User, Store
-from sqlalchemy import func, desc
+from models import db, ProductAnalytics, Product, User, Store, Review, Comment
+from sqlalchemy import func, desc, extract
+from sqlalchemy.sql import case
 from datetime import datetime, timedelta
 from logger import setup_logger
 
@@ -249,6 +250,418 @@ def log_analytics():
     db.session.commit()
 
     return jsonify({'message': 'Analytics logged successfully'}), 201
+
+@analytics_bp.route('/reviews-overview', methods=['GET'])
+@jwt_required()
+def get_reviews_overview():
+    try:
+        user_id = int(get_jwt_identity())
+    except (TypeError, ValueError):
+        return jsonify({'message': 'Invalid token identity'}), 422
+    user = User.query.get(user_id)
+
+    if not user or user.role not in ['manager', 'super_admin']:
+        return jsonify({'message': 'Unauthorized'}), 403
+
+    days = request.args.get('days', 30, type=int)
+    start_date = datetime.utcnow() - timedelta(days=days)
+
+    store_filter = None
+    if user.role == 'manager' and user.store:
+        store_filter = user.store.id
+
+    # Total reviews
+    reviews_query = db.session.query(func.count(Review.id)).filter(
+        Review.created_at >= start_date
+    )
+    if store_filter:
+        reviews_query = reviews_query.join(Product).filter(Product.store_id == store_filter)
+    total_reviews = reviews_query.scalar() or 0
+
+    # Average rating
+    rating_query = db.session.query(func.avg(Review.rating)).filter(
+        Review.created_at >= start_date
+    )
+    if store_filter:
+        rating_query = rating_query.join(Product).filter(Product.store_id == store_filter)
+    avg_rating = rating_query.scalar() or 0
+
+    # Total comments
+    comments_query = db.session.query(func.count(Comment.id)).filter(
+        Comment.created_at >= start_date
+    )
+    if store_filter:
+        comments_query = comments_query.join(Product).filter(Product.store_id == store_filter)
+    total_comments = comments_query.scalar() or 0
+
+    # Average comments per product
+    product_count_query = db.session.query(func.count(func.distinct(Product.id)))
+    if store_filter:
+        product_count_query = product_count_query.filter(Product.store_id == store_filter)
+    total_products = product_count_query.scalar() or 1  # Avoid division by zero
+    avg_comments_per_product = round(total_comments / total_products, 2)
+
+    return jsonify({
+        'reviews_overview': {
+            'total_reviews': total_reviews,
+            'avg_rating': round(avg_rating, 2),
+            'total_comments': total_comments,
+            'avg_comments_per_product': avg_comments_per_product
+        }
+    }), 200
+
+@analytics_bp.route('/reviews-trends', methods=['GET'])
+@jwt_required()
+def get_reviews_trends():
+    try:
+        user_id = int(get_jwt_identity())
+    except (TypeError, ValueError):
+        return jsonify({'message': 'Invalid token identity'}), 422
+    user = User.query.get(user_id)
+
+    if not user or user.role not in ['manager', 'super_admin']:
+        return jsonify({'message': 'Unauthorized'}), 403
+
+    days = request.args.get('days', 30, type=int)
+    start_date = datetime.utcnow() - timedelta(days=days)
+
+    store_filter = None
+    if user.role == 'manager' and user.store:
+        store_filter = user.store.id
+
+    # Reviews over time (daily)
+    reviews_trends_query = db.session.query(
+        func.date(Review.created_at).label('date'),
+        func.count(Review.id).label('reviews')
+    ).filter(Review.created_at >= start_date)
+
+    if store_filter:
+        reviews_trends_query = reviews_trends_query.join(Product).filter(Product.store_id == store_filter)
+
+    reviews_trends_query = reviews_trends_query.group_by(func.date(Review.created_at)).order_by('date')
+
+    reviews_trends = []
+    for row in reviews_trends_query.all():
+        reviews_trends.append({
+            'date': row.date.isoformat(),
+            'reviews': row.reviews
+        })
+
+    return jsonify({'reviews_trends': reviews_trends}), 200
+
+@analytics_bp.route('/comments-overview', methods=['GET'])
+@jwt_required()
+def get_comments_overview():
+    try:
+        user_id = int(get_jwt_identity())
+    except (TypeError, ValueError):
+        return jsonify({'message': 'Invalid token identity'}), 422
+    user = User.query.get(user_id)
+
+    if not user or user.role not in ['manager', 'super_admin']:
+        return jsonify({'message': 'Unauthorized'}), 403
+
+    days = request.args.get('days', 30, type=int)
+    start_date = datetime.utcnow() - timedelta(days=days)
+
+    store_filter = None
+    if user.role == 'manager' and user.store:
+        store_filter = user.store.id
+
+    # Total comments
+    comments_query = db.session.query(func.count(Comment.id)).filter(
+        Comment.created_at >= start_date
+    )
+    if store_filter:
+        comments_query = comments_query.join(Product).filter(Product.store_id == store_filter)
+    total_comments = comments_query.scalar() or 0
+
+    # Average comments per product
+    product_count_query = db.session.query(func.count(func.distinct(Product.id)))
+    if store_filter:
+        product_count_query = product_count_query.filter(Product.store_id == store_filter)
+    total_products = product_count_query.scalar() or 1
+    avg_comments_per_product = round(total_comments / total_products, 2)
+
+    return jsonify({
+        'comments_overview': {
+            'total_comments': total_comments,
+            'avg_comments_per_product': avg_comments_per_product
+        }
+    }), 200
+
+@analytics_bp.route('/comments-trends', methods=['GET'])
+@jwt_required()
+def get_comments_trends():
+    try:
+        user_id = int(get_jwt_identity())
+    except (TypeError, ValueError):
+        return jsonify({'message': 'Invalid token identity'}), 422
+    user = User.query.get(user_id)
+
+    if not user or user.role not in ['manager', 'super_admin']:
+        return jsonify({'message': 'Unauthorized'}), 403
+
+    days = request.args.get('days', 30, type=int)
+    start_date = datetime.utcnow() - timedelta(days=days)
+
+    store_filter = None
+    if user.role == 'manager' and user.store:
+        store_filter = user.store.id
+
+    # Comments over time (daily)
+    comments_trends_query = db.session.query(
+        func.date(Comment.created_at).label('date'),
+        func.count(Comment.id).label('comments')
+    ).filter(Comment.created_at >= start_date)
+
+    if store_filter:
+        comments_trends_query = comments_trends_query.join(Product).filter(Product.store_id == store_filter)
+
+    comments_trends_query = comments_trends_query.group_by(func.date(Comment.created_at)).order_by('date')
+
+    comments_trends = []
+    for row in comments_trends_query.all():
+        comments_trends.append({
+            'date': row.date.isoformat(),
+            'comments': row.comments
+        })
+
+    return jsonify({'comments_trends': comments_trends}), 200
+
+@analytics_bp.route('/products-analytics', methods=['GET'])
+@jwt_required()
+def get_products_analytics():
+    try:
+        user_id = int(get_jwt_identity())
+    except (TypeError, ValueError):
+        return jsonify({'message': 'Invalid token identity'}), 422
+    user = User.query.get(user_id)
+
+    if not user or user.role not in ['manager', 'super_admin']:
+        return jsonify({'message': 'Unauthorized'}), 403
+
+    days = request.args.get('days', 30, type=int)
+    start_date = datetime.utcnow() - timedelta(days=days)
+
+    # For managers, filter by their store; for super_admin, show all
+    store_filter = None
+    if user.role == 'manager' and user.store:
+        store_filter = user.store.id
+
+    # Query products with analytics
+    query = db.session.query(
+        Product.id,
+        Product.name,
+        Product.store_id,
+        Store.name.label('store_name'),
+        func.count(ProductAnalytics.id).label('total_views'),
+        func.sum(case((ProductAnalytics.action == 'click', 1), else_=0)).label('total_clicks'),
+        func.sum(case((ProductAnalytics.action == 'add_to_cart', 1), else_=0)).label('total_cart_adds'),
+        func.avg(case((ProductAnalytics.action == 'view', ProductAnalytics.time_spent), else_=None)).label('avg_time_spent'),
+        func.count(func.distinct(Review.id)).label('total_reviews'),
+        func.avg(Review.rating).label('avg_rating'),
+        func.count(func.distinct(Comment.id)).label('total_comments')
+    ).outerjoin(ProductAnalytics, Product.id == ProductAnalytics.product_id)\
+     .outerjoin(Store, Product.store_id == Store.id)\
+     .outerjoin(Review, Product.id == Review.product_id)\
+     .outerjoin(Comment, Product.id == Comment.product_id)\
+     .filter(ProductAnalytics.timestamp >= start_date if ProductAnalytics.timestamp else True)
+
+    if store_filter:
+        query = query.filter(Product.store_id == store_filter)
+
+    query = query.group_by(Product.id, Product.name, Product.store_id, Store.name).order_by(desc('total_views'))
+
+    results = query.all()
+
+    data = []
+    for row in results:
+        data.append({
+            'product_id': row.id,
+            'product_name': row.name,
+            'store_id': row.store_id,
+            'store_name': row.store_name,
+            'total_views': row.total_views or 0,
+            'total_clicks': row.total_clicks or 0,
+            'total_cart_adds': row.total_cart_adds or 0,
+            'avg_time_spent': round(row.avg_time_spent or 0, 2),
+            'total_reviews': row.total_reviews or 0,
+            'avg_rating': round(row.avg_rating or 0, 2),
+            'total_comments': row.total_comments or 0
+        })
+
+    return jsonify({'products_analytics': data}), 200
+
+@analytics_bp.route('/stores-analytics', methods=['GET'])
+@jwt_required()
+def get_stores_analytics():
+    try:
+        user_id = int(get_jwt_identity())
+    except (TypeError, ValueError):
+        return jsonify({'message': 'Invalid token identity'}), 422
+    user = User.query.get(user_id)
+
+    if not user or user.role not in ['manager', 'super_admin']:
+        return jsonify({'message': 'Unauthorized'}), 403
+
+    days = request.args.get('days', 30, type=int)
+    start_date = datetime.utcnow() - timedelta(days=days)
+
+    # For managers, only their store; for super_admin, all stores
+    store_filter = None
+    if user.role == 'manager' and user.store:
+        store_filter = user.store.id
+
+    # Query stores with analytics
+    query = db.session.query(
+        Store.id,
+        Store.name,
+        func.count(func.distinct(Product.id)).label('total_products'),
+        func.count(ProductAnalytics.id).label('total_views'),
+        func.sum(case((ProductAnalytics.action == 'click', 1), else_=0)).label('total_clicks'),
+        func.sum(case((ProductAnalytics.action == 'add_to_cart', 1), else_=0)).label('total_cart_adds'),
+        func.avg(case((ProductAnalytics.action == 'view', ProductAnalytics.time_spent), else_=None)).label('avg_time_spent'),
+        func.count(func.distinct(Review.id)).label('total_reviews'),
+        func.avg(Review.rating).label('avg_rating'),
+        func.count(func.distinct(Comment.id)).label('total_comments')
+    ).outerjoin(Product, Store.id == Product.store_id)\
+     .outerjoin(ProductAnalytics, Product.id == ProductAnalytics.product_id)\
+     .outerjoin(Review, Product.id == Review.product_id)\
+     .outerjoin(Comment, Product.id == Comment.product_id)\
+     .filter(ProductAnalytics.timestamp >= start_date if ProductAnalytics.timestamp else True)
+
+    if store_filter:
+        query = query.filter(Store.id == store_filter)
+
+    query = query.group_by(Store.id, Store.name).order_by(desc('total_views'))
+
+    results = query.all()
+
+    data = []
+    for row in results:
+        data.append({
+            'store_id': row.id,
+            'store_name': row.name,
+            'total_products': row.total_products or 0,
+            'total_views': row.total_views or 0,
+            'total_clicks': row.total_clicks or 0,
+            'total_cart_adds': row.total_cart_adds or 0,
+            'avg_time_spent': round(row.avg_time_spent or 0, 2),
+            'total_reviews': row.total_reviews or 0,
+            'avg_rating': round(row.avg_rating or 0, 2),
+            'total_comments': row.total_comments or 0
+        })
+
+    return jsonify({'stores_analytics': data}), 200
+
+@analytics_bp.route('/comments', methods=['GET'])
+@jwt_required()
+def get_all_comments():
+    try:
+        user_id = int(get_jwt_identity())
+    except (TypeError, ValueError):
+        return jsonify({'message': 'Invalid token identity'}), 422
+    user = User.query.get(user_id)
+
+    if not user or user.role not in ['manager', 'super_admin']:
+        return jsonify({'message': 'Unauthorized'}), 403
+
+    days = request.args.get('days', 30, type=int)
+    start_date = datetime.utcnow() - timedelta(days=days)
+
+    store_filter = None
+    if user.role == 'manager' and user.store:
+        store_filter = user.store.id
+
+    query = db.session.query(
+        Comment.id,
+        Comment.content,
+        Comment.created_at,
+        User.name.label('user_name'),
+        User.email.label('user_email'),
+        Product.name.label('product_name'),
+        Store.name.label('store_name')
+    ).join(User, Comment.user_id == User.id)\
+     .join(Product, Comment.product_id == Product.id)\
+     .join(Store, Product.store_id == Store.id)\
+     .filter(Comment.created_at >= start_date)
+
+    if store_filter:
+        query = query.filter(Product.store_id == store_filter)
+
+    query = query.order_by(desc(Comment.created_at))
+
+    results = query.all()
+
+    data = []
+    for row in results:
+        data.append({
+            'id': row.id,
+            'content': row.content,
+            'created_at': row.created_at.isoformat(),
+            'user_name': row.user_name,
+            'user_email': row.user_email,
+            'product_name': row.product_name,
+            'store_name': row.store_name
+        })
+
+    return jsonify({'comments': data}), 200
+
+@analytics_bp.route('/reviews', methods=['GET'])
+@jwt_required()
+def get_all_reviews():
+    try:
+        user_id = int(get_jwt_identity())
+    except (TypeError, ValueError):
+        return jsonify({'message': 'Invalid token identity'}), 422
+    user = User.query.get(user_id)
+
+    if not user or user.role not in ['manager', 'super_admin']:
+        return jsonify({'message': 'Unauthorized'}), 403
+
+    days = request.args.get('days', 30, type=int)
+    start_date = datetime.utcnow() - timedelta(days=days)
+
+    store_filter = None
+    if user.role == 'manager' and user.store:
+        store_filter = user.store.id
+
+    query = db.session.query(
+        Review.id,
+        Review.rating,
+        Review.comment,
+        Review.created_at,
+        User.name.label('user_name'),
+        User.email.label('user_email'),
+        Product.name.label('product_name'),
+        Store.name.label('store_name')
+    ).join(User, Review.user_id == User.id)\
+     .join(Product, Review.product_id == Product.id)\
+     .join(Store, Product.store_id == Store.id)\
+     .filter(Review.created_at >= start_date)
+
+    if store_filter:
+        query = query.filter(Product.store_id == store_filter)
+
+    query = query.order_by(desc(Review.created_at))
+
+    results = query.all()
+
+    data = []
+    for row in results:
+        data.append({
+            'id': row.id,
+            'rating': row.rating,
+            'comment': row.comment,
+            'created_at': row.created_at.isoformat(),
+            'user_name': row.user_name,
+            'user_email': row.user_email,
+            'product_name': row.product_name,
+            'store_name': row.store_name
+        })
+
+    return jsonify({'reviews': data}), 200
 
 @analytics_bp.route('/welcome', methods=['GET'])
 def welcome():

@@ -540,6 +540,103 @@ def delete_product(product_id):
 
     return jsonify({'message': 'Product deleted successfully'}), 200
 
+@products_bp.route('/comments/counts', methods=['GET'])
+@jwt_required()
+def get_comments_counts():
+    try:
+        user_id = int(get_jwt_identity())
+    except (TypeError, ValueError):
+        return jsonify({'message': 'Invalid token identity'}), 422
+    user = User.query.get(user_id)
+
+    if not user or user.role not in ['manager', 'super_admin']:
+        return jsonify({'message': 'Unauthorized'}), 403
+
+    # Get comment counts per product
+    from sqlalchemy import func
+    comment_counts = db.session.query(
+        Comment.product_id,
+        func.count(Comment.id).label('count')
+    ).group_by(Comment.product_id).all()
+
+    # Build response with product details
+    counts_list = []
+    for product_id, count in comment_counts:
+        product = Product.query.get(product_id)
+        if product:
+            counts_list.append({
+                'product_id': product_id,
+                'product_name': product.name,
+                'store_name': product.store.name if product.store else 'Unknown Store',
+                'comment_count': count
+            })
+
+    return jsonify({'comment_counts': counts_list}), 200
+
+
+@products_bp.route('/comments/all', methods=['GET'])
+@jwt_required()
+def get_all_comments():
+    try:
+        user_id = int(get_jwt_identity())
+    except (TypeError, ValueError):
+        return jsonify({'message': 'Invalid token identity'}), 422
+    user = User.query.get(user_id)
+
+    if not user or user.role not in ['manager', 'super_admin']:
+        return jsonify({'message': 'Unauthorized'}), 403
+
+    # Get all comments with product and store info
+    comments_query = Comment.query.join(Product, Comment.product_id == Product.id).add_columns(
+        Product.name.label('product_name'),
+        Product.store_id.label('store_id')
+    ).order_by(Comment.created_at.desc()).all()
+
+    comments_list = []
+    for comment, product_name, store_id in comments_query:
+        store = Store.query.get(store_id) if store_id else None
+        comments_list.append({
+            'id': comment.id,
+            'product_id': comment.product_id,
+            'product_name': product_name,
+            'store_name': store.name if store else 'Unknown Store',
+            'user_id': comment.user_id,
+            'user_name': comment.user_name,
+            'comment': comment.comment,
+            'created_at': comment.created_at.isoformat()
+        })
+
+    return jsonify({'comments': comments_list}), 200
+
+
+@products_bp.route('/comments/<int:comment_id>', methods=['DELETE'])
+@jwt_required()
+def delete_comment(comment_id):
+    try:
+        user_id = int(get_jwt_identity())
+    except (TypeError, ValueError):
+        return jsonify({'message': 'Invalid token identity'}), 422
+    user = User.query.get(user_id)
+
+    if not user or user.role not in ['manager', 'super_admin']:
+        return jsonify({'message': 'Unauthorized'}), 403
+
+    comment = Comment.query.get(comment_id)
+    if not comment:
+        return jsonify({'message': 'Comment not found'}), 404
+
+    # For managers, check if the comment belongs to their store's products
+    if user.role == 'manager':
+        product = Product.query.get(comment.product_id)
+        if not product or product.store_id != user.store.id:
+            return jsonify({'message': 'Unauthorized to delete this comment'}), 403
+
+    db.session.delete(comment)
+    db.session.commit()
+
+    return jsonify({'message': 'Comment deleted successfully'}), 200
+
+
 @products_bp.route('/stores/<int:store_id>', methods=['GET'])
 def get_store(store_id):
     store = Store.query.get(store_id)

@@ -5,6 +5,8 @@ import TopProductsList from "../../components/analytics/TopProductsList";
 import ProductViewsChart from "../../components/analytics/ProductViewsChart";
 import ProductClicksChart from "../../components/analytics/ProductClicksChart";
 import RevenueChart from "../../components/analytics/RevenueChart";
+import ReviewTrendsChart from "../../components/analytics/ReviewTrendsChart";
+import CommentTrendsChart from "../../components/analytics/CommentTrendsChart";
 
 const ManagerAnalytics = () => {
   const [analyticsData, setAnalyticsData] = useState({
@@ -14,9 +16,15 @@ const ManagerAnalytics = () => {
       total_cart_adds: 0,
       avg_time_spent: 0,
       top_products: [],
+      total_reviews: 0,
+      avg_rating: 0,
+      total_comments: 0,
+      avg_comments_per_product: 0,
     },
     productViews: [],
     productClicks: [],
+    reviewsTrends: [],
+    commentsTrends: [],
   });
   const [loading, setLoading] = useState(true);
   const [filterDays, setFilterDays] = useState(30);
@@ -29,7 +37,14 @@ const ManagerAnalytics = () => {
   const fetchAnalytics = async () => {
     try {
       const token = localStorage.getItem("token");
-      const [overviewRes, viewsRes, clicksRes] = await Promise.all([
+      const [
+        overviewRes,
+        viewsRes,
+        clicksRes,
+        reviewsOverviewRes,
+        reviewsTrendsRes,
+        commentsTrendsRes,
+      ] = await Promise.all([
         fetch(
           `http://localhost:5000/api/analytics/overview?days=${filterDays}`,
           {
@@ -48,24 +63,62 @@ const ManagerAnalytics = () => {
             headers: { Authorization: `Bearer ${token}` },
           }
         ),
+        fetch(
+          `http://localhost:5000/api/analytics/reviews-overview?days=${filterDays}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        ),
+        fetch(
+          `http://localhost:5000/api/analytics/reviews-trends?days=${filterDays}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        ),
+        fetch(
+          `http://localhost:5000/api/analytics/comments-trends?days=${filterDays}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        ),
       ]);
 
-      const [overviewData, viewsData, clicksData] = await Promise.all([
+      const [
+        overviewData,
+        viewsData,
+        clicksData,
+        reviewsOverviewData,
+        reviewsTrendsData,
+        commentsTrendsData,
+      ] = await Promise.all([
         overviewRes.json(),
         viewsRes.json(),
         clicksRes.json(),
+        reviewsOverviewRes.json(),
+        reviewsTrendsRes.json(),
+        commentsTrendsRes.json(),
       ]);
 
       setAnalyticsData({
-        overview: overviewData.overview || {
-          total_views: 0,
-          total_clicks: 0,
-          total_cart_adds: 0,
-          avg_time_spent: 0,
-          top_products: [],
+        overview: {
+          ...(overviewData.overview || {
+            total_views: 0,
+            total_clicks: 0,
+            total_cart_adds: 0,
+            avg_time_spent: 0,
+            top_products: [],
+          }),
+          ...(reviewsOverviewData.reviews_overview || {
+            total_reviews: 0,
+            avg_rating: 0,
+            total_comments: 0,
+            avg_comments_per_product: 0,
+          }),
         },
         productViews: viewsData.analytics || [],
         productClicks: clicksData.analytics || [],
+        reviewsTrends: reviewsTrendsData.reviews_trends || [],
+        commentsTrends: commentsTrendsData.comments_trends || [],
       });
     } catch (error) {
       console.error("Error fetching analytics:", error);
@@ -159,7 +212,8 @@ const ManagerAnalytics = () => {
         {activeTab === "trends" && (
           <div className="grid grid-cols-1 gap-6">
             <RevenueChart />
-            {/* Additional trend charts can be added here */}
+            <ReviewTrendsChart data={analyticsData.reviewsTrends} />
+            <CommentTrendsChart data={analyticsData.commentsTrends} />
           </div>
         )}
       </div>

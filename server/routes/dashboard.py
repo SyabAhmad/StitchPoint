@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from werkzeug.security import generate_password_hash
 from werkzeug.utils import secure_filename
-from models import db, User, Order, Product, PageView, ButtonClick
+from models import db, User, Order, Product, PageView, ButtonClick, Review, Store
 from sqlalchemy import func
 import os
 from datetime import datetime
@@ -84,6 +84,19 @@ def admin_dashboard():
     else:
         total_orders = Order.query.filter_by(store_id=store_filter).count()
 
+    # Total reviews and average rating (global for super_admin, store-specific for manager)
+    if user.role == 'super_admin':
+        total_reviews = Review.query.count()
+        avg_rating_result = db.session.query(func.avg(Review.rating)).scalar()
+        avg_rating = round(float(avg_rating_result), 2) if avg_rating_result else 0.0
+    else:
+        # For managers, get reviews for their store's products
+        store_products = Product.query.filter_by(store_id=store_filter).with_entities(Product.id).all()
+        product_ids = [p.id for p in store_products]
+        total_reviews = Review.query.filter(Review.product_id.in_(product_ids)).count()
+        avg_rating_result = db.session.query(func.avg(Review.rating)).filter(Review.product_id.in_(product_ids)).scalar()
+        avg_rating = round(float(avg_rating_result), 2) if avg_rating_result else 0.0
+
     # Recent orders (global for super_admin, store-specific for manager)
     if user.role == 'super_admin':
         recent_orders = Order.query.order_by(Order.created_at.desc()).limit(10).all()
@@ -97,6 +110,18 @@ def admin_dashboard():
         'created_at': order.created_at.isoformat()
     } for order in recent_orders]
 
+    # Top rated products (global for super_admin, store-specific for manager)
+    if user.role == 'super_admin':
+        top_rated_products = db.session.query(
+            Product.id, Product.name, func.avg(Review.rating).label('avg_rating'), func.count(Review.id).label('review_count')
+        ).join(Review, Product.id == Review.product_id).group_by(Product.id, Product.name).order_by(func.avg(Review.rating).desc()).limit(5).all()
+    else:
+        store_products = Product.query.filter_by(store_id=store_filter).with_entities(Product.id).all()
+        product_ids = [p.id for p in store_products]
+        top_rated_products = db.session.query(
+            Product.id, Product.name, func.avg(Review.rating).label('avg_rating'), func.count(Review.id).label('review_count')
+        ).join(Review, Product.id == Review.product_id).filter(Product.id.in_(product_ids)).group_by(Product.id, Product.name).order_by(func.avg(Review.rating).desc()).limit(5).all()
+
     # Analytics data (global for super_admin, store-specific for manager)
     if user.role == 'super_admin':
         page_views_today = PageView.query.filter(func.date(PageView.viewed_at) == func.date(func.now())).count()
@@ -109,6 +134,9 @@ def admin_dashboard():
     analytics = {
         'total_products': total_products,
         'total_orders': total_orders,
+        'total_reviews': total_reviews,
+        'average_rating': avg_rating,
+        'top_rated_products': [{'product_id': p.id, 'product_name': p.name, 'avg_rating': round(float(p.avg_rating), 2), 'review_count': p.review_count} for p in top_rated_products],
         'page_views_today': page_views_today,
         'button_clicks_today': button_clicks_today
     }
@@ -400,3 +428,67 @@ def update_store():
     db.session.commit()
 
     return jsonify({'message': 'Store updated successfully'}), 200
+
+
+@dashboard_bp.route('/reviews/all', methods=['GET'])
+@jwt_required()
+def get_all_reviews():
+    try:
+        user_id = int(get_jwt_identity())
+    except (TypeError, ValueError):
+        return jsonify({'message': 'Invalid token identity'}), 422
+    user = User.query.get(user_id)
+
+    if not user or user.role not in ['manager', 'super_admin']:
+        return jsonify({'message': 'Unauthorized'}), 403
+
+    # Get all reviews with product and store info
+    reviews_query = Review.query.join(Product, Review.product_id == Product.id).add_columns(
+        Product.name.label('product_name'),
+        Product.store_id.label('store_id')
+    ).order_by(Review.created_at.desc()).all()
+
+    reviews_list = []
+    for review, product_name, store_id in reviews_query:
+        store = Store.query.get(store_id) if store_id else None
+        reviews_list.append({
+            'id': review.id,
+            'product_id': review.product_id,
+            'product_name': product_name,
+            'store_name': store.name if store else 'Unknown Store',
+            'user_id': review.user_id,
+            'user_name': review.user_name,
+            'rating': review.rating,
+            'comment': review.comment,
+            'created_at': review.created_at.isoformat()
+        })
+
+    return jsonify({'reviews': reviews_list}), 200
+
+
+@dashboard_bp.route('/reviews/<int:review_id>', methods=['DELETE'])
+@jwt_required()
+def delete_review(review_id):
+    try:
+        user_id = int(get_jwt_identity())
+    except (TypeError, ValueError):
+        return jsonify({'message': 'Invalid token identity'}), 422
+    user = User.query.get(user_id)
+
+    if not user or user.role not in ['manager', 'super_admin']:
+        return jsonify({'message': 'Unauthorized'}), 403
+
+    review = Review.query.get(review_id)
+    if not review:
+        return jsonify({'message': 'Review not found'}), 404
+
+    # For managers, check if the review belongs to their store's products
+    if user.role == 'manager':
+        product = Product.query.get(review.product_id)
+        if not product or product.store_id != user.store.id:
+            return jsonify({'message': 'Unauthorized to delete this review'}), 403
+
+    db.session.delete(review)
+    db.session.commit()
+
+    return jsonify({'message': 'Review deleted successfully'}), 200

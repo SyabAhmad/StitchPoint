@@ -1,0 +1,290 @@
+import React, { useState, useEffect } from "react";
+import OverviewStats from "../../components/analytics/OverviewStats";
+import AnalyticsPieChart from "../../components/analytics/AnalyticsPieChart";
+import TopProductsList from "../../components/analytics/TopProductsList";
+import ProductViewsChart from "../../components/analytics/ProductViewsChart";
+import ProductClicksChart from "../../components/analytics/ProductClicksChart";
+import ReviewTrendsChart from "../../components/analytics/ReviewTrendsChart";
+import CommentTrendsChart from "../../components/analytics/CommentTrendsChart";
+
+const ProductAnalytics = () => {
+  const [productsAnalytics, setProductsAnalytics] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [filterDays, setFilterDays] = useState(30);
+
+  useEffect(() => {
+    fetchProductsAnalytics();
+  }, [filterDays]);
+
+  const fetchProductsAnalytics = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        `http://localhost:5000/api/analytics/products-analytics?days=${filterDays}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      const data = await response.json();
+      setProductsAnalytics(data.products_analytics || []);
+    } catch (error) {
+      console.error("Error fetching products analytics:", error);
+      setProductsAnalytics([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div
+        className="flex justify-center items-center h-screen"
+        style={{ backgroundColor: "#000000", color: "#ffffff" }}
+      >
+        <div className="flex flex-col items-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-yellow-500 mb-4"></div>
+          <span>Loading products analytics...</span>
+        </div>
+      </div>
+    );
+  }
+
+  // Calculate overview stats from products analytics
+  const overview = {
+    total_views: productsAnalytics.reduce((sum, p) => sum + p.total_views, 0),
+    total_clicks: productsAnalytics.reduce((sum, p) => sum + p.total_clicks, 0),
+    total_cart_adds: productsAnalytics.reduce(
+      (sum, p) => sum + p.total_cart_adds,
+      0
+    ),
+    avg_time_spent:
+      productsAnalytics.length > 0
+        ? productsAnalytics.reduce((sum, p) => sum + p.avg_time_spent, 0) /
+          productsAnalytics.length
+        : 0,
+    total_reviews: productsAnalytics.reduce(
+      (sum, p) => sum + p.total_reviews,
+      0
+    ),
+    avg_rating:
+      productsAnalytics.length > 0
+        ? productsAnalytics.reduce((sum, p) => sum + p.avg_rating, 0) /
+          productsAnalytics.length
+        : 0,
+    total_comments: productsAnalytics.reduce(
+      (sum, p) => sum + p.total_comments,
+      0
+    ),
+    avg_comments_per_product:
+      productsAnalytics.length > 0
+        ? productsAnalytics.reduce((sum, p) => sum + p.total_comments, 0) /
+          productsAnalytics.length
+        : 0,
+    top_products: productsAnalytics.slice(0, 5).map((p) => ({
+      product_id: p.product_id,
+      name: p.product_name,
+      views: p.total_views,
+    })),
+  };
+
+  return (
+    <div
+      className="p-8"
+      style={{ backgroundColor: "#000000", minHeight: "100vh" }}
+    >
+      <div className="max-w-7xl mx-auto">
+        <h1 className="text-3xl font-bold mb-6" style={{ color: "#d4af37" }}>
+          Product Analytics
+        </h1>
+
+        {/* Filter */}
+        <div className="mb-6">
+          <label className="block text-sm mb-2" style={{ color: "#cccccc" }}>
+            Time Period:
+          </label>
+          <select
+            value={filterDays}
+            onChange={(e) => setFilterDays(Number(e.target.value))}
+            className="px-3 py-2 rounded"
+            style={{
+              backgroundColor: "#2d2d2d",
+              color: "#ffffff",
+              border: "1px solid #3d3d3d",
+            }}
+          >
+            <option value={7}>Last 7 days</option>
+            <option value={30}>Last 30 days</option>
+            <option value={90}>Last 90 days</option>
+          </select>
+        </div>
+
+        {/* Overview Stats */}
+        <OverviewStats data={overview} />
+
+        {/* Products Table */}
+        <div
+          className="shadow overflow-hidden sm:rounded-md mb-8"
+          style={{ backgroundColor: "#1d1d1d" }}
+        >
+          <div
+            className="px-4 py-5 sm:px-6 border-b"
+            style={{ borderColor: "#2d2d2d" }}
+          >
+            <h3
+              className="text-lg leading-6 font-medium"
+              style={{ color: "#ffffff" }}
+            >
+              Products Performance
+            </h3>
+            <p className="mt-1 max-w-2xl text-sm" style={{ color: "#999999" }}>
+              Detailed analytics for each product
+            </p>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="min-w-full">
+              <thead style={{ backgroundColor: "#2d2d2d" }}>
+                <tr>
+                  <th
+                    className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
+                    style={{ color: "#d4af37" }}
+                  >
+                    Product
+                  </th>
+                  <th
+                    className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
+                    style={{ color: "#d4af37" }}
+                  >
+                    Store
+                  </th>
+                  <th
+                    className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
+                    style={{ color: "#d4af37" }}
+                  >
+                    Views
+                  </th>
+                  <th
+                    className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
+                    style={{ color: "#d4af37" }}
+                  >
+                    Clicks
+                  </th>
+                  <th
+                    className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
+                    style={{ color: "#d4af37" }}
+                  >
+                    Cart Adds
+                  </th>
+                  <th
+                    className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
+                    style={{ color: "#d4af37" }}
+                  >
+                    Avg Time
+                  </th>
+                  <th
+                    className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
+                    style={{ color: "#d4af37" }}
+                  >
+                    Reviews
+                  </th>
+                  <th
+                    className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
+                    style={{ color: "#d4af37" }}
+                  >
+                    Avg Rating
+                  </th>
+                  <th
+                    className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
+                    style={{ color: "#d4af37" }}
+                  >
+                    Comments
+                  </th>
+                </tr>
+              </thead>
+              <tbody style={{ backgroundColor: "#1d1d1d" }}>
+                {productsAnalytics.map((product, index) => (
+                  <tr
+                    key={product.product_id}
+                    className="transition-colors duration-150"
+                    style={{
+                      borderBottom: "1px solid #2d2d2d",
+                      backgroundColor: index % 2 === 0 ? "#1d1d1d" : "#2d2d2d",
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = "#1f1f1f";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor =
+                        index % 2 === 0 ? "#1d1d1d" : "#2d2d2d";
+                    }}
+                  >
+                    <td
+                      className="px-6 py-4 whitespace-nowrap text-sm font-medium"
+                      style={{ color: "#ffffff" }}
+                    >
+                      {product.product_name}
+                    </td>
+                    <td
+                      className="px-6 py-4 whitespace-nowrap text-sm"
+                      style={{ color: "#cccccc" }}
+                    >
+                      {product.store_name}
+                    </td>
+                    <td
+                      className="px-6 py-4 whitespace-nowrap text-sm"
+                      style={{ color: "#cccccc" }}
+                    >
+                      {product.total_views}
+                    </td>
+                    <td
+                      className="px-6 py-4 whitespace-nowrap text-sm"
+                      style={{ color: "#cccccc" }}
+                    >
+                      {product.total_clicks}
+                    </td>
+                    <td
+                      className="px-6 py-4 whitespace-nowrap text-sm"
+                      style={{ color: "#cccccc" }}
+                    >
+                      {product.total_cart_adds}
+                    </td>
+                    <td
+                      className="px-6 py-4 whitespace-nowrap text-sm"
+                      style={{ color: "#cccccc" }}
+                    >
+                      {product.avg_time_spent}s
+                    </td>
+                    <td
+                      className="px-6 py-4 whitespace-nowrap text-sm"
+                      style={{ color: "#cccccc" }}
+                    >
+                      {product.total_reviews}
+                    </td>
+                    <td
+                      className="px-6 py-4 whitespace-nowrap text-sm"
+                      style={{ color: "#cccccc" }}
+                    >
+                      {product.avg_rating}
+                    </td>
+                    <td
+                      className="px-6 py-4 whitespace-nowrap text-sm"
+                      style={{ color: "#cccccc" }}
+                    >
+                      {product.total_comments}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            {productsAnalytics.length === 0 && (
+              <div className="text-center py-8" style={{ color: "#999999" }}>
+                No products analytics available.
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ProductAnalytics;

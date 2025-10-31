@@ -26,6 +26,30 @@ const OverviewStats = ({ data }) => {
       color: "#f4e4bc",
       icon: "⏱️",
     },
+    {
+      label: "Total Reviews",
+      value: data.total_reviews,
+      color: "#ffd700",
+      icon: "⭐",
+    },
+    {
+      label: "Avg Rating",
+      value: data.avg_rating,
+      color: "#ffb347",
+      icon: "📊",
+    },
+    {
+      label: "Total Comments",
+      value: data.total_comments,
+      color: "#ff8c00",
+      icon: "💬",
+    },
+    {
+      label: "Avg Comments/Product",
+      value: data.avg_comments_per_product,
+      color: "#ff6347",
+      icon: "📝",
+    },
   ];
 
   return (
