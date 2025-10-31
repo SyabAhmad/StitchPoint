@@ -31,101 +31,101 @@ const ManagerAnalytics = () => {
   const [activeTab, setActiveTab] = useState("overview");
 
   useEffect(() => {
+    const fetchAnalytics = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const [
+          overviewRes,
+          viewsRes,
+          clicksRes,
+          reviewsOverviewRes,
+          reviewsTrendsRes,
+          commentsTrendsRes,
+        ] = await Promise.all([
+          fetch(
+            `http://localhost:5000/api/analytics/overview?days=${filterDays}`,
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          ),
+          fetch(
+            `http://localhost:5000/api/analytics/product-views?days=${filterDays}`,
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          ),
+          fetch(
+            `http://localhost:5000/api/analytics/product-clicks?days=${filterDays}`,
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          ),
+          fetch(
+            `http://localhost:5000/api/analytics/reviews-overview?days=${filterDays}`,
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          ),
+          fetch(
+            `http://localhost:5000/api/analytics/reviews-trends?days=${filterDays}`,
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          ),
+          fetch(
+            `http://localhost:5000/api/analytics/comments-trends?days=${filterDays}`,
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          ),
+        ]);
+
+        const [
+          overviewData,
+          viewsData,
+          clicksData,
+          reviewsOverviewData,
+          reviewsTrendsData,
+          commentsTrendsData,
+        ] = await Promise.all([
+          overviewRes.json(),
+          viewsRes.json(),
+          clicksRes.json(),
+          reviewsOverviewRes.json(),
+          reviewsTrendsRes.json(),
+          commentsTrendsRes.json(),
+        ]);
+
+        setAnalyticsData({
+          overview: {
+            ...(overviewData.overview || {
+              total_views: 0,
+              total_clicks: 0,
+              total_cart_adds: 0,
+              avg_time_spent: 0,
+              top_products: [],
+            }),
+            ...(reviewsOverviewData.reviews_overview || {
+              total_reviews: 0,
+              avg_rating: 0,
+              total_comments: 0,
+              avg_comments_per_product: 0,
+            }),
+          },
+          productViews: viewsData.analytics || [],
+          productClicks: clicksData.analytics || [],
+          reviewsTrends: reviewsTrendsData.reviews_trends || [],
+          commentsTrends: commentsTrendsData.comments_trends || [],
+        });
+      } catch (error) {
+        console.error("Error fetching analytics:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchAnalytics();
   }, [filterDays]);
-
-  const fetchAnalytics = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      const [
-        overviewRes,
-        viewsRes,
-        clicksRes,
-        reviewsOverviewRes,
-        reviewsTrendsRes,
-        commentsTrendsRes,
-      ] = await Promise.all([
-        fetch(
-          `http://localhost:5000/api/analytics/overview?days=${filterDays}`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        ),
-        fetch(
-          `http://localhost:5000/api/analytics/product-views?days=${filterDays}`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        ),
-        fetch(
-          `http://localhost:5000/api/analytics/product-clicks?days=${filterDays}`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        ),
-        fetch(
-          `http://localhost:5000/api/analytics/reviews-overview?days=${filterDays}`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        ),
-        fetch(
-          `http://localhost:5000/api/analytics/reviews-trends?days=${filterDays}`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        ),
-        fetch(
-          `http://localhost:5000/api/analytics/comments-trends?days=${filterDays}`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        ),
-      ]);
-
-      const [
-        overviewData,
-        viewsData,
-        clicksData,
-        reviewsOverviewData,
-        reviewsTrendsData,
-        commentsTrendsData,
-      ] = await Promise.all([
-        overviewRes.json(),
-        viewsRes.json(),
-        clicksRes.json(),
-        reviewsOverviewRes.json(),
-        reviewsTrendsRes.json(),
-        commentsTrendsRes.json(),
-      ]);
-
-      setAnalyticsData({
-        overview: {
-          ...(overviewData.overview || {
-            total_views: 0,
-            total_clicks: 0,
-            total_cart_adds: 0,
-            avg_time_spent: 0,
-            top_products: [],
-          }),
-          ...(reviewsOverviewData.reviews_overview || {
-            total_reviews: 0,
-            avg_rating: 0,
-            total_comments: 0,
-            avg_comments_per_product: 0,
-          }),
-        },
-        productViews: viewsData.analytics || [],
-        productClicks: clicksData.analytics || [],
-        reviewsTrends: reviewsTrendsData.reviews_trends || [],
-        commentsTrends: commentsTrendsData.comments_trends || [],
-      });
-    } catch (error) {
-      console.error("Error fetching analytics:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   if (loading) {
     return (

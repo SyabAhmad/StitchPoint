@@ -13,27 +13,27 @@ const ProductAnalytics = () => {
   const [filterDays, setFilterDays] = useState(30);
 
   useEffect(() => {
+    const fetchProductsAnalytics = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await fetch(
+          `http://localhost:5000/api/analytics/products-analytics?days=${filterDays}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        const data = await response.json();
+        setProductsAnalytics(data.products_analytics || []);
+      } catch (error) {
+        console.error("Error fetching products analytics:", error);
+        setProductsAnalytics([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchProductsAnalytics();
   }, [filterDays]);
-
-  const fetchProductsAnalytics = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      const response = await fetch(
-        `http://localhost:5000/api/analytics/products-analytics?days=${filterDays}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      const data = await response.json();
-      setProductsAnalytics(data.products_analytics || []);
-    } catch (error) {
-      console.error("Error fetching products analytics:", error);
-      setProductsAnalytics([]);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   if (loading) {
     return (

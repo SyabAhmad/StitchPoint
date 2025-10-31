@@ -17,74 +17,117 @@ import {
 } from "react-icons/fa";
 
 const Analytics = () => {
-  const [analytics, setAnalytics] = useState({});
+  const [analyticsData, setAnalyticsData] = useState({
+    overview: {
+      total_views: 0,
+      total_clicks: 0,
+      total_cart_adds: 0,
+      avg_time_spent: 0,
+      top_products: [],
+      total_reviews: 0,
+      avg_rating: 0,
+      total_comments: 0,
+      avg_comments_per_product: 0,
+    },
+    productViews: [],
+    productClicks: [],
+    reviewsTrends: [],
+    commentsTrends: [],
+  });
   const [recentOrders, setRecentOrders] = useState([]);
-  const [overviewData, setOverviewData] = useState({});
-  const [reviewsTrends, setReviewsTrends] = useState([]);
-  const [commentsTrends, setCommentsTrends] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedPeriod, setSelectedPeriod] = useState("today");
-  const [filterDays, setFilterDays] = useState(30);
+  const [selectedPeriod, setSelectedPeriod] = useState("month");
+
+  const periodToDays = (p) => {
+    if (p === "today") return 1;
+    if (p === "week") return 7;
+    return 30;
+  };
 
   useEffect(() => {
+    const fetchAnalyticsData = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const days = periodToDays(selectedPeriod);
+
+        const [
+          overviewRes,
+          viewsRes,
+          clicksRes,
+          reviewsOverviewRes,
+          reviewsTrendsRes,
+          commentsTrendsRes,
+          basicRes,
+        ] = await Promise.all([
+          fetch(`http://localhost:5000/api/analytics/overview?days=${days}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          fetch(
+            `http://localhost:5000/api/analytics/product-views?days=${days}`,
+            { headers: { Authorization: `Bearer ${token}` } }
+          ),
+          fetch(
+            `http://localhost:5000/api/analytics/product-clicks?days=${days}`,
+            { headers: { Authorization: `Bearer ${token}` } }
+          ),
+          fetch(
+            `http://localhost:5000/api/analytics/reviews-overview?days=${days}`,
+            { headers: { Authorization: `Bearer ${token}` } }
+          ),
+          fetch(
+            `http://localhost:5000/api/analytics/reviews-trends?days=${days}`,
+            { headers: { Authorization: `Bearer ${token}` } }
+          ),
+          fetch(
+            `http://localhost:5000/api/analytics/comments-trends?days=${days}`,
+            { headers: { Authorization: `Bearer ${token}` } }
+          ),
+          fetch("http://localhost:5000/api/dashboard/admin", {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+        ]);
+
+        const [
+          overviewData,
+          viewsData,
+          clicksData,
+          reviewsOverviewData,
+          reviewsTrendsData,
+          commentsTrendsData,
+          basicData,
+        ] = await Promise.all([
+          overviewRes.json(),
+          viewsRes.json(),
+          clicksRes.json(),
+          reviewsOverviewRes.json(),
+          reviewsTrendsRes.json(),
+          commentsTrendsRes.json(),
+          basicRes.json(),
+        ]);
+
+        setAnalyticsData({
+          overview: {
+            ...(overviewData.overview || {}),
+            ...(reviewsOverviewData.reviews_overview || {}),
+          },
+          productViews: viewsData.analytics || [],
+          productClicks: clicksData.analytics || [],
+          reviewsTrends: reviewsTrendsData.reviews_trends || [],
+          commentsTrends: commentsTrendsData.comments_trends || [],
+        });
+
+        setRecentOrders(basicData.recent_orders || []);
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching analytics data:", error);
+        setAnalyticsData((p) => p);
+        setRecentOrders([]);
+        setLoading(false);
+      }
+    };
+
     fetchAnalyticsData();
-  }, [filterDays]);
-
-  const fetchAnalyticsData = async () => {
-    try {
-      const token = localStorage.getItem("token");
-
-      // Fetch basic analytics
-      const basicResponse = await fetch(
-        "http://localhost:5000/api/dashboard/admin",
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      const basicData = await basicResponse.json();
-
-      // Fetch detailed analytics
-      const overviewResponse = await fetch(
-        `http://localhost:5000/api/analytics/overview?days=${filterDays}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      const overviewData = await overviewResponse.json();
-
-      // Fetch trends
-      const reviewsTrendsResponse = await fetch(
-        `http://localhost:5000/api/analytics/reviews-trends?days=${filterDays}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      const reviewsTrendsData = await reviewsTrendsResponse.json();
-
-      const commentsTrendsResponse = await fetch(
-        `http://localhost:5000/api/analytics/comments-trends?days=${filterDays}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      const commentsTrendsData = await commentsTrendsResponse.json();
-
-      setAnalytics(basicData.analytics || {});
-      setRecentOrders(basicData.recent_orders || []);
-      setOverviewData(overviewData.overview || {});
-      setReviewsTrends(reviewsTrendsData.reviews_trends || []);
-      setCommentsTrends(commentsTrendsData.comments_trends || []);
-      setLoading(false);
-    } catch (error) {
-      console.error("Error fetching analytics data:", error);
-      setAnalytics({});
-      setRecentOrders([]);
-      setOverviewData({});
-      setReviewsTrends([]);
-      setCommentsTrends([]);
-      setLoading(false);
-    }
-  };
+  }, [selectedPeriod]);
 
   if (loading) {
     return (
@@ -184,166 +227,10 @@ const Analytics = () => {
           </div>
         </div>
 
-        {/* Analytics Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
-          <div
-            className="shadow rounded-lg p-5 transition-all duration-200 hover:transform hover:scale-105"
-            style={{ backgroundColor: "#1d1d1d" }}
-          >
-            <div className="flex items-center">
-              <div
-                className="flex-shrink-0 p-3 rounded-full"
-                style={{ backgroundColor: "rgba(212, 175, 55, 0.2)" }}
-              >
-                <FaUsers className="w-6 h-6" style={{ color: "#d4af37" }} />
-              </div>
-              <div className="ml-5 w-0 flex-1">
-                <dl>
-                  <dt
-                    className="text-sm font-medium truncate"
-                    style={{ color: "#999999" }}
-                  >
-                    Total Users
-                  </dt>
-                  <dd
-                    className="text-lg font-bold"
-                    style={{ color: "#ffffff" }}
-                  >
-                    {analytics.total_users}
-                  </dd>
-                </dl>
-              </div>
-            </div>
-          </div>
+        {/* Overview Stats */}
+        <OverviewStats data={analyticsData.overview} />
 
-          <div
-            className="shadow rounded-lg p-5 transition-all duration-200 hover:transform hover:scale-105"
-            style={{ backgroundColor: "#1d1d1d" }}
-          >
-            <div className="flex items-center">
-              <div
-                className="flex-shrink-0 p-3 rounded-full"
-                style={{ backgroundColor: "rgba(212, 175, 55, 0.2)" }}
-              >
-                <FaBox className="w-6 h-6" style={{ color: "#d4af37" }} />
-              </div>
-              <div className="ml-5 w-0 flex-1">
-                <dl>
-                  <dt
-                    className="text-sm font-medium truncate"
-                    style={{ color: "#999999" }}
-                  >
-                    Total Products
-                  </dt>
-                  <dd
-                    className="text-lg font-bold"
-                    style={{ color: "#ffffff" }}
-                  >
-                    {analytics.total_products}
-                  </dd>
-                </dl>
-              </div>
-            </div>
-          </div>
-
-          <div
-            className="shadow rounded-lg p-5 transition-all duration-200 hover:transform hover:scale-105"
-            style={{ backgroundColor: "#1d1d1d" }}
-          >
-            <div className="flex items-center">
-              <div
-                className="flex-shrink-0 p-3 rounded-full"
-                style={{ backgroundColor: "rgba(212, 175, 55, 0.2)" }}
-              >
-                <FaShoppingCart
-                  className="w-6 h-6"
-                  style={{ color: "#d4af37" }}
-                />
-              </div>
-              <div className="ml-5 w-0 flex-1">
-                <dl>
-                  <dt
-                    className="text-sm font-medium truncate"
-                    style={{ color: "#999999" }}
-                  >
-                    Total Orders
-                  </dt>
-                  <dd
-                    className="text-lg font-bold"
-                    style={{ color: "#ffffff" }}
-                  >
-                    {analytics.total_orders}
-                  </dd>
-                </dl>
-              </div>
-            </div>
-          </div>
-
-          <div
-            className="shadow rounded-lg p-5 transition-all duration-200 hover:transform hover:scale-105"
-            style={{ backgroundColor: "#1d1d1d" }}
-          >
-            <div className="flex items-center">
-              <div
-                className="flex-shrink-0 p-3 rounded-full"
-                style={{ backgroundColor: "rgba(212, 175, 55, 0.2)" }}
-              >
-                <FaEye className="w-6 h-6" style={{ color: "#d4af37" }} />
-              </div>
-              <div className="ml-5 w-0 flex-1">
-                <dl>
-                  <dt
-                    className="text-sm font-medium truncate"
-                    style={{ color: "#999999" }}
-                  >
-                    Page Views Today
-                  </dt>
-                  <dd
-                    className="text-lg font-bold"
-                    style={{ color: "#ffffff" }}
-                  >
-                    {analytics.page_views_today}
-                  </dd>
-                </dl>
-              </div>
-            </div>
-          </div>
-
-          <div
-            className="shadow rounded-lg p-5 transition-all duration-200 hover:transform hover:scale-105"
-            style={{ backgroundColor: "#1d1d1d" }}
-          >
-            <div className="flex items-center">
-              <div
-                className="flex-shrink-0 p-3 rounded-full"
-                style={{ backgroundColor: "rgba(212, 175, 55, 0.2)" }}
-              >
-                <FaMousePointer
-                  className="w-6 h-6"
-                  style={{ color: "#d4af37" }}
-                />
-              </div>
-              <div className="ml-5 w-0 flex-1">
-                <dl>
-                  <dt
-                    className="text-sm font-medium truncate"
-                    style={{ color: "#999999" }}
-                  >
-                    Clicks Today
-                  </dt>
-                  <dd
-                    className="text-lg font-bold"
-                    style={{ color: "#ffffff" }}
-                  >
-                    {analytics.button_clicks_today}
-                  </dd>
-                </dl>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Revenue Chart Placeholder */}
+        {/* Charts: Product Views & Clicks */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           <div
             className="shadow rounded-lg p-6"
@@ -351,36 +238,16 @@ const Analytics = () => {
           >
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-medium" style={{ color: "#ffffff" }}>
-                Revenue Overview
+                Product Views
               </h3>
               <button
                 className="p-2 rounded-md transition-colors duration-200"
                 style={{ color: "#d4af37" }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor =
-                    "rgba(212, 175, 55, 0.1)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = "transparent";
-                }}
               >
-                <FaChartLine />
+                <FaEye />
               </button>
             </div>
-            <div
-              className="h-64 flex items-center justify-center"
-              style={{ backgroundColor: "#2d2d2d", borderRadius: "0.375rem" }}
-            >
-              <div className="text-center">
-                <FaChartLine
-                  className="mx-auto h-12 w-12 mb-2"
-                  style={{ color: "#d4af37" }}
-                />
-                <p style={{ color: "#999999" }}>
-                  Chart visualization would go here
-                </p>
-              </div>
-            </div>
+            <ProductViewsChart data={analyticsData.productViews} />
           </div>
 
           <div
@@ -389,35 +256,47 @@ const Analytics = () => {
           >
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-medium" style={{ color: "#ffffff" }}>
-                Top Products
+                Product Clicks
               </h3>
               <button
                 className="p-2 rounded-md transition-colors duration-200"
                 style={{ color: "#d4af37" }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor =
-                    "rgba(212, 175, 55, 0.1)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = "transparent";
-                }}
               >
-                <FaBox />
+                <FaMousePointer />
               </button>
             </div>
-            <div
-              className="h-64 flex items-center justify-center"
-              style={{ backgroundColor: "#2d2d2d", borderRadius: "0.375rem" }}
+            <ProductClicksChart data={analyticsData.productClicks} />
+          </div>
+        </div>
+
+        {/* Top Products */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+          <div
+            className="shadow rounded-lg p-6"
+            style={{ backgroundColor: "#1d1d1d" }}
+          >
+            <h3
+              className="text-lg font-medium mb-4"
+              style={{ color: "#ffffff" }}
             >
-              <div className="text-center">
-                <FaBox
-                  className="mx-auto h-12 w-12 mb-2"
-                  style={{ color: "#d4af37" }}
-                />
-                <p style={{ color: "#999999" }}>
-                  Top products list would go here
-                </p>
-              </div>
+              Top Products
+            </h3>
+            <TopProductsList products={analyticsData.overview.top_products} />
+          </div>
+
+          <div
+            className="shadow rounded-lg p-6"
+            style={{ backgroundColor: "#1d1d1d" }}
+          >
+            <h3
+              className="text-lg font-medium mb-4"
+              style={{ color: "#ffffff" }}
+            >
+              Trends
+            </h3>
+            <div className="space-y-4">
+              <ReviewTrendsChart data={analyticsData.reviewsTrends} />
+              <CommentTrendsChart data={analyticsData.commentsTrends} />
             </div>
           </div>
         </div>

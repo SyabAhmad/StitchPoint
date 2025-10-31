@@ -24,11 +24,13 @@ import ManagerComments from "./pages/manager/Comments.jsx";
 import ManagerReviews from "./pages/manager/Reviews.jsx";
 import SuperAdminDashboard from "./pages/super_admin/Dashboard.jsx";
 import Analytics from "./pages/super_admin/Analytics.jsx";
+import QuickActions from "./pages/super_admin/QuickActions.jsx";
 import UserManagement from "./pages/super_admin/UserManagement.jsx";
 import Products from "./pages/super_admin/Products.jsx";
 import Orders from "./pages/super_admin/Orders.jsx";
 import ProductAnalytics from "./pages/super_admin/ProductAnalytics.jsx";
 import StoreAnalytics from "./pages/super_admin/StoreAnalytics.jsx";
+import StoreAnalyticsDetail from "./pages/super_admin/StoreAnalyticsDetail.jsx";
 import Comments from "./pages/super_admin/Comments.jsx";
 import Reviews from "./pages/super_admin/Reviews.jsx";
 
@@ -60,13 +62,17 @@ function App() {
             <Route path="profile" element={<ManagerProfile />} />
           </Route>
           <Route path="super-admin-dashboard" element={<SuperAdminDashboard />}>
-            <Route index element={<Analytics />} />
+            <Route index element={<QuickActions />} />
             <Route path="analytics" element={<Analytics />} />
             <Route path="user-management" element={<UserManagement />} />
             <Route path="products" element={<Products />} />
             <Route path="orders" element={<Orders />} />
             <Route path="product-analytics" element={<ProductAnalytics />} />
             <Route path="store-analytics" element={<StoreAnalytics />} />
+            <Route
+              path="store-analytics/:store_id"
+              element={<StoreAnalyticsDetail />}
+            />
             <Route path="comments" element={<Comments />} />
             <Route path="reviews" element={<Reviews />} />
           </Route>

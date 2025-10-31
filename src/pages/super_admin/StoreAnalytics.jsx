@@ -1,32 +1,34 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 const StoreAnalytics = () => {
   const [storesAnalytics, setStoresAnalytics] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filterDays, setFilterDays] = useState(30);
+  const navigate = useNavigate();
 
   useEffect(() => {
+    const fetchStoresAnalytics = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await fetch(
+          `http://localhost:5000/api/analytics/stores-analytics?days=${filterDays}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        const data = await response.json();
+        setStoresAnalytics(data.stores_analytics || []);
+      } catch (error) {
+        console.error("Error fetching stores analytics:", error);
+        setStoresAnalytics([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchStoresAnalytics();
   }, [filterDays]);
-
-  const fetchStoresAnalytics = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      const response = await fetch(
-        `http://localhost:5000/api/analytics/stores-analytics?days=${filterDays}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      const data = await response.json();
-      setStoresAnalytics(data.stores_analytics || []);
-    } catch (error) {
-      console.error("Error fetching stores analytics:", error);
-      setStoresAnalytics([]);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   if (loading) {
     return (
@@ -160,6 +162,7 @@ const StoreAnalytics = () => {
                     style={{
                       borderBottom: "1px solid #2d2d2d",
                       backgroundColor: index % 2 === 0 ? "#1d1d1d" : "#2d2d2d",
+                      cursor: "pointer",
                     }}
                     onMouseEnter={(e) => {
                       e.currentTarget.style.backgroundColor = "#1f1f1f";
@@ -168,6 +171,11 @@ const StoreAnalytics = () => {
                       e.currentTarget.style.backgroundColor =
                         index % 2 === 0 ? "#1d1d1d" : "#2d2d2d";
                     }}
+                    onClick={() =>
+                      navigate(
+                        `/super-admin-dashboard/store-analytics/${store.store_id}`
+                      )
+                    }
                   >
                     <td
                       className="px-6 py-4 whitespace-nowrap text-sm font-medium"

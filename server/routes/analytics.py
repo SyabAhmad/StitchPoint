@@ -555,6 +555,130 @@ def get_stores_analytics():
 
     return jsonify({'stores_analytics': data}), 200
 
+
+@analytics_bp.route('/stores-analytics/<int:store_id>', methods=['GET'])
+@jwt_required()
+def get_store_analytics(store_id):
+    try:
+        user_id = int(get_jwt_identity())
+    except (TypeError, ValueError):
+        return jsonify({'message': 'Invalid token identity'}), 422
+    user = User.query.get(user_id)
+
+    if not user or user.role not in ['manager', 'super_admin']:
+        return jsonify({'message': 'Unauthorized'}), 403
+
+    # Managers may only access their own store
+    if user.role == 'manager' and user.store and user.store.id != store_id:
+        return jsonify({'message': 'Unauthorized for this store'}), 403
+
+    days = request.args.get('days', 30, type=int)
+    start_date = datetime.utcnow() - timedelta(days=days)
+
+    # Query single store analytics
+    row = db.session.query(
+        Store.id,
+        Store.name,
+        func.count(func.distinct(Product.id)).label('total_products'),
+        func.count(ProductAnalytics.id).label('total_views'),
+        func.sum(case((ProductAnalytics.action == 'click', 1), else_=0)).label('total_clicks'),
+        func.sum(case((ProductAnalytics.action == 'add_to_cart', 1), else_=0)).label('total_cart_adds'),
+        func.avg(case((ProductAnalytics.action == 'view', ProductAnalytics.time_spent), else_=None)).label('avg_time_spent'),
+        func.count(func.distinct(Review.id)).label('total_reviews'),
+        func.avg(Review.rating).label('avg_rating'),
+        func.count(func.distinct(Comment.id)).label('total_comments')
+    ) \
+    .outerjoin(Product, Store.id == Product.store_id) \
+    .outerjoin(ProductAnalytics, Product.id == ProductAnalytics.product_id) \
+    .outerjoin(Review, Product.id == Review.product_id) \
+    .outerjoin(Comment, Product.id == Comment.product_id) \
+    .filter(Store.id == store_id) \
+    .filter(ProductAnalytics.timestamp >= start_date if ProductAnalytics.timestamp else True) \
+    .group_by(Store.id, Store.name) \
+    .first()
+
+    if not row:
+        return jsonify({'message': 'Store not found'}), 404
+
+    store_data = {
+        'store_id': row.id,
+        'store_name': row.name,
+        'total_products': row.total_products or 0,
+        'total_views': row.total_views or 0,
+        'total_clicks': row.total_clicks or 0,
+        'total_cart_adds': row.total_cart_adds or 0,
+        'avg_time_spent': round(row.avg_time_spent or 0, 2),
+        'total_reviews': row.total_reviews or 0,
+        'avg_rating': round(row.avg_rating or 0, 2),
+        'total_comments': row.total_comments or 0
+    }
+
+    return jsonify({'store': store_data}), 200
+
+
+@analytics_bp.route('/products-by-store', methods=['GET'])
+@jwt_required()
+def get_products_by_store():
+    try:
+        user_id = int(get_jwt_identity())
+    except (TypeError, ValueError):
+        return jsonify({'message': 'Invalid token identity'}), 422
+    user = User.query.get(user_id)
+
+    if not user or user.role not in ['manager', 'super_admin']:
+        return jsonify({'message': 'Unauthorized'}), 403
+
+    days = request.args.get('days', 30, type=int)
+    start_date = datetime.utcnow() - timedelta(days=days)
+
+    store_id = request.args.get('store_id', type=int)
+    # For managers, default to their store
+    if user.role == 'manager' and user.store:
+        store_id = user.store.id
+
+    if not store_id:
+        return jsonify({'message': 'store_id is required'}), 400
+
+    # Query products for the given store
+    query = db.session.query(
+        Product.id,
+        Product.name,
+        Product.store_id,
+        func.count(ProductAnalytics.id).label('total_views'),
+        func.sum(case((ProductAnalytics.action == 'click', 1), else_=0)).label('total_clicks'),
+        func.sum(case((ProductAnalytics.action == 'add_to_cart', 1), else_=0)).label('total_cart_adds'),
+        func.avg(case((ProductAnalytics.action == 'view', ProductAnalytics.time_spent), else_=None)).label('avg_time_spent'),
+        func.count(func.distinct(Review.id)).label('total_reviews'),
+        func.avg(Review.rating).label('avg_rating'),
+        func.count(func.distinct(Comment.id)).label('total_comments')
+    ) \
+    .outerjoin(ProductAnalytics, Product.id == ProductAnalytics.product_id) \
+    .outerjoin(Review, Product.id == Review.product_id) \
+    .outerjoin(Comment, Product.id == Comment.product_id) \
+    .filter(Product.store_id == store_id) \
+    .filter(ProductAnalytics.timestamp >= start_date if ProductAnalytics.timestamp else True) \
+    .group_by(Product.id, Product.name, Product.store_id) \
+    .order_by(desc('total_views'))
+
+    results = query.all()
+
+    data = []
+    for row in results:
+        data.append({
+            'product_id': row.id,
+            'product_name': row.name,
+            'store_id': row.store_id,
+            'total_views': row.total_views or 0,
+            'total_clicks': row.total_clicks or 0,
+            'total_cart_adds': row.total_cart_adds or 0,
+            'avg_time_spent': round(row.avg_time_spent or 0, 2),
+            'total_reviews': row.total_reviews or 0,
+            'avg_rating': round(row.avg_rating or 0, 2),
+            'total_comments': row.total_comments or 0
+        })
+
+    return jsonify({'products': data}), 200
+
 @analytics_bp.route('/comments', methods=['GET'])
 @jwt_required()
 def get_all_comments():
