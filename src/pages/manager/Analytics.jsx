@@ -1,19 +1,10 @@
 import React, { useState, useEffect } from "react";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  PieChart,
-  Pie,
-  Cell,
-  LineChart,
-  Line,
-  ResponsiveContainer,
-} from "recharts";
+import OverviewStats from "../../components/analytics/OverviewStats";
+import AnalyticsPieChart from "../../components/analytics/AnalyticsPieChart";
+import TopProductsList from "../../components/analytics/TopProductsList";
+import ProductViewsChart from "../../components/analytics/ProductViewsChart";
+import ProductClicksChart from "../../components/analytics/ProductClicksChart";
+import RevenueChart from "../../components/analytics/RevenueChart";
 
 const ManagerAnalytics = () => {
   const [analyticsData, setAnalyticsData] = useState({
@@ -83,26 +74,6 @@ const ManagerAnalytics = () => {
     }
   };
 
-  const COLORS = ["#d4af37", "#b8860b", "#daa520", "#f4e4bc", "#8b7355"];
-
-  const pieData = [
-    {
-      name: "Views",
-      value: analyticsData.overview.total_views,
-      color: "#d4af37",
-    },
-    {
-      name: "Clicks",
-      value: analyticsData.overview.total_clicks,
-      color: "#b8860b",
-    },
-    {
-      name: "Cart Adds",
-      value: analyticsData.overview.total_cart_adds,
-      color: "#daa520",
-    },
-  ];
-
   if (loading) {
     return (
       <div
@@ -111,7 +82,7 @@ const ManagerAnalytics = () => {
       >
         <div className="flex flex-col items-center">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-yellow-500 mb-4"></div>
-          <span>Loading...</span>
+          <span>Loading analytics...</span>
         </div>
       </div>
     );
@@ -123,7 +94,7 @@ const ManagerAnalytics = () => {
       style={{ backgroundColor: "#000000", color: "#ffffff" }}
     >
       <h1 className="text-3xl font-bold mb-6" style={{ color: "#d4af37" }}>
-        Analytics
+        Analytics Dashboard
       </h1>
 
       {/* Filter */}
@@ -149,7 +120,7 @@ const ManagerAnalytics = () => {
 
       {/* Tabs */}
       <div className="flex mb-6 space-x-2">
-        {["overview", "views", "clicks"].map((tab) => (
+        {["overview", "performance", "trends"].map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
@@ -170,204 +141,25 @@ const ManagerAnalytics = () => {
       <div className="space-y-6">
         {activeTab === "overview" && (
           <>
-            {/* Overview Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-              <div
-                className="shadow rounded-lg p-6"
-                style={{ backgroundColor: "#1d1d1d" }}
-              >
-                <div
-                  className="text-3xl font-bold mb-2"
-                  style={{ color: "#d4af37" }}
-                >
-                  {analyticsData.overview.total_views}
-                </div>
-                <div className="text-sm" style={{ color: "#cccccc" }}>
-                  Total Views
-                </div>
-              </div>
-              <div
-                className="shadow rounded-lg p-6"
-                style={{ backgroundColor: "#1d1d1d" }}
-              >
-                <div
-                  className="text-3xl font-bold mb-2"
-                  style={{ color: "#b8860b" }}
-                >
-                  {analyticsData.overview.total_clicks}
-                </div>
-                <div className="text-sm" style={{ color: "#cccccc" }}>
-                  Total Clicks
-                </div>
-              </div>
-              <div
-                className="shadow rounded-lg p-6"
-                style={{ backgroundColor: "#1d1d1d" }}
-              >
-                <div
-                  className="text-3xl font-bold mb-2"
-                  style={{ color: "#daa520" }}
-                >
-                  {analyticsData.overview.total_cart_adds}
-                </div>
-                <div className="text-sm" style={{ color: "#cccccc" }}>
-                  Cart Adds
-                </div>
-              </div>
-              <div
-                className="shadow rounded-lg p-6"
-                style={{ backgroundColor: "#1d1d1d" }}
-              >
-                <div
-                  className="text-3xl font-bold mb-2"
-                  style={{ color: "#f4e4bc" }}
-                >
-                  {analyticsData.overview.avg_time_spent}s
-                </div>
-                <div className="text-sm" style={{ color: "#cccccc" }}>
-                  Avg Time Spent
-                </div>
-              </div>
-            </div>
-
-            {/* Pie Chart */}
-            <div
-              className="shadow rounded-lg p-6 mb-8"
-              style={{ backgroundColor: "#1d1d1d" }}
-            >
-              <h3
-                className="text-lg font-semibold mb-4"
-                style={{ color: "#d4af37" }}
-              >
-                Analytics Overview
-              </h3>
-              <div className="h-80">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={pieData}
-                      cx="50%"
-                      cy="50%"
-                      outerRadius={100}
-                      dataKey="value"
-                      label={({ name, percent }) =>
-                        `${name} ${(percent * 100).toFixed(0)}%`
-                      }
-                    >
-                      {pieData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
-                      ))}
-                    </Pie>
-                    <Tooltip />
-                  </PieChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
-
-            {/* Top Products */}
-            <div
-              className="shadow rounded-lg p-6"
-              style={{ backgroundColor: "#1d1d1d" }}
-            >
-              <h3
-                className="text-lg font-semibold mb-4"
-                style={{ color: "#d4af37" }}
-              >
-                Top Products by Views
-              </h3>
-              <div className="space-y-2">
-                {analyticsData.overview.top_products
-                  .slice(0, 5)
-                  .map((product) => (
-                    <div
-                      key={product.product_id}
-                      className="flex justify-between items-center p-3 rounded"
-                      style={{ backgroundColor: "#2d2d2d" }}
-                    >
-                      <span style={{ color: "#ffffff" }}>{product.name}</span>
-                      <span style={{ color: "#d4af37" }}>
-                        {product.views} views
-                      </span>
-                    </div>
-                  ))}
-              </div>
+            <OverviewStats data={analyticsData.overview} />
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <AnalyticsPieChart data={analyticsData.overview} />
+              <TopProductsList products={analyticsData.overview.top_products} />
             </div>
           </>
         )}
 
-        {activeTab === "views" && (
-          <div
-            className="shadow rounded-lg p-6"
-            style={{ backgroundColor: "#1d1d1d" }}
-          >
-            <h3
-              className="text-lg font-semibold mb-4"
-              style={{ color: "#d4af37" }}
-            >
-              Product Views
-            </h3>
-            <div className="h-96">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={analyticsData.productViews.slice(0, 10)}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#555555" />
-                  <XAxis
-                    dataKey="product_name"
-                    stroke="#cccccc"
-                    fontSize={12}
-                    angle={-45}
-                    textAnchor="end"
-                    height={80}
-                  />
-                  <YAxis stroke="#cccccc" fontSize={12} />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "#2d2d2d",
-                      border: "1px solid #3d3d3d",
-                      color: "#ffffff",
-                    }}
-                  />
-                  <Bar dataKey="views" fill="#d4af37" />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
+        {activeTab === "performance" && (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <ProductViewsChart data={analyticsData.productViews} />
+            <ProductClicksChart data={analyticsData.productClicks} />
           </div>
         )}
 
-        {activeTab === "clicks" && (
-          <div
-            className="shadow rounded-lg p-6"
-            style={{ backgroundColor: "#1d1d1d" }}
-          >
-            <h3
-              className="text-lg font-semibold mb-4"
-              style={{ color: "#d4af37" }}
-            >
-              Product Clicks
-            </h3>
-            <div className="h-96">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={analyticsData.productClicks.slice(0, 10)}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#555555" />
-                  <XAxis
-                    dataKey="product_name"
-                    stroke="#cccccc"
-                    fontSize={12}
-                    angle={-45}
-                    textAnchor="end"
-                    height={80}
-                  />
-                  <YAxis stroke="#cccccc" fontSize={12} />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "#2d2d2d",
-                      border: "1px solid #3d3d3d",
-                      color: "#ffffff",
-                    }}
-                  />
-                  <Bar dataKey="clicks" fill="#b8860b" />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
+        {activeTab === "trends" && (
+          <div className="grid grid-cols-1 gap-6">
+            <RevenueChart />
+            {/* Additional trend charts can be added here */}
           </div>
         )}
       </div>

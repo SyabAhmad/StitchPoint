@@ -449,7 +449,7 @@ export default function Collections() {
 
                     <div className="flex gap-3">
                       <button
-                        className="flex-1 bg-gradient-to-r from-gold-500 to-gold-600 text-white px-4 py-2 rounded-xl font-bold hover:from-gold-600 hover:to-gold-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 uppercase text-xs tracking-wide"
+                        className="flex-1 bg-gradient-to-r from-gold-500 to-gold-600 text-black px-4 py-2 rounded-xl font-bold hover:from-gold-600 hover:to-gold-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 uppercase text-xs tracking-wide"
                         onClick={() => handleAddToCart(product)}
                       >
                         🛒 Add to Cart

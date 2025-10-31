@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { FaEdit, FaTrash, FaPlus, FaTimes } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import AnalyticsAside from "../../components/AnalyticsAside";
+import { makeAuthenticatedRequest } from "../../utils/auth";
 
 const ManagerProducts = () => {
   const [products, setProducts] = useState([]);
@@ -54,19 +55,30 @@ const ManagerProducts = () => {
     fetchCategories();
   }, []);
 
+  // Debounce search term to prevent excessive filtering on every keystroke
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 300); // 300ms delay
+
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
   // Apply filters whenever products or filter states change
   useEffect(() => {
     let filtered = products;
 
     // Search by name or description
-    if (searchTerm) {
+    if (debouncedSearchTerm) {
       filtered = filtered.filter(
         (product) =>
-          product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          product.name
+            .toLowerCase()
+            .includes(debouncedSearchTerm.toLowerCase()) ||
           (product.description &&
             product.description
               .toLowerCase()
-              .includes(searchTerm.toLowerCase()))
+              .includes(debouncedSearchTerm.toLowerCase()))
       );
     }
 
@@ -106,7 +118,14 @@ const ManagerProducts = () => {
     setFilteredProducts(filtered);
     setTotalProducts(filtered.length);
     setCurrentPage(1); // Reset to first page when filters change
-  }, [products, searchTerm, selectedCategory, stockFilter, minPrice, maxPrice]);
+  }, [
+    products,
+    debouncedSearchTerm,
+    selectedCategory,
+    stockFilter,
+    minPrice,
+    maxPrice,
+  ]);
 
   // Pagination logic (client-side)
   const totalPages = Math.ceil(totalProducts / productsPerPage);
@@ -119,20 +138,14 @@ const ManagerProducts = () => {
 
   const fetchProducts = async (page = 1, perPage = 10, filters = {}) => {
     try {
-      const token = localStorage.getItem("token");
       const queryParams = new URLSearchParams({
         page: page.toString(),
         per_page: perPage.toString(),
         ...filters,
       });
 
-      const response = await fetch(
-        `http://localhost:5000/api/products?${queryParams.toString()}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+      const response = await makeAuthenticatedRequest(
+        `http://localhost:5000/api/products?${queryParams.toString()}`
       );
       const data = await response.json();
 
