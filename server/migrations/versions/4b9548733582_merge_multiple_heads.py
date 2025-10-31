@@ -11,9 +11,12 @@ import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
 revision = '4b9548733582'
-down_revision = None
+# This is a merge revision that combines multiple heads. Set the
+# down_revision to the tuple of parent revisions so Alembic builds the
+# correct graph. Clear depends_on to avoid duplicate/ambiguous entries.
+down_revision = ('a0b509847b58', 'add_parent_id_to_category', 'b6a31bbdfda8')
 branch_labels = None
-depends_on = ['a0b509847b58', 'add_parent_id_to_category', 'b6a31bbdfda8']
+depends_on = None
 
 
 def upgrade():

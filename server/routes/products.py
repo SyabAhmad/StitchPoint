@@ -3,7 +3,7 @@ from werkzeug.utils import secure_filename
 import os
 import time
 from flask_jwt_extended import jwt_required, get_jwt_identity, verify_jwt_in_request
-from models import db, Product, User, Category, Store, Review, OrderItem
+from models import db, Product, User, Category, Store, Review, Comment, OrderItem
 
 products_bp = Blueprint('products', __name__)
 
@@ -438,6 +438,82 @@ def post_review(product_id):
         'created_at': new_review.created_at.isoformat()
     }
     return jsonify({'review': resp}), 201
+
+
+@products_bp.route('/products/<int:product_id>/comments', methods=['GET'])
+def get_comments(product_id):
+    product = Product.query.get(product_id)
+    if not product:
+        return jsonify({'message': 'Product not found'}), 404
+
+    comments_q = Comment.query.filter_by(product_id=product.id).order_by(Comment.created_at.desc()).all()
+    comments_list = []
+    for c in comments_q:
+        commenter_name = c.user_name
+        if not commenter_name and c.user_id:
+            u = User.query.get(c.user_id)
+            commenter_name = u.name if u and u.name else (u.email if u else None)
+        comments_list.append({
+            'id': c.id,
+            'user_id': c.user_id,
+            'user_name': commenter_name,
+            'comment': c.comment,
+            'created_at': c.created_at.isoformat()
+        })
+
+    return jsonify({'comments': comments_list}), 200
+
+
+@products_bp.route('/products/<int:product_id>/comments', methods=['POST'])
+def post_comment(product_id):
+    product = Product.query.get(product_id)
+    if not product:
+        return jsonify({'message': 'Product not found'}), 404
+
+    # Attempt to parse JWT if present (optional)
+    user_id = None
+    try:
+        verify_jwt_in_request(optional=True)
+        identity = get_jwt_identity()
+        if identity:
+            try:
+                user_id = int(identity)
+            except Exception:
+                user_id = None
+    except Exception:
+        # no valid JWT present
+        user_id = None
+
+    data = request.get_json() or {}
+    comment = data.get('comment')
+    user_name = data.get('user_name')
+
+    if not comment:
+        return jsonify({'message': 'Comment is required'}), 400
+
+    # If no logged in user, require user_name
+    if not user_id and not user_name:
+        return jsonify({'message': 'user_name is required for anonymous comments'}), 400
+
+    # Create comment
+    new_comment = Comment(
+        product_id=product.id,
+        user_id=user_id,
+        user_name=user_name if user_name else None,
+        comment=comment
+    )
+    db.session.add(new_comment)
+    db.session.commit()
+
+    # Build response
+    resp = {
+        'id': new_comment.id,
+        'user_id': new_comment.user_id,
+        'user_name': new_comment.user_name,
+        'comment': new_comment.comment,
+        'created_at': new_comment.created_at.isoformat()
+    }
+    return jsonify({'comment': resp}), 201
 
 @products_bp.route('/products/<int:product_id>', methods=['DELETE'])
 @jwt_required()

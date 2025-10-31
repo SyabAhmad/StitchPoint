@@ -113,6 +113,8 @@ const ProductDetails = ({
       fetchRecommendations(data.product.id);
       // Fetch reviews from the dedicated endpoint to ensure fresh data
       fetchReviews(data.product.id);
+      // Fetch comments from the dedicated endpoint
+      fetchComments(data.product.id);
     } catch (e) {
       console.error(e);
       setError(e.message || "Failed to load product");
@@ -133,6 +135,8 @@ const ProductDetails = ({
       fetchRecommendations(propProduct.id);
       // Load reviews for propProduct
       fetchReviews(propProduct.id);
+      // Load comments for propProduct
+      fetchComments(propProduct.id);
       setLoading(false);
     } else if (id) {
       fetchProduct();
