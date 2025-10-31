@@ -636,7 +636,10 @@ const ProductDetails = ({
                     <span className="text-sm text-gray-600">
                       <strong>Category:</strong> {product.category || "General"}
                     </span>
-                    <button className="text-yellow-600 hover:text-yellow-700 font-medium text-sm">
+                    <button
+                      onClick={() => navigate(`/store/${product.store_id}`)}
+                      className="text-yellow-600 hover:text-yellow-700 font-medium text-sm"
+                    >
                       Visit Store
                     </button>
                   </div>

@@ -59,6 +59,7 @@ def get_products():
             'category': product.category,
             'category_id': category_obj.id if category_obj else None,
             'store_name': product.store.name if product.store else 'Unknown Store',
+            'store_id': product.store_id if product.store else None,
             'created_at': product.created_at.isoformat(),
             'updated_at': product.updated_at.isoformat()
         })
@@ -283,6 +284,7 @@ def get_product(product_id):
         'category': product.category,
         'category_id': category_obj.id if category_obj else None,
         'store_name': product.store.name if product.store else 'Unknown Store',
+        'store_id': product.store_id if product.store else None,
         'created_at': product.created_at.isoformat(),
         'updated_at': product.updated_at.isoformat(),
         'reviews': reviews_list,
@@ -461,3 +463,44 @@ def delete_product(product_id):
     db.session.commit()
 
     return jsonify({'message': 'Product deleted successfully'}), 200
+
+@products_bp.route('/stores/<int:store_id>', methods=['GET'])
+def get_store(store_id):
+    store = Store.query.get(store_id)
+    if not store:
+        return jsonify({'message': 'Store not found'}), 404
+
+    # Get all products for this store
+    products = Product.query.filter_by(store_id=store_id).all()
+    product_list = []
+    for product in products:
+        category_obj = Category.query.filter_by(name=product.category).first() if product.category else None
+        product_list.append({
+            'id': product.id,
+            'name': product.name,
+            'description': product.description,
+            'price': product.price,
+            'stock_quantity': product.stock_quantity,
+            'image_url': product.image_url,
+            'category': product.category,
+            'category_id': category_obj.id if category_obj else None,
+            'store_name': store.name,
+            'store_id': store.id,
+            'created_at': product.created_at.isoformat(),
+            'updated_at': product.updated_at.isoformat()
+        })
+
+    store_data = {
+        'id': store.id,
+        'name': store.name,
+        'address': store.address,
+        'logo_url': store.logo_url,
+        'contact_number': store.contact_number,
+        'description': store.description,
+        'manager_id': store.manager_id,
+        'created_at': store.created_at.isoformat(),
+        'updated_at': store.updated_at.isoformat(),
+        'products': product_list
+    }
+
+    return jsonify({'store': store_data}), 200

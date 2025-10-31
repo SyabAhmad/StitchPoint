@@ -439,7 +439,13 @@ export default function Collections() {
                             </span>
                           </p>
                           {product.store_name && (
-                            <p className="text-black/50 text-xs mt-1">
+                            <p
+                              className="text-black/50 text-xs mt-1 cursor-pointer hover:text-gold-600 transition-colors"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                navigate(`/store/${product.store_id}`);
+                              }}
+                            >
                               By: {product.store_name}
                             </p>
                           )}
