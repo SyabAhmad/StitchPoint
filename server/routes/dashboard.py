@@ -1,8 +1,11 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from werkzeug.security import generate_password_hash
+from werkzeug.utils import secure_filename
 from models import db, User, Order, Product, PageView, ButtonClick
 from sqlalchemy import func
+import os
+from datetime import datetime
 
 dashboard_bp = Blueprint('dashboard', __name__)
 
@@ -191,6 +194,9 @@ def create_user():
             db.session.rollback()
             return jsonify({'message': 'Store name is required for managers'}), 400
 
+        # Commit user first to get the ID
+        db.session.commit()
+
         from models import Store
         new_store = Store(
             name=store_name,
@@ -201,8 +207,9 @@ def create_user():
             manager_id=new_user.id
         )
         db.session.add(new_store)
-
-    db.session.commit()
+        db.session.commit()
+    else:
+        db.session.commit()
 
     return jsonify({'message': 'User created successfully', 'user': {'id': new_user.id, 'email': new_user.email, 'name': new_user.name, 'role': new_user.role}}), 201
 
@@ -343,19 +350,52 @@ def update_store():
     if not user.store:
         return jsonify({'message': 'Store not found'}), 404
 
-    data = request.get_json() or {}
     store = user.store
 
-    if 'name' in data:
-        store.name = data['name']
-    if 'address' in data:
-        store.address = data['address']
-    if 'logo_url' in data:
-        store.logo_url = data['logo_url']
-    if 'contact_number' in data:
-        store.contact_number = data['contact_number']
-    if 'description' in data:
-        store.description = data['description']
+    # Handle FormData for file uploads
+    if request.content_type and 'multipart/form-data' in request.content_type:
+        name = request.form.get('name')
+        address = request.form.get('address')
+        contact_number = request.form.get('contact_number')
+        description = request.form.get('description')
+
+        # Handle logo file upload
+        logo_file = request.files.get('logo')
+        if logo_file and logo_file.filename:
+            # Ensure uploads directory exists
+            uploads_dir = os.path.join(os.getcwd(), 'uploads')
+            os.makedirs(uploads_dir, exist_ok=True)
+
+            # Create unique filename with timestamp
+            timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+            filename = secure_filename(f"{timestamp}_{logo_file.filename}")
+            filepath = os.path.join(uploads_dir, filename)
+            logo_file.save(filepath)
+
+            # Store relative path in database
+            store.logo_url = f"/uploads/{filename}"
+
+        if name is not None:
+            store.name = name
+        if address is not None:
+            store.address = address
+        if contact_number is not None:
+            store.contact_number = contact_number
+        if description is not None:
+            store.description = description
+    else:
+        # Handle JSON data (backward compatibility)
+        data = request.get_json() or {}
+        if 'name' in data:
+            store.name = data['name']
+        if 'address' in data:
+            store.address = data['address']
+        if 'logo_url' in data:
+            store.logo_url = data['logo_url']
+        if 'contact_number' in data:
+            store.contact_number = data['contact_number']
+        if 'description' in data:
+            store.description = data['description']
 
     db.session.commit()
 

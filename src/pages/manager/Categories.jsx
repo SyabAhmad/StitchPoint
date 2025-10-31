@@ -1,24 +1,35 @@
 import React, { useState, useEffect } from "react";
-import { FaEdit, FaTrash, FaPlus } from "react-icons/fa";
+import { FaEdit, FaTrash, FaPlus, FaSearch } from "react-icons/fa";
 
 const ManagerCategories = () => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingCategory, setEditingCategory] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
   const [formData, setFormData] = useState({
     name: "",
     description: "",
+    parent_id: "",
   });
 
   useEffect(() => {
     fetchCategories();
   }, []);
 
-  const fetchCategories = async () => {
+  useEffect(() => {
+    fetchCategories(searchTerm);
+  }, [searchTerm]);
+
+  const fetchCategories = async (search = "") => {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch("http://localhost:5000/api/categories", {
+      const url = search
+        ? `http://localhost:5000/api/categories?search=${encodeURIComponent(
+            search
+          )}`
+        : "http://localhost:5000/api/categories";
+      const response = await fetch(url, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -60,10 +71,11 @@ const ManagerCategories = () => {
         fetchCategories();
         setShowAddForm(false);
         setEditingCategory(null);
-        setFormData({ name: "", description: "" });
+        setFormData({ name: "", description: "", parent_id: "" });
         alert(editingCategory ? "Category updated!" : "Category added!");
       } else {
-        alert("Error saving category");
+        const errorData = await response.json();
+        alert(`Error saving category: ${errorData.message || "Unknown error"}`);
       }
     } catch (error) {
       console.error("Error saving category:", error);
@@ -76,6 +88,7 @@ const ManagerCategories = () => {
     setFormData({
       name: category.name,
       description: category.description || "",
+      parent_id: category.parent_id || "",
     });
     setShowAddForm(true);
   };
@@ -214,6 +227,38 @@ const ManagerCategories = () => {
                 }}
               />
             </div>
+            <div>
+              <label
+                className="block text-sm font-medium mb-2"
+                style={{ color: "#ffffff" }}
+              >
+                Parent Category
+              </label>
+              <select
+                name="parent_id"
+                value={formData.parent_id}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 rounded transition-colors duration-200"
+                style={{
+                  backgroundColor: "#2d2d2d",
+                  color: "#ffffff",
+                  border: "1px solid #3d3d3d",
+                }}
+                onFocus={(e) => {
+                  e.currentTarget.style.borderColor = "#d4af37";
+                }}
+                onBlur={(e) => {
+                  e.currentTarget.style.borderColor = "#3d3d3d";
+                }}
+              >
+                <option value="">None (Top Level)</option>
+                {categories.map((category) => (
+                  <option key={category.id} value={category.id}>
+                    {category.name}
+                  </option>
+                ))}
+              </select>
+            </div>
             <div className="flex justify-end space-x-4">
               <button
                 type="button"
@@ -261,15 +306,50 @@ const ManagerCategories = () => {
           className="px-4 py-5 sm:px-6 border-b"
           style={{ borderColor: "#2d2d2d" }}
         >
-          <h3
-            className="text-lg leading-6 font-medium"
-            style={{ color: "#ffffff" }}
-          >
-            Manage Categories
-          </h3>
-          <p className="mt-1 max-w-2xl text-sm" style={{ color: "#999999" }}>
-            View and manage all categories
-          </p>
+          <div className="flex justify-between items-center">
+            <div>
+              <h3
+                className="text-lg leading-6 font-medium"
+                style={{ color: "#ffffff" }}
+              >
+                Manage Categories
+              </h3>
+              <p
+                className="mt-1 max-w-2xl text-sm"
+                style={{ color: "#999999" }}
+              >
+                View and manage all categories
+              </p>
+            </div>
+            <div className="flex items-center">
+              <div className="relative">
+                <FaSearch
+                  className="absolute left-3 top-1/2 transform -translate-y-1/2"
+                  style={{ color: "#999999" }}
+                />
+                <input
+                  type="text"
+                  placeholder="Search categories..."
+                  value={searchTerm}
+                  onChange={(e) => {
+                    setSearchTerm(e.target.value);
+                  }}
+                  className="pl-10 pr-4 py-2 rounded-md transition-colors duration-200"
+                  style={{
+                    backgroundColor: "#2d2d2d",
+                    color: "#ffffff",
+                    border: "1px solid #3d3d3d",
+                  }}
+                  onFocus={(e) => {
+                    e.currentTarget.style.borderColor = "#d4af37";
+                  }}
+                  onBlur={(e) => {
+                    e.currentTarget.style.borderColor = "#3d3d3d";
+                  }}
+                />
+              </div>
+            </div>
+          </div>
         </div>
         <div className="overflow-x-auto">
           <table className="min-w-full">

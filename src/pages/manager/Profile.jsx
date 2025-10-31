@@ -10,7 +10,7 @@ const ManagerProfile = () => {
     email: "",
     store_name: "",
     store_address: "",
-    store_logo_url: "",
+    store_logo: null,
     store_contact_number: "",
     store_description: "",
   });
@@ -34,7 +34,7 @@ const ManagerProfile = () => {
             email: userData.email || "",
             store_name: data.store.name || "",
             store_address: data.store.address || "",
-            store_logo_url: data.store.logo_url || "",
+            store_logo: null,
             store_contact_number: data.store.contact_number || "",
             store_description: data.store.description || "",
           });
@@ -44,7 +44,7 @@ const ManagerProfile = () => {
             email: userData.email || "",
             store_name: "",
             store_address: "",
-            store_logo_url: "",
+            store_logo: null,
             store_contact_number: "",
             store_description: "",
           });
@@ -58,7 +58,7 @@ const ManagerProfile = () => {
           email: userData.email || "",
           store_name: "",
           store_address: "",
-          store_logo_url: "",
+          store_logo: null,
           store_contact_number: "",
           store_description: "",
         });
@@ -67,8 +67,12 @@ const ManagerProfile = () => {
   }, []);
 
   const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    const { name, value, type, files } = e.target;
+    if (type === "file") {
+      setFormData((prev) => ({ ...prev, [name]: files[0] }));
+    } else {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    }
   };
 
   const handleSave = async (e) => {
@@ -98,18 +102,20 @@ const ManagerProfile = () => {
       // }
 
       // Then, update the store
+      const formDataToSend = new FormData();
+      formDataToSend.append("name", formData.store_name);
+      formDataToSend.append("address", formData.store_address);
+      formDataToSend.append("contact_number", formData.store_contact_number);
+      formDataToSend.append("description", formData.store_description);
+      if (formData.store_logo) {
+        formDataToSend.append("logo", formData.store_logo);
+      }
+
       const storeResponse = await fetchWithAuth(
         "http://localhost:5000/api/dashboard/store",
         {
           method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            name: formData.store_name,
-            address: formData.store_address,
-            logo_url: formData.store_logo_url,
-            contact_number: formData.store_contact_number,
-            description: formData.store_description,
-          }),
+          body: formDataToSend,
         }
       );
 
@@ -277,12 +283,12 @@ const ManagerProfile = () => {
                 className="block text-sm font-medium mb-2"
                 style={{ color: "#ffffff" }}
               >
-                Store Logo URL
+                Store Logo
               </label>
               <input
-                type="url"
-                name="store_logo_url"
-                value={formData.store_logo_url}
+                type="file"
+                name="store_logo"
+                accept="image/*"
                 onChange={handleInputChange}
                 className="w-full px-3 py-2 rounded transition-colors duration-200"
                 style={{
