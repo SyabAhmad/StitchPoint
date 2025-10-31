@@ -10,9 +10,10 @@ import {
   FaStore,
   FaUserCog,
 } from "react-icons/fa";
-import { Link, Outlet } from "react-router-dom";
+import { Link, Outlet, useLocation } from "react-router-dom";
 
 const SuperAdminDashboard = () => {
+  const location = useLocation();
   const [loading, setLoading] = useState(true);
   const [users, setUsers] = useState([]);
   const [usersLoading, setUsersLoading] = useState(true);
@@ -33,8 +34,11 @@ const SuperAdminDashboard = () => {
 
     setCurrentUser(userData);
 
-    // If super_admin, fetch users for quick overview
-    if (userData.role === "super_admin") {
+    // If super_admin and on main dashboard route, fetch users for quick overview
+    if (
+      userData.role === "super_admin" &&
+      location.pathname === "/super-admin-dashboard"
+    ) {
       const token = localStorage.getItem("token");
       if (!token) {
         // missing token — redirect to login
@@ -90,7 +94,7 @@ const SuperAdminDashboard = () => {
 
     // Auth OK, stop loading — child routes will fetch their own data if needed
     setLoading(false);
-  }, []);
+  }, [location.pathname]);
 
   if (loading) {
     return (

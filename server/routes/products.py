@@ -14,6 +14,9 @@ def get_products():
     category = request.args.get('category', '')
     min_price = request.args.get('min_price', type=float, default=0)
     max_price = request.args.get('max_price', type=float, default=float('inf'))
+    stock = request.args.get('stock', '')
+    page = request.args.get('page', type=int, default=1)
+    per_page = request.args.get('per_page', type=int, default=10)
 
     # Build query
     query = Product.query
@@ -29,7 +32,20 @@ def get_products():
 
     query = query.filter(Product.price >= min_price, Product.price <= max_price)
 
-    products = query.all()
+    if stock:
+        if stock == 'in-stock':
+            query = query.filter(Product.stock_quantity > 0)
+        elif stock == 'low-stock':
+            query = query.filter(Product.stock_quantity >= 1, Product.stock_quantity <= 10)
+        elif stock == 'out-of-stock':
+            query = query.filter(Product.stock_quantity == 0)
+
+    # Get total count before pagination
+    total = query.count()
+
+    # Apply pagination
+    products = query.offset((page - 1) * per_page).limit(per_page).all()
+
     product_list = []
     for product in products:
         category_obj = Category.query.filter_by(name=product.category).first() if product.category else None
@@ -46,7 +62,7 @@ def get_products():
             'created_at': product.created_at.isoformat(),
             'updated_at': product.updated_at.isoformat()
         })
-    return jsonify({'products': product_list}), 200
+    return jsonify({'products': product_list, 'total': total, 'page': page, 'per_page': per_page}), 200
 
 @products_bp.route('/products', methods=['POST'])
 @jwt_required()

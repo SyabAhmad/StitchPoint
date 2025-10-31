@@ -29,7 +29,17 @@ const ManagerProducts = () => {
 
   const [currentPage, setCurrentPage] = useState(1);
   const [productsPerPage] = useState(10); // Number of products per page
+
+  // Filter states (temporary inputs)
+  const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("");
+  const [stockFilter, setStockFilter] = useState("");
+  const [minPrice, setMinPrice] = useState("");
+  const [maxPrice, setMaxPrice] = useState("");
+
   const [totalProducts, setTotalProducts] = useState(0);
+  const [filteredProducts, setFilteredProducts] = useState([]);
 
   const navigate = useNavigate();
 
@@ -40,15 +50,84 @@ const ManagerProducts = () => {
       return;
     }
     setUser(userData);
-    fetchProducts(currentPage, productsPerPage);
+    fetchProducts(); // Fetch all products for client-side filtering
     fetchCategories();
-  }, [currentPage, productsPerPage]);
+  }, []);
 
-  const fetchProducts = async (page, perPage) => {
+  // Apply filters whenever products or filter states change
+  useEffect(() => {
+    let filtered = products;
+
+    // Search by name or description
+    if (searchTerm) {
+      filtered = filtered.filter(
+        (product) =>
+          product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          (product.description &&
+            product.description
+              .toLowerCase()
+              .includes(searchTerm.toLowerCase()))
+      );
+    }
+
+    // Filter by category
+    if (selectedCategory) {
+      filtered = filtered.filter(
+        (product) => product.category_id === parseInt(selectedCategory)
+      );
+    }
+
+    // Filter by stock status
+    if (stockFilter) {
+      if (stockFilter === "in-stock") {
+        filtered = filtered.filter((product) => product.stock_quantity > 0);
+      } else if (stockFilter === "low-stock") {
+        filtered = filtered.filter(
+          (product) =>
+            product.stock_quantity >= 1 && product.stock_quantity <= 10
+        );
+      } else if (stockFilter === "out-of-stock") {
+        filtered = filtered.filter((product) => product.stock_quantity === 0);
+      }
+    }
+
+    // Filter by price range
+    if (minPrice) {
+      filtered = filtered.filter(
+        (product) => product.price >= parseFloat(minPrice)
+      );
+    }
+    if (maxPrice) {
+      filtered = filtered.filter(
+        (product) => product.price <= parseFloat(maxPrice)
+      );
+    }
+
+    setFilteredProducts(filtered);
+    setTotalProducts(filtered.length);
+    setCurrentPage(1); // Reset to first page when filters change
+  }, [products, searchTerm, selectedCategory, stockFilter, minPrice, maxPrice]);
+
+  // Pagination logic (client-side)
+  const totalPages = Math.ceil(totalProducts / productsPerPage);
+  const indexOfLastProduct = currentPage * productsPerPage;
+  const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+  const currentProducts = filteredProducts.slice(
+    indexOfFirstProduct,
+    indexOfLastProduct
+  );
+
+  const fetchProducts = async (page = 1, perPage = 10, filters = {}) => {
     try {
       const token = localStorage.getItem("token");
+      const queryParams = new URLSearchParams({
+        page: page.toString(),
+        per_page: perPage.toString(),
+        ...filters,
+      });
+
       const response = await fetch(
-        `http://localhost:5000/api/products?page=${page}&per_page=${perPage}`,
+        `http://localhost:5000/api/products?${queryParams.toString()}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -56,18 +135,19 @@ const ManagerProducts = () => {
         }
       );
       const data = await response.json();
-      // Filter products to only show those from the manager's store
+
+      // Filter products to only show those from the manager's store (client-side after server fetch)
       const userData = JSON.parse(localStorage.getItem("user"));
       if (userData && userData.role === "manager") {
         const storeProducts = data.products.filter(
           (product) => product.store_name === userData.store_name
         );
         setProducts(storeProducts || []);
-        setTotalProducts(data.total_products); // Assuming API returns total_products
       } else {
         setProducts(data.products || []);
-        setTotalProducts(data.total_products); // Assuming API returns total_products
       }
+
+      setTotalProducts(data.total || 0);
     } catch (error) {
       console.error("Error fetching products:", error);
     } finally {
@@ -132,7 +212,7 @@ const ManagerProducts = () => {
       }
 
       if (response.ok) {
-        fetchProducts(currentPage, productsPerPage);
+        fetchProducts(1, 10000); // Refetch all products after add/edit
         setShowAddForm(false);
         setEditingProduct(null);
         setFormData({
@@ -208,9 +288,6 @@ const ManagerProducts = () => {
       alert("Error deleting product");
     }
   };
-
-  // Calculate total pages
-  const totalPages = Math.ceil(totalProducts / productsPerPage);
 
   // Handle page change
   const handlePageChange = (pageNumber) => {
@@ -733,6 +810,183 @@ const ManagerProducts = () => {
           </div>
         )}
 
+        {/* Filters Section */}
+        <div
+          className="mb-6 p-6 rounded-lg"
+          style={{ backgroundColor: "#1d1d1d" }}
+        >
+          <h3 className="text-lg font-medium mb-4" style={{ color: "#d4af37" }}>
+            Filters
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+            <div>
+              <label
+                className="block text-sm font-medium mb-2"
+                style={{ color: "#ffffff" }}
+              >
+                Search by Name
+              </label>
+              <input
+                type="text"
+                placeholder="Search products..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full px-3 py-2 rounded transition-colors duration-200"
+                style={{
+                  backgroundColor: "#2d2d2d",
+                  color: "#ffffff",
+                  border: "1px solid #3d3d3d",
+                }}
+                onFocus={(e) => {
+                  e.currentTarget.style.borderColor = "#d4af37";
+                }}
+                onBlur={(e) => {
+                  e.currentTarget.style.borderColor = "#3d3d3d";
+                }}
+              />
+            </div>
+            <div>
+              <label
+                className="block text-sm font-medium mb-2"
+                style={{ color: "#ffffff" }}
+              >
+                Category
+              </label>
+              <select
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+                className="w-full px-3 py-2 rounded transition-colors duration-200"
+                style={{
+                  backgroundColor: "#2d2d2d",
+                  color: "#ffffff",
+                  border: "1px solid #3d3d3d",
+                }}
+                onFocus={(e) => {
+                  e.currentTarget.style.borderColor = "#d4af37";
+                }}
+                onBlur={(e) => {
+                  e.currentTarget.style.borderColor = "#3d3d3d";
+                }}
+              >
+                <option value="">All Categories</option>
+                {categories.map((category) => (
+                  <option key={category.id} value={category.id}>
+                    {category.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label
+                className="block text-sm font-medium mb-2"
+                style={{ color: "#ffffff" }}
+              >
+                Stock Status
+              </label>
+              <select
+                value={stockFilter}
+                onChange={(e) => setStockFilter(e.target.value)}
+                className="w-full px-3 py-2 rounded transition-colors duration-200"
+                style={{
+                  backgroundColor: "#2d2d2d",
+                  color: "#ffffff",
+                  border: "1px solid #3d3d3d",
+                }}
+                onFocus={(e) => {
+                  e.currentTarget.style.borderColor = "#d4af37";
+                }}
+                onBlur={(e) => {
+                  e.currentTarget.style.borderColor = "#3d3d3d";
+                }}
+              >
+                <option value="">All Stock</option>
+                <option value="in-stock">In Stock ({">"}0)</option>
+                <option value="low-stock">Low Stock (1-10)</option>
+                <option value="out-of-stock">Out of Stock (0)</option>
+              </select>
+            </div>
+            <div>
+              <label
+                className="block text-sm font-medium mb-2"
+                style={{ color: "#ffffff" }}
+              >
+                Min Price
+              </label>
+              <input
+                type="number"
+                placeholder="Min price"
+                value={minPrice}
+                onChange={(e) => setMinPrice(e.target.value)}
+                step="0.01"
+                className="w-full px-3 py-2 rounded transition-colors duration-200"
+                style={{
+                  backgroundColor: "#2d2d2d",
+                  color: "#ffffff",
+                  border: "1px solid #3d3d3d",
+                }}
+                onFocus={(e) => {
+                  e.currentTarget.style.borderColor = "#d4af37";
+                }}
+                onBlur={(e) => {
+                  e.currentTarget.style.borderColor = "#3d3d3d";
+                }}
+              />
+            </div>
+            <div>
+              <label
+                className="block text-sm font-medium mb-2"
+                style={{ color: "#ffffff" }}
+              >
+                Max Price
+              </label>
+              <input
+                type="number"
+                placeholder="Max price"
+                value={maxPrice}
+                onChange={(e) => setMaxPrice(e.target.value)}
+                step="0.01"
+                className="w-full px-3 py-2 rounded transition-colors duration-200"
+                style={{
+                  backgroundColor: "#2d2d2d",
+                  color: "#ffffff",
+                  border: "1px solid #3d3d3d",
+                }}
+                onFocus={(e) => {
+                  e.currentTarget.style.borderColor = "#d4af37";
+                }}
+                onBlur={(e) => {
+                  e.currentTarget.style.borderColor = "#3d3d3d";
+                }}
+              />
+            </div>
+          </div>
+          <div className="flex justify-end mt-4">
+            <button
+              onClick={() => {
+                setSearchTerm("");
+                setSelectedCategory("");
+                setStockFilter("");
+                setMinPrice("");
+                setMaxPrice("");
+                setCurrentPage(1);
+              }}
+              className="px-4 py-2 rounded transition-colors duration-200"
+              style={{
+                backgroundColor: "#555555",
+                color: "#ffffff",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = "#777777";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = "#555555";
+              }}
+            >
+              Clear Filters
+            </button>
+          </div>
+        </div>
+
         <div
           className="shadow overflow-hidden sm:rounded-md"
           style={{ backgroundColor: "#1d1d1d" }}
@@ -788,7 +1042,7 @@ const ManagerProducts = () => {
                 </tr>
               </thead>
               <tbody style={{ backgroundColor: "#1d1d1d" }}>
-                {products.map((product, index) => (
+                {currentProducts.map((product, index) => (
                   <tr
                     key={product.id}
                     className="transition-colors duration-150"

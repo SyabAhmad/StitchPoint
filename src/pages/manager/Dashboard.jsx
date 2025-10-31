@@ -10,9 +10,10 @@ import {
   FaStore,
   FaUserCog,
 } from "react-icons/fa";
-import { Link, Outlet } from "react-router-dom";
+import { Link, Outlet, useLocation } from "react-router-dom";
 
 const ManagerDashboard = () => {
+  const location = useLocation();
   const [loading, setLoading] = useState(true);
   const [analytics, setAnalytics] = useState({});
   const [recentOrders, setRecentOrders] = useState([]);
@@ -25,30 +26,34 @@ const ManagerDashboard = () => {
       return;
     }
 
-    // Fetch dashboard data
-    fetch("http://localhost:5000/api/dashboard/admin", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return response.json();
+    // Fetch dashboard data only if on the main dashboard route
+    if (location.pathname === "/manager-dashboard") {
+      fetch("http://localhost:5000/api/dashboard/admin", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       })
-      .then((data) => {
-        setAnalytics(data.analytics || {});
-        setRecentOrders(data.recent_orders || []);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error("Error fetching dashboard data:", error);
-        setAnalytics({});
-        setRecentOrders([]);
-        setLoading(false);
-      });
-  }, []);
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then((data) => {
+          setAnalytics(data.analytics || {});
+          setRecentOrders(data.recent_orders || []);
+          setLoading(false);
+        })
+        .catch((error) => {
+          console.error("Error fetching dashboard data:", error);
+          setAnalytics({});
+          setRecentOrders([]);
+          setLoading(false);
+        });
+    } else {
+      setLoading(false);
+    }
+  }, [location.pathname]);
 
   if (loading) {
     return (
@@ -202,224 +207,245 @@ const ManagerDashboard = () => {
         {/* Main Content */}
         <main className="flex-1 p-8">
           <div className="max-w-7xl mx-auto">
-            <h1
-              className="text-3xl font-bold mb-6"
-              style={{ color: "#d4af37" }}
-            >
-              Manager Dashboard
-            </h1>
-
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-              <div
-                className="shadow rounded-lg p-5"
-                style={{ backgroundColor: "#1d1d1d" }}
-              >
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <div
-                      className="w-8 h-8 rounded-md flex items-center justify-center"
-                      style={{ backgroundColor: "#d4af37", color: "#000000" }}
-                    >
-                      <span className="font-bold">P</span>
-                    </div>
-                  </div>
-                  <div className="ml-5 w-0 flex-1">
-                    <dl>
-                      <dt
-                        className="text-sm font-medium truncate"
-                        style={{ color: "#cccccc" }}
-                      >
-                        Total Products
-                      </dt>
-                      <dd
-                        className="text-lg font-medium"
-                        style={{ color: "#ffffff" }}
-                      >
-                        {analytics.total_products}
-                      </dd>
-                    </dl>
-                  </div>
-                </div>
-              </div>
-
-              <div
-                className="shadow rounded-lg p-5"
-                style={{ backgroundColor: "#1d1d1d" }}
-              >
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <div
-                      className="w-8 h-8 rounded-md flex items-center justify-center"
-                      style={{ backgroundColor: "#d4af37", color: "#000000" }}
-                    >
-                      <span className="font-bold">O</span>
-                    </div>
-                  </div>
-                  <div className="ml-5 w-0 flex-1">
-                    <dl>
-                      <dt
-                        className="text-sm font-medium truncate"
-                        style={{ color: "#cccccc" }}
-                      >
-                        Total Orders
-                      </dt>
-                      <dd
-                        className="text-lg font-medium"
-                        style={{ color: "#ffffff" }}
-                      >
-                        {analytics.total_orders}
-                      </dd>
-                    </dl>
-                  </div>
-                </div>
-              </div>
-
-              <div
-                className="shadow rounded-lg p-5"
-                style={{ backgroundColor: "#1d1d1d" }}
-              >
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <div
-                      className="w-8 h-8 rounded-md flex items-center justify-center"
-                      style={{ backgroundColor: "#d4af37", color: "#000000" }}
-                    >
-                      <span className="font-bold">V</span>
-                    </div>
-                  </div>
-                  <div className="ml-5 w-0 flex-1">
-                    <dl>
-                      <dt
-                        className="text-sm font-medium truncate"
-                        style={{ color: "#cccccc" }}
-                      >
-                        Page Views Today
-                      </dt>
-                      <dd
-                        className="text-lg font-medium"
-                        style={{ color: "#ffffff" }}
-                      >
-                        {analytics.page_views_today}
-                      </dd>
-                    </dl>
-                  </div>
-                </div>
-              </div>
-
-              <div
-                className="shadow rounded-lg p-5"
-                style={{ backgroundColor: "#1d1d1d" }}
-              >
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <div
-                      className="w-8 h-8 rounded-md flex items-center justify-center"
-                      style={{ backgroundColor: "#d4af37", color: "#000000" }}
-                    >
-                      <span className="font-bold">R</span>
-                    </div>
-                  </div>
-                  <div className="ml-5 w-0 flex-1">
-                    <dl>
-                      <dt
-                        className="text-sm font-medium truncate"
-                        style={{ color: "#cccccc" }}
-                      >
-                        Revenue Today
-                      </dt>
-                      <dd
-                        className="text-lg font-medium"
-                        style={{ color: "#ffffff" }}
-                      >
-                        ${analytics.revenue_today || 0}
-                      </dd>
-                    </dl>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div
-              className="shadow overflow-hidden sm:rounded-md"
-              style={{ backgroundColor: "#1d1d1d" }}
-            >
-              <div
-                className="px-4 py-5 sm:px-6 border-b"
-                style={{ borderColor: "#2d2d2d" }}
-              >
-                <h3
-                  className="text-lg leading-6 font-medium"
-                  style={{ color: "#ffffff" }}
+            {location.pathname === "/manager-dashboard" && (
+              <>
+                <h1
+                  className="text-3xl font-bold mb-6"
+                  style={{ color: "#d4af37" }}
                 >
-                  Recent Orders
-                </h3>
-                <p
-                  className="mt-1 max-w-2xl text-sm"
-                  style={{ color: "#999999" }}
-                >
-                  Latest orders from customers
-                </p>
-              </div>
-              <ul className="divide-y divide-gray-200">
-                {recentOrders.length > 0 ? (
-                  recentOrders.map((order) => (
-                    <li key={order.id}>
-                      <div className="px-4 py-4 sm:px-6">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center">
-                            <p
-                              className="text-sm font-medium truncate"
-                              style={{ color: "#d4af37" }}
-                            >
-                              Order #{order.id}
-                            </p>
-                            <p className="ml-2 flex-shrink-0 flex">
-                              <span
-                                className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                                  order.status === "delivered"
-                                    ? "bg-green-900 text-green-200"
-                                    : order.status === "shipped"
-                                    ? "bg-blue-900 text-blue-200"
-                                    : order.status === "processing"
-                                    ? "bg-yellow-900 text-yellow-200"
-                                    : "bg-gray-900 text-gray-200"
-                                }`}
-                              >
-                                {order.status}
-                              </span>
-                            </p>
-                          </div>
-                          <div className="ml-2 flex-shrink-0 flex">
-                            <p className="text-sm" style={{ color: "#cccccc" }}>
-                              ${order.total_amount}
-                            </p>
-                          </div>
-                        </div>
-                        <div className="mt-2 sm:flex sm:justify-between">
-                          <div className="sm:flex">
-                            <p
-                              className="flex items-center text-sm"
-                              style={{ color: "#999999" }}
-                            >
-                              By {order.user_email} •{" "}
-                              {new Date(order.created_at).toLocaleDateString()}
-                            </p>
-                          </div>
+                  Manager Dashboard
+                </h1>
+
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                  <div
+                    className="shadow rounded-lg p-5"
+                    style={{ backgroundColor: "#1d1d1d" }}
+                  >
+                    <div className="flex items-center">
+                      <div className="flex-shrink-0">
+                        <div
+                          className="w-8 h-8 rounded-md flex items-center justify-center"
+                          style={{
+                            backgroundColor: "#d4af37",
+                            color: "#000000",
+                          }}
+                        >
+                          <span className="font-bold">P</span>
                         </div>
                       </div>
-                    </li>
-                  ))
-                ) : (
-                  <li>
-                    <div className="px-4 py-4 sm:px-6">
-                      <p className="text-sm" style={{ color: "#999999" }}>
-                        No recent orders
-                      </p>
+                      <div className="ml-5 w-0 flex-1">
+                        <dl>
+                          <dt
+                            className="text-sm font-medium truncate"
+                            style={{ color: "#cccccc" }}
+                          >
+                            Total Products
+                          </dt>
+                          <dd
+                            className="text-lg font-medium"
+                            style={{ color: "#ffffff" }}
+                          >
+                            {analytics.total_products}
+                          </dd>
+                        </dl>
+                      </div>
                     </div>
-                  </li>
-                )}
-              </ul>
-            </div>
+                  </div>
+
+                  <div
+                    className="shadow rounded-lg p-5"
+                    style={{ backgroundColor: "#1d1d1d" }}
+                  >
+                    <div className="flex items-center">
+                      <div className="flex-shrink-0">
+                        <div
+                          className="w-8 h-8 rounded-md flex items-center justify-center"
+                          style={{
+                            backgroundColor: "#d4af37",
+                            color: "#000000",
+                          }}
+                        >
+                          <span className="font-bold">O</span>
+                        </div>
+                      </div>
+                      <div className="ml-5 w-0 flex-1">
+                        <dl>
+                          <dt
+                            className="text-sm font-medium truncate"
+                            style={{ color: "#cccccc" }}
+                          >
+                            Total Orders
+                          </dt>
+                          <dd
+                            className="text-lg font-medium"
+                            style={{ color: "#ffffff" }}
+                          >
+                            {analytics.total_orders}
+                          </dd>
+                        </dl>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div
+                    className="shadow rounded-lg p-5"
+                    style={{ backgroundColor: "#1d1d1d" }}
+                  >
+                    <div className="flex items-center">
+                      <div className="flex-shrink-0">
+                        <div
+                          className="w-8 h-8 rounded-md flex items-center justify-center"
+                          style={{
+                            backgroundColor: "#d4af37",
+                            color: "#000000",
+                          }}
+                        >
+                          <span className="font-bold">V</span>
+                        </div>
+                      </div>
+                      <div className="ml-5 w-0 flex-1">
+                        <dl>
+                          <dt
+                            className="text-sm font-medium truncate"
+                            style={{ color: "#cccccc" }}
+                          >
+                            Page Views Today
+                          </dt>
+                          <dd
+                            className="text-lg font-medium"
+                            style={{ color: "#ffffff" }}
+                          >
+                            {analytics.page_views_today}
+                          </dd>
+                        </dl>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div
+                    className="shadow rounded-lg p-5"
+                    style={{ backgroundColor: "#1d1d1d" }}
+                  >
+                    <div className="flex items-center">
+                      <div className="flex-shrink-0">
+                        <div
+                          className="w-8 h-8 rounded-md flex items-center justify-center"
+                          style={{
+                            backgroundColor: "#d4af37",
+                            color: "#000000",
+                          }}
+                        >
+                          <span className="font-bold">R</span>
+                        </div>
+                      </div>
+                      <div className="ml-5 w-0 flex-1">
+                        <dl>
+                          <dt
+                            className="text-sm font-medium truncate"
+                            style={{ color: "#cccccc" }}
+                          >
+                            Revenue Today
+                          </dt>
+                          <dd
+                            className="text-lg font-medium"
+                            style={{ color: "#ffffff" }}
+                          >
+                            ${analytics.revenue_today || 0}
+                          </dd>
+                        </dl>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div
+                  className="shadow overflow-hidden sm:rounded-md"
+                  style={{ backgroundColor: "#1d1d1d" }}
+                >
+                  <div
+                    className="px-4 py-5 sm:px-6 border-b"
+                    style={{ borderColor: "#2d2d2d" }}
+                  >
+                    <h3
+                      className="text-lg leading-6 font-medium"
+                      style={{ color: "#ffffff" }}
+                    >
+                      Recent Orders
+                    </h3>
+                    <p
+                      className="mt-1 max-w-2xl text-sm"
+                      style={{ color: "#999999" }}
+                    >
+                      Latest orders from customers
+                    </p>
+                  </div>
+                  <ul className="divide-y divide-gray-200">
+                    {recentOrders.length > 0 ? (
+                      recentOrders.map((order) => (
+                        <li key={order.id}>
+                          <div className="px-4 py-4 sm:px-6">
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center">
+                                <p
+                                  className="text-sm font-medium truncate"
+                                  style={{ color: "#d4af37" }}
+                                >
+                                  Order #{order.id}
+                                </p>
+                                <p className="ml-2 flex-shrink-0 flex">
+                                  <span
+                                    className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                                      order.status === "delivered"
+                                        ? "bg-green-900 text-green-200"
+                                        : order.status === "shipped"
+                                        ? "bg-blue-900 text-blue-200"
+                                        : order.status === "processing"
+                                        ? "bg-yellow-900 text-yellow-200"
+                                        : "bg-gray-900 text-gray-200"
+                                    }`}
+                                  >
+                                    {order.status}
+                                  </span>
+                                </p>
+                              </div>
+                              <div className="ml-2 flex-shrink-0 flex">
+                                <p
+                                  className="text-sm"
+                                  style={{ color: "#cccccc" }}
+                                >
+                                  ${order.total_amount}
+                                </p>
+                              </div>
+                            </div>
+                            <div className="mt-2 sm:flex sm:justify-between">
+                              <div className="sm:flex">
+                                <p
+                                  className="flex items-center text-sm"
+                                  style={{ color: "#999999" }}
+                                >
+                                  By {order.user_email} •{" "}
+                                  {new Date(
+                                    order.created_at
+                                  ).toLocaleDateString()}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        </li>
+                      ))
+                    ) : (
+                      <li>
+                        <div className="px-4 py-4 sm:px-6">
+                          <p className="text-sm" style={{ color: "#999999" }}>
+                            No recent orders
+                          </p>
+                        </div>
+                      </li>
+                    )}
+                  </ul>
+                </div>
+              </>
+            )}
 
             <Outlet />
           </div>
