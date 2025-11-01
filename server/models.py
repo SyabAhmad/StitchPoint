@@ -4,11 +4,13 @@ from datetime import datetime
 db = SQLAlchemy()
 
 class User(db.Model):
+    __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(256), nullable=False)
     name = db.Column(db.String(100), nullable=True)
-    role = db.Column(db.String(20), default='customer')  # customer, manager, or super_admin
+    role = db.Column(db.String(20), default='customer')
+    profile_picture = db.Column(db.String(500), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     # Relationships
@@ -18,6 +20,8 @@ class User(db.Model):
     page_views = db.relationship('PageView', backref='user', lazy=True)
     button_clicks = db.relationship('ButtonClick', backref='user', lazy=True)
     store = db.relationship('Store', backref='manager', uselist=False, lazy=True)
+    addresses = db.relationship('Address', backref='user', lazy=True)
+    payment_methods = db.relationship('PaymentMethod', backref='user', lazy=True)
 
     def __repr__(self):
         return f'<User {self.email}>'
@@ -29,7 +33,7 @@ class Store(db.Model):
     logo_url = db.Column(db.String(500), nullable=True)
     contact_number = db.Column(db.String(20), nullable=True)
     description = db.Column(db.Text, nullable=True)
-    manager_id = db.Column(db.Integer, db.ForeignKey('user.id'), unique=True, nullable=False)
+    manager_id = db.Column(db.Integer, db.ForeignKey('users.id'), unique=True, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
@@ -63,7 +67,7 @@ class Product(db.Model):
 
 class Cart(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
@@ -85,7 +89,7 @@ class CartItem(db.Model):
 
 class Wishlist(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     name = db.Column(db.String(100), default='My Wishlist')
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
@@ -105,11 +109,12 @@ class WishlistItem(db.Model):
         return f'<WishlistItem {self.id}>'
 
 class Order(db.Model):
+    __tablename__ = 'orders'
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     store_id = db.Column(db.Integer, db.ForeignKey('store.id'), nullable=False)
     total_amount = db.Column(db.Float, nullable=False)
-    status = db.Column(db.String(50), default='pending')  # pending, processing, shipped, delivered, cancelled
+    status = db.Column(db.String(50), default='pending')
     shipping_address = db.Column(db.Text, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
@@ -123,21 +128,21 @@ class Order(db.Model):
 
 class OrderItem(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    order_id = db.Column(db.Integer, db.ForeignKey('order.id'), nullable=False)
+    order_id = db.Column(db.Integer, db.ForeignKey('orders.id'), nullable=False)
     product_id = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=False)
     quantity = db.Column(db.Integer, nullable=False)
-    price = db.Column(db.Float, nullable=False)  # Price at time of order
+    price = db.Column(db.Float, nullable=False)
 
     def __repr__(self):
         return f'<OrderItem {self.id}>'
 
 class Payment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    order_id = db.Column(db.Integer, db.ForeignKey('order.id'), nullable=False)
+    order_id = db.Column(db.Integer, db.ForeignKey('orders.id'), nullable=False)
     amount = db.Column(db.Float, nullable=False)
-    payment_method = db.Column(db.String(50), nullable=False)  # credit_card, paypal, etc.
+    payment_method = db.Column(db.String(50), nullable=False)
     transaction_id = db.Column(db.String(200), nullable=True)
-    status = db.Column(db.String(50), default='pending')  # pending, completed, failed, refunded
+    status = db.Column(db.String(50), default='pending')
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     def __repr__(self):
@@ -145,11 +150,11 @@ class Payment(db.Model):
 
 class PageView(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)  # Anonymous users allowed
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
     page_url = db.Column(db.String(500), nullable=False)
     referrer = db.Column(db.String(500), nullable=True)
     user_agent = db.Column(db.Text, nullable=True)
-    ip_address = db.Column(db.String(45), nullable=True)  # IPv6 support
+    ip_address = db.Column(db.String(45), nullable=True)
     viewed_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     def __repr__(self):
@@ -171,7 +176,7 @@ class Category(db.Model):
 
 class ButtonClick(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)  # Anonymous users allowed
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
     button_name = db.Column(db.String(100), nullable=False)
     page_url = db.Column(db.String(500), nullable=False)
     element_id = db.Column(db.String(100), nullable=True)
@@ -184,7 +189,7 @@ class ButtonClick(db.Model):
 class Review(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     product_id = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
     user_name = db.Column(db.String(120), nullable=True)
     rating = db.Column(db.Integer, nullable=False, default=5)
     comment = db.Column(db.Text, nullable=True)
@@ -196,7 +201,7 @@ class Review(db.Model):
 class Comment(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     product_id = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
     user_name = db.Column(db.String(120), nullable=True)
     comment = db.Column(db.Text, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
@@ -207,10 +212,10 @@ class Comment(db.Model):
 class ProductAnalytics(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     product_id = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)  # Anonymous users allowed
-    action = db.Column(db.String(50), nullable=False)  # 'view', 'click', 'add_to_cart', etc.
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
+    action = db.Column(db.String(50), nullable=False)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
-    time_spent = db.Column(db.Float, nullable=True)  # Time spent on page in seconds
+    time_spent = db.Column(db.Float, nullable=True)
     referrer = db.Column(db.String(500), nullable=True)
     user_agent = db.Column(db.Text, nullable=True)
 
@@ -219,3 +224,34 @@ class ProductAnalytics(db.Model):
 
     def __repr__(self):
         return f'<ProductAnalytics {self.action} on product {self.product_id}>'
+
+class Address(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    name = db.Column(db.String(100), nullable=False)  # e.g., "Home", "Work"
+    street_address = db.Column(db.Text, nullable=False)
+    city = db.Column(db.String(100), nullable=False)
+    state = db.Column(db.String(100), nullable=False)
+    postal_code = db.Column(db.String(20), nullable=False)
+    country = db.Column(db.String(100), nullable=False)
+    is_default = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    def __repr__(self):
+        return f'<Address {self.name} for user {self.user_id}>'
+
+class PaymentMethod(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    cardholder_name = db.Column(db.String(100), nullable=False)
+    card_number_last_four = db.Column(db.String(4), nullable=False)  # Store only last 4 digits
+    card_type = db.Column(db.String(50), nullable=False)  # e.g., "Visa", "MasterCard"
+    expiry_month = db.Column(db.Integer, nullable=False)
+    expiry_year = db.Column(db.Integer, nullable=False)
+    is_default = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    def __repr__(self):
+        return f'<PaymentMethod {self.card_type} ****{self.card_number_last_four} for user {self.user_id}>'

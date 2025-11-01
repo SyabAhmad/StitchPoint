@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from werkzeug.security import generate_password_hash
 from werkzeug.utils import secure_filename
-from models import db, User, Order, Product, PageView, ButtonClick, Review, Store, OrderItem
+from models import db, User, Order, Product, PageView, ButtonClick, Review, Store, OrderItem, Address, PaymentMethod
 from sqlalchemy import func
 import os
 from datetime import datetime
@@ -66,6 +66,7 @@ def customer_dashboard():
             'name': user.name,
             'email': user.email,
             'role': user.role,
+            'profile_picture': user.profile_picture,
             'created_at': user.created_at.isoformat()
         },
         'orders': orders_data,
@@ -416,8 +417,10 @@ def update_store():
         # Handle logo file upload
         logo_file = request.files.get('logo')
         if logo_file and logo_file.filename:
-            # Ensure uploads directory exists
-            uploads_dir = os.path.join(os.getcwd(), 'uploads')
+            # Ensure uploads directory exists in project root
+            server_dir = os.path.dirname(os.path.abspath(__file__))
+            project_root = os.path.dirname(os.path.dirname(server_dir))
+            uploads_dir = os.path.join(project_root, 'uploads')
             os.makedirs(uploads_dir, exist_ok=True)
 
             # Create unique filename with timestamp
@@ -518,3 +521,313 @@ def delete_review(review_id):
     db.session.commit()
 
     return jsonify({'message': 'Review deleted successfully'}), 200
+
+# Profile routes
+@dashboard_bp.route('/profile', methods=['GET'])
+@jwt_required()
+def get_profile():
+    try:
+        user_id = int(get_jwt_identity())
+    except (TypeError, ValueError):
+        return jsonify({'message': 'Invalid token identity'}), 422
+    user = User.query.get(user_id)
+
+    if not user:
+        return jsonify({'message': 'User not found'}), 404
+
+    addresses = Address.query.filter_by(user_id=user_id).all()
+    addresses_data = [{
+        'id': addr.id,
+        'name': addr.name,
+        'street_address': addr.street_address,
+        'city': addr.city,
+        'state': addr.state,
+        'postal_code': addr.postal_code,
+        'country': addr.country,
+        'is_default': addr.is_default
+    } for addr in addresses]
+
+    payments = PaymentMethod.query.filter_by(user_id=user_id).all()
+    payments_data = [{
+        'id': pm.id,
+        'cardholder_name': pm.cardholder_name,
+        'card_number_last_four': pm.card_number_last_four,
+        'card_type': pm.card_type,
+        'expiry_month': pm.expiry_month,
+        'expiry_year': pm.expiry_year,
+        'is_default': pm.is_default
+    } for pm in payments]
+
+    return jsonify({
+        'user': {
+            'id': user.id,
+            'name': user.name,
+            'email': user.email,
+            'profile_picture': user.profile_picture,
+            'role': user.role,
+            'created_at': user.created_at.isoformat()
+        },
+        'addresses': addresses_data,
+        'payment_methods': payments_data
+    }), 200
+
+@dashboard_bp.route('/profile', methods=['PUT'])
+@jwt_required()
+def update_profile():
+    try:
+        user_id = int(get_jwt_identity())
+    except (TypeError, ValueError):
+        return jsonify({'message': 'Invalid token identity'}), 422
+    user = User.query.get(user_id)
+
+    if not user:
+        return jsonify({'message': 'User not found'}), 404
+
+    # Handle FormData for file uploads
+    if request.content_type and 'multipart/form-data' in request.content_type:
+        name = request.form.get('name')
+        email = request.form.get('email')
+
+        # Handle profile picture upload
+        profile_file = request.files.get('profile_picture')
+        if profile_file and profile_file.filename:
+            # Ensure uploads directory exists in project root
+            # Get project root by going up two levels from this file's location
+            server_dir = os.path.dirname(os.path.abspath(__file__))
+            project_root = os.path.dirname(os.path.dirname(server_dir))
+            uploads_dir = os.path.join(project_root, 'uploads')
+            os.makedirs(uploads_dir, exist_ok=True)
+
+            # Create unique filename with timestamp
+            timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+            filename = secure_filename(f"{timestamp}_{profile_file.filename}")
+            filepath = os.path.join(uploads_dir, filename)
+            profile_file.save(filepath)
+
+            # Store relative path in database
+            user.profile_picture = f"/uploads/{filename}"
+
+        if name is not None:
+            user.name = name
+        if email is not None and email != user.email:
+            if User.query.filter_by(email=email).first():
+                return jsonify({'message': 'Email already in use'}), 400
+            user.email = email
+    else:
+        # Handle JSON data
+        data = request.get_json() or {}
+        if 'name' in data:
+            user.name = data['name']
+        if 'email' in data and data['email'] != user.email:
+            if User.query.filter_by(email=data['email']).first():
+                return jsonify({'message': 'Email already in use'}), 400
+            user.email = data['email']
+
+    db.session.commit()
+    return jsonify({
+        'message': 'Profile updated successfully',
+        'user': {
+            'id': user.id,
+            'name': user.name,
+            'email': user.email,
+            'profile_picture': user.profile_picture,
+            'role': user.role,
+            'created_at': user.created_at.isoformat()
+        }
+    }), 200
+
+@dashboard_bp.route('/profile/addresses', methods=['POST'])
+@jwt_required()
+def add_address():
+    try:
+        user_id = int(get_jwt_identity())
+    except (TypeError, ValueError):
+        return jsonify({'message': 'Invalid token identity'}), 422
+
+    data = request.get_json() or {}
+    name = data.get('name')
+    street_address = data.get('street_address')
+    city = data.get('city')
+    state = data.get('state')
+    postal_code = data.get('postal_code')
+    country = data.get('country')
+    is_default = data.get('is_default', False)
+
+    if not all([name, street_address, city, state, postal_code, country]):
+        return jsonify({'message': 'All address fields are required'}), 400
+
+    # If setting as default, unset other defaults
+    if is_default:
+        Address.query.filter_by(user_id=user_id, is_default=True).update({'is_default': False})
+
+    new_address = Address(
+        user_id=user_id,
+        name=name,
+        street_address=street_address,
+        city=city,
+        state=state,
+        postal_code=postal_code,
+        country=country,
+        is_default=is_default
+    )
+    db.session.add(new_address)
+    db.session.commit()
+
+    return jsonify({'message': 'Address added successfully', 'address_id': new_address.id}), 201
+
+@dashboard_bp.route('/profile/addresses/<int:address_id>', methods=['PUT'])
+@jwt_required()
+def update_address(address_id):
+    try:
+        user_id = int(get_jwt_identity())
+    except (TypeError, ValueError):
+        return jsonify({'message': 'Invalid token identity'}), 422
+
+    address = Address.query.filter_by(id=address_id, user_id=user_id).first()
+    if not address:
+        return jsonify({'message': 'Address not found'}), 404
+
+    data = request.get_json() or {}
+    name = data.get('name')
+    street_address = data.get('street_address')
+    city = data.get('city')
+    state = data.get('state')
+    postal_code = data.get('postal_code')
+    country = data.get('country')
+    is_default = data.get('is_default', False)
+
+    if name is not None:
+        address.name = name
+    if street_address is not None:
+        address.street_address = street_address
+    if city is not None:
+        address.city = city
+    if state is not None:
+        address.state = state
+    if postal_code is not None:
+        address.postal_code = postal_code
+    if country is not None:
+        address.country = country
+    if is_default is not None:
+        if is_default:
+            Address.query.filter_by(user_id=user_id, is_default=True).update({'is_default': False})
+        address.is_default = is_default
+
+    db.session.commit()
+    return jsonify({'message': 'Address updated successfully'}), 200
+
+@dashboard_bp.route('/profile/addresses/<int:address_id>', methods=['DELETE'])
+@jwt_required()
+def delete_address(address_id):
+    try:
+        user_id = int(get_jwt_identity())
+    except (TypeError, ValueError):
+        return jsonify({'message': 'Invalid token identity'}), 422
+
+    address = Address.query.filter_by(id=address_id, user_id=user_id).first()
+    if not address:
+        return jsonify({'message': 'Address not found'}), 404
+
+    db.session.delete(address)
+    db.session.commit()
+    return jsonify({'message': 'Address deleted successfully'}), 200
+
+@dashboard_bp.route('/profile/payments', methods=['POST'])
+@jwt_required()
+def add_payment_method():
+    try:
+        user_id = int(get_jwt_identity())
+    except (TypeError, ValueError):
+        return jsonify({'message': 'Invalid token identity'}), 422
+
+    data = request.get_json() or {}
+    cardholder_name = data.get('cardholder_name')
+    card_number = data.get('card_number')  # Full card number for processing
+    card_type = data.get('card_type')
+    expiry_month = data.get('expiry_month')
+    expiry_year = data.get('expiry_year')
+    is_default = data.get('is_default', False)
+
+    if not all([cardholder_name, card_number, card_type, expiry_month, expiry_year]):
+        return jsonify({'message': 'All payment fields are required'}), 400
+
+    # Basic validation
+    if len(card_number) < 13 or len(card_number) > 19:
+        return jsonify({'message': 'Invalid card number'}), 400
+
+    card_number_last_four = card_number[-4:]
+
+    # If setting as default, unset other defaults
+    if is_default:
+        PaymentMethod.query.filter_by(user_id=user_id, is_default=True).update({'is_default': False})
+
+    new_payment = PaymentMethod(
+        user_id=user_id,
+        cardholder_name=cardholder_name,
+        card_number_last_four=card_number_last_four,
+        card_type=card_type,
+        expiry_month=expiry_month,
+        expiry_year=expiry_year,
+        is_default=is_default
+    )
+    db.session.add(new_payment)
+    db.session.commit()
+
+    return jsonify({'message': 'Payment method added successfully', 'payment_id': new_payment.id}), 201
+
+@dashboard_bp.route('/profile/payments/<int:payment_id>', methods=['PUT'])
+@jwt_required()
+def update_payment_method(payment_id):
+    try:
+        user_id = int(get_jwt_identity())
+    except (TypeError, ValueError):
+        return jsonify({'message': 'Invalid token identity'}), 422
+
+    payment = PaymentMethod.query.filter_by(id=payment_id, user_id=user_id).first()
+    if not payment:
+        return jsonify({'message': 'Payment method not found'}), 404
+
+    data = request.get_json() or {}
+    cardholder_name = data.get('cardholder_name')
+    card_number = data.get('card_number')  # Full card number for processing
+    card_type = data.get('card_type')
+    expiry_month = data.get('expiry_month')
+    expiry_year = data.get('expiry_year')
+    is_default = data.get('is_default', False)
+
+    if card_number and (len(card_number) < 13 or len(card_number) > 19):
+        return jsonify({'message': 'Invalid card number'}), 400
+
+    if cardholder_name is not None:
+        payment.cardholder_name = cardholder_name
+    if card_number is not None:
+        payment.card_number_last_four = card_number[-4:]
+    if card_type is not None:
+        payment.card_type = card_type
+    if expiry_month is not None:
+        payment.expiry_month = expiry_month
+    if expiry_year is not None:
+        payment.expiry_year = expiry_year
+    if is_default is not None:
+        if is_default:
+            PaymentMethod.query.filter_by(user_id=user_id, is_default=True).update({'is_default': False})
+        payment.is_default = is_default
+
+    db.session.commit()
+    return jsonify({'message': 'Payment method updated successfully'}), 200
+
+@dashboard_bp.route('/profile/payments/<int:payment_id>', methods=['DELETE'])
+@jwt_required()
+def delete_payment_method(payment_id):
+    try:
+        user_id = int(get_jwt_identity())
+    except (TypeError, ValueError):
+        return jsonify({'message': 'Invalid token identity'}), 422
+
+    payment = PaymentMethod.query.filter_by(id=payment_id, user_id=user_id).first()
+    if not payment:
+        return jsonify({'message': 'Payment method not found'}), 404
+
+    db.session.delete(payment)
+    db.session.commit()
+    return jsonify({'message': 'Payment method deleted successfully'}), 200
