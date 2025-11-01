@@ -1,5 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { FaEdit, FaLock, FaUnlock, FaPlus, FaFilter } from "react-icons/fa";
+import {
+  FaEdit,
+  FaLock,
+  FaUnlock,
+  FaPlus,
+  FaFilter,
+  FaSearch,
+} from "react-icons/fa";
 import { fetchWithAuth } from "../../utils/fetchWithAuth";
 
 const UserManagement = () => {
@@ -22,6 +29,10 @@ const UserManagement = () => {
     store_description: "",
   });
   const [roleFilter, setRoleFilter] = useState("all");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [usersPerPage] = useState(10);
 
   useEffect(() => {
     const userData = JSON.parse(localStorage.getItem("user"));
@@ -38,6 +49,16 @@ const UserManagement = () => {
         setLoading(false);
       });
   }, []);
+
+  // Debounce search term
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+      setCurrentPage(1); // Reset to first page when search changes
+    }, 300); // 300ms delay
+
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
 
   const handleRoleChange = (userId, role) => {
     fetchWithAuth(`http://localhost:5000/api/dashboard/users/${userId}/role`, {
@@ -547,6 +568,29 @@ const UserManagement = () => {
             )}
 
             <div className="mt-4 flex items-center space-x-3">
+              <FaSearch style={{ color: "#d4af37" }} />
+              <input
+                type="text"
+                placeholder="Search by name or email..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="px-3 py-1 rounded transition-colors duration-200"
+                style={{
+                  backgroundColor: "#2d2d2d",
+                  color: "#ffffff",
+                  border: "1px solid #3d3d3d",
+                  width: "250px",
+                }}
+                onFocus={(e) => {
+                  e.currentTarget.style.borderColor = "#d4af37";
+                }}
+                onBlur={(e) => {
+                  e.currentTarget.style.borderColor = "#3d3d3d";
+                }}
+              />
+            </div>
+
+            <div className="mt-4 flex items-center space-x-3">
               <FaFilter style={{ color: "#d4af37" }} />
               <span className="text-sm" style={{ color: "#cccccc" }}>
                 Filter:
@@ -683,8 +727,24 @@ const UserManagement = () => {
               </thead>
               <tbody style={{ backgroundColor: "#1d1d1d" }}>
                 {users
-                  .filter((user) =>
-                    roleFilter === "all" ? true : user.role === roleFilter
+                  .filter((user) => {
+                    const matchesRole =
+                      roleFilter === "all" || user.role === roleFilter;
+                    const matchesSearch =
+                      debouncedSearchTerm === "" ||
+                      (user.name &&
+                        user.name
+                          .toLowerCase()
+                          .includes(debouncedSearchTerm.toLowerCase())) ||
+                      (user.email &&
+                        user.email
+                          .toLowerCase()
+                          .includes(debouncedSearchTerm.toLowerCase()));
+                    return matchesRole && matchesSearch;
+                  })
+                  .slice(
+                    (currentPage - 1) * usersPerPage,
+                    currentPage * usersPerPage
                   )
                   .map((user, index) => (
                     <tr
@@ -980,14 +1040,79 @@ const UserManagement = () => {
                   ))}
               </tbody>
             </table>
-            {users.filter((user) =>
-              roleFilter === "all" ? true : user.role === roleFilter
-            ).length === 0 && (
+            {users.filter((user) => {
+              const matchesRole =
+                roleFilter === "all" || user.role === roleFilter;
+              const matchesSearch =
+                debouncedSearchTerm === "" ||
+                (user.name &&
+                  user.name
+                    .toLowerCase()
+                    .includes(debouncedSearchTerm.toLowerCase())) ||
+                (user.email &&
+                  user.email
+                    .toLowerCase()
+                    .includes(debouncedSearchTerm.toLowerCase()));
+              return matchesRole && matchesSearch;
+            }).length === 0 && (
               <div className="text-center py-8" style={{ color: "#999999" }}>
-                No users found for the selected filter.
+                No users found for the selected filter and search term.
               </div>
             )}
           </div>
+
+          {/* Pagination */}
+          {(() => {
+            const filteredUsers = users.filter((user) => {
+              const matchesRole =
+                roleFilter === "all" || user.role === roleFilter;
+              const matchesSearch =
+                debouncedSearchTerm === "" ||
+                (user.name &&
+                  user.name
+                    .toLowerCase()
+                    .includes(debouncedSearchTerm.toLowerCase())) ||
+                (user.email &&
+                  user.email
+                    .toLowerCase()
+                    .includes(debouncedSearchTerm.toLowerCase()));
+              return matchesRole && matchesSearch;
+            });
+            const totalPages = Math.ceil(filteredUsers.length / usersPerPage);
+            if (totalPages <= 1) return null;
+            return (
+              <div className="flex justify-center items-center space-x-2 mt-4">
+                <button
+                  onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                  disabled={currentPage === 1}
+                  className="px-3 py-1 rounded transition-colors duration-200"
+                  style={{
+                    backgroundColor: currentPage === 1 ? "#2d2d2d" : "#d4af37",
+                    color: currentPage === 1 ? "#666666" : "#000000",
+                  }}
+                >
+                  Previous
+                </button>
+                <span style={{ color: "#cccccc" }}>
+                  Page {currentPage} of {totalPages}
+                </span>
+                <button
+                  onClick={() =>
+                    setCurrentPage(Math.min(totalPages, currentPage + 1))
+                  }
+                  disabled={currentPage === totalPages}
+                  className="px-3 py-1 rounded transition-colors duration-200"
+                  style={{
+                    backgroundColor:
+                      currentPage === totalPages ? "#2d2d2d" : "#d4af37",
+                    color: currentPage === totalPages ? "#666666" : "#000000",
+                  }}
+                >
+                  Next
+                </button>
+              </div>
+            );
+          })()}
         </div>
       </div>
     </div>

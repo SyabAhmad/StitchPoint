@@ -4,25 +4,33 @@ const Comments = () => {
   const [comments, setComments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filterDays, setFilterDays] = useState(30);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalComments, setTotalComments] = useState(0);
+  const [limit] = useState(10); // Fixed limit for now, can be made configurable later
 
   useEffect(() => {
     fetchComments();
-  }, [filterDays]);
+  }, [filterDays, currentPage]);
 
   const fetchComments = async () => {
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `http://localhost:5000/api/analytics/comments?days=${filterDays}`,
+        `http://localhost:5000/api/analytics/comments?days=${filterDays}&page=${currentPage}&limit=${limit}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
       const data = await response.json();
       setComments(data.comments || []);
+      setTotalPages(data.pagination?.pages || 1);
+      setTotalComments(data.pagination?.total || 0);
     } catch (error) {
       console.error("Error fetching comments:", error);
       setComments([]);
+      setTotalPages(1);
+      setTotalComments(0);
     } finally {
       setLoading(false);
     }
@@ -59,7 +67,10 @@ const Comments = () => {
           </label>
           <select
             value={filterDays}
-            onChange={(e) => setFilterDays(Number(e.target.value))}
+            onChange={(e) => {
+              setFilterDays(Number(e.target.value));
+              setCurrentPage(1); // Reset to first page when filter changes
+            }}
             className="px-3 py-2 rounded"
             style={{
               backgroundColor: "#2d2d2d",
@@ -189,6 +200,47 @@ const Comments = () => {
             )}
           </div>
         </div>
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="mt-6 flex justify-between items-center">
+            <div className="text-sm" style={{ color: "#cccccc" }}>
+              Showing {comments.length > 0 ? (currentPage - 1) * limit + 1 : 0}{" "}
+              to {Math.min(currentPage * limit, totalComments)} of{" "}
+              {totalComments} comments
+            </div>
+            <div className="flex space-x-2">
+              <button
+                onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                disabled={currentPage === 1}
+                className="px-3 py-1 rounded text-sm disabled:opacity-50"
+                style={{
+                  backgroundColor: currentPage === 1 ? "#2d2d2d" : "#d4af37",
+                  color: "#000000",
+                }}
+              >
+                Previous
+              </button>
+              <span className="px-3 py-1 text-sm" style={{ color: "#cccccc" }}>
+                Page {currentPage} of {totalPages}
+              </span>
+              <button
+                onClick={() =>
+                  setCurrentPage(Math.min(totalPages, currentPage + 1))
+                }
+                disabled={currentPage === totalPages}
+                className="px-3 py-1 rounded text-sm disabled:opacity-50"
+                style={{
+                  backgroundColor:
+                    currentPage === totalPages ? "#2d2d2d" : "#d4af37",
+                  color: "#000000",
+                }}
+              >
+                Next
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

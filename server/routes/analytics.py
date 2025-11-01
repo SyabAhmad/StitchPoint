@@ -718,13 +718,18 @@ def get_all_comments():
     days = request.args.get('days', 30, type=int)
     start_date = datetime.utcnow() - timedelta(days=days)
 
+    # Pagination parameters
+    page = request.args.get('page', 1, type=int)
+    limit = request.args.get('limit', 10, type=int)
+    offset = (page - 1) * limit
+
     store_filter = None
     if user.role == 'manager' and user.store:
         store_filter = user.store.id
 
     query = db.session.query(
         Comment.id,
-        Comment.content,
+        Comment.comment,
         Comment.created_at,
         User.name.label('user_name'),
         User.email.label('user_email'),
@@ -740,13 +745,19 @@ def get_all_comments():
 
     query = query.order_by(desc(Comment.created_at))
 
+    # Get total count for pagination
+    total_count = query.count()
+
+    # Apply pagination
+    query = query.offset(offset).limit(limit)
+
     results = query.all()
 
     data = []
     for row in results:
         data.append({
             'id': row.id,
-            'content': row.content,
+            'content': row.comment,
             'created_at': row.created_at.isoformat(),
             'user_name': row.user_name,
             'user_email': row.user_email,
@@ -754,7 +765,15 @@ def get_all_comments():
             'store_name': row.store_name
         })
 
-    return jsonify({'comments': data}), 200
+    return jsonify({
+        'comments': data,
+        'pagination': {
+            'page': page,
+            'limit': limit,
+            'total': total_count,
+            'pages': (total_count + limit - 1) // limit
+        }
+    }), 200
 
 @analytics_bp.route('/reviews', methods=['GET'])
 @jwt_required()
