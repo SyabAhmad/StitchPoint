@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
+import ReviewModal from "../../components/ReviewModal";
 
 const Orders = () => {
   const navigate = useNavigate();
@@ -8,6 +9,7 @@ const Orders = () => {
   const [orders, setOrders] = useState([]);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [reviewingItem, setReviewingItem] = useState(null); // {order, item, product}
   const token = localStorage.getItem("token");
 
   useEffect(() => {
@@ -69,6 +71,12 @@ const Orders = () => {
       console.error("Error cancelling order:", error);
       toast.error("Error cancelling order");
     }
+  };
+
+  const handleReviewSubmitted = () => {
+    setReviewingItem(null);
+    toast.success("Review submitted successfully!");
+    loadOrders();
   };
 
   if (loading) {
@@ -274,22 +282,47 @@ const Orders = () => {
                   </div>
 
                   {/* Actions */}
-                  {selectedOrder.status === "pending" ||
-                  selectedOrder.status === "processing" ? (
-                    <button
-                      onClick={() => handleCancelOrder(selectedOrder.id)}
-                      className="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-3 rounded-lg transition-all transform hover:scale-105"
-                    >
-                      ❌ Cancel Order
-                    </button>
-                  ) : (
-                    <button
-                      onClick={() => navigate("/collections")}
-                      className="w-full bg-gray-900 hover:bg-gray-800 text-white font-bold py-3 rounded-lg transition-all transform hover:scale-105"
-                    >
-                      🛍️ Shop Again
-                    </button>
-                  )}
+                  <div className="space-y-3">
+                    {selectedOrder.status === "pending" ||
+                    selectedOrder.status === "processing" ? (
+                      <button
+                        onClick={() => handleCancelOrder(selectedOrder.id)}
+                        className="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-3 rounded-lg transition-all transform hover:scale-105"
+                      >
+                        ❌ Cancel Order
+                      </button>
+                    ) : null}
+
+                    {selectedOrder.status === "delivered" ? (
+                      <button
+                        onClick={() => {
+                          // Start review with first item if multiple items exist
+                          const firstItem =
+                            selectedOrder.items && selectedOrder.items[0];
+                          if (firstItem) {
+                            setReviewingItem({
+                              order: selectedOrder,
+                              item: firstItem,
+                            });
+                          }
+                        }}
+                        className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition-all transform hover:scale-105 flex items-center justify-center gap-2"
+                      >
+                        ⭐ Leave Review
+                      </button>
+                    ) : null}
+
+                    {selectedOrder.status !== "pending" &&
+                    selectedOrder.status !== "processing" &&
+                    selectedOrder.status !== "delivered" ? (
+                      <button
+                        onClick={() => navigate("/collections")}
+                        className="w-full bg-gray-900 hover:bg-gray-800 text-white font-bold py-3 rounded-lg transition-all transform hover:scale-105"
+                      >
+                        🛍️ Shop Again
+                      </button>
+                    ) : null}
+                  </div>
                 </div>
               </div>
             ) : (
@@ -305,6 +338,16 @@ const Orders = () => {
           </div>
         </div>
       </div>
+
+      {/* Review Modal */}
+      {reviewingItem && (
+        <ReviewModal
+          order={reviewingItem.order}
+          orderItem={reviewingItem.item}
+          onClose={() => setReviewingItem(null)}
+          onSubmit={handleReviewSubmitted}
+        />
+      )}
     </div>
   );
 };

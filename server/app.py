@@ -17,6 +17,7 @@ from routes.dashboard import dashboard_bp
 from routes.categories import categories_bp
 from routes.analytics import analytics_bp
 from routes.orders import orders_bp
+from routes.reviews import reviews_bp
 from logger import setup_logger
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
@@ -66,6 +67,7 @@ app.register_blueprint(dashboard_bp, url_prefix='/api/dashboard')
 app.register_blueprint(categories_bp, url_prefix='/api')
 app.register_blueprint(analytics_bp, url_prefix='/api/analytics')
 app.register_blueprint(orders_bp, url_prefix='/api/orders')
+app.register_blueprint(reviews_bp, url_prefix='/api/reviews')
 
 @app.route('/uploads/<path:filename>')
 def serve_uploaded_file(filename):

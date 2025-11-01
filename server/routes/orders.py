@@ -143,7 +143,9 @@ def get_orders():
                 'updated_at': order.updated_at.isoformat(),
                 'items': [
                     {
+                        'id': item.id,
                         'product_id': item.product_id,
+                        'product_name': item.product.name if item.product else 'Unknown Product',
                         'quantity': item.quantity,
                         'price': item.price
                     }
