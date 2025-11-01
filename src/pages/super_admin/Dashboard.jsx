@@ -19,11 +19,9 @@ import {
   FaBuilding,
 } from "react-icons/fa";
 import { Link, Outlet } from "react-router-dom";
-import StarfieldBackground from "../../components/StarfieldBackground";
 
 const SuperAdminDashboard = () => {
   const [loading, setLoading] = useState(true);
-  const [_currentUser, setCurrentUser] = useState(null);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -38,7 +36,6 @@ const SuperAdminDashboard = () => {
       return;
     }
 
-    setCurrentUser(userData);
     setLoading(false);
   }, []);
 
@@ -58,8 +55,7 @@ const SuperAdminDashboard = () => {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: "#000000" }}>
-      <StarfieldBackground />
-      <div className="flex relative z-10">
+      <div className="flex">
         {/* Sidebar */}
         <aside
           className="w-64 shadow-lg min-h-screen"

@@ -747,6 +747,17 @@ def get_all_reviews():
     days = request.args.get('days', 30, type=int)
     start_date = datetime.utcnow() - timedelta(days=days)
 
+    # Pagination parameters
+    page = request.args.get('page', 1, type=int)
+    limit = request.args.get('limit', 10, type=int)
+    offset = (page - 1) * limit
+
+    # Search parameter
+    search = request.args.get('search', '').strip()
+
+    # Rating filter
+    rating_filter = request.args.get('rating_filter', 'all')  # 'all', 'high', 'low'
+
     store_filter = None
     if user.role == 'manager' and user.store:
         store_filter = user.store.id
@@ -768,7 +779,29 @@ def get_all_reviews():
     if store_filter:
         query = query.filter(Product.store_id == store_filter)
 
-    query = query.order_by(desc(Review.created_at))
+    # Apply search filter
+    if search:
+        query = query.filter(
+            db.or_(
+                Review.comment.ilike(f'%{search}%'),
+                User.name.ilike(f'%{search}%'),
+                User.email.ilike(f'%{search}%'),
+                Product.name.ilike(f'%{search}%'),
+                Store.name.ilike(f'%{search}%')
+            )
+        )
+
+    # Apply rating filter
+    if rating_filter == 'high':
+        query = query.filter(Review.rating >= 4)
+    elif rating_filter == 'low':
+        query = query.filter(Review.rating <= 2)
+
+    # Get total count for pagination
+    total_count = query.count()
+
+    # Apply ordering and pagination
+    query = query.order_by(desc(Review.created_at)).offset(offset).limit(limit)
 
     results = query.all()
 
@@ -785,7 +818,67 @@ def get_all_reviews():
             'store_name': row.store_name
         })
 
-    return jsonify({'reviews': data}), 200
+    return jsonify({
+        'reviews': data,
+        'pagination': {
+            'page': page,
+            'limit': limit,
+            'total': total_count,
+            'pages': (total_count + limit - 1) // limit
+        }
+    }), 200
+
+@analytics_bp.route('/reviews/<int:review_id>', methods=['GET'])
+@jwt_required()
+def get_review_details(review_id):
+    try:
+        user_id = int(get_jwt_identity())
+    except (TypeError, ValueError):
+        return jsonify({'message': 'Invalid token identity'}), 422
+    user = User.query.get(user_id)
+
+    if not user or user.role not in ['manager', 'super_admin']:
+        return jsonify({'message': 'Unauthorized'}), 403
+
+    # Fetch the review with related data
+    review = db.session.query(
+        Review.id,
+        Review.rating,
+        Review.comment,
+        Review.created_at,
+        User.name.label('user_name'),
+        User.email.label('user_email'),
+        Product.id.label('product_id'),
+        Product.name.label('product_name'),
+        Store.id.label('store_id'),
+        Store.name.label('store_name')
+    ).join(User, Review.user_id == User.id)\
+     .join(Product, Review.product_id == Product.id)\
+     .join(Store, Product.store_id == Store.id)\
+     .filter(Review.id == review_id)\
+     .first()
+
+    if not review:
+        return jsonify({'message': 'Review not found'}), 404
+
+    # Check if manager can access this review (only their store's reviews)
+    if user.role == 'manager' and user.store and user.store.id != review.store_id:
+        return jsonify({'message': 'Unauthorized for this review'}), 403
+
+    review_data = {
+        'id': review.id,
+        'rating': review.rating,
+        'comment': review.comment,
+        'created_at': review.created_at.isoformat(),
+        'user_name': review.user_name,
+        'user_email': review.user_email,
+        'product_id': review.product_id,
+        'product_name': review.product_name,
+        'store_id': review.store_id,
+        'store_name': review.store_name
+    }
+
+    return jsonify({'review': review_data}), 200
 
 @analytics_bp.route('/welcome', methods=['GET'])
 def welcome():

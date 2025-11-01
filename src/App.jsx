@@ -36,6 +36,7 @@ import StoreComments from "./pages/super_admin/StoreComments.jsx";
 import StoreProducts from "./pages/super_admin/StoreProducts.jsx";
 import Comments from "./pages/super_admin/Comments.jsx";
 import Reviews from "./pages/super_admin/Reviews.jsx";
+import ReviewDetails from "./pages/super_admin/ReviewDetails.jsx";
 
 function App() {
   return (
@@ -90,6 +91,7 @@ function App() {
             />
             <Route path="comments" element={<Comments />} />
             <Route path="reviews" element={<Reviews />} />
+            <Route path="reviews/:review_id" element={<ReviewDetails />} />
           </Route>
         </Route>
       </Routes>
