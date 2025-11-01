@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const CustomerDashboard = () => {
+  const navigate = useNavigate();
   const [orders, setOrders] = useState([]);
   const [cartCount, setCartCount] = useState(0);
   const [wishlistCount, setWishlistCount] = useState(0);
   const [totalSpent, setTotalSpent] = useState(0);
   const [totalOrders, setTotalOrders] = useState(0);
   const [recommendedProducts, setRecommendedProducts] = useState([]);
+  const [profilePicture, setProfilePicture] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -38,6 +40,10 @@ const CustomerDashboard = () => {
         setTotalSpent(data.total_spent || 0);
         setTotalOrders(data.total_orders || 0);
         setRecommendedProducts(data.recommended_products || []);
+        // Update profile picture from dashboard data
+        if (data.user?.profile_picture) {
+          setProfilePicture(data.user.profile_picture);
+        }
         setLoading(false);
       })
       .catch((error) => {
@@ -63,167 +69,163 @@ const CustomerDashboard = () => {
   const userData = JSON.parse(localStorage.getItem("user"));
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <div className="px-4 py-6 sm:px-0">
+    <div className="min-h-screen bg-white">
+      <div className="max-w-7xl mx-auto py-8 sm:px-6 lg:px-8">
+        <div className="px-4 py-8 sm:px-0">
           {/* User Header */}
-          <div className="bg-white shadow rounded-lg mb-6">
-            <div className="px-4 py-5 sm:px-6">
+          <div className="bg-gradient-to-r from-gray-100 to-gray-50 shadow-lg rounded-2xl mb-8 p-8">
+            <div className="flex items-center justify-between">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
                   <img
-                    className="h-12 w-12 rounded-full"
-                    src={userData?.profile_picture || "/placeholder-avatar.jpg"}
+                    className="h-20 w-20 rounded-full object-cover border-4 border-gray-900 shadow-lg"
+                    src={
+                      profilePicture ||
+                      userData?.profile_picture ||
+                      "/placeholder-avatar.svg"
+                    }
                     alt="Profile"
+                    onError={(e) => {
+                      e.target.src = "/placeholder-avatar.svg";
+                    }}
                   />
                 </div>
-                <div className="ml-4 flex-1">
-                  <h2 className="text-lg font-medium text-gray-900">
-                    Welcome back, {userData?.name || "Customer"}!
+                <div className="ml-6 flex-1">
+                  <h2 className="text-4xl font-extrabold text-gray-900">
+                    Welcome back, {userData?.name || "Customer"}! 👋
                   </h2>
-                  <p className="text-sm text-gray-500">{userData?.email}</p>
-                </div>
-                <div className="flex-shrink-0">
-                  <Link
-                    to="/profile"
-                    className="bg-indigo-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-indigo-700"
-                  >
-                    Manage Profile
-                  </Link>
+                  <p className="text-gray-600 mt-2">{userData?.email}</p>
                 </div>
               </div>
+              <Link
+                to="/profile"
+                className="bg-gray-900 hover:bg-gray-800 text-white font-bold px-6 py-3 rounded-lg transition-all transform hover:scale-105"
+              >
+                ⚙️ Manage Profile
+              </Link>
             </div>
           </div>
 
-          <h1 className="text-3xl font-bold text-gray-900 mb-6">
-            Customer Dashboard
+          <h1 className="text-3xl font-extrabold text-gray-900 mb-8">
+            📊 Dashboard
           </h1>
 
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-            <div className="bg-white overflow-hidden shadow rounded-lg">
-              <div className="p-5">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <div className="w-8 h-8 bg-black rounded-md flex items-center justify-center">
-                      <span className="text-white font-bold">C</span>
-                    </div>
-                  </div>
-                  <div className="ml-5 w-0 flex-1">
-                    <dl>
-                      <dt className="text-sm font-medium text-gray-500 truncate">
-                        Cart Items
-                      </dt>
-                      <dd className="text-lg font-medium text-gray-900">
-                        {cartCount}
-                      </dd>
-                    </dl>
-                  </div>
+          {/* Stats Grid - Clickable Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
+            {/* Cart Items */}
+            <div
+              onClick={() => navigate("/cart")}
+              className="bg-white border-2 border-gray-200 rounded-2xl p-6 shadow-md hover:shadow-xl hover:border-gray-900 transition-all transform hover:scale-105 cursor-pointer"
+            >
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-gray-600 text-sm font-semibold">
+                    🛒 Cart Items
+                  </p>
+                  <p className="text-4xl font-extrabold text-gray-900 mt-2">
+                    {cartCount}
+                  </p>
                 </div>
+                <div className="text-4xl">🛍️</div>
               </div>
+              <p className="text-xs text-gray-500 mt-4">Click to view cart</p>
             </div>
 
-            <div className="bg-white overflow-hidden shadow rounded-lg">
-              <div className="p-5">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <div className="w-8 h-8 bg-black rounded-md flex items-center justify-center">
-                      <span className="text-white font-bold">W</span>
-                    </div>
-                  </div>
-                  <div className="ml-5 w-0 flex-1">
-                    <dl>
-                      <dt className="text-sm font-medium text-gray-500 truncate">
-                        Wishlist Items
-                      </dt>
-                      <dd className="text-lg font-medium text-gray-900">
-                        {wishlistCount}
-                      </dd>
-                    </dl>
-                  </div>
+            {/* Wishlist Items */}
+            <div
+              onClick={() => navigate("/wishlist")}
+              className="bg-white border-2 border-gray-200 rounded-2xl p-6 shadow-md hover:shadow-xl hover:border-gray-900 transition-all transform hover:scale-105 cursor-pointer"
+            >
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-gray-600 text-sm font-semibold">
+                    ❤️ Wishlist
+                  </p>
+                  <p className="text-4xl font-extrabold text-gray-900 mt-2">
+                    {wishlistCount}
+                  </p>
                 </div>
+                <div className="text-4xl">💝</div>
               </div>
+              <p className="text-xs text-gray-500 mt-4">
+                Click to view wishlist
+              </p>
             </div>
 
-            <div className="bg-white overflow-hidden shadow rounded-lg">
-              <div className="p-5">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <div className="w-8 h-8 bg-black rounded-md flex items-center justify-center">
-                      <span className="text-white font-bold">O</span>
-                    </div>
-                  </div>
-                  <div className="ml-5 w-0 flex-1">
-                    <dl>
-                      <dt className="text-sm font-medium text-gray-500 truncate">
-                        Total Orders
-                      </dt>
-                      <dd className="text-lg font-medium text-gray-900">
-                        {totalOrders}
-                      </dd>
-                    </dl>
-                  </div>
+            {/* Total Orders */}
+            <div
+              onClick={() => navigate("/customer/orders")}
+              className="bg-white border-2 border-gray-200 rounded-2xl p-6 shadow-md hover:shadow-xl hover:border-gray-900 transition-all transform hover:scale-105 cursor-pointer"
+            >
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-gray-600 text-sm font-semibold">
+                    📦 Total Orders
+                  </p>
+                  <p className="text-4xl font-extrabold text-gray-900 mt-2">
+                    {totalOrders}
+                  </p>
                 </div>
+                <div className="text-4xl">📋</div>
               </div>
+              <p className="text-xs text-gray-500 mt-4">
+                Click to view all orders
+              </p>
             </div>
 
-            <div className="bg-white overflow-hidden shadow rounded-lg">
-              <div className="p-5">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <div className="w-8 h-8 bg-black rounded-md flex items-center justify-center">
-                      <span className="text-white font-bold">$</span>
-                    </div>
-                  </div>
-                  <div className="ml-5 w-0 flex-1">
-                    <dl>
-                      <dt className="text-sm font-medium text-gray-500 truncate">
-                        Total Spent
-                      </dt>
-                      <dd className="text-lg font-medium text-gray-900">
-                        ${totalSpent.toFixed(2)}
-                      </dd>
-                    </dl>
-                  </div>
+            {/* Total Spent */}
+            <div className="bg-white border-2 border-gray-200 rounded-2xl p-6 shadow-md hover:shadow-xl hover:border-gray-900 transition-all">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-gray-600 text-sm font-semibold">
+                    💰 Total Spent
+                  </p>
+                  <p className="text-4xl font-extrabold text-gray-900 mt-2">
+                    ${totalSpent.toFixed(2)}
+                  </p>
                 </div>
+                <div className="text-4xl">💳</div>
               </div>
+              <p className="text-xs text-gray-500 mt-4">Lifetime spending</p>
             </div>
           </div>
 
           {recommendedProducts.length > 0 && (
-            <div className="bg-white shadow overflow-hidden sm:rounded-md mb-8">
-              <div className="px-4 py-5 sm:px-6">
-                <h3 className="text-lg leading-6 font-medium text-gray-900">
-                  You might also like these
+            <div className="bg-white shadow-lg rounded-2xl border border-gray-200 mb-12">
+              <div className="px-8 py-6 sm:px-8">
+                <h3 className="text-2xl font-bold text-gray-900">
+                  ✨ You Might Also Like
                 </h3>
-                <p className="mt-1 max-w-2xl text-sm text-gray-500">
+                <p className="mt-2 text-gray-600">
                   Recommended products based on your preferences
                 </p>
               </div>
-              <div className="px-4 py-5 sm:px-6">
+              <div className="px-8 py-6 sm:px-8">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                   {recommendedProducts.map((product) => (
                     <div
                       key={product.id}
-                      className="bg-gray-50 rounded-lg p-4 hover:shadow-md transition-shadow"
+                      onClick={() => navigate(`/product/${product.id}`)}
+                      className="bg-gray-50 rounded-xl p-4 hover:shadow-xl hover:border-2 hover:border-gray-900 transition-all transform hover:scale-105 cursor-pointer border border-gray-200"
                     >
-                      <div className="aspect-w-1 aspect-h-1 mb-4">
+                      <div className="mb-4 overflow-hidden rounded-lg">
                         <img
                           src={product.image_url || "/placeholder-product.jpg"}
                           alt={product.name}
-                          className="w-full h-32 object-cover rounded-md"
+                          className="w-full h-40 object-cover hover:scale-110 transition-transform"
                         />
                       </div>
-                      <h4 className="text-sm font-medium text-gray-900 truncate">
+                      <h4 className="text-sm font-bold text-gray-900 truncate">
                         {product.name}
                       </h4>
-                      <p className="text-sm text-gray-500 truncate">
+                      <p className="text-xs text-gray-500 truncate mt-1">
                         {product.store_name}
                       </p>
-                      <p className="text-lg font-semibold text-gray-900 mt-1">
+                      <p className="text-lg font-bold text-gray-900 mt-3">
                         ${product.price}
                       </p>
-                      <button className="mt-2 w-full bg-indigo-600 text-white py-2 px-4 rounded-md text-sm font-medium hover:bg-indigo-700 transition-colors">
-                        View Product
+                      <button className="mt-3 w-full bg-gray-900 hover:bg-gray-800 text-white py-2 px-4 rounded-lg text-sm font-bold transition-all transform hover:scale-105">
+                        👁️ View Product
                       </button>
                     </div>
                   ))}
@@ -232,66 +234,90 @@ const CustomerDashboard = () => {
             </div>
           )}
 
-          <div className="bg-white shadow overflow-hidden sm:rounded-md">
-            <div className="px-4 py-5 sm:px-6">
-              <h3 className="text-lg leading-6 font-medium text-gray-900">
-                Recent Orders
-              </h3>
-              <p className="mt-1 max-w-2xl text-sm text-gray-500">
-                Your latest order history
-              </p>
+          {/* Recent Orders Section */}
+          <div className="bg-white shadow-lg rounded-2xl border border-gray-200">
+            <div className="px-8 py-6 sm:px-8">
+              <div className="flex justify-between items-center">
+                <div>
+                  <h3 className="text-2xl font-bold text-gray-900">
+                    📦 Recent Orders
+                  </h3>
+                  <p className="mt-2 text-gray-600">
+                    Your latest order history
+                  </p>
+                </div>
+                <button
+                  onClick={() => navigate("/customer/orders")}
+                  className="bg-gray-900 hover:bg-gray-800 text-white font-bold px-6 py-2 rounded-lg transition-all transform hover:scale-105"
+                >
+                  View All →
+                </button>
+              </div>
             </div>
-            <ul className="divide-y divide-gray-200">
+            <div className="divide-y divide-gray-200">
               {orders.length > 0 ? (
-                orders.map((order) => (
-                  <li key={order.id}>
-                    <div className="px-4 py-4 sm:px-6">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center">
-                          <p className="text-sm font-medium text-indigo-600 truncate">
+                orders.slice(0, 5).map((order) => (
+                  <div
+                    key={order.id}
+                    onClick={() => navigate(`/customer/orders/${order.id}`)}
+                    className="px-8 py-6 hover:bg-gray-50 transition-all cursor-pointer border-l-4 border-l-transparent hover:border-l-gray-900"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-6">
+                        <div>
+                          <p className="text-lg font-bold text-gray-900">
                             Order #{order.id}
                           </p>
-                          <p className="ml-2 flex-shrink-0 flex">
-                            <span
-                              className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                                order.status === "delivered"
-                                  ? "bg-green-100 text-green-800"
-                                  : order.status === "shipped"
-                                  ? "bg-blue-100 text-blue-800"
-                                  : order.status === "processing"
-                                  ? "bg-yellow-100 text-yellow-800"
-                                  : "bg-gray-100 text-gray-800"
-                              }`}
-                            >
-                              {order.status}
-                            </span>
-                          </p>
-                        </div>
-                        <div className="ml-2 flex-shrink-0 flex">
-                          <p className="text-sm text-gray-500">
-                            ${order.total_amount}
+                          <p className="text-sm text-gray-600 mt-1">
+                            📅{" "}
+                            {new Date(order.created_at).toLocaleDateString(
+                              "en-US",
+                              {
+                                year: "numeric",
+                                month: "short",
+                                day: "numeric",
+                              }
+                            )}
                           </p>
                         </div>
                       </div>
-                      <div className="mt-2 sm:flex sm:justify-between">
-                        <div className="sm:flex">
-                          <p className="flex items-center text-sm text-gray-500">
-                            Ordered on{" "}
-                            {new Date(order.created_at).toLocaleDateString()}
-                          </p>
-                        </div>
+                      <div className="text-right">
+                        <p className="text-2xl font-bold text-gray-900">
+                          ${order.total_amount}
+                        </p>
+                        <span
+                          className={`inline-block mt-2 px-4 py-1 text-sm font-bold rounded-full ${
+                            order.status === "delivered"
+                              ? "bg-green-100 text-green-800"
+                              : order.status === "shipped"
+                              ? "bg-blue-100 text-blue-800"
+                              : order.status === "processing"
+                              ? "bg-yellow-100 text-yellow-800"
+                              : order.status === "cancelled"
+                              ? "bg-red-100 text-red-800"
+                              : "bg-gray-100 text-gray-800"
+                          }`}
+                        >
+                          {order.status.charAt(0).toUpperCase() +
+                            order.status.slice(1)}
+                        </span>
                       </div>
                     </div>
-                  </li>
+                  </div>
                 ))
               ) : (
-                <li>
-                  <div className="px-4 py-4 sm:px-6">
-                    <p className="text-sm text-gray-500">No orders yet</p>
-                  </div>
-                </li>
+                <div className="px-8 py-12 text-center">
+                  <p className="text-2xl text-gray-400">🛒</p>
+                  <p className="text-gray-600 mt-3">No orders yet</p>
+                  <Link
+                    to="/collections"
+                    className="inline-block mt-4 bg-gray-900 hover:bg-gray-800 text-white font-bold px-6 py-2 rounded-lg transition-all"
+                  >
+                    Start Shopping
+                  </Link>
+                </div>
               )}
-            </ul>
+            </div>
           </div>
         </div>
       </div>

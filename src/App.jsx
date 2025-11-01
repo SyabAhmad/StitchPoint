@@ -10,11 +10,13 @@ import ProductDetails from "./pages/ProductDetails.jsx";
 import StoreDetails from "./pages/StoreDetails.jsx";
 import Contact from "./pages/Contact.jsx";
 import Cart from "./pages/Cart.jsx";
+import Checkout from "./pages/Checkout.jsx";
 import Wishlist from "./pages/Wishlist.jsx";
 import Login from "./pages/Login.jsx";
 import Signup from "./pages/Signup.jsx";
 import CustomerDashboard from "./pages/customer/Dashboard.jsx";
 import CustomerProfile from "./pages/customer/Profile.jsx";
+import CustomerOrders from "./pages/customer/Orders.jsx";
 import ManagerDashboard from "./pages/manager/Dashboard.jsx";
 import ManagerProfile from "./pages/manager/Profile.jsx";
 import ManagerProducts from "./pages/manager/Products.jsx";
@@ -52,11 +54,16 @@ function App() {
           <Route path="store/:store_id" element={<StoreDetails />} />
           <Route path="contact" element={<Contact />} />
           <Route path="cart" element={<Cart />} />
+          <Route path="checkout" element={<Checkout />} />
           <Route path="wishlist" element={<Wishlist />} />
           <Route path="login" element={<Login />} />
           <Route path="signup" element={<Signup />} />
           <Route path="dashboard" element={<CustomerDashboard />} />
+          <Route path="customer/dashboard" element={<CustomerDashboard />} />
           <Route path="profile" element={<CustomerProfile />} />
+          <Route path="customer/profile" element={<CustomerProfile />} />
+          <Route path="customer/orders" element={<CustomerOrders />} />
+          <Route path="customer/orders/:orderId" element={<CustomerOrders />} />
           <Route path="manager-dashboard" element={<ManagerDashboard />}>
             <Route index element={<div />} />
             <Route path="products" element={<ManagerProducts />} />

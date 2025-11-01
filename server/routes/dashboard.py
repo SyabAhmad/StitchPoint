@@ -66,6 +66,7 @@ def customer_dashboard():
             'name': user.name,
             'email': user.email,
             'role': user.role,
+            'profile_picture': user.profile_picture,
             'created_at': user.created_at.isoformat()
         },
         'orders': orders_data,
@@ -416,8 +417,10 @@ def update_store():
         # Handle logo file upload
         logo_file = request.files.get('logo')
         if logo_file and logo_file.filename:
-            # Ensure uploads directory exists
-            uploads_dir = os.path.join(os.getcwd(), 'uploads')
+            # Ensure uploads directory exists in project root
+            server_dir = os.path.dirname(os.path.abspath(__file__))
+            project_root = os.path.dirname(os.path.dirname(server_dir))
+            uploads_dir = os.path.join(project_root, 'uploads')
             os.makedirs(uploads_dir, exist_ok=True)
 
             # Create unique filename with timestamp
@@ -588,8 +591,11 @@ def update_profile():
         # Handle profile picture upload
         profile_file = request.files.get('profile_picture')
         if profile_file and profile_file.filename:
-            # Ensure uploads directory exists
-            uploads_dir = os.path.join(os.getcwd(), 'uploads')
+            # Ensure uploads directory exists in project root
+            # Get project root by going up two levels from this file's location
+            server_dir = os.path.dirname(os.path.abspath(__file__))
+            project_root = os.path.dirname(os.path.dirname(server_dir))
+            uploads_dir = os.path.join(project_root, 'uploads')
             os.makedirs(uploads_dir, exist_ok=True)
 
             # Create unique filename with timestamp
@@ -618,7 +624,17 @@ def update_profile():
             user.email = data['email']
 
     db.session.commit()
-    return jsonify({'message': 'Profile updated successfully'}), 200
+    return jsonify({
+        'message': 'Profile updated successfully',
+        'user': {
+            'id': user.id,
+            'name': user.name,
+            'email': user.email,
+            'profile_picture': user.profile_picture,
+            'role': user.role,
+            'created_at': user.created_at.isoformat()
+        }
+    }), 200
 
 @dashboard_bp.route('/profile/addresses', methods=['POST'])
 @jwt_required()
