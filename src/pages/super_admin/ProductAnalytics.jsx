@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import OverviewStats from "../../components/analytics/OverviewStats";
 import AnalyticsPieChart from "../../components/analytics/AnalyticsPieChart";
 import TopProductsList from "../../components/analytics/TopProductsList";
@@ -8,32 +9,59 @@ import ReviewTrendsChart from "../../components/analytics/ReviewTrendsChart";
 import CommentTrendsChart from "../../components/analytics/CommentTrendsChart";
 
 const ProductAnalytics = () => {
+  const navigate = useNavigate();
   const [productsAnalytics, setProductsAnalytics] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filterDays, setFilterDays] = useState(30);
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+  const [selectedStore, setSelectedStore] = useState(null);
+  const [stores, setStores] = useState([]);
+  const [pagination, setPagination] = useState({});
+
+  useEffect(() => {
+    const fetchStores = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await fetch("http://localhost:5000/api/stores", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await response.json();
+        setStores(data.stores || []);
+      } catch (error) {
+        console.error("Error fetching stores:", error);
+      }
+    };
+
+    fetchStores();
+  }, []);
 
   useEffect(() => {
     const fetchProductsAnalytics = async () => {
+      setLoading(true);
       try {
         const token = localStorage.getItem("token");
-        const response = await fetch(
-          `http://localhost:5000/api/analytics/products-analytics?days=${filterDays}`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
+        let url = `http://localhost:5000/api/analytics/products-analytics?days=${filterDays}&page=${page}&limit=${limit}`;
+        if (selectedStore) {
+          url += `&store_id=${selectedStore}`;
+        }
+        const response = await fetch(url, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         const data = await response.json();
         setProductsAnalytics(data.products_analytics || []);
+        setPagination(data.pagination || {});
       } catch (error) {
         console.error("Error fetching products analytics:", error);
         setProductsAnalytics([]);
+        setPagination({});
       } finally {
         setLoading(false);
       }
     };
 
     fetchProductsAnalytics();
-  }, [filterDays]);
+  }, [filterDays, page, limit, selectedStore]);
 
   if (loading) {
     return (
@@ -68,7 +96,7 @@ const ProductAnalytics = () => {
     ),
     avg_rating:
       productsAnalytics.length > 0
-        ? productsAnalytics.reduce((sum, p) => sum + p.avg_rating, 0) /
+        ? productsAnalytics.reduce((sum, p) => sum + (p.avg_rating || 0), 0) /
           productsAnalytics.length
         : 0,
     total_comments: productsAnalytics.reduce(
@@ -97,25 +125,57 @@ const ProductAnalytics = () => {
           Product Analytics
         </h1>
 
-        {/* Filter */}
-        <div className="mb-6">
-          <label className="block text-sm mb-2" style={{ color: "#cccccc" }}>
-            Time Period:
-          </label>
-          <select
-            value={filterDays}
-            onChange={(e) => setFilterDays(Number(e.target.value))}
-            className="px-3 py-2 rounded"
-            style={{
-              backgroundColor: "#2d2d2d",
-              color: "#ffffff",
-              border: "1px solid #3d3d3d",
-            }}
-          >
-            <option value={7}>Last 7 days</option>
-            <option value={30}>Last 30 days</option>
-            <option value={90}>Last 90 days</option>
-          </select>
+        {/* Filters */}
+        <div className="mb-6 flex flex-wrap gap-4">
+          <div>
+            <label className="block text-sm mb-2" style={{ color: "#cccccc" }}>
+              Time Period:
+            </label>
+            <select
+              value={filterDays}
+              onChange={(e) => {
+                setFilterDays(Number(e.target.value));
+                setPage(1); // Reset to first page
+              }}
+              className="px-3 py-2 rounded"
+              style={{
+                backgroundColor: "#2d2d2d",
+                color: "#ffffff",
+                border: "1px solid #3d3d3d",
+              }}
+            >
+              <option value={7}>Last 7 days</option>
+              <option value={30}>Last 30 days</option>
+              <option value={90}>Last 90 days</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm mb-2" style={{ color: "#cccccc" }}>
+              Store:
+            </label>
+            <select
+              value={selectedStore || ""}
+              onChange={(e) => {
+                setSelectedStore(
+                  e.target.value ? Number(e.target.value) : null
+                );
+                setPage(1); // Reset to first page
+              }}
+              className="px-3 py-2 rounded"
+              style={{
+                backgroundColor: "#2d2d2d",
+                color: "#ffffff",
+                border: "1px solid #3d3d3d",
+              }}
+            >
+              <option value="">All Stores</option>
+              {stores.map((store) => (
+                <option key={store.id} value={store.id}>
+                  {store.name}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
 
         {/* Overview Stats */}
@@ -204,7 +264,7 @@ const ProductAnalytics = () => {
                 {productsAnalytics.map((product, index) => (
                   <tr
                     key={product.product_id}
-                    className="transition-colors duration-150"
+                    className="transition-colors duration-150 cursor-pointer"
                     style={{
                       borderBottom: "1px solid #2d2d2d",
                       backgroundColor: index % 2 === 0 ? "#1d1d1d" : "#2d2d2d",
@@ -216,12 +276,24 @@ const ProductAnalytics = () => {
                       e.currentTarget.style.backgroundColor =
                         index % 2 === 0 ? "#1d1d1d" : "#2d2d2d";
                     }}
+                    onClick={() => navigate(`/product/${product.product_id}`)}
                   >
                     <td
                       className="px-6 py-4 whitespace-nowrap text-sm font-medium"
                       style={{ color: "#ffffff" }}
                     >
-                      {product.product_name}
+                      <Link
+                        to={`/product/${product.product_id}`}
+                        style={{ color: "#d4af37", textDecoration: "none" }}
+                        onMouseEnter={(e) =>
+                          (e.target.style.textDecoration = "underline")
+                        }
+                        onMouseLeave={(e) =>
+                          (e.target.style.textDecoration = "none")
+                        }
+                      >
+                        {product.product_name}
+                      </Link>
                     </td>
                     <td
                       className="px-6 py-4 whitespace-nowrap text-sm"
@@ -263,7 +335,7 @@ const ProductAnalytics = () => {
                       className="px-6 py-4 whitespace-nowrap text-sm"
                       style={{ color: "#cccccc" }}
                     >
-                      {product.avg_rating}
+                      {product.avg_rating || 0}
                     </td>
                     <td
                       className="px-6 py-4 whitespace-nowrap text-sm"
@@ -281,6 +353,154 @@ const ProductAnalytics = () => {
               </div>
             )}
           </div>
+
+          {/* Pagination Controls */}
+          {pagination.total_pages > 1 && (
+            <div
+              className="px-4 py-3 sm:px-6 flex items-center justify-between"
+              style={{
+                backgroundColor: "#1d1d1d",
+                borderTop: "1px solid #2d2d2d",
+              }}
+            >
+              <div className="flex-1 flex justify-between sm:hidden">
+                <button
+                  onClick={() => setPage(Math.max(1, page - 1))}
+                  disabled={page === 1}
+                  className="relative inline-flex items-center px-4 py-2 text-sm font-medium rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
+                  style={{
+                    color: "#ffffff",
+                    backgroundColor: "#2d2d2d",
+                    border: "1px solid #3d3d3d",
+                  }}
+                  onMouseEnter={(e) =>
+                    (e.currentTarget.style.backgroundColor = "#1f1f1f")
+                  }
+                  onMouseLeave={(e) =>
+                    (e.currentTarget.style.backgroundColor = "#2d2d2d")
+                  }
+                >
+                  Previous
+                </button>
+                <button
+                  onClick={() =>
+                    setPage(Math.min(pagination.total_pages, page + 1))
+                  }
+                  disabled={page === pagination.total_pages}
+                  className="ml-3 relative inline-flex items-center px-4 py-2 text-sm font-medium rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
+                  style={{
+                    color: "#ffffff",
+                    backgroundColor: "#2d2d2d",
+                    border: "1px solid #3d3d3d",
+                  }}
+                  onMouseEnter={(e) =>
+                    (e.currentTarget.style.backgroundColor = "#1f1f1f")
+                  }
+                  onMouseLeave={(e) =>
+                    (e.currentTarget.style.backgroundColor = "#2d2d2d")
+                  }
+                >
+                  Next
+                </button>
+              </div>
+              <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                <div>
+                  <p className="text-sm" style={{ color: "#cccccc" }}>
+                    Showing{" "}
+                    <span className="font-medium">
+                      {(page - 1) * limit + 1}
+                    </span>{" "}
+                    to{" "}
+                    <span className="font-medium">
+                      {Math.min(page * limit, pagination.total_count)}
+                    </span>{" "}
+                    of{" "}
+                    <span className="font-medium">
+                      {pagination.total_count}
+                    </span>{" "}
+                    results
+                  </p>
+                </div>
+                <div>
+                  <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
+                    <button
+                      onClick={() => setPage(Math.max(1, page - 1))}
+                      disabled={page === 1}
+                      className="relative inline-flex items-center px-2 py-2 rounded-l-md text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                      style={{
+                        color: "#cccccc",
+                        backgroundColor: "#2d2d2d",
+                        border: "1px solid #3d3d3d",
+                      }}
+                      onMouseEnter={(e) =>
+                        (e.currentTarget.style.backgroundColor = "#1f1f1f")
+                      }
+                      onMouseLeave={(e) =>
+                        (e.currentTarget.style.backgroundColor = "#2d2d2d")
+                      }
+                    >
+                      Previous
+                    </button>
+                    {Array.from(
+                      { length: Math.min(5, pagination.total_pages) },
+                      (_, i) => {
+                        const pageNum =
+                          Math.max(
+                            1,
+                            Math.min(pagination.total_pages - 4, page - 2)
+                          ) + i;
+                        return (
+                          <button
+                            key={pageNum}
+                            onClick={() => setPage(pageNum)}
+                            className="relative inline-flex items-center px-4 py-2 border text-sm font-medium"
+                            style={{
+                              color: pageNum === page ? "#d4af37" : "#cccccc",
+                              backgroundColor:
+                                pageNum === page ? "#2d2d2d" : "#1d1d1d",
+                              border: "1px solid #3d3d3d",
+                            }}
+                            onMouseEnter={(e) => {
+                              if (pageNum !== page)
+                                e.currentTarget.style.backgroundColor =
+                                  "#1f1f1f";
+                            }}
+                            onMouseLeave={(e) => {
+                              if (pageNum !== page)
+                                e.currentTarget.style.backgroundColor =
+                                  "#1d1d1d";
+                            }}
+                          >
+                            {pageNum}
+                          </button>
+                        );
+                      }
+                    )}
+                    <button
+                      onClick={() =>
+                        setPage(Math.min(pagination.total_pages, page + 1))
+                      }
+                      disabled={page === pagination.total_pages}
+                      className="relative inline-flex items-center px-2 py-2 rounded-r-md text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                      style={{
+                        color: "#cccccc",
+                        backgroundColor: "#2d2d2d",
+                        border: "1px solid #3d3d3d",
+                      }}
+                      onMouseEnter={(e) =>
+                        (e.currentTarget.style.backgroundColor = "#1f1f1f")
+                      }
+                      onMouseLeave={(e) =>
+                        (e.currentTarget.style.backgroundColor = "#2d2d2d")
+                      }
+                    >
+                      Next
+                    </button>
+                  </nav>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

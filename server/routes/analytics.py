@@ -444,10 +444,20 @@ def get_products_analytics():
     days = request.args.get('days', 30, type=int)
     start_date = datetime.utcnow() - timedelta(days=days)
 
-    # For managers, filter by their store; for super_admin, show all
+    # Pagination parameters
+    page = request.args.get('page', 1, type=int)
+    limit = request.args.get('limit', 10, type=int)
+    offset = (page - 1) * limit
+
+    # Store filter
+    store_id = request.args.get('store_id', type=int)
+
+    # For managers, filter by their store; for super_admin, allow store_id filter
     store_filter = None
     if user.role == 'manager' and user.store:
         store_filter = user.store.id
+    elif user.role == 'super_admin' and store_id:
+        store_filter = store_id
 
     # Query products with analytics
     query = db.session.query(
@@ -473,6 +483,12 @@ def get_products_analytics():
 
     query = query.group_by(Product.id, Product.name, Product.store_id, Store.name).order_by(desc('total_views'))
 
+    # Get total count for pagination
+    total_count = query.count()
+
+    # Apply pagination
+    query = query.offset(offset).limit(limit)
+
     results = query.all()
 
     data = []
@@ -491,7 +507,15 @@ def get_products_analytics():
             'total_comments': row.total_comments or 0
         })
 
-    return jsonify({'products_analytics': data}), 200
+    return jsonify({
+        'products_analytics': data,
+        'pagination': {
+            'page': page,
+            'limit': limit,
+            'total': total_count,
+            'pages': (total_count + limit - 1) // limit
+        }
+    }), 200
 
 @analytics_bp.route('/stores-analytics', methods=['GET'])
 @jwt_required()

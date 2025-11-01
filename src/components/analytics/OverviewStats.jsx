@@ -34,7 +34,7 @@ const OverviewStats = ({ data }) => {
     },
     {
       label: "Avg Rating",
-      value: data.avg_rating,
+      value: data.avg_rating || 0,
       color: "#ffb347",
       icon: "📊",
     },
