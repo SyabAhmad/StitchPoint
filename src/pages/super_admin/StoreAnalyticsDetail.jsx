@@ -1,40 +1,36 @@
 import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
+import {
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
 
 const StoreAnalyticsDetail = () => {
   const { store_id } = useParams();
-  const [store, setStore] = useState(null);
-  const [products, setProducts] = useState([]);
+  const [store, setStore] = useState({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchStoreDetail = async () => {
       try {
         const token = localStorage.getItem("token");
-        const [storeRes, productsRes] = await Promise.all([
-          fetch(
-            `http://localhost:5000/api/analytics/stores-analytics/${store_id}`,
-            {
-              headers: { Authorization: `Bearer ${token}` },
-            }
-          ),
-          fetch(
-            `http://localhost:5000/api/analytics/products-by-store?store_id=${store_id}`,
-            {
-              headers: { Authorization: `Bearer ${token}` },
-            }
-          ),
-        ]);
+        const storeRes = await fetch(
+          `http://localhost:5000/api/analytics/stores-analytics/${store_id}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
 
         const storeData = await storeRes.json();
-        const productsData = await productsRes.json();
-
         setStore(storeData.store || storeData);
-        setProducts(productsData.products || productsData);
       } catch (error) {
         console.error("Error fetching store detail:", error);
         setStore(null);
-        setProducts([]);
       } finally {
         setLoading(false);
       }
@@ -106,162 +102,131 @@ const StoreAnalyticsDetail = () => {
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-          <div
-            className="shadow rounded-lg p-6"
-            style={{ backgroundColor: "#1d1d1d" }}
-          >
+        {/* Store Summary - Full Width */}
+        <div
+          className="shadow rounded-lg p-8 mb-8 grid grid-cols-1 md:grid-cols-3 gap-8"
+          style={{ backgroundColor: "#1d1d1d" }}
+        >
+          <div>
             <h3
               style={{ color: "#ffffff" }}
-              className="text-lg font-semibold mb-2"
+              className="text-lg font-semibold mb-4"
             >
               Store Summary
             </h3>
-            <div style={{ color: "#cccccc" }}>
-              <p>Total Products: {store.total_products}</p>
-              <p>Total Views: {store.total_views}</p>
-              <p>Total Clicks: {store.total_clicks}</p>
-              <p>Cart Adds: {store.total_cart_adds}</p>
-              <p>Avg Time Spent: {store.avg_time_spent}s</p>
-              <p>Total Reviews: {store.total_reviews}</p>
-              <p>Avg Rating: {store.avg_rating}</p>
-              <p>Total Comments: {store.total_comments}</p>
-            </div>
-          </div>
-
-          <div
-            className="shadow rounded-lg p-6 lg:col-span-2"
-            style={{ backgroundColor: "#1d1d1d" }}
-          >
-            <h3
-              style={{ color: "#ffffff" }}
-              className="text-lg font-semibold mb-2"
-            >
-              Products
-            </h3>
-            {products.length > 0 ? (
-              <div className="overflow-x-auto">
-                <table className="min-w-full">
-                  <thead style={{ backgroundColor: "#2d2d2d" }}>
-                    <tr>
-                      <th
-                        className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
-                        style={{ color: "#d4af37" }}
-                      >
-                        Product
-                      </th>
-                      <th
-                        className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
-                        style={{ color: "#d4af37" }}
-                      >
-                        Views
-                      </th>
-                      <th
-                        className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
-                        style={{ color: "#d4af37" }}
-                      >
-                        Clicks
-                      </th>
-                      <th
-                        className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
-                        style={{ color: "#d4af37" }}
-                      >
-                        Cart Adds
-                      </th>
-                      <th
-                        className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
-                        style={{ color: "#d4af37" }}
-                      >
-                        Avg Time
-                      </th>
-                      <th
-                        className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
-                        style={{ color: "#d4af37" }}
-                      >
-                        Reviews
-                      </th>
-                      <th
-                        className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
-                        style={{ color: "#d4af37" }}
-                      >
-                        Avg Rating
-                      </th>
-                      <th
-                        className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
-                        style={{ color: "#d4af37" }}
-                      >
-                        Comments
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody style={{ backgroundColor: "#1d1d1d" }}>
-                    {products.map((p, idx) => (
-                      <tr
-                        key={p.product_id}
-                        style={{
-                          backgroundColor:
-                            idx % 2 === 0 ? "#1d1d1d" : "#2d2d2d",
-                        }}
-                      >
-                        <td
-                          className="px-6 py-4 whitespace-nowrap text-sm"
-                          style={{ color: "#ffffff" }}
-                        >
-                          {p.product_name}
-                        </td>
-                        <td
-                          className="px-6 py-4 whitespace-nowrap text-sm"
-                          style={{ color: "#cccccc" }}
-                        >
-                          {p.total_views}
-                        </td>
-                        <td
-                          className="px-6 py-4 whitespace-nowrap text-sm"
-                          style={{ color: "#cccccc" }}
-                        >
-                          {p.total_clicks}
-                        </td>
-                        <td
-                          className="px-6 py-4 whitespace-nowrap text-sm"
-                          style={{ color: "#cccccc" }}
-                        >
-                          {p.total_cart_adds}
-                        </td>
-                        <td
-                          className="px-6 py-4 whitespace-nowrap text-sm"
-                          style={{ color: "#cccccc" }}
-                        >
-                          {p.avg_time_spent}s
-                        </td>
-                        <td
-                          className="px-6 py-4 whitespace-nowrap text-sm"
-                          style={{ color: "#cccccc" }}
-                        >
-                          {p.total_reviews}
-                        </td>
-                        <td
-                          className="px-6 py-4 whitespace-nowrap text-sm"
-                          style={{ color: "#cccccc" }}
-                        >
-                          {p.avg_rating}
-                        </td>
-                        <td
-                          className="px-6 py-4 whitespace-nowrap text-sm"
-                          style={{ color: "#cccccc" }}
-                        >
-                          {p.total_comments}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            ) : (
-              <div style={{ color: "#999999" }} className="py-8 text-center">
-                No products found for this store.
-              </div>
+            {store.logo_url && (
+              <img
+                src={store.logo_url}
+                alt={`${store.store_name} logo`}
+                className="w-20 h-20 rounded-full mb-4"
+              />
             )}
           </div>
+          <div style={{ color: "#cccccc" }} className="grid grid-cols-1 gap-2">
+            <p>
+              <span style={{ color: "#d4af37" }}>Total Products:</span>{" "}
+              {store.total_products}
+            </p>
+            <p>
+              <span style={{ color: "#d4af37" }}>Total Views:</span>{" "}
+              {store.total_views}
+            </p>
+            <p>
+              <span style={{ color: "#d4af37" }}>Total Clicks:</span>{" "}
+              {store.total_clicks}
+            </p>
+            <p>
+              <span style={{ color: "#d4af37" }}>Cart Adds:</span>{" "}
+              {store.total_cart_adds}
+            </p>
+          </div>
+          <div style={{ color: "#cccccc" }} className="grid grid-cols-1 gap-2">
+            <p>
+              <span style={{ color: "#d4af37" }}>Avg Time Spent:</span>{" "}
+              {store.avg_time_spent}s
+            </p>
+            <p>
+              <span style={{ color: "#d4af37" }}>Total Reviews:</span>{" "}
+              {store.total_reviews}
+            </p>
+            <p>
+              <span style={{ color: "#d4af37" }}>Avg Rating:</span>{" "}
+              {store.avg_rating}
+            </p>
+            <p>
+              <span style={{ color: "#d4af37" }}>Total Comments:</span>{" "}
+              {store.total_comments}
+            </p>
+          </div>
+        </div>
+
+        {/* Clickable Cards Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Reviews Card */}
+          <Link
+            to={`/super-admin-dashboard/store-analytics/${store_id}/reviews`}
+            className="shadow rounded-lg p-6 cursor-pointer transition-transform hover:scale-105"
+            style={{ backgroundColor: "#1d1d1d" }}
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <h3
+                  style={{ color: "#d4af37" }}
+                  className="text-lg font-semibold mb-2"
+                >
+                  Reviews
+                </h3>
+                <p style={{ color: "#cccccc" }} className="text-3xl font-bold">
+                  {store.total_reviews}
+                </p>
+              </div>
+              <div className="text-5xl">⭐</div>
+            </div>
+          </Link>
+
+          {/* Comments Card */}
+          <Link
+            to={`/super-admin-dashboard/store-analytics/${store_id}/comments`}
+            className="shadow rounded-lg p-6 cursor-pointer transition-transform hover:scale-105"
+            style={{ backgroundColor: "#1d1d1d" }}
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <h3
+                  style={{ color: "#d4af37" }}
+                  className="text-lg font-semibold mb-2"
+                >
+                  Comments
+                </h3>
+                <p style={{ color: "#cccccc" }} className="text-3xl font-bold">
+                  {store.total_comments}
+                </p>
+              </div>
+              <div className="text-5xl">💬</div>
+            </div>
+          </Link>
+
+          {/* Products Card */}
+          <Link
+            to={`/super-admin-dashboard/store-analytics/${store_id}/products`}
+            className="shadow rounded-lg p-6 cursor-pointer transition-transform hover:scale-105"
+            style={{ backgroundColor: "#1d1d1d" }}
+          >
+            <div className="flex items-center justify-between">
+              <div>
+                <h3
+                  style={{ color: "#d4af37" }}
+                  className="text-lg font-semibold mb-2"
+                >
+                  Products
+                </h3>
+                <p style={{ color: "#cccccc" }} className="text-3xl font-bold">
+                  {store.total_products}
+                </p>
+              </div>
+              <div className="text-5xl">📦</div>
+            </div>
+          </Link>
         </div>
       </div>
     </div>

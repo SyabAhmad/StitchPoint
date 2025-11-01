@@ -31,6 +31,9 @@ import Orders from "./pages/super_admin/Orders.jsx";
 import ProductAnalytics from "./pages/super_admin/ProductAnalytics.jsx";
 import StoreAnalytics from "./pages/super_admin/StoreAnalytics.jsx";
 import StoreAnalyticsDetail from "./pages/super_admin/StoreAnalyticsDetail.jsx";
+import StoreReviews from "./pages/super_admin/StoreReviews.jsx";
+import StoreComments from "./pages/super_admin/StoreComments.jsx";
+import StoreProducts from "./pages/super_admin/StoreProducts.jsx";
 import Comments from "./pages/super_admin/Comments.jsx";
 import Reviews from "./pages/super_admin/Reviews.jsx";
 
@@ -72,6 +75,18 @@ function App() {
             <Route
               path="store-analytics/:store_id"
               element={<StoreAnalyticsDetail />}
+            />
+            <Route
+              path="store-analytics/:store_id/reviews"
+              element={<StoreReviews />}
+            />
+            <Route
+              path="store-analytics/:store_id/comments"
+              element={<StoreComments />}
+            />
+            <Route
+              path="store-analytics/:store_id/products"
+              element={<StoreProducts />}
             />
             <Route path="comments" element={<Comments />} />
             <Route path="reviews" element={<Reviews />} />
