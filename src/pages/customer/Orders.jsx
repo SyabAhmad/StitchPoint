@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import ReviewModal from "../../components/ReviewModal";
+import DeliveryConfirmationModal from "../../components/DeliveryConfirmationModal";
 
 const Orders = () => {
   const navigate = useNavigate();
@@ -10,6 +11,7 @@ const Orders = () => {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [loading, setLoading] = useState(true);
   const [reviewingItem, setReviewingItem] = useState(null); // {order, item, product}
+  const [confirmingDeliveryOrder, setConfirmingDeliveryOrder] = useState(null);
   const token = localStorage.getItem("token");
 
   useEffect(() => {
@@ -293,7 +295,32 @@ const Orders = () => {
                       </button>
                     ) : null}
 
-                    {selectedOrder.status === "delivered" ? (
+                    {selectedOrder.status === "shipped" &&
+                    !selectedOrder.delivery_confirmed_by_customer ? (
+                      <button
+                        onClick={() =>
+                          setConfirmingDeliveryOrder(selectedOrder)
+                        }
+                        className="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-3 rounded-lg transition-all transform hover:scale-105 flex items-center justify-center gap-2"
+                      >
+                        📦 Confirm Delivery
+                      </button>
+                    ) : null}
+
+                    {selectedOrder.status === "delivered" &&
+                    !selectedOrder.delivery_confirmed_by_customer ? (
+                      <button
+                        onClick={() =>
+                          setConfirmingDeliveryOrder(selectedOrder)
+                        }
+                        className="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-3 rounded-lg transition-all transform hover:scale-105 flex items-center justify-center gap-2"
+                      >
+                        📦 Confirm Delivery
+                      </button>
+                    ) : null}
+
+                    {selectedOrder.status === "delivered" &&
+                    selectedOrder.delivery_confirmed_by_customer ? (
                       <button
                         onClick={() => {
                           // Start review with first item if multiple items exist
@@ -314,13 +341,25 @@ const Orders = () => {
 
                     {selectedOrder.status !== "pending" &&
                     selectedOrder.status !== "processing" &&
-                    selectedOrder.status !== "delivered" ? (
+                    selectedOrder.status !== "delivered" &&
+                    selectedOrder.status !== "shipped" ? (
                       <button
                         onClick={() => navigate("/collections")}
                         className="w-full bg-gray-900 hover:bg-gray-800 text-white font-bold py-3 rounded-lg transition-all transform hover:scale-105"
                       >
                         🛍️ Shop Again
                       </button>
+                    ) : null}
+
+                    {selectedOrder.status === "delivery_issue" ? (
+                      <div className="bg-red-50 border-l-4 border-red-600 p-4 rounded">
+                        <p className="text-sm font-semibold text-red-800">
+                          ⚠️ Delivery Issue Reported
+                        </p>
+                        <p className="text-xs text-red-700 mt-2">
+                          Store manager will contact you to resolve this.
+                        </p>
+                      </div>
                     ) : null}
                   </div>
                 </div>
@@ -338,6 +377,18 @@ const Orders = () => {
           </div>
         </div>
       </div>
+
+      {/* Delivery Confirmation Modal */}
+      {confirmingDeliveryOrder && (
+        <DeliveryConfirmationModal
+          order={confirmingDeliveryOrder}
+          onClose={() => setConfirmingDeliveryOrder(null)}
+          onConfirmed={() => {
+            setConfirmingDeliveryOrder(null);
+            loadOrders();
+          }}
+        />
+      )}
 
       {/* Review Modal */}
       {reviewingItem && (

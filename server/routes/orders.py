@@ -139,6 +139,9 @@ def get_orders():
                 'total_amount': order.total_amount,
                 'status': order.status,
                 'shipping_address': order.shipping_address,
+                'is_delivered': order.is_delivered,
+                'delivery_confirmed_by_customer': order.delivery_confirmed_by_customer,
+                'delivery_confirmed_at': order.delivery_confirmed_at.isoformat() if order.delivery_confirmed_at else None,
                 'created_at': order.created_at.isoformat(),
                 'updated_at': order.updated_at.isoformat(),
                 'items': [
@@ -357,3 +360,59 @@ def get_admin_orders():
     except Exception as e:
         logger.error(f"Error fetching admin orders: {str(e)}")
         return jsonify({'message': f'Error fetching orders: {str(e)}'}), 500
+
+
+@orders_bp.route('/<int:order_id>/confirm-delivery', methods=['PUT'])
+@jwt_required()
+def confirm_delivery(order_id):
+    """Confirm that customer received the package"""
+    try:
+        user_id = get_jwt_identity()
+        
+        # Get order
+        order = Order.query.filter_by(id=order_id, user_id=user_id).first()
+        if not order:
+            return jsonify({'message': 'Order not found'}), 404
+        
+        # Check if order is in shipped/delivered status
+        if order.status not in ['shipped', 'delivered']:
+            return jsonify({'message': 'Order must be shipped or delivered to confirm'}), 400
+        
+        # Get request data
+        data = request.get_json()
+        received = data.get('received', True)
+        issue_description = data.get('issue_description', None)
+        
+        if received:
+            # Customer confirms they received the package
+            order.is_delivered = True
+            order.delivery_confirmed_by_customer = True
+            order.delivery_confirmed_at = datetime.utcnow()
+            order.status = 'delivered'
+            
+            db.session.commit()
+            
+            logger.info(f"Order {order_id} delivery confirmed by customer")
+            
+            return jsonify({
+                'message': 'Delivery confirmed! You can now leave a review.',
+                'order_id': order_id,
+                'status': 'delivered'
+            }), 200
+        else:
+            # Customer reports they didn't receive the package
+            order.status = 'delivery_issue'
+            db.session.commit()
+            
+            logger.info(f"Order {order_id} has delivery issue: {issue_description}")
+            
+            return jsonify({
+                'message': 'Issue reported. Store manager will contact you shortly.',
+                'order_id': order_id,
+                'status': 'delivery_issue',
+                'issue': issue_description
+            }), 200
+    
+    except Exception as e:
+        logger.error(f"Error confirming delivery: {str(e)}")
+        return jsonify({'message': f'Error confirming delivery: {str(e)}'}), 500

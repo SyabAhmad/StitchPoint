@@ -116,6 +116,9 @@ class Order(db.Model):
     total_amount = db.Column(db.Float, nullable=False)
     status = db.Column(db.String(50), default='pending')
     shipping_address = db.Column(db.Text, nullable=True)
+    is_delivered = db.Column(db.Boolean, default=False)
+    delivery_confirmed_at = db.Column(db.DateTime, nullable=True)
+    delivery_confirmed_by_customer = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
