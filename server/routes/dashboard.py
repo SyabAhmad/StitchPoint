@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from werkzeug.security import generate_password_hash
 from werkzeug.utils import secure_filename
-from models import db, User, Order, Product, PageView, ButtonClick, Review, Store
+from models import db, User, Order, Product, PageView, ButtonClick, Review, Store, OrderItem
 from sqlalchemy import func
 import os
 from datetime import datetime
@@ -39,15 +39,41 @@ def customer_dashboard():
     wishlist = user.wishlists[0] if user.wishlists else None
     wishlist_count = len(wishlist.items) if wishlist else 0
 
+    # Calculate total spent
+    total_spent_result = db.session.query(func.sum(Order.total_amount)).filter(Order.user_id == user_id).scalar()
+    total_spent = float(total_spent_result) if total_spent_result else 0.0
+
+    # Order summary
+    total_orders = Order.query.filter_by(user_id=user_id).count()
+
+    # Get ordered product IDs to exclude from recommendations
+    ordered_product_ids = db.session.query(OrderItem.product_id).join(Order, OrderItem.order_id == Order.id).filter(Order.user_id == user_id).distinct().all()
+    ordered_product_ids = [p.product_id for p in ordered_product_ids]
+
+    # Recommended products: random 4 products not ordered by user
+    recommended_products = Product.query.filter(~Product.id.in_(ordered_product_ids)).order_by(func.random()).limit(4).all() if ordered_product_ids else Product.query.order_by(func.random()).limit(4).all()
+    recommended_data = [{
+        'id': p.id,
+        'name': p.name,
+        'price': p.price,
+        'image_url': p.image_url,
+        'store_name': p.store.name if p.store else 'Unknown'
+    } for p in recommended_products]
+
     return jsonify({
         'user': {
             'id': user.id,
             'name': user.name,
-            'email': user.email
+            'email': user.email,
+            'role': user.role,
+            'created_at': user.created_at.isoformat()
         },
         'orders': orders_data,
         'cart_count': cart_count,
-        'wishlist_count': wishlist_count
+        'wishlist_count': wishlist_count,
+        'total_spent': total_spent,
+        'total_orders': total_orders,
+        'recommended_products': recommended_data
     }), 200
 
 @dashboard_bp.route('/admin', methods=['GET'])

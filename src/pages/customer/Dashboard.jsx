@@ -4,6 +4,9 @@ const CustomerDashboard = () => {
   const [orders, setOrders] = useState([]);
   const [cartCount, setCartCount] = useState(0);
   const [wishlistCount, setWishlistCount] = useState(0);
+  const [totalSpent, setTotalSpent] = useState(0);
+  const [totalOrders, setTotalOrders] = useState(0);
+  const [recommendedProducts, setRecommendedProducts] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -31,6 +34,9 @@ const CustomerDashboard = () => {
         setOrders(data.orders || []);
         setCartCount(data.cart_count || 0);
         setWishlistCount(data.wishlist_count || 0);
+        setTotalSpent(data.total_spent || 0);
+        setTotalOrders(data.total_orders || 0);
+        setRecommendedProducts(data.recommended_products || []);
         setLoading(false);
       })
       .catch((error) => {
@@ -38,6 +44,9 @@ const CustomerDashboard = () => {
         setOrders([]);
         setCartCount(0);
         setWishlistCount(0);
+        setTotalSpent(0);
+        setTotalOrders(0);
+        setRecommendedProducts([]);
         setLoading(false);
       });
   }, []);
@@ -50,15 +59,38 @@ const CustomerDashboard = () => {
     );
   }
 
+  const userData = JSON.parse(localStorage.getItem("user"));
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 py-6 sm:px-0">
+          {/* User Header */}
+          <div className="bg-white shadow rounded-lg mb-6">
+            <div className="px-4 py-5 sm:px-6">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <img
+                    className="h-12 w-12 rounded-full"
+                    src={userData?.profile_picture || "/placeholder-avatar.jpg"}
+                    alt="Profile"
+                  />
+                </div>
+                <div className="ml-4">
+                  <h2 className="text-lg font-medium text-gray-900">
+                    Welcome back, {userData?.name || "Customer"}!
+                  </h2>
+                  <p className="text-sm text-gray-500">{userData?.email}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <h1 className="text-3xl font-bold text-gray-900 mb-6">
             Customer Dashboard
           </h1>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
             <div className="bg-white overflow-hidden shadow rounded-lg">
               <div className="p-5">
                 <div className="flex items-center">
@@ -117,7 +149,29 @@ const CustomerDashboard = () => {
                         Total Orders
                       </dt>
                       <dd className="text-lg font-medium text-gray-900">
-                        {orders.length}
+                        {totalOrders}
+                      </dd>
+                    </dl>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white overflow-hidden shadow rounded-lg">
+              <div className="p-5">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0">
+                    <div className="w-8 h-8 bg-purple-500 rounded-md flex items-center justify-center">
+                      <span className="text-white font-bold">$</span>
+                    </div>
+                  </div>
+                  <div className="ml-5 w-0 flex-1">
+                    <dl>
+                      <dt className="text-sm font-medium text-gray-500 truncate">
+                        Total Spent
+                      </dt>
+                      <dd className="text-lg font-medium text-gray-900">
+                        ${totalSpent.toFixed(2)}
                       </dd>
                     </dl>
                   </div>
@@ -125,6 +179,49 @@ const CustomerDashboard = () => {
               </div>
             </div>
           </div>
+
+          {recommendedProducts.length > 0 && (
+            <div className="bg-white shadow overflow-hidden sm:rounded-md mb-8">
+              <div className="px-4 py-5 sm:px-6">
+                <h3 className="text-lg leading-6 font-medium text-gray-900">
+                  You might also like these
+                </h3>
+                <p className="mt-1 max-w-2xl text-sm text-gray-500">
+                  Recommended products based on your preferences
+                </p>
+              </div>
+              <div className="px-4 py-5 sm:px-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                  {recommendedProducts.map((product) => (
+                    <div
+                      key={product.id}
+                      className="bg-gray-50 rounded-lg p-4 hover:shadow-md transition-shadow"
+                    >
+                      <div className="aspect-w-1 aspect-h-1 mb-4">
+                        <img
+                          src={product.image_url || "/placeholder-product.jpg"}
+                          alt={product.name}
+                          className="w-full h-32 object-cover rounded-md"
+                        />
+                      </div>
+                      <h4 className="text-sm font-medium text-gray-900 truncate">
+                        {product.name}
+                      </h4>
+                      <p className="text-sm text-gray-500 truncate">
+                        {product.store_name}
+                      </p>
+                      <p className="text-lg font-semibold text-gray-900 mt-1">
+                        ${product.price}
+                      </p>
+                      <button className="mt-2 w-full bg-indigo-600 text-white py-2 px-4 rounded-md text-sm font-medium hover:bg-indigo-700 transition-colors">
+                        View Product
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
 
           <div className="bg-white shadow overflow-hidden sm:rounded-md">
             <div className="px-4 py-5 sm:px-6">
