@@ -133,7 +133,7 @@ export default function Collections() {
     return (
       <div className="min-h-screen">
         {/* Header Section with Search */}
-        <div className="bg-gradient-to-br from-gold-500/5 via-white to-gold-500/5 py-16 px-4 text-center relative overflow-hidden">
+        <div className="bg-gradient-to-br from-gold-500/5 via-white to-gold-500/5 py-8 px-4 text-center relative overflow-hidden">
           <div
             className="absolute inset-0 opacity-30 animate-pulse"
             style={{
@@ -141,21 +141,21 @@ export default function Collections() {
             }}
           ></div>
           <div className="relative z-10 max-w-3xl mx-auto">
-            <h1 className="text-4xl md:text-5xl font-bold font-serif text-gold-500 mb-4 tracking-tight">
+            <h1 className="text-3xl md:text-4xl font-bold font-serif text-gold-500 mb-3 tracking-tight">
               Our Collections
             </h1>
-            <p className="text-md md:text-lg text-black/70 max-w-xl mx-auto leading-relaxed font-light mb-6">
+            <p className="text-sm md:text-base text-black/70 max-w-xl mx-auto leading-relaxed font-light mb-5">
               Discover timeless elegance in our curated selection of couture
               pieces.
             </p>
             <div className="flex justify-center">
-              <div className="w-full max-w-lg h-12 bg-gray-200 rounded-full animate-pulse"></div>
+              <div className="w-full max-w-lg h-10 bg-gray-200 rounded-full animate-pulse"></div>
             </div>
           </div>
         </div>
 
         {/* Main Content Area with Skeletons */}
-        <div className="max-w-7xl mx-auto px-4 py-12 grid grid-cols-1 lg:grid-cols-4 gap-10">
+        <div className="max-w-7xl mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-4 gap-10">
           {/* Filters Sidebar Skeleton */}
           <aside className="lg:col-span-1 bg-white rounded-3xl shadow-xl border border-gold-500/10 p-8 h-fit sticky top-8 animate-pulse">
             <div className="h-8 bg-gray-200 rounded mb-8"></div>
@@ -197,11 +197,11 @@ export default function Collections() {
   if (error) {
     return (
       <div className="min-h-screen">
-        <div className="py-16 px-4 text-center bg-gradient-to-br from-gold-500/2 to-white/98">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold font-serif text-gold-500 mb-4">
+        <div className="py-12 px-4 text-center bg-gradient-to-br from-gold-500/2 to-white/98">
+          <h1 className="text-3xl md:text-4xl font-bold font-serif text-gold-500 mb-4">
             Collections
           </h1>
-          <p className="text-lg md:text-xl text-black/70">
+          <p className="text-base md:text-lg text-black/70">
             Error loading collections: {error}
           </p>
         </div>
@@ -212,7 +212,7 @@ export default function Collections() {
   return (
     <div className="min-h-screen">
       {/* Header Section with Search */}
-      <div className="bg-gradient-to-br from-gold-500/5 via-white to-gold-500/5 py-16 px-4 text-center relative overflow-hidden">
+      <div className="bg-gradient-to-br from-gold-500/5 via-white to-gold-500/5 py-8 px-4 text-center relative overflow-hidden">
         <div
           className="absolute inset-0 opacity-30"
           style={{
@@ -220,10 +220,10 @@ export default function Collections() {
           }}
         ></div>
         <div className="relative z-10 max-w-3xl mx-auto">
-          <h1 className="text-4xl md:text-5xl font-bold font-serif text-gold-500 mb-4 tracking-tight">
+          <h1 className="text-3xl md:text-4xl font-bold font-serif text-gold-500 mb-3 tracking-tight">
             Our Collections
           </h1>
-          <p className="text-md md:text-lg text-black/70 max-w-xl mx-auto leading-relaxed font-light mb-6">
+          <p className="text-sm md:text-base text-black/70 max-w-xl mx-auto leading-relaxed font-light mb-5">
             Discover timeless elegance in our curated selection of couture
             pieces.
           </p>
@@ -233,14 +233,14 @@ export default function Collections() {
               placeholder="Search products..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full max-w-lg px-5 py-3 border border-gold-500/30 rounded-full focus:outline-none focus:border-gold-500 focus:ring-2 focus:ring-gold-500/20 transition-colors shadow-lg text-lg"
+              className="w-full max-w-lg px-5 py-2.5 border border-gold-500/30 rounded-full focus:outline-none focus:border-gold-500 focus:ring-2 focus:ring-gold-500/20 transition-colors shadow-lg text-base"
             />
           </div>
         </div>
       </div>
 
       {/* Main Content Area */}
-      <div className="max-w-7xl mx-auto px-4 py-12">
+      <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Horizontal Filters Bar */}
         <div className="bg-white rounded-3xl shadow-xl border border-gold-500/10 p-6 mb-8">
           <div className="flex flex-col lg:flex-row lg:items-center gap-6">

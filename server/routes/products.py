@@ -274,6 +274,28 @@ def get_product(product_id):
     if len(reviews_list) > 0:
         avg_rating = round(total_rating / len(reviews_list), 2)
 
+    # Calculate store stats
+    store = product.store
+    store_rating = None
+    store_total_reviews = 0
+    store_products_sold = 0
+    if store:
+        # Get all products for the store
+        store_products = Product.query.filter_by(store_id=store.id).all()
+        store_product_ids = [p.id for p in store_products]
+
+        # Calculate average rating across all store products
+        store_reviews = Review.query.filter(Review.product_id.in_(store_product_ids)).all()
+        store_total_reviews = len(store_reviews)
+        if store_reviews:
+            total_store_rating = sum(r.rating for r in store_reviews if r.rating)
+            store_rating = round(total_store_rating / len([r for r in store_reviews if r.rating]), 1) if total_store_rating else None
+
+        # Calculate total products sold (sum of order item quantities)
+        from sqlalchemy import func
+        sold_result = db.session.query(func.sum(OrderItem.quantity)).filter(OrderItem.product_id.in_(store_product_ids)).scalar()
+        store_products_sold = sold_result or 0
+
     product_data = {
         'id': product.id,
         'name': product.name,
@@ -285,6 +307,9 @@ def get_product(product_id):
         'category_id': category_obj.id if category_obj else None,
         'store_name': product.store.name if product.store else 'Unknown Store',
         'store_id': product.store_id if product.store else None,
+        'store_rating': store_rating,
+        'store_total_reviews': store_total_reviews,
+        'store_products_sold': store_products_sold,
         'created_at': product.created_at.isoformat(),
         'updated_at': product.updated_at.isoformat(),
         'reviews': reviews_list,

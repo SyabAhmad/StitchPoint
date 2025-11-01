@@ -7,6 +7,8 @@ const StoreProducts = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [storeName, setStoreName] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -54,6 +56,17 @@ const StoreProducts = () => {
     );
   }
 
+  // Pagination logic
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentProducts = products.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(products.length / itemsPerPage);
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   return (
     <div
       style={{ backgroundColor: "#000000", minHeight: "100vh" }}
@@ -74,7 +87,9 @@ const StoreProducts = () => {
           Products for {storeName}
         </h1>
         <p style={{ color: "#999999" }} className="mt-2">
-          Total Products: {products.length}
+          Showing {products.length > 0 ? indexOfFirstItem + 1 : 0}-
+          {Math.min(indexOfLastItem, products.length)} of {products.length}{" "}
+          products
         </p>
       </div>
 
@@ -138,7 +153,7 @@ const StoreProducts = () => {
               </tr>
             </thead>
             <tbody style={{ backgroundColor: "#1d1d1d" }}>
-              {products.map((p, idx) => (
+              {currentProducts.map((p, idx) => (
                 <tr
                   key={p.product_id}
                   style={{
@@ -200,6 +215,56 @@ const StoreProducts = () => {
               ))}
             </tbody>
           </table>
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div
+              className="px-4 py-4 border-t flex items-center justify-between"
+              style={{ borderColor: "#2d2d2d" }}
+            >
+              <button
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+                className="px-4 py-2 rounded text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-opacity-80 transition-colors"
+                style={{
+                  backgroundColor: "#2d2d2d",
+                  color: "#ffffff",
+                  border: "1px solid #3d3d3d",
+                }}
+              >
+                Previous
+              </button>
+              <div className="flex gap-2">
+                {[...Array(totalPages)].map((_, i) => (
+                  <button
+                    key={i + 1}
+                    onClick={() => handlePageChange(i + 1)}
+                    className="px-3 py-1 rounded text-sm font-medium hover:opacity-80 transition-opacity"
+                    style={{
+                      backgroundColor:
+                        currentPage === i + 1 ? "#d4af37" : "#2d2d2d",
+                      color: currentPage === i + 1 ? "#000000" : "#ffffff",
+                      border: "1px solid #3d3d3d",
+                    }}
+                  >
+                    {i + 1}
+                  </button>
+                ))}
+              </div>
+              <button
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                className="px-4 py-2 rounded text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed hover:bg-opacity-80 transition-colors"
+                style={{
+                  backgroundColor: "#2d2d2d",
+                  color: "#ffffff",
+                  border: "1px solid #3d3d3d",
+                }}
+              >
+                Next
+              </button>
+            </div>
+          )}
         </div>
       ) : (
         <div

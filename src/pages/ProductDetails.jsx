@@ -437,7 +437,16 @@ const ProductDetails = ({
                       ))}
                     </div>
                     <span className="text-sm text-gray-600 font-semibold">
-                      4.5 (24 reviews)
+                      {product.store_rating ? `${product.store_rating}` : "N/A"}{" "}
+                      (
+                      {product.store_total_reviews
+                        ? product.store_total_reviews >= 1000
+                          ? `${(product.store_total_reviews / 1000).toFixed(
+                              1
+                            )}k`
+                          : product.store_total_reviews
+                        : 0}{" "}
+                      reviews)
                     </span>
                     <span className="text-sm text-gray-400">•</span>
                     <span className="text-sm text-gray-600">Highly rated</span>
@@ -628,11 +637,29 @@ const ProductDetails = ({
                           ))}
                         </div>
                         <span className="text-sm text-gray-600">
-                          4.8 (1.2k reviews)
+                          {product.store_rating
+                            ? `${product.store_rating}`
+                            : "N/A"}{" "}
+                          (
+                          {product.store_total_reviews
+                            ? product.store_total_reviews >= 1000
+                              ? `${(product.store_total_reviews / 1000).toFixed(
+                                  1
+                                )}k`
+                              : product.store_total_reviews
+                            : 0}{" "}
+                          reviews)
                         </span>
                       </div>
                       <p className="text-sm text-gray-600">
-                        2.5k products sold
+                        {product.store_products_sold
+                          ? product.store_products_sold >= 1000
+                            ? `${(product.store_products_sold / 1000).toFixed(
+                                1
+                              )}k`
+                            : product.store_products_sold
+                          : 0}{" "}
+                        products sold
                       </p>
                     </div>
                   </div>
