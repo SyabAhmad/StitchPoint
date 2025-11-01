@@ -14,6 +14,7 @@ import Wishlist from "./pages/Wishlist.jsx";
 import Login from "./pages/Login.jsx";
 import Signup from "./pages/Signup.jsx";
 import CustomerDashboard from "./pages/customer/Dashboard.jsx";
+import CustomerProfile from "./pages/customer/Profile.jsx";
 import ManagerDashboard from "./pages/manager/Dashboard.jsx";
 import ManagerProfile from "./pages/manager/Profile.jsx";
 import ManagerProducts from "./pages/manager/Products.jsx";
@@ -55,6 +56,7 @@ function App() {
           <Route path="login" element={<Login />} />
           <Route path="signup" element={<Signup />} />
           <Route path="dashboard" element={<CustomerDashboard />} />
+          <Route path="profile" element={<CustomerProfile />} />
           <Route path="manager-dashboard" element={<ManagerDashboard />}>
             <Route index element={<div />} />
             <Route path="products" element={<ManagerProducts />} />

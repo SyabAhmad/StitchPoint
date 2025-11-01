@@ -10,6 +10,7 @@ class User(db.Model):
     password_hash = db.Column(db.String(256), nullable=False)
     name = db.Column(db.String(100), nullable=True)
     role = db.Column(db.String(20), default='customer')
+    profile_picture = db.Column(db.String(500), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     # Relationships
@@ -19,6 +20,8 @@ class User(db.Model):
     page_views = db.relationship('PageView', backref='user', lazy=True)
     button_clicks = db.relationship('ButtonClick', backref='user', lazy=True)
     store = db.relationship('Store', backref='manager', uselist=False, lazy=True)
+    addresses = db.relationship('Address', backref='user', lazy=True)
+    payment_methods = db.relationship('PaymentMethod', backref='user', lazy=True)
 
     def __repr__(self):
         return f'<User {self.email}>'
@@ -221,3 +224,34 @@ class ProductAnalytics(db.Model):
 
     def __repr__(self):
         return f'<ProductAnalytics {self.action} on product {self.product_id}>'
+
+class Address(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    name = db.Column(db.String(100), nullable=False)  # e.g., "Home", "Work"
+    street_address = db.Column(db.Text, nullable=False)
+    city = db.Column(db.String(100), nullable=False)
+    state = db.Column(db.String(100), nullable=False)
+    postal_code = db.Column(db.String(20), nullable=False)
+    country = db.Column(db.String(100), nullable=False)
+    is_default = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    def __repr__(self):
+        return f'<Address {self.name} for user {self.user_id}>'
+
+class PaymentMethod(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    cardholder_name = db.Column(db.String(100), nullable=False)
+    card_number_last_four = db.Column(db.String(4), nullable=False)  # Store only last 4 digits
+    card_type = db.Column(db.String(50), nullable=False)  # e.g., "Visa", "MasterCard"
+    expiry_month = db.Column(db.Integer, nullable=False)
+    expiry_year = db.Column(db.Integer, nullable=False)
+    is_default = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    def __repr__(self):
+        return f'<PaymentMethod {self.card_type} ****{self.card_number_last_four} for user {self.user_id}>'
