@@ -13,6 +13,7 @@ def create_order():
     """Create orders for items, grouped by store"""
     try:
         user_id = get_jwt_identity()
+        user = User.query.get(int(user_id))
         data = request.get_json()
 
         # Validate required fields
@@ -29,21 +30,26 @@ def create_order():
         if not payment_method:
             return jsonify({'message': 'Invalid payment method'}), 400
 
-        # Group items by store
+        # Group items by store and validate stock
         items_by_store = {}
         for item in data['items']:
             product = Product.query.get(item['id'])
             if not product:
                 return jsonify({'message': f'Invalid product: {item["id"]}'}), 400
-            
+
+            # Check stock availability
+            if product.stock_quantity < item['quantity']:
+                return jsonify({'message': f'Insufficient stock for product {product.name}. Available: {product.stock_quantity}, Requested: {item["quantity"]}'}), 400
+
             store_id = product.store_id
             if store_id not in items_by_store:
                 items_by_store[store_id] = []
-            
+
             items_by_store[store_id].append({
                 'product_id': item['id'],
                 'quantity': item['quantity'],
-                'price': item['price']
+                'price': item['price'],
+                'product': product  # Keep product reference for stock update
             })
 
         # Calculate shipping address string
@@ -60,9 +66,13 @@ def create_order():
         num_stores = len(items_by_store)
 
         for store_id, store_items in items_by_store.items():
+            # Prevent managers from buying from their own store
+            if user.role == 'manager' and user.store and user.store.id == store_id:
+                return jsonify({'message': 'Managers cannot purchase from their own store'}), 403
+
             # Calculate this store's portion
             store_subtotal = sum(item['price'] * item['quantity'] for item in store_items)
-            
+
             # Split tax and shipping proportionally
             proportion = store_subtotal / subtotal if subtotal > 0 else (1 / num_stores)
             store_tax = tax * proportion
@@ -80,7 +90,7 @@ def create_order():
             db.session.add(order)
             db.session.flush()
 
-            # Add order items for this store
+            # Add order items for this store and update stock
             for item in store_items:
                 order_item = OrderItem(
                     order_id=order.id,
@@ -89,6 +99,9 @@ def create_order():
                     price=item['price']
                 )
                 db.session.add(order_item)
+
+                # Update product stock
+                item['product'].stock_quantity -= item['quantity']
 
             # Create payment record
             payment = Payment(

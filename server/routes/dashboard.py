@@ -102,8 +102,12 @@ def admin_dashboard():
     # Total products (global for super_admin, store-specific for manager)
     if user.role == 'super_admin':
         total_products = Product.query.count()
+        total_stock_value = db.session.query(func.sum(Product.price * Product.stock_quantity)).scalar()
+        total_stock_value = float(total_stock_value) if total_stock_value else 0.0
     else:
         total_products = Product.query.filter_by(store_id=store_filter).count()
+        total_stock_value = db.session.query(func.sum(Product.price * Product.stock_quantity)).filter(Product.store_id == store_filter).scalar()
+        total_stock_value = float(total_stock_value) if total_stock_value else 0.0
 
     # Total orders (global for super_admin, store-specific for manager)
     if user.role == 'super_admin':
@@ -165,7 +169,8 @@ def admin_dashboard():
         'average_rating': avg_rating,
         'top_rated_products': [{'product_id': p.id, 'product_name': p.name, 'avg_rating': round(float(p.avg_rating), 2), 'review_count': p.review_count} for p in top_rated_products],
         'page_views_today': page_views_today,
-        'button_clicks_today': button_clicks_today
+        'button_clicks_today': button_clicks_today,
+        'total_stock_value': total_stock_value
     }
     if user.role == 'super_admin':
         analytics['total_users'] = total_users
