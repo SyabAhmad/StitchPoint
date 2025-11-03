@@ -178,7 +178,7 @@ const CustomerDashboard = () => {
                     💰 Total Spent
                   </p>
                   <p className="text-4xl font-extrabold text-gray-900 mt-2">
-                    ${totalSpent.toFixed(2)}
+                    PKR {totalSpent.toFixed(2)}
                   </p>
                 </div>
                 <div className="text-4xl">💳</div>
@@ -219,7 +219,7 @@ const CustomerDashboard = () => {
                         {product.store_name}
                       </p>
                       <p className="text-lg font-bold text-gray-900 mt-3">
-                        ${product.price}
+                        PKR {product.price}
                       </p>
                       <button className="mt-3 w-full bg-gray-900 hover:bg-gray-800 text-white py-2 px-4 rounded-lg text-sm font-bold transition-all transform hover:scale-105">
                         👁️ View Product
@@ -280,7 +280,7 @@ const CustomerDashboard = () => {
                       </div>
                       <div className="text-right">
                         <p className="text-2xl font-bold text-gray-900">
-                          ${order.total_amount}
+                          PKR {order.total_amount}
                         </p>
                         <span
                           className={`inline-block mt-2 px-4 py-1 text-sm font-bold rounded-full ${

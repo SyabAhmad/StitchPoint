@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from models import db, ProductAnalytics, Product, User, Store, Review, Comment
+from models import db, ProductAnalytics, Product, User, Store, Review, Comment, Order, OrderItem
 from sqlalchemy import func, desc, extract
 from sqlalchemy.sql import case
 from datetime import datetime, timedelta
@@ -934,6 +934,71 @@ def get_review_details(review_id):
     }
 
     return jsonify({'review': review_data}), 200
+
+@analytics_bp.route('/financial-trends', methods=['GET'])
+@jwt_required()
+def get_financial_trends():
+    try:
+        user_id = int(get_jwt_identity())
+    except (TypeError, ValueError):
+        return jsonify({'message': 'Invalid token identity'}), 422
+    user = User.query.get(user_id)
+
+    if not user or user.role not in ['manager', 'super_admin']:
+        return jsonify({'message': 'Unauthorized'}), 403
+
+    days = request.args.get('days', 30, type=int)
+    start_date = datetime.utcnow() - timedelta(days=days)
+
+    store_filter = None
+    if user.role == 'manager' and user.store:
+        store_filter = user.store.id
+
+    # Query daily financial data
+    query = db.session.query(
+        func.date(Order.created_at).label('date'),
+        func.sum(Order.total_amount).label('daily_sales'),
+        func.sum(func.coalesce(Product.cost_price, Product.price) * OrderItem.quantity).label('daily_costs'),
+        (func.sum(Order.total_amount) - func.sum(func.coalesce(Product.cost_price, Product.price) * OrderItem.quantity)).label('daily_profit')
+    ).join(OrderItem, Order.id == OrderItem.order_id)\
+     .join(Product, OrderItem.product_id == Product.id)\
+     .filter(Order.status == 'delivered')\
+     .filter(Order.created_at >= start_date)
+
+    if store_filter:
+        query = query.filter(Order.store_id == store_filter)
+
+    query = query.group_by(func.date(Order.created_at)).order_by('date')
+
+    results = query.all()
+
+    # Fill in missing dates with zero values
+    data = []
+    current_date = start_date.date()
+    end_date = datetime.utcnow().date()
+
+    # Create a dict of existing data
+    existing_data = {row.date: row for row in results}
+
+    while current_date <= end_date:
+        if current_date in existing_data:
+            row = existing_data[current_date]
+            data.append({
+                'date': current_date.isoformat(),
+                'sales': round(float(row.daily_sales or 0), 2),
+                'costs': round(float(row.daily_costs or 0), 2),
+                'profit': round(float(row.daily_profit or 0), 2)
+            })
+        else:
+            data.append({
+                'date': current_date.isoformat(),
+                'sales': 0.0,
+                'costs': 0.0,
+                'profit': 0.0
+            })
+        current_date += timedelta(days=1)
+
+    return jsonify({'financial_trends': data}), 200
 
 @analytics_bp.route('/welcome', methods=['GET'])
 def welcome():

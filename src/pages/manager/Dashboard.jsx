@@ -14,12 +14,16 @@ import {
 } from "react-icons/fa";
 import { Link, Outlet, useLocation } from "react-router-dom";
 import { fetchWithAuth } from "../../utils/fetchWithAuth.js";
+import CostChart from "../../components/analytics/CostChart.jsx";
+import SalesChart from "../../components/analytics/SalesChart.jsx";
+import ProfitChart from "../../components/analytics/ProfitChart.jsx";
 
 const ManagerDashboard = () => {
   const location = useLocation();
   const [loading, setLoading] = useState(true);
   const [analytics, setAnalytics] = useState({});
   const [recentOrders, setRecentOrders] = useState([]);
+  const [financialTrends, setFinancialTrends] = useState([]);
   useEffect(() => {
     const token = localStorage.getItem("token");
     const userData = JSON.parse(localStorage.getItem("user"));
@@ -31,22 +35,34 @@ const ManagerDashboard = () => {
 
     // Fetch dashboard data only if on the main dashboard route
     if (location.pathname === "/manager-dashboard") {
-      fetchWithAuth("http://localhost:5000/api/dashboard/admin")
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+      Promise.all([
+        fetchWithAuth("http://localhost:5000/api/dashboard/admin"),
+        fetchWithAuth("http://localhost:5000/api/analytics/financial-trends"),
+      ])
+        .then(([dashboardResponse, trendsResponse]) => {
+          if (!dashboardResponse.ok) {
+            throw new Error(
+              `Dashboard HTTP error! status: ${dashboardResponse.status}`
+            );
           }
-          return response.json();
+          if (!trendsResponse.ok) {
+            throw new Error(
+              `Trends HTTP error! status: ${trendsResponse.status}`
+            );
+          }
+          return Promise.all([dashboardResponse.json(), trendsResponse.json()]);
         })
-        .then((data) => {
-          setAnalytics(data.analytics || {});
-          setRecentOrders(data.recent_orders || []);
+        .then(([dashboardData, trendsData]) => {
+          setAnalytics(dashboardData.analytics || {});
+          setRecentOrders(dashboardData.recent_orders || []);
+          setFinancialTrends(trendsData.financial_trends || []);
           setLoading(false);
         })
         .catch((error) => {
           console.error("Error fetching dashboard data:", error);
           setAnalytics({});
           setRecentOrders([]);
+          setFinancialTrends([]);
           setLoading(false);
         });
     } else {
@@ -505,6 +521,13 @@ const ManagerDashboard = () => {
                       </div>
                     </div>
                   </div>
+                </div>
+
+                {/* Financial Trends Charts */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                  <CostChart data={financialTrends} />
+                  <SalesChart data={financialTrends} />
+                  <ProfitChart data={financialTrends} />
                 </div>
 
                 {/* Top Rated Products Card */}
