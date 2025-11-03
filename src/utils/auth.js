@@ -33,6 +33,8 @@ export const logout = () => {
   localStorage.removeItem("token");
   localStorage.removeItem("refreshToken");
   localStorage.removeItem("user");
+  localStorage.removeItem("cart"); // Clear localStorage cart on logout
+  localStorage.removeItem("wishlist"); // Clear localStorage wishlist on logout
   window.location.href = "/login";
 };
 

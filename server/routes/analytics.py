@@ -537,7 +537,7 @@ def get_stores_analytics():
     if user.role == 'manager' and user.store:
         store_filter = user.store.id
 
-    # Query stores with analytics
+    # Query stores with analytics including financial data
     query = db.session.query(
         Store.id,
         Store.name,
@@ -548,12 +548,20 @@ def get_stores_analytics():
         func.avg(case((ProductAnalytics.action == 'view', ProductAnalytics.time_spent), else_=None)).label('avg_time_spent'),
         func.count(func.distinct(Review.id)).label('total_reviews'),
         func.avg(Review.rating).label('avg_rating'),
-        func.count(func.distinct(Comment.id)).label('total_comments')
+        func.count(func.distinct(Comment.id)).label('total_comments'),
+        # Financial calculations
+        func.sum(Order.total_amount).label('total_revenue'),
+        func.sum(OrderItem.quantity).label('total_units_sold'),
+        func.sum(func.coalesce(Product.cost_price, Product.price) * OrderItem.quantity).label('total_costs'),
+        (func.sum(Order.total_amount) - func.sum(func.coalesce(Product.cost_price, Product.price) * OrderItem.quantity)).label('total_profit')
     ).outerjoin(Product, Store.id == Product.store_id)\
      .outerjoin(ProductAnalytics, Product.id == ProductAnalytics.product_id)\
      .outerjoin(Review, Product.id == Review.product_id)\
      .outerjoin(Comment, Product.id == Comment.product_id)\
-     .filter(ProductAnalytics.timestamp >= start_date if ProductAnalytics.timestamp else True)
+     .outerjoin(OrderItem, Product.id == OrderItem.product_id)\
+     .outerjoin(Order, OrderItem.order_id == Order.id)\
+     .filter(ProductAnalytics.timestamp >= start_date if ProductAnalytics.timestamp else True)\
+     .filter(Order.status == 'delivered')  # Only count delivered orders for revenue
 
     if store_filter:
         query = query.filter(Store.id == store_filter)
@@ -574,7 +582,11 @@ def get_stores_analytics():
             'avg_time_spent': round(row.avg_time_spent or 0, 2),
             'total_reviews': row.total_reviews or 0,
             'avg_rating': round(row.avg_rating or 0, 2),
-            'total_comments': row.total_comments or 0
+            'total_comments': row.total_comments or 0,
+            'total_revenue': round(row.total_revenue or 0, 2),
+            'total_units_sold': row.total_units_sold or 0,
+            'total_costs': round(row.total_costs or 0, 2),
+            'total_profit': round(row.total_profit or 0, 2)
         })
 
     return jsonify({'stores_analytics': data}), 200

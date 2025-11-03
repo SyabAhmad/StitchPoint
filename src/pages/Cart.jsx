@@ -13,36 +13,83 @@ const Cart = () => {
   const navigate = useNavigate();
   const [cartItems, setCartItems] = useState([]);
   const [total, setTotal] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [updating, setUpdating] = useState(false);
 
   useEffect(() => {
     loadCart();
   }, []);
 
-  const loadCart = () => {
-    const items = getCart();
-    setCartItems(items);
-    setTotal(getCartTotal());
+  const loadCart = async () => {
+    try {
+      setLoading(true);
+      const items = await getCart();
+      setCartItems(items);
+      const cartTotal = await getCartTotal();
+      setTotal(cartTotal);
+    } catch (error) {
+      console.error("Error loading cart:", error);
+      setCartItems([]);
+      setTotal(0);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleRemoveItem = (productId) => {
-    removeFromCart(productId);
-    loadCart();
+  const handleRemoveItem = async (productId) => {
+    try {
+      setUpdating(true);
+      await removeFromCart(productId);
+      await loadCart();
+    } catch (error) {
+      console.error("Error removing item:", error);
+      // Could show error toast here
+    } finally {
+      setUpdating(false);
+    }
   };
 
-  const handleUpdateQuantity = (productId, newQuantity) => {
+  const handleUpdateQuantity = async (productId, newQuantity) => {
     if (newQuantity < 1) return;
-    updateCartItemQuantity(productId, newQuantity);
-    loadCart();
+    try {
+      setUpdating(true);
+      await updateCartItemQuantity(productId, newQuantity);
+      await loadCart();
+    } catch (error) {
+      console.error("Error updating quantity:", error);
+      // Could show error toast here
+    } finally {
+      setUpdating(false);
+    }
   };
 
-  const handleClearCart = () => {
-    clearCart();
-    loadCart();
+  const handleClearCart = async () => {
+    try {
+      setUpdating(true);
+      await clearCart();
+      await loadCart();
+    } catch (error) {
+      console.error("Error clearing cart:", error);
+      // Could show error toast here
+    } finally {
+      setUpdating(false);
+    }
   };
 
   const handleCheckout = () => {
     navigate("/checkout");
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-white flex justify-center items-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900"></div>
+          <p className="mt-4 text-gray-600">Loading your cart...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (cartItems.length === 0) {
     return (

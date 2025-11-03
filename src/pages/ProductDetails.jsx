@@ -155,7 +155,7 @@ const ProductDetails = ({
       propOnAddToCart(product);
     } else {
       try {
-        addToCart({ ...product, quantity });
+        await addToCart(product, quantity);
         toast.success(`${product.name} added to cart!`);
       } catch {
         toast.error("Failed to add to cart");

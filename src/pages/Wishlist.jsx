@@ -1,36 +1,60 @@
 import React, { useState, useEffect } from "react";
 import { FaHeart, FaTrash, FaShoppingCart } from "react-icons/fa";
-import {
-  getWishlist,
-  removeFromWishlist,
-  isInWishlist,
-} from "../utils/wishlistUtils";
+import { getWishlist, removeFromWishlist } from "../utils/wishlistUtils";
 import { addToCart } from "../utils/cartUtils";
 
 const Wishlist = () => {
   const [wishlistItems, setWishlistItems] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     loadWishlist();
   }, []);
 
-  const loadWishlist = () => {
-    const items = getWishlist();
-    setWishlistItems(items);
+  const loadWishlist = async () => {
+    try {
+      setLoading(true);
+      const items = await getWishlist();
+      setWishlistItems(items);
+    } catch (error) {
+      console.error("Error loading wishlist:", error);
+      setWishlistItems([]);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleRemoveFromWishlist = (productId) => {
-    removeFromWishlist(productId);
-    loadWishlist();
+  const handleRemoveFromWishlist = async (productId) => {
+    try {
+      await removeFromWishlist(productId);
+      await loadWishlist();
+    } catch (error) {
+      console.error("Error removing from wishlist:", error);
+      // Could show error toast here
+    }
   };
 
-  const handleAddToCart = (product) => {
-    addToCart(product);
-    // Optionally remove from wishlist after adding to cart
-    // removeFromWishlist(product.id);
-    // loadWishlist();
-    alert("Added to cart!");
+  const handleAddToCart = async (product) => {
+    try {
+      await addToCart(product);
+      alert("Added to cart!");
+    } catch (error) {
+      console.error("Error adding to cart:", error);
+      alert("Failed to add to cart. Please try again.");
+    }
   };
+
+  if (loading) {
+    return (
+      <div className="container mx-auto p-4">
+        <h1 className="text-3xl font-bold mb-4">My Wishlist</h1>
+        <div className="text-center py-12">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="text-gray-500 mt-4">Loading wishlist...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (wishlistItems.length === 0) {
     return (

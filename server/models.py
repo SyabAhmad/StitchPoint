@@ -49,6 +49,7 @@ class Product(db.Model):
     name = db.Column(db.String(200), nullable=False)
     description = db.Column(db.Text, nullable=True)
     price = db.Column(db.Float, nullable=False)
+    cost_price = db.Column(db.Float, nullable=True)  # Cost to the store for this product
     stock_quantity = db.Column(db.Integer, default=0)
     image_url = db.Column(db.String(500), nullable=True)
     category = db.Column(db.String(100), nullable=True)
@@ -78,11 +79,16 @@ class Cart(db.Model):
         return f'<Cart {self.id}>'
 
 class CartItem(db.Model):
+    __tablename__ = 'cart_item'
     id = db.Column(db.Integer, primary_key=True)
     cart_id = db.Column(db.Integer, db.ForeignKey('cart.id'), nullable=False)
     product_id = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=False)
     quantity = db.Column(db.Integer, default=1)
-    added_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    # Unique constraint to prevent duplicate products in cart
+    __table_args__ = (db.UniqueConstraint('cart_id', 'product_id', name='unique_cart_product'),)
 
     def __repr__(self):
         return f'<CartItem {self.id}>'

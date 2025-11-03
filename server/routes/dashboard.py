@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from werkzeug.security import generate_password_hash
 from werkzeug.utils import secure_filename
-from models import db, User, Order, Product, PageView, ButtonClick, Review, Store, OrderItem, Address, PaymentMethod
+from models import db, User, Order, Product, PageView, ButtonClick, Review, Store, OrderItem, Address, PaymentMethod, Cart, CartItem, WishlistItem
 from sqlalchemy import func
 import os
 from datetime import datetime
@@ -31,13 +31,35 @@ def customer_dashboard():
         'created_at': order.created_at.isoformat()
     } for order in orders]
 
-    # Get user's cart items count
+    # Get user's cart items
     cart = user.carts[0] if user.carts else None
-    cart_count = sum(item.quantity for item in cart.items) if cart else 0
+    cart_items = []
+    cart_total_value = 0.0
+    if cart:
+        for item in cart.items:
+            item_total = item.quantity * item.product.price
+            cart_total_value += item_total
+            cart_items.append({
+                'product_id': item.product_id,
+                'product_name': item.product.name,
+                'quantity': item.quantity,
+                'price': item.product.price,
+                'total': item_total,
+                'image_url': item.product.image_url
+            })
 
-    # Get user's wishlist items count
+    # Get user's wishlist items
     wishlist = user.wishlists[0] if user.wishlists else None
-    wishlist_count = len(wishlist.items) if wishlist else 0
+    wishlist_items = []
+    if wishlist:
+        for item in wishlist.items:
+            wishlist_items.append({
+                'product_id': item.product_id,
+                'product_name': item.product.name,
+                'price': item.product.price,
+                'image_url': item.product.image_url,
+                'store_name': item.product.store.name if item.product.store else 'Unknown'
+            })
 
     # Calculate total spent
     total_spent_result = db.session.query(func.sum(Order.total_amount)).filter(Order.user_id == user_id).scalar()
@@ -70,8 +92,9 @@ def customer_dashboard():
             'created_at': user.created_at.isoformat()
         },
         'orders': orders_data,
-        'cart_count': cart_count,
-        'wishlist_count': wishlist_count,
+        'cart_items': cart_items,
+        'cart_total_value': cart_total_value,
+        'wishlist_items': wishlist_items,
         'total_spent': total_spent,
         'total_orders': total_orders,
         'recommended_products': recommended_data
@@ -102,7 +125,7 @@ def admin_dashboard():
     # Total products (global for super_admin, store-specific for manager)
     if user.role == 'super_admin':
         total_products = Product.query.count()
-        total_stock_value = db.session.query(func.sum(Product.price * Product.stock_quantity)).scalar()
+        total_stock_value = db.session.query(func.sum(func.coalesce(Product.cost_price, Product.price) * Product.stock_quantity)).scalar()
         total_stock_value = float(total_stock_value) if total_stock_value else 0.0
         total_revenue = db.session.query(func.sum(Order.total_amount)).filter(Order.status == 'delivered').scalar()
         total_revenue = float(total_revenue) if total_revenue else 0.0
@@ -110,12 +133,18 @@ def admin_dashboard():
         revenue_today = float(revenue_today) if revenue_today else 0.0
     else:
         total_products = Product.query.filter_by(store_id=store_filter).count()
-        total_stock_value = db.session.query(func.sum(Product.price * Product.stock_quantity)).filter(Product.store_id == store_filter).scalar()
+        total_stock_value = db.session.query(func.sum(func.coalesce(Product.cost_price, 0) * Product.stock_quantity)).filter(Product.store_id == store_filter).scalar()
         total_stock_value = float(total_stock_value) if total_stock_value else 0.0
         total_revenue = db.session.query(func.sum(Order.total_amount)).filter(Order.store_id == store_filter, Order.status == 'delivered').scalar()
         total_revenue = float(total_revenue) if total_revenue else 0.0
         revenue_today = db.session.query(func.sum(Order.total_amount)).filter(Order.store_id == store_filter, Order.status == 'delivered', func.date(Order.created_at) == func.date(func.now())).scalar()
         revenue_today = float(revenue_today) if revenue_today else 0.0
+        # Financial metrics for managers
+        total_units_sold = db.session.query(func.sum(OrderItem.quantity)).join(Order, OrderItem.order_id == Order.id).filter(Order.store_id == store_filter, Order.status == 'delivered').scalar()
+        total_units_sold = int(total_units_sold) if total_units_sold else 0
+        total_costs = db.session.query(func.sum(func.coalesce(Product.cost_price, 0) * OrderItem.quantity)).join(Order, OrderItem.order_id == Order.id).join(Product, OrderItem.product_id == Product.id).filter(Order.store_id == store_filter, Order.status == 'delivered').scalar()
+        total_costs = float(total_costs) if total_costs else 0.0
+        total_profit = total_revenue - total_costs
 
     # Total orders (global for super_admin, store-specific for manager)
     if user.role == 'super_admin':
@@ -170,6 +199,55 @@ def admin_dashboard():
         page_views_today = 0  # Placeholder
         button_clicks_today = 0  # Placeholder
 
+    # Get cart items and total value for all users (global for super_admin, store-specific for manager)
+    if user.role == 'super_admin':
+        carts = Cart.query.all()
+        product_ids = None  # No filtering needed
+    else:
+        # For managers, get carts for their store's products
+        store_products = Product.query.filter_by(store_id=store_filter).with_entities(Product.id).all()
+        product_ids = [p.id for p in store_products]
+        carts = Cart.query.join(CartItem).filter(CartItem.product_id.in_(product_ids)).distinct().all()
+
+    cart_items_data = []
+    total_cart_value = 0.0
+    total_cart_items = 0
+    for cart in carts:
+        cart_total = 0.0
+        items_data = []
+        for item in cart.items:
+            # For managers, only include items from their store
+            if product_ids and item.product_id not in product_ids:
+                continue
+            item_total = item.quantity * item.product.price
+            cart_total += item_total
+            total_cart_items += item.quantity
+            items_data.append({
+                'product_id': item.product_id,
+                'product_name': item.product.name,
+                'quantity': item.quantity,
+                'price': item.product.price,
+                'total': item_total
+            })
+        total_cart_value += cart_total
+        cart_items_data.append({
+            'user_id': cart.user_id,
+            'user_email': cart.user.email,
+            'items': items_data,
+            'cart_total': cart_total
+        })
+
+    # Get wishlist items count (global for super_admin, store-specific for manager)
+    if user.role == 'super_admin':
+        total_wishlist_items = db.session.query(func.count(WishlistItem.id)).scalar()
+        total_wishlist_items = int(total_wishlist_items) if total_wishlist_items else 0
+    else:
+        # For managers, get wishlist items for their store's products
+        store_products = Product.query.filter_by(store_id=store_filter).with_entities(Product.id).all()
+        product_ids = [p.id for p in store_products]
+        total_wishlist_items = db.session.query(func.count(WishlistItem.id)).filter(WishlistItem.product_id.in_(product_ids)).scalar()
+        total_wishlist_items = int(total_wishlist_items) if total_wishlist_items else 0
+
     analytics = {
         'total_products': total_products,
         'total_orders': total_orders,
@@ -180,8 +258,18 @@ def admin_dashboard():
         'button_clicks_today': button_clicks_today,
         'total_stock_value': total_stock_value,
         'total_revenue': total_revenue,
-        'revenue_today': revenue_today
+        'revenue_today': revenue_today,
+        'cart_items': cart_items_data,
+        'total_cart_value': total_cart_value,
+        'total_cart_items': total_cart_items,
+        'total_wishlist_items': total_wishlist_items
     }
+    if user.role == 'manager':
+        analytics.update({
+            'total_units_sold': total_units_sold,
+            'total_costs': total_costs,
+            'total_profit': total_profit
+        })
     if user.role == 'super_admin':
         analytics['total_users'] = total_users
 

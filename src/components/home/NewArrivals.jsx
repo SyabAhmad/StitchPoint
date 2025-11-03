@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import { addToCart } from "../../utils/cartUtils";
+import toast from "react-hot-toast";
 
 export default function NewArrivals() {
   const [products, setProducts] = useState([]);
@@ -21,6 +23,16 @@ export default function NewArrivals() {
 
     fetchProducts();
   }, []);
+
+  const handleAddToCart = async (product) => {
+    try {
+      await addToCart(product);
+      toast.success(`${product.name} added to cart!`);
+    } catch (error) {
+      console.error("Error adding to cart:", error);
+      toast.error("Failed to add to cart");
+    }
+  };
 
   return (
     <section className="py-16 px-4 bg-gradient-to-br from-gold-500/2 to-white/98">
@@ -58,8 +70,11 @@ export default function NewArrivals() {
                     </p>
                   )}
                 </div>
-                <button className="bg-gold-500 text-black px-4 py-2 rounded-lg font-semibold hover:bg-gold-600 transition-colors duration-300 shadow-md hover:shadow-lg hover:-translate-y-1">
-                  Buy Now
+                <button
+                  onClick={() => handleAddToCart(product)}
+                  className="bg-gold-500 text-black px-4 py-2 rounded-lg font-semibold hover:bg-gold-600 transition-colors duration-300 shadow-md hover:shadow-lg hover:-translate-y-1"
+                >
+                  Add to Cart
                 </button>
               </div>
             </div>

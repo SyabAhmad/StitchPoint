@@ -1,3 +1,5 @@
+import { logout } from "./auth.js";
+
 export async function fetchWithAuth(url, options = {}) {
   const baseOptions = { ...options };
   // Attach current access token if available
@@ -16,19 +18,26 @@ export async function fetchWithAuth(url, options = {}) {
 
     // Try refresh flow once
     const refreshToken = localStorage.getItem("refreshToken");
-    if (!refreshToken) return res;
+    if (!refreshToken) {
+      logout();
+      return res;
+    }
 
     const r = await fetch("http://localhost:5000/api/auth/refresh", {
       method: "POST",
       headers: { Authorization: `Bearer ${refreshToken}` },
     });
-    if (!r.ok) return res;
+    if (!r.ok) {
+      logout();
+      return res;
+    }
     const json = await r.json().catch(() => ({}));
     if (json.access_token) {
       localStorage.setItem("token", json.access_token);
       // retry original request with new token
       return fetch(url, attachToken(json.access_token));
     }
+    logout();
     return res;
   }
 

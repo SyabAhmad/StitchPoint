@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { fetchWithAuth } from "../../utils/fetchWithAuth.js";
 
 const CustomerDashboard = () => {
   const navigate = useNavigate();
   const [orders, setOrders] = useState([]);
-  const [cartCount, setCartCount] = useState(0);
-  const [wishlistCount, setWishlistCount] = useState(0);
+  const [cartItems, setCartItems] = useState([]);
+  const [wishlistItems, setWishlistItems] = useState([]);
   const [totalSpent, setTotalSpent] = useState(0);
   const [totalOrders, setTotalOrders] = useState(0);
   const [recommendedProducts, setRecommendedProducts] = useState([]);
@@ -22,11 +23,7 @@ const CustomerDashboard = () => {
     }
 
     // Fetch dashboard data
-    fetch("http://localhost:5000/api/dashboard/customer", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
+    fetchWithAuth("http://localhost:5000/api/dashboard/customer")
       .then((response) => {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -35,8 +32,8 @@ const CustomerDashboard = () => {
       })
       .then((data) => {
         setOrders(data.orders || []);
-        setCartCount(data.cart_count || 0);
-        setWishlistCount(data.wishlist_count || 0);
+        setCartItems(data.cart_items || []);
+        setWishlistItems(data.wishlist_items || []);
         setTotalSpent(data.total_spent || 0);
         setTotalOrders(data.total_orders || 0);
         setRecommendedProducts(data.recommended_products || []);
@@ -49,8 +46,8 @@ const CustomerDashboard = () => {
       .catch((error) => {
         console.error("Error fetching dashboard data:", error);
         setOrders([]);
-        setCartCount(0);
-        setWishlistCount(0);
+        setCartItems([]);
+        setWishlistItems([]);
         setTotalSpent(0);
         setTotalOrders(0);
         setRecommendedProducts([]);
@@ -123,7 +120,7 @@ const CustomerDashboard = () => {
                     🛒 Cart Items
                   </p>
                   <p className="text-4xl font-extrabold text-gray-900 mt-2">
-                    {cartCount}
+                    {cartItems.length}
                   </p>
                 </div>
                 <div className="text-4xl">🛍️</div>
@@ -142,7 +139,7 @@ const CustomerDashboard = () => {
                     ❤️ Wishlist
                   </p>
                   <p className="text-4xl font-extrabold text-gray-900 mt-2">
-                    {wishlistCount}
+                    {wishlistItems.length}
                   </p>
                 </div>
                 <div className="text-4xl">💝</div>

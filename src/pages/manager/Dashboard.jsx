@@ -13,6 +13,7 @@ import {
   FaStar,
 } from "react-icons/fa";
 import { Link, Outlet, useLocation } from "react-router-dom";
+import { fetchWithAuth } from "../../utils/fetchWithAuth.js";
 
 const ManagerDashboard = () => {
   const location = useLocation();
@@ -30,11 +31,7 @@ const ManagerDashboard = () => {
 
     // Fetch dashboard data only if on the main dashboard route
     if (location.pathname === "/manager-dashboard") {
-      fetch("http://localhost:5000/api/dashboard/admin", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
+      fetchWithAuth("http://localhost:5000/api/dashboard/admin")
         .then((response) => {
           if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
@@ -338,7 +335,7 @@ const ManagerDashboard = () => {
                             color: "#000000",
                           }}
                         >
-                          <span className="font-bold">R</span>
+                          <span className="font-bold">C</span>
                         </div>
                       </div>
                       <div className="ml-5 w-0 flex-1">
@@ -347,13 +344,86 @@ const ManagerDashboard = () => {
                             className="text-sm font-medium truncate"
                             style={{ color: "#cccccc" }}
                           >
-                            Total Reviews
+                            Cart Items
                           </dt>
                           <dd
                             className="text-lg font-medium"
                             style={{ color: "#ffffff" }}
                           >
-                            {analytics.total_reviews || 0}
+                            {analytics.total_cart_items || 0}
+                          </dd>
+                        </dl>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div
+                    className="shadow rounded-lg p-5"
+                    style={{ backgroundColor: "#1d1d1d" }}
+                  >
+                    <div className="flex items-center">
+                      <div className="flex-shrink-0">
+                        <div
+                          className="w-8 h-8 rounded-md flex items-center justify-center"
+                          style={{
+                            backgroundColor: "#d4af37",
+                            color: "#000000",
+                          }}
+                        >
+                          <span className="font-bold">W</span>
+                        </div>
+                      </div>
+                      <div className="ml-5 w-0 flex-1">
+                        <dl>
+                          <dt
+                            className="text-sm font-medium truncate"
+                            style={{ color: "#cccccc" }}
+                          >
+                            Wishlist Items
+                          </dt>
+                          <dd
+                            className="text-lg font-medium"
+                            style={{ color: "#ffffff" }}
+                          >
+                            {analytics.total_wishlist_items || 0}
+                          </dd>
+                        </dl>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Financial Metrics */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                  <div
+                    className="shadow rounded-lg p-5"
+                    style={{ backgroundColor: "#1d1d1d" }}
+                  >
+                    <div className="flex items-center">
+                      <div className="flex-shrink-0">
+                        <div
+                          className="w-8 h-8 rounded-md flex items-center justify-center"
+                          style={{
+                            backgroundColor: "#d4af37",
+                            color: "#000000",
+                          }}
+                        >
+                          <span className="font-bold">U</span>
+                        </div>
+                      </div>
+                      <div className="ml-5 w-0 flex-1">
+                        <dl>
+                          <dt
+                            className="text-sm font-medium truncate"
+                            style={{ color: "#cccccc" }}
+                          >
+                            Total Units Sold
+                          </dt>
+                          <dd
+                            className="text-lg font-medium"
+                            style={{ color: "#ffffff" }}
+                          >
+                            {analytics.total_units_sold || 0}
                           </dd>
                         </dl>
                       </div>
@@ -382,13 +452,54 @@ const ManagerDashboard = () => {
                             className="text-sm font-medium truncate"
                             style={{ color: "#cccccc" }}
                           >
-                            Revenue Today
+                            Total Costs
                           </dt>
                           <dd
                             className="text-lg font-medium"
                             style={{ color: "#ffffff" }}
                           >
-                            ${analytics.revenue_today || 0}
+                            PKR{" "}
+                            {analytics.total_costs
+                              ? analytics.total_costs.toFixed(2)
+                              : "0.00"}
+                          </dd>
+                        </dl>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div
+                    className="shadow rounded-lg p-5"
+                    style={{ backgroundColor: "#1d1d1d" }}
+                  >
+                    <div className="flex items-center">
+                      <div className="flex-shrink-0">
+                        <div
+                          className="w-8 h-8 rounded-md flex items-center justify-center"
+                          style={{
+                            backgroundColor: "#d4af37",
+                            color: "#000000",
+                          }}
+                        >
+                          <span className="font-bold">P</span>
+                        </div>
+                      </div>
+                      <div className="ml-5 w-0 flex-1">
+                        <dl>
+                          <dt
+                            className="text-sm font-medium truncate"
+                            style={{ color: "#cccccc" }}
+                          >
+                            Total Profit
+                          </dt>
+                          <dd
+                            className="text-lg font-medium"
+                            style={{ color: "#ffffff" }}
+                          >
+                            PKR{" "}
+                            {analytics.total_profit
+                              ? analytics.total_profit.toFixed(2)
+                              : "0.00"}
                           </dd>
                         </dl>
                       </div>
@@ -521,7 +632,7 @@ const ManagerDashboard = () => {
                                   className="text-sm"
                                   style={{ color: "#cccccc" }}
                                 >
-                                  ${order.total_amount}
+                                  PKR {order.total_amount}
                                 </p>
                               </div>
                             </div>
