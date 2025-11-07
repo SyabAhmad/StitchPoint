@@ -210,7 +210,8 @@ const StoreAnalyticsDetail = () => {
           </div>
           <div style={{ color: "#cccccc" }} className="grid grid-cols-1 gap-2">
             <p>
-              <span style={{ color: "#d4af37" }}>Total Revenue:</span> $
+              <span style={{ color: "#d4af37" }}>Total Revenue:</span> PKR
+              {" "}
               {store.total_revenue || 0}
             </p>
             <p>
@@ -218,11 +219,13 @@ const StoreAnalyticsDetail = () => {
               {store.total_units_sold || 0}
             </p>
             <p>
-              <span style={{ color: "#d4af37" }}>Total Costs:</span> $
+              <span style={{ color: "#d4af37" }}>Total Costs:</span> PKR
+              {" "}
               {store.total_costs || 0}
             </p>
             <p>
-              <span style={{ color: "#d4af37" }}>Total Profit:</span> $
+              <span style={{ color: "#d4af37" }}>Total Profit:</span> PKR
+              {" "}
               {store.total_profit || 0}
             </p>
           </div>
@@ -318,7 +321,7 @@ const StoreAnalyticsDetail = () => {
                   ))}
                 </Pie>
                 <Tooltip
-                  formatter={(value) => [`$${value.toFixed(2)}`, ""]}
+                  formatter={(value) => [`PKR ${value.toFixed(2)}`, ""]}
                   contentStyle={{
                     backgroundColor: "#2d2d2d",
                     border: "1px solid #3d3d3d",

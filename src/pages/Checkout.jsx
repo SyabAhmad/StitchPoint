@@ -163,7 +163,7 @@ const Checkout = () => {
                         Order #{order.order_id} • Store ID: {order.store_id}
                       </p>
                       <p className="text-gray-700 text-sm">
-                        Items: {order.items_count} • Amount: $
+                        Items: {order.items_count} • Amount: PKR
                         {(typeof order.amount === "number"
                           ? order.amount
                           : 0
@@ -175,7 +175,7 @@ const Checkout = () => {
                   <div className="mt-6 pt-6 border-t-2 border-gray-200">
                     <p className="text-gray-700 font-semibold">
                       <span className="font-bold text-xl text-gray-900">
-                        Total: $
+                        Total: PKR
                       </span>
                       <span className="font-bold text-xl text-gray-900">
                         {createdOrders
@@ -188,7 +188,8 @@ const Checkout = () => {
               ) : (
                 <>
                   <p className="text-gray-700 mb-4">
-                    <span className="font-semibold">Order Total:</span> $
+                    <span className="font-semibold">Order Total:</span> PKR
+                    {" "}
                     {(
                       (typeof total === "number" ? total : 0) * 1.08 +
                       (shippingMethod === "express" ? 15 : 0)
@@ -368,7 +369,7 @@ const Checkout = () => {
                             Delivery in 1-2 business days
                           </p>
                         </div>
-                        <span className="font-bold text-gray-900">+$15</span>
+                        <span className="font-bold text-gray-900">+PKR 15</span>
                       </label>
                     </div>
                   </div>
@@ -513,7 +514,7 @@ const Checkout = () => {
                               </p>
                             </div>
                             <p className="font-bold text-gray-900">
-                              ${(item.price * item.quantity).toFixed(2)}
+                              PKR {(item.price * item.quantity).toFixed(2)}
                             </p>
                           </div>
                         ))}
@@ -613,7 +614,7 @@ const Checkout = () => {
                         {item.name} x{item.quantity}
                       </span>
                       <span className="font-semibold text-gray-900">
-                        ${(item.price * item.quantity).toFixed(2)}
+                        PKR {(item.price * item.quantity).toFixed(2)}
                       </span>
                     </div>
                   ))}
@@ -625,16 +626,13 @@ const Checkout = () => {
                 <div className="flex justify-between text-gray-700">
                   <span>Subtotal</span>
                   <span className="font-semibold">
-                    ${(typeof total === "number" ? total : 0).toFixed(2)}
+                    PKR {(typeof total === "number" ? total : 0).toFixed(2)}
                   </span>
                 </div>
                 <div className="flex justify-between text-gray-700">
                   <span>Tax (8%)</span>
                   <span className="font-semibold">
-                    $
-                    {((typeof total === "number" ? total : 0) * 0.08).toFixed(
-                      2
-                    )}
+                    PKR {((typeof total === "number" ? total : 0) * 0.08).toFixed(2)}
                   </span>
                 </div>
                 <div className="flex justify-between text-gray-700">
@@ -643,7 +641,7 @@ const Checkout = () => {
                     {shippingMethod === "express" ? "(Express)" : "(Standard)"}
                   </span>
                   <span className="font-semibold">
-                    ${shippingMethod === "express" ? "15.00" : "0.00"}
+                    PKR {shippingMethod === "express" ? "15.00" : "0.00"}
                   </span>
                 </div>
               </div>
@@ -653,8 +651,7 @@ const Checkout = () => {
               <div className="flex justify-between text-xl font-bold text-gray-900">
                 <span>Total</span>
                 <span>
-                  $
-                  {(
+                  PKR {(
                     (typeof total === "number" ? total : 0) * 1.08 +
                     (shippingMethod === "express" ? 15 : 0)
                   ).toFixed(2)}

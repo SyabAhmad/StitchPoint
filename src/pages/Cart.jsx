@@ -14,7 +14,7 @@ const Cart = () => {
   const [cartItems, setCartItems] = useState([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [updating, setUpdating] = useState(false);
+  const [, setUpdating] = useState(false);
 
   useEffect(() => {
     loadCart();
@@ -176,7 +176,7 @@ const Cart = () => {
                       </p>
                     )}
                     <p className="text-xl font-bold text-gray-900 mt-2">
-                      ${item.price.toFixed(2)}
+                      PKR {item.price.toFixed(2)}
                     </p>
                   </div>
 
@@ -206,7 +206,7 @@ const Cart = () => {
                   {/* Item Total */}
                   <div className="text-right">
                     <p className="text-xl font-bold text-gray-900">
-                      ${(item.price * item.quantity).toFixed(2)}
+                      PKR {(item.price * item.quantity).toFixed(2)}
                     </p>
                     <button
                       onClick={() => handleRemoveItem(item.id)}
@@ -230,7 +230,7 @@ const Cart = () => {
               <div className="space-y-3 mb-6">
                 <div className="flex justify-between text-gray-700">
                   <span>Subtotal</span>
-                  <span className="font-semibold">${total.toFixed(2)}</span>
+                  <span className="font-semibold">PKR {total.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-gray-700">
                   <span>Items</span>
@@ -245,7 +245,7 @@ const Cart = () => {
                 <div className="flex justify-between text-gray-700">
                   <span>💰 Tax (8%)</span>
                   <span className="font-semibold">
-                    ${(total * 0.08).toFixed(2)}
+                    PKR {(total * 0.08).toFixed(2)}
                   </span>
                 </div>
               </div>
@@ -255,7 +255,7 @@ const Cart = () => {
               <div className="flex justify-between text-2xl font-bold text-gray-900 mb-8">
                 <span>Total</span>
                 <span className="text-gray-900">
-                  ${(total * 1.08).toFixed(2)}
+                  PKR {(total * 1.08).toFixed(2)}
                 </span>
               </div>
 

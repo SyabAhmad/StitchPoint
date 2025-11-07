@@ -4,7 +4,7 @@ import {
   FaSave,
   FaTimes,
   FaPercentage,
-  FaDollarSign,
+  FaMoneyBillWave,
   FaStore,
   FaBoxOpen,
   FaCheckCircle,
@@ -448,7 +448,7 @@ const Commissions = () => {
                               {commission.product_name}
                             </h4>
                             <p className="text-sm" style={{ color: "#b0b0b0" }}>
-                              Price: ${commission.price}
+                              Price: PKR {commission.price}
                             </p>
                           </div>
 
@@ -487,12 +487,12 @@ const Commissions = () => {
                               </div>
                               <div className="space-y-2">
                                 <label className="text-xs uppercase tracking-wide text-gray-400 flex items-center gap-2">
-                                  <FaDollarSign className="text-gray-500" />{" "}
-                                  Fixed Amount
+                                  <FaMoneyBillWave className="text-gray-500" />{" "}
+                                  Fixed Amount (PKR)
                                 </label>
                                 <div className="relative">
                                   <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-gray-500">
-                                    $
+                                    PKR
                                   </span>
                                   <input
                                     type="number"
@@ -506,7 +506,7 @@ const Commissions = () => {
                                         e.target.value
                                       )
                                     }
-                                    className="w-full rounded-lg px-4 py-2 text-sm pl-6 focus:outline-none focus:ring-2"
+                                    className="w-full rounded-lg px-4 py-2 text-sm pl-12 focus:outline-none focus:ring-2"
                                     style={{
                                       backgroundColor: "#1b1b1b",
                                       border: "1px solid #2d2d2d",
@@ -543,8 +543,8 @@ const Commissions = () => {
                                         color: "#f4d03f",
                                       }}
                                     >
-                                      <FaDollarSign className="mr-2" />$
-                                      {commission.commission_amount}
+                                      <FaMoneyBillWave className="mr-2" />
+                                      PKR {commission.commission_amount}
                                     </span>
                                   )}
                                 </>

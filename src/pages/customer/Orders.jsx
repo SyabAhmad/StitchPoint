@@ -150,7 +150,7 @@ const Orders = () => {
                         </div>
                         <div className="text-right">
                           <p className="text-2xl font-bold text-gray-900">
-                            ${order.total_amount?.toFixed(2)}
+                            PKR {order.total_amount?.toFixed(2)}
                           </p>
                           <span
                             className={`inline-block mt-2 px-4 py-1 text-xs font-bold rounded-full ${
@@ -268,7 +268,7 @@ const Orders = () => {
                             Product #{item.product_id} x{item.quantity}
                           </span>
                           <span className="font-semibold text-gray-900">
-                            ${(item.price * item.quantity).toFixed(2)}
+                            PKR {(item.price * item.quantity).toFixed(2)}
                           </span>
                         </div>
                       ))}
@@ -279,7 +279,7 @@ const Orders = () => {
                   <div className="bg-white rounded-lg p-4 mb-6">
                     <div className="flex justify-between text-lg font-bold text-gray-900">
                       <span>Total</span>
-                      <span>${selectedOrder.total_amount?.toFixed(2)}</span>
+                      <span>PKR {selectedOrder.total_amount?.toFixed(2)}</span>
                     </div>
                   </div>
 

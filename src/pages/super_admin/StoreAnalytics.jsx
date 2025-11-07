@@ -324,7 +324,7 @@ const StoreAnalytics = () => {
                           className="px-6 py-4 whitespace-nowrap text-sm"
                           style={{ color: "#d4af37" }}
                         >
-                          ${store.total_revenue || 0}
+                          PKR {store.total_revenue || 0}
                         </td>
                         <td
                           className="px-6 py-4 whitespace-nowrap text-sm"
@@ -339,7 +339,7 @@ const StoreAnalytics = () => {
                               store.total_profit >= 0 ? "#4ecdc4" : "#ff6b6b",
                           }}
                         >
-                          ${store.total_profit || 0}
+                          PKR {store.total_profit || 0}
                         </td>
                       </tr>
                     ))}

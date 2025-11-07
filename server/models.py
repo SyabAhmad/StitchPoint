@@ -294,7 +294,10 @@ class CommissionRate(db.Model):
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     def __repr__(self):
-        return f'<CommissionRate {self.name}: {self.commission_percentage}% for ${self.min_price}-${self.max_price or "unlimited"}>'
+        return (
+            f'<CommissionRate {self.name}: {self.commission_percentage}% '
+            f'for PKR {self.min_price}-{self.max_price or "unlimited"}>'
+        )
 
 class Notification(db.Model):
     id = db.Column(db.Integer, primary_key=True)

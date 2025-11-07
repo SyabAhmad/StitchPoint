@@ -6,6 +6,8 @@ import {
   FaPlus,
   FaFilter,
   FaSearch,
+  FaChevronLeft,
+  FaChevronRight,
 } from "react-icons/fa";
 import { fetchWithAuth } from "../../utils/fetchWithAuth";
 
@@ -31,24 +33,20 @@ const UserManagement = () => {
   const [roleFilter, setRoleFilter] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
+  // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
-  const [usersPerPage] = useState(10);
+  const [perPage, setPerPage] = useState(10);
+  const [totalPages, setTotalPages] = useState(0);
+  const [totalItems, setTotalItems] = useState(0);
+  const [hasNext, setHasNext] = useState(false);
+  const [hasPrev, setHasPrev] = useState(false);
 
   useEffect(() => {
     const userData = JSON.parse(localStorage.getItem("user"));
     setCurrentUser(userData);
 
-    fetchWithAuth("http://localhost:5000/api/dashboard/users")
-      .then((response) => response.json())
-      .then((data) => {
-        setUsers(data.users || []);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error("Error fetching users:", error);
-        setLoading(false);
-      });
-  }, []);
+    fetchUsers();
+  }, [currentPage, perPage]);
 
   // Debounce search term
   useEffect(() => {
@@ -59,6 +57,45 @@ const UserManagement = () => {
 
     return () => clearTimeout(timer);
   }, [searchTerm]);
+
+  const fetchUsers = async () => {
+    try {
+      setLoading(true);
+      const response = await fetchWithAuth(
+        `http://localhost:5000/api/dashboard/users?page=${currentPage}&per_page=${perPage}`
+      );
+      if (!response.ok) {
+        throw new Error("Failed to fetch users");
+      }
+      const data = await response.json();
+      setUsers(data.users || []);
+
+      // Update pagination state
+      setCurrentPage(data.pagination?.page || 1);
+      setPerPage(data.pagination?.per_page || 10);
+      setTotalPages(data.pagination?.pages || 0);
+      setTotalItems(data.pagination?.total || 0);
+      setHasNext(data.pagination?.has_next || false);
+      setHasPrev(data.pagination?.has_prev || false);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+      setLoading(false);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Pagination functions
+  const handlePageChange = (newPage) => {
+    if (newPage >= 1 && newPage <= totalPages) {
+      setCurrentPage(newPage);
+    }
+  };
+
+  const handlePerPageChange = (newPerPage) => {
+    setPerPage(newPerPage);
+    setCurrentPage(1); // Reset to first page when changing items per page
+  };
 
   const handleRoleChange = (userId, role) => {
     fetchWithAuth(`http://localhost:5000/api/dashboard/users/${userId}/role`, {
@@ -742,10 +779,6 @@ const UserManagement = () => {
                           .includes(debouncedSearchTerm.toLowerCase()));
                     return matchesRole && matchesSearch;
                   })
-                  .slice(
-                    (currentPage - 1) * usersPerPage,
-                    currentPage * usersPerPage
-                  )
                   .map((user, index) => (
                     <tr
                       key={user.id}
@@ -1061,58 +1094,97 @@ const UserManagement = () => {
             )}
           </div>
 
-          {/* Pagination */}
-          {(() => {
-            const filteredUsers = users.filter((user) => {
-              const matchesRole =
-                roleFilter === "all" || user.role === roleFilter;
-              const matchesSearch =
-                debouncedSearchTerm === "" ||
-                (user.name &&
-                  user.name
-                    .toLowerCase()
-                    .includes(debouncedSearchTerm.toLowerCase())) ||
-                (user.email &&
-                  user.email
-                    .toLowerCase()
-                    .includes(debouncedSearchTerm.toLowerCase()));
-              return matchesRole && matchesSearch;
-            });
-            const totalPages = Math.ceil(filteredUsers.length / usersPerPage);
-            if (totalPages <= 1) return null;
-            return (
-              <div className="flex justify-center items-center space-x-2 mt-4">
+          {/* Modern Pagination Controls */}
+          {totalPages > 1 && (
+            <div
+              className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4 mt-4 rounded-xl"
+              style={{
+                background:
+                  "linear-gradient(135deg, rgba(33,33,33,0.8), rgba(17,17,17,0.95))",
+                border: "1px solid #2d2d2d",
+              }}
+            >
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2">
+                  <label className="text-sm text-gray-400">
+                    Items per page:
+                  </label>
+                  <select
+                    value={perPage}
+                    onChange={(e) =>
+                      handlePerPageChange(Number(e.target.value))
+                    }
+                    className="px-3 py-1 rounded text-sm bg-gray-800 text-white border border-gray-600 focus:border-d4af37 focus:outline-none"
+                  >
+                    <option value={5}>5</option>
+                    <option value={10}>10</option>
+                    <option value={20}>20</option>
+                    <option value={50}>50</option>
+                  </select>
+                </div>
+                <div className="text-sm text-gray-400">
+                  Showing {(currentPage - 1) * perPage + 1} to{" "}
+                  {Math.min(currentPage * perPage, totalItems)} of {totalItems}{" "}
+                  results
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
                 <button
-                  onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                  disabled={currentPage === 1}
-                  className="px-3 py-1 rounded transition-colors duration-200"
-                  style={{
-                    backgroundColor: currentPage === 1 ? "#2d2d2d" : "#d4af37",
-                    color: currentPage === 1 ? "#666666" : "#000000",
-                  }}
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={!hasPrev}
+                  className={`px-3 py-2 rounded text-sm font-medium transition-all flex items-center gap-2 ${
+                    hasPrev
+                      ? "bg-gray-700 text-white hover:bg-gray-600"
+                      : "bg-gray-800 text-gray-500 cursor-not-allowed"
+                  }`}
                 >
-                  Previous
+                  <FaChevronLeft /> Previous
                 </button>
-                <span style={{ color: "#cccccc" }}>
-                  Page {currentPage} of {totalPages}
-                </span>
+
+                <div className="flex items-center gap-1">
+                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                    let pageNum;
+                    if (totalPages <= 5) {
+                      pageNum = i + 1;
+                    } else if (currentPage <= 3) {
+                      pageNum = i + 1;
+                    } else if (currentPage >= totalPages - 2) {
+                      pageNum = totalPages - 4 + i;
+                    } else {
+                      pageNum = currentPage - 2 + i;
+                    }
+
+                    return (
+                      <button
+                        key={pageNum}
+                        onClick={() => handlePageChange(pageNum)}
+                        className={`px-3 py-2 rounded text-sm font-medium transition-all ${
+                          pageNum === currentPage
+                            ? "bg-d4af37 text-black"
+                            : "bg-gray-700 text-white hover:bg-gray-600"
+                        }`}
+                      >
+                        {pageNum}
+                      </button>
+                    );
+                  })}
+                </div>
+
                 <button
-                  onClick={() =>
-                    setCurrentPage(Math.min(totalPages, currentPage + 1))
-                  }
-                  disabled={currentPage === totalPages}
-                  className="px-3 py-1 rounded transition-colors duration-200"
-                  style={{
-                    backgroundColor:
-                      currentPage === totalPages ? "#2d2d2d" : "#d4af37",
-                    color: currentPage === totalPages ? "#666666" : "#000000",
-                  }}
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={!hasNext}
+                  className={`px-3 py-2 rounded text-sm font-medium transition-all flex items-center gap-2 ${
+                    hasNext
+                      ? "bg-gray-700 text-white hover:bg-gray-600"
+                      : "bg-gray-800 text-gray-500 cursor-not-allowed"
+                  }`}
                 >
-                  Next
+                  Next <FaChevronRight />
                 </button>
               </div>
-            );
-          })()}
+            </div>
+          )}
         </div>
       </div>
     </div>

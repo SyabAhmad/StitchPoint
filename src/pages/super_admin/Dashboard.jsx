@@ -17,8 +17,8 @@ import {
   FaList,
   FaClipboardList,
   FaBuilding,
-  FaDollarSign,
   FaCalendarAlt,
+  FaMoneyBillWave,
 } from "react-icons/fa";
 import { Link, Outlet, useLocation } from "react-router-dom";
 import { fetchWithAuth } from "../../utils/fetchWithAuth.js";
@@ -374,7 +374,7 @@ const SuperAdminDashboard = () => {
                       e.currentTarget.style.color = "#ffffff";
                     }}
                   >
-                    <FaDollarSign className="mr-3 h-5 w-5" />
+                    <FaMoneyBillWave className="mr-3 h-5 w-5" />
                     Commissions
                   </Link>
                 </li>
@@ -484,7 +484,7 @@ const SuperAdminDashboard = () => {
                     style={{ backgroundColor: "#1d1d1d" }}
                   >
                     <div className="flex items-center">
-                      <FaDollarSign
+                      <FaMoneyBillWave
                         className="h-8 w-8"
                         style={{ color: "#ef4444" }}
                       />
@@ -537,7 +537,7 @@ const SuperAdminDashboard = () => {
                       style={{ backgroundColor: "#1d1d1d" }}
                     >
                       <div className="flex items-center">
-                        <FaDollarSign
+                        <FaMoneyBillWave
                           className="h-8 w-8"
                           style={{ color: "#4ecdc4" }}
                         />
@@ -871,7 +871,7 @@ const SuperAdminDashboard = () => {
                                   className="text-sm font-medium"
                                   style={{ color: "#ffffff" }}
                                 >
-                                  ${order.total_amount}
+                                  PKR {order.total_amount}
                                 </p>
                               </div>
                             </div>

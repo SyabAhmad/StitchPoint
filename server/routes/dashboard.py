@@ -506,7 +506,23 @@ def get_users():
     if not user or user.role != 'super_admin':
         return jsonify({'message': 'Unauthorized'}), 403
 
-    users = User.query.filter(User.role == 'manager').all()
+    # Get pagination parameters
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 10, type=int)
+    
+    # Ensure reasonable pagination limits
+    per_page = min(max(per_page, 1), 100)  # Max 100 items per page
+
+    # Get total count for pagination
+    total_count = User.query.count()
+
+    # Get paginated users
+    users = User.query.paginate(
+        page=page,
+        per_page=per_page,
+        error_out=False
+    )
+
     users_data = [{
         'id': u.id,
         'name': u.name,
@@ -519,9 +535,20 @@ def get_users():
             'address': u.store.address,
             'contact_number': u.store.contact_number
         } if u.store else None
-    } for u in users]
+    } for u in users.items]
 
-    return jsonify({'users': users_data}), 200
+    # Return paginated response with metadata
+    return jsonify({
+        'users': users_data,
+        'pagination': {
+            'page': page,
+            'per_page': per_page,
+            'total': total_count,
+            'pages': (total_count + per_page - 1) // per_page,
+            'has_next': users.has_next,
+            'has_prev': users.has_prev
+        }
+    }), 200
 
 
 @dashboard_bp.route('/users', methods=['POST'])

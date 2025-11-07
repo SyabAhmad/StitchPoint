@@ -5,7 +5,6 @@ import {
   FaTrash,
   FaSave,
   FaTimes,
-  FaDollarSign,
   FaPercentage,
   FaChartLine,
   FaInfoCircle,
@@ -392,10 +391,10 @@ const CommissionRates = () => {
                   const remaining = price - commission;
                   document.getElementById(
                     "commission-preview"
-                  ).textContent = `$${commission}`;
+                  ).textContent = `PKR ${commission.toFixed(2)}`;
                   document.getElementById(
                     "store-revenue"
-                  ).textContent = `$${remaining.toFixed(2)}`;
+                  ).textContent = `PKR ${remaining.toFixed(2)}`;
                 }}
               />
             </div>
@@ -408,7 +407,7 @@ const CommissionRates = () => {
                 id="commission-preview"
                 style={{ color: "#4ecdc4" }}
               >
-                $0.00
+                PKR 0.00
               </div>
             </div>
             <div className="text-center">
@@ -420,7 +419,7 @@ const CommissionRates = () => {
                 id="store-revenue"
                 style={{ color: "#d4af37" }}
               >
-                $0.00
+                PKR 0.00
               </div>
             </div>
           </div>
@@ -481,7 +480,7 @@ const CommissionRates = () => {
                       className="block text-sm font-medium mb-2"
                       style={{ color: "#cccccc" }}
                     >
-                      Minimum Price ($)
+                      Minimum Price (PKR)
                     </label>
                     <input
                       type="number"
@@ -509,7 +508,7 @@ const CommissionRates = () => {
                       className="block text-sm font-medium mb-2"
                       style={{ color: "#cccccc" }}
                     >
-                      Maximum Price ($) - Leave empty for unlimited
+                      Maximum Price (PKR) - Leave empty for unlimited
                     </label>
                     <input
                       type="number"

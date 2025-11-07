@@ -239,7 +239,7 @@ const StoreProducts = () => {
                     className="px-6 py-4 whitespace-nowrap text-sm"
                     style={{ color: "#d4af37" }}
                   >
-                    ${p.total_revenue || 0}
+                    PKR {p.total_revenue || 0}
                   </td>
                   <td
                     className="px-6 py-4 whitespace-nowrap text-sm"
@@ -251,7 +251,7 @@ const StoreProducts = () => {
                     className="px-6 py-4 whitespace-nowrap text-sm"
                     style={{ color: "#cccccc" }}
                   >
-                    ${p.total_costs || 0}
+                    PKR {p.total_costs || 0}
                   </td>
                   <td
                     className="px-6 py-4 whitespace-nowrap text-sm"
@@ -259,7 +259,7 @@ const StoreProducts = () => {
                       color: p.total_profit >= 0 ? "#4ecdc4" : "#ff6b6b",
                     }}
                   >
-                    ${p.total_profit || 0}
+                    PKR {p.total_profit || 0}
                   </td>
                 </tr>
               ))}

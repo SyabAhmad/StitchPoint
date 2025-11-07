@@ -44,19 +44,19 @@ def ensure_default_commission_rates():
 	"""Ensure baseline commission rate tiers exist for new deployments."""
 	default_rates = [
 		{
-			'name': 'Low Tier ($0-$500)',
+			'name': 'Low Tier (PKR 0-500)',
 			'min_price': 0.0,
 			'max_price': 500.0,
 			'commission_percentage': 5.0,
 		},
 		{
-			'name': 'Medium Tier ($500-$2000)',
+			'name': 'Medium Tier (PKR 500-2000)',
 			'min_price': 500.0,
 			'max_price': 2000.0,
 			'commission_percentage': 8.0,
 		},
 		{
-			'name': 'High Tier ($2000+)',
+			'name': 'High Tier (PKR 2000+)',
 			'min_price': 2000.0,
 			'max_price': None,
 			'commission_percentage': 10.0,

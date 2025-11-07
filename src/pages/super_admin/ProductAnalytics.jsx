@@ -388,7 +388,7 @@ const ProductAnalytics = () => {
                       className="px-6 py-4 whitespace-nowrap text-sm"
                       style={{ color: "#d4af37" }}
                     >
-                      ${product.total_revenue || 0}
+                      PKR {product.total_revenue || 0}
                     </td>
                     <td
                       className="px-6 py-4 whitespace-nowrap text-sm"
@@ -400,7 +400,7 @@ const ProductAnalytics = () => {
                       className="px-6 py-4 whitespace-nowrap text-sm"
                       style={{ color: "#cccccc" }}
                     >
-                      ${product.total_costs || 0}
+                      PKR {product.total_costs || 0}
                     </td>
                     <td
                       className="px-6 py-4 whitespace-nowrap text-sm"
@@ -409,7 +409,7 @@ const ProductAnalytics = () => {
                           product.total_profit >= 0 ? "#4ecdc4" : "#ff6b6b",
                       }}
                     >
-                      ${product.total_profit || 0}
+                      PKR {product.total_profit || 0}
                     </td>
                   </tr>
                 ))}

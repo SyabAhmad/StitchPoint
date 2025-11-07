@@ -119,7 +119,7 @@ const Wishlist = () => {
               )}
 
               <p className="text-xl font-bold text-gray-900 mb-4">
-                ${item.price}
+                PKR {item.price}
               </p>
 
               <button

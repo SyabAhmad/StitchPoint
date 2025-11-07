@@ -31,7 +31,7 @@ const ProfitChart = ({ data }) => {
           />
           <Tooltip
             labelFormatter={(value) => new Date(value).toLocaleDateString()}
-            formatter={(value) => [`$${value.toFixed(2)}`, "Profit"]}
+            formatter={(value) => [`PKR ${value.toFixed(2)}`, "Profit"]}
             contentStyle={{
               backgroundColor: "#1d1d1d",
               border: "1px solid #3d3d3d",

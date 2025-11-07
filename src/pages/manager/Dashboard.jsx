@@ -11,6 +11,7 @@ import {
   FaUserCog,
   FaComment,
   FaStar,
+  FaMoneyBillWave,
 } from "react-icons/fa";
 import { Link, Outlet, useLocation } from "react-router-dom";
 import { fetchWithAuth } from "../../utils/fetchWithAuth.js";
@@ -459,7 +460,7 @@ const ManagerDashboard = () => {
                             color: "#000000",
                           }}
                         >
-                          <span className="font-bold">$</span>
+                          <FaMoneyBillWave size={16} />
                         </div>
                       </div>
                       <div className="ml-5 w-0 flex-1">

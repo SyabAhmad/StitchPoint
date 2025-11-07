@@ -149,7 +149,7 @@ const Products = () => {
                       className="px-6 py-4 whitespace-nowrap text-sm"
                       style={{ color: "#cccccc" }}
                     >
-                      ${product.price}
+                      PKR {product.price}
                     </td>
                     <td
                       className="px-6 py-4 whitespace-nowrap text-sm"

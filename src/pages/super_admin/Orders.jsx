@@ -209,7 +209,7 @@ const Orders = () => {
                           className="text-sm font-medium"
                           style={{ color: "#ffffff" }}
                         >
-                          ${order.total_amount}
+                          PKR {order.total_amount}
                         </p>
                         <FaEye style={{ color: "#d4af37" }} />
                       </div>
@@ -331,7 +331,7 @@ const Orders = () => {
                         Product ID: {item.product_id}
                       </p>
                       <p>Quantity: {item.quantity}</p>
-                      <p>Price: ${item.price}</p>
+                      <p>Price: PKR {item.price}</p>
                     </div>
                   ))
                 ) : (
@@ -402,7 +402,7 @@ const Orders = () => {
                 Total Amount
               </p>
               <p className="text-2xl font-bold" style={{ color: "#d4af37" }}>
-                ${selectedOrder.total_amount}
+                PKR {selectedOrder.total_amount}
               </p>
             </div>
           </div>

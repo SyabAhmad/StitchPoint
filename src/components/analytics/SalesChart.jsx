@@ -31,7 +31,7 @@ const SalesChart = ({ data }) => {
           />
           <Tooltip
             labelFormatter={(value) => new Date(value).toLocaleDateString()}
-            formatter={(value) => [`$${value.toFixed(2)}`, "Sales"]}
+            formatter={(value) => [`PKR ${value.toFixed(2)}`, "Sales"]}
             contentStyle={{
               backgroundColor: "#1d1d1d",
               border: "1px solid #3d3d3d",

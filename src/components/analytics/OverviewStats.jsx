@@ -57,13 +57,13 @@ const OverviewStats = ({ data }) => {
     stats.push(
       {
         label: "Total Revenue",
-        value: `$${data.total_revenue || 0}`,
+        value: `PKR ${data.total_revenue || 0}`,
         color: "#4ecdc4",
         icon: "💰",
       },
       {
         label: "Total Profit",
-        value: `$${data.total_profit || 0}`,
+        value: `PKR ${data.total_profit || 0}`,
         color: data.total_profit >= 0 ? "#4ecdc4" : "#ff6b6b",
         icon: "📈",
       },
@@ -75,7 +75,7 @@ const OverviewStats = ({ data }) => {
       },
       {
         label: "Total Costs",
-        value: `$${data.total_costs || 0}`,
+        value: `PKR ${data.total_costs || 0}`,
         color: "#ff6b6b",
         icon: "💸",
       }
