@@ -10,7 +10,7 @@ from flask_cors import CORS
 import os
 
 from config import Config
-from models import db
+from models import db, CommissionRate
 from routes.auth import auth_bp
 from routes.products import products_bp
 from routes.dashboard import dashboard_bp
@@ -20,6 +20,10 @@ from routes.orders import orders_bp
 from routes.reviews import reviews_bp
 from routes.cart import cart_bp
 from routes.wishlist import wishlist_bp
+from routes.commission_rates import commission_rates_bp
+from routes.notifications import notifications_bp
+from routes.commissions import commissions_bp
+from routes.cost_prices import cost_prices_bp
 from logger import setup_logger
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
@@ -35,6 +39,46 @@ CORS(app)
 
 # Set up logger
 logger = setup_logger()
+
+
+def ensure_default_commission_rates():
+	"""Ensure baseline commission rate tiers exist for new deployments."""
+	default_rates = [
+		{
+			'name': 'Low Tier ($0-$500)',
+			'min_price': 0.0,
+			'max_price': 500.0,
+			'commission_percentage': 5.0,
+		},
+		{
+			'name': 'Medium Tier ($500-$2000)',
+			'min_price': 500.0,
+			'max_price': 2000.0,
+			'commission_percentage': 8.0,
+		},
+		{
+			'name': 'High Tier ($2000+)',
+			'min_price': 2000.0,
+			'max_price': None,
+			'commission_percentage': 10.0,
+		},
+	]
+
+	created = False
+	for rate in default_rates:
+		if not CommissionRate.query.filter_by(name=rate['name']).first():
+			commission_rate = CommissionRate(
+				name=rate['name'],
+				min_price=rate['min_price'],
+				max_price=rate['max_price'],
+				commission_percentage=rate['commission_percentage'],
+		)
+			db.session.add(commission_rate)
+			created = True
+
+	if created:
+		db.session.commit()
+		logger.info('Default commission rates initialized.')
 
 
 # JWT error handlers to return consistent JSON messages and helpful logs
@@ -72,6 +116,13 @@ app.register_blueprint(orders_bp, url_prefix='/api/orders')
 app.register_blueprint(reviews_bp, url_prefix='/api/reviews')
 app.register_blueprint(cart_bp, url_prefix='/api/cart')
 app.register_blueprint(wishlist_bp, url_prefix='/api/wishlist')
+app.register_blueprint(commission_rates_bp)
+app.register_blueprint(notifications_bp)
+app.register_blueprint(commissions_bp)
+app.register_blueprint(cost_prices_bp, url_prefix='/api/cost-prices')
+
+with app.app_context():
+	ensure_default_commission_rates()
 
 @app.route('/uploads/<path:filename>')
 def serve_uploaded_file(filename):

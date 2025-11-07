@@ -3,7 +3,7 @@ from werkzeug.utils import secure_filename
 import os
 import time
 from flask_jwt_extended import jwt_required, get_jwt_identity, verify_jwt_in_request
-from models import db, Product, User, Category, Store, Review, Comment, OrderItem
+from models import db, Product, User, Category, Store, Review, Comment, OrderItem, Commission, CommissionRate
 
 products_bp = Blueprint('products', __name__)
 
@@ -74,16 +74,13 @@ def create_product():
         return jsonify({'message': 'Invalid token identity'}), 422
     user = User.query.get(user_id)
 
-    if not user or user.role not in ['manager', 'super_admin']:
+    if not user or user.role != 'manager':
         return jsonify({'message': 'Unauthorized'}), 403
 
     # Determine store_id based on user role
-    if user.role == 'manager':
-        if not user.store:
-            return jsonify({'message': 'Manager has no associated store'}), 403
-        store_id = user.store.id
-    else:  # super_admin can specify store_id or default to none
-        store_id = request.form.get('store_id')
+    if not user.store:
+        return jsonify({'message': 'Manager has no associated store'}), 403
+    store_id = user.store.id
 
     # Handle FormData instead of JSON
     name = request.form.get('name')
@@ -143,6 +140,23 @@ def create_product():
     db.session.add(new_product)
     db.session.commit()
 
+    # Automatically assign commission based on product price and commission rates
+    applicable_rate = CommissionRate.query.filter(
+        CommissionRate.is_active == True,
+        CommissionRate.min_price <= price,
+        db.or_(CommissionRate.max_price.is_(None), CommissionRate.max_price >= price)
+    ).first()
+    
+    if applicable_rate:
+        commission = Commission(
+            product_id=new_product.id,
+            store_id=store_id,
+            commission_percentage=applicable_rate.commission_percentage,
+            commission_amount=None
+        )
+        db.session.add(commission)
+        db.session.commit()
+
     return jsonify({'message': 'Product created successfully', 'product': {
         'id': new_product.id,
         'name': new_product.name,
@@ -164,15 +178,15 @@ def update_product(product_id):
         return jsonify({'message': 'Invalid token identity'}), 422
     user = User.query.get(user_id)
 
-    if not user or user.role not in ['manager', 'super_admin']:
+    if not user or user.role != 'manager':
         return jsonify({'message': 'Unauthorized'}), 403
 
     product = Product.query.get(product_id)
     if not product:
         return jsonify({'message': 'Product not found'}), 404
 
-    # Check if user owns this product (for managers)
-    if user.role == 'manager' and product.store_id != user.store.id:
+    # Check if user owns this product
+    if product.store_id != user.store.id:
         return jsonify({'message': 'Unauthorized to update this product'}), 403
 
     # Handle FormData instead of JSON
@@ -228,6 +242,31 @@ def update_product(product_id):
     product.category = category_name
 
     db.session.commit()
+
+    # Update commission if price changed (find new applicable rate)
+    applicable_rate = CommissionRate.query.filter(
+        CommissionRate.is_active == True,
+        CommissionRate.min_price <= price,
+        db.or_(CommissionRate.max_price.is_(None), CommissionRate.max_price >= price)
+    ).first()
+    
+    existing_commission = Commission.query.filter_by(product_id=product.id).first()
+    
+    if applicable_rate:
+        if existing_commission:
+            # Update existing commission
+            existing_commission.commission_percentage = applicable_rate.commission_percentage
+            db.session.commit()
+        else:
+            # Create new commission if none exists
+            commission = Commission(
+                product_id=product.id,
+                store_id=product.store_id,
+                commission_percentage=applicable_rate.commission_percentage,
+                commission_amount=None
+            )
+            db.session.add(commission)
+            db.session.commit()
 
     return jsonify({'message': 'Product updated successfully', 'product': {
         'id': product.id,
@@ -549,15 +588,15 @@ def delete_product(product_id):
         return jsonify({'message': 'Invalid token identity'}), 422
     user = User.query.get(user_id)
 
-    if not user or user.role not in ['manager', 'super_admin']:
+    if not user or user.role != 'manager':
         return jsonify({'message': 'Unauthorized'}), 403
 
     product = Product.query.get(product_id)
     if not product:
         return jsonify({'message': 'Product not found'}), 404
 
-    # Check if user owns this product (for managers)
-    if user.role == 'manager' and product.store_id != user.store.id:
+    # Check if user owns this product
+    if product.store_id != user.store.id:
         return jsonify({'message': 'Unauthorized to delete this product'}), 403
 
     db.session.delete(product)
@@ -643,7 +682,7 @@ def delete_comment(comment_id):
         return jsonify({'message': 'Invalid token identity'}), 422
     user = User.query.get(user_id)
 
-    if not user or user.role not in ['manager', 'super_admin']:
+    if not user or user.role != 'manager':
         return jsonify({'message': 'Unauthorized'}), 403
 
     comment = Comment.query.get(comment_id)
@@ -651,10 +690,9 @@ def delete_comment(comment_id):
         return jsonify({'message': 'Comment not found'}), 404
 
     # For managers, check if the comment belongs to their store's products
-    if user.role == 'manager':
-        product = Product.query.get(comment.product_id)
-        if not product or product.store_id != user.store.id:
-            return jsonify({'message': 'Unauthorized to delete this comment'}), 403
+    product = Product.query.get(comment.product_id)
+    if not product or product.store_id != user.store.id:
+        return jsonify({'message': 'Unauthorized to delete this comment'}), 403
 
     db.session.delete(comment)
     db.session.commit()

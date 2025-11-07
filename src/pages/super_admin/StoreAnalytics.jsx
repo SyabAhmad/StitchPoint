@@ -228,6 +228,24 @@ const StoreAnalytics = () => {
                       >
                         Comments
                       </th>
+                      <th
+                        className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
+                        style={{ color: "#d4af37" }}
+                      >
+                        Revenue
+                      </th>
+                      <th
+                        className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
+                        style={{ color: "#d4af37" }}
+                      >
+                        Units Sold
+                      </th>
+                      <th
+                        className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
+                        style={{ color: "#d4af37" }}
+                      >
+                        Profit
+                      </th>
                     </tr>
                   </thead>
                   <tbody style={{ backgroundColor: "#1d1d1d" }}>
@@ -301,6 +319,27 @@ const StoreAnalytics = () => {
                           style={{ color: "#cccccc" }}
                         >
                           {store.total_comments}
+                        </td>
+                        <td
+                          className="px-6 py-4 whitespace-nowrap text-sm"
+                          style={{ color: "#d4af37" }}
+                        >
+                          ${store.total_revenue || 0}
+                        </td>
+                        <td
+                          className="px-6 py-4 whitespace-nowrap text-sm"
+                          style={{ color: "#cccccc" }}
+                        >
+                          {store.total_units_sold || 0}
+                        </td>
+                        <td
+                          className="px-6 py-4 whitespace-nowrap text-sm"
+                          style={{
+                            color:
+                              store.total_profit >= 0 ? "#4ecdc4" : "#ff6b6b",
+                          }}
+                        >
+                          ${store.total_profit || 0}
                         </td>
                       </tr>
                     ))}

@@ -30,9 +30,10 @@ const Checkout = () => {
   const loadCheckoutData = async () => {
     try {
       // Load cart
-      const items = getCart();
-      setCartItems(items);
-      setTotal(getCartTotal());
+      const items = (await getCart()) || [];
+      setCartItems(Array.isArray(items) ? items : []);
+      const cartTotal = await getCartTotal();
+      setTotal(typeof cartTotal === "number" ? cartTotal : 0);
 
       // Load addresses and payments
       const response = await fetch(
@@ -83,10 +84,12 @@ const Checkout = () => {
         payment_method_id: selectedPayment.id,
         shipping_method: shippingMethod,
         notes: orderNotes,
-        subtotal: total,
-        tax: total * 0.08,
+        subtotal: typeof total === "number" ? total : 0,
+        tax: (typeof total === "number" ? total : 0) * 0.08,
         shipping_cost: shippingMethod === "express" ? 15 : 0,
-        total: total * 1.08 + (shippingMethod === "express" ? 15 : 0),
+        total:
+          (typeof total === "number" ? total : 0) * 1.08 +
+          (shippingMethod === "express" ? 15 : 0),
       };
 
       const response = await fetch("http://localhost:5000/api/orders", {
@@ -161,7 +164,10 @@ const Checkout = () => {
                       </p>
                       <p className="text-gray-700 text-sm">
                         Items: {order.items_count} • Amount: $
-                        {order.amount.toFixed(2)}
+                        {(typeof order.amount === "number"
+                          ? order.amount
+                          : 0
+                        ).toFixed(2)}
                       </p>
                     </div>
                   ))}
@@ -184,7 +190,7 @@ const Checkout = () => {
                   <p className="text-gray-700 mb-4">
                     <span className="font-semibold">Order Total:</span> $
                     {(
-                      total * 1.08 +
+                      (typeof total === "number" ? total : 0) * 1.08 +
                       (shippingMethod === "express" ? 15 : 0)
                     ).toFixed(2)}
                   </p>
@@ -492,24 +498,25 @@ const Checkout = () => {
                       📦 Order Items
                     </h3>
                     <div className="space-y-3">
-                      {cartItems.map((item) => (
-                        <div
-                          key={item.id}
-                          className="flex justify-between items-center p-3 bg-white rounded-lg border border-gray-300"
-                        >
-                          <div className="flex-1">
-                            <p className="font-semibold text-gray-900">
-                              {item.name}
-                            </p>
-                            <p className="text-sm text-gray-600">
-                              Qty: {item.quantity}
+                      {Array.isArray(cartItems) &&
+                        cartItems.map((item) => (
+                          <div
+                            key={item.id}
+                            className="flex justify-between items-center p-3 bg-white rounded-lg border border-gray-300"
+                          >
+                            <div className="flex-1">
+                              <p className="font-semibold text-gray-900">
+                                {item.name}
+                              </p>
+                              <p className="text-sm text-gray-600">
+                                Qty: {item.quantity}
+                              </p>
+                            </div>
+                            <p className="font-bold text-gray-900">
+                              ${(item.price * item.quantity).toFixed(2)}
                             </p>
                           </div>
-                          <p className="font-bold text-gray-900">
-                            ${(item.price * item.quantity).toFixed(2)}
-                          </p>
-                        </div>
-                      ))}
+                        ))}
                     </div>
                   </div>
 
@@ -599,16 +606,17 @@ const Checkout = () => {
               </h3>
 
               <div className="space-y-3 mb-6 max-h-64 overflow-y-auto">
-                {cartItems.map((item) => (
-                  <div key={item.id} className="flex justify-between text-sm">
-                    <span className="text-gray-700">
-                      {item.name} x{item.quantity}
-                    </span>
-                    <span className="font-semibold text-gray-900">
-                      ${(item.price * item.quantity).toFixed(2)}
-                    </span>
-                  </div>
-                ))}
+                {Array.isArray(cartItems) &&
+                  cartItems.map((item) => (
+                    <div key={item.id} className="flex justify-between text-sm">
+                      <span className="text-gray-700">
+                        {item.name} x{item.quantity}
+                      </span>
+                      <span className="font-semibold text-gray-900">
+                        ${(item.price * item.quantity).toFixed(2)}
+                      </span>
+                    </div>
+                  ))}
               </div>
 
               <hr className="my-4 border-gray-300" />
@@ -616,12 +624,17 @@ const Checkout = () => {
               <div className="space-y-3 text-sm">
                 <div className="flex justify-between text-gray-700">
                   <span>Subtotal</span>
-                  <span className="font-semibold">${total.toFixed(2)}</span>
+                  <span className="font-semibold">
+                    ${(typeof total === "number" ? total : 0).toFixed(2)}
+                  </span>
                 </div>
                 <div className="flex justify-between text-gray-700">
                   <span>Tax (8%)</span>
                   <span className="font-semibold">
-                    ${(total * 0.08).toFixed(2)}
+                    $
+                    {((typeof total === "number" ? total : 0) * 0.08).toFixed(
+                      2
+                    )}
                   </span>
                 </div>
                 <div className="flex justify-between text-gray-700">
@@ -642,7 +655,7 @@ const Checkout = () => {
                 <span>
                   $
                   {(
-                    total * 1.08 +
+                    (typeof total === "number" ? total : 0) * 1.08 +
                     (shippingMethod === "express" ? 15 : 0)
                   ).toFixed(2)}
                 </span>

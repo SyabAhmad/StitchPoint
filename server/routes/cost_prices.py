@@ -13,13 +13,18 @@ def get_cost_prices():
         return jsonify({'message': 'Invalid token identity'}), 422
 
     user = User.query.get(user_id)
-    if not user or user.role != 'manager':
+    if not user or user.role not in ['manager', 'super_admin']:
         return jsonify({'message': 'Unauthorized'}), 403
 
-    if not user.store:
-        return jsonify({'message': 'Manager has no associated store'}), 403
+    # For super admins, show all products; for managers, only their store's products
+    if user.role == 'manager':
+        if not user.store:
+            return jsonify({'message': 'Manager has no associated store'}), 403
+        products = Product.query.filter_by(store_id=user.store.id).all()
+    else:
+        # Super admin can see all products
+        products = Product.query.all()
 
-    products = Product.query.filter_by(store_id=user.store.id).all()
     products_data = [{
         'id': p.id,
         'name': p.name,
@@ -42,9 +47,6 @@ def update_cost_prices():
     if not user or user.role != 'manager':
         return jsonify({'message': 'Unauthorized'}), 403
 
-    if not user.store:
-        return jsonify({'message': 'Manager has no associated store'}), 403
-
     data = request.get_json() or {}
     updates = data.get('updates', [])
 
@@ -59,8 +61,11 @@ def update_cost_prices():
         if product_id is None or cost_price is None:
             continue
 
-        # Ensure the product belongs to the manager's store
+        # Only allow managers to update cost prices for their store's products
+        if not user.store:
+            continue
         product = Product.query.filter_by(id=product_id, store_id=user.store.id).first()
+
         if not product:
             continue
 

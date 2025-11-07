@@ -13,8 +13,8 @@ export default function NewArrivals() {
           throw new Error("Failed to fetch products");
         }
         const data = await response.json();
-        // Get the latest 3 products
-        setProducts(data.slice(0, 3));
+        // Get the latest 6 products
+        setProducts(data.slice(0, 6));
       } catch (err) {
         console.error("Error fetching products:", err);
         setProducts([]);
@@ -35,9 +35,9 @@ export default function NewArrivals() {
   };
 
   return (
-    <section className="py-16 px-4 bg-gradient-to-br from-gold-500/2 to-white/98">
-      <div className="max-w-6xl mx-auto">
-        <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold font-serif text-gold-500 text-center mb-8">
+    <section className="py-20 px-6 bg-gradient-to-br from-gold-500/3 to-white/97">
+      <div className="max-w-7xl mx-auto">
+        <h3 className="text-3xl md:text-4xl lg:text-5xl font-bold font-serif text-gold-500 text-center mb-12 tracking-wide">
           New Arrivals
         </h3>
       </div>
@@ -82,6 +82,7 @@ export default function NewArrivals() {
         ) : (
           <div className="col-span-full text-center py-16 text-black/60">
             <p className="text-lg mb-2">No new arrivals available.</p>
+            <p className="text-sm">Please check back later for new arrivals.</p>
           </div>
         )}
       </div>

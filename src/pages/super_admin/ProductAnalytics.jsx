@@ -108,6 +108,23 @@ const ProductAnalytics = () => {
         ? productsAnalytics.reduce((sum, p) => sum + p.total_comments, 0) /
           productsAnalytics.length
         : 0,
+    // Financial metrics
+    total_revenue: productsAnalytics.reduce(
+      (sum, p) => sum + (p.total_revenue || 0),
+      0
+    ),
+    total_profit: productsAnalytics.reduce(
+      (sum, p) => sum + (p.total_profit || 0),
+      0
+    ),
+    total_units_sold: productsAnalytics.reduce(
+      (sum, p) => sum + (p.total_units_sold || 0),
+      0
+    ),
+    total_costs: productsAnalytics.reduce(
+      (sum, p) => sum + (p.total_costs || 0),
+      0
+    ),
     top_products: productsAnalytics.slice(0, 5).map((p) => ({
       product_id: p.product_id,
       name: p.product_name,
@@ -258,6 +275,30 @@ const ProductAnalytics = () => {
                   >
                     Comments
                   </th>
+                  <th
+                    className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
+                    style={{ color: "#d4af37" }}
+                  >
+                    Revenue
+                  </th>
+                  <th
+                    className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
+                    style={{ color: "#d4af37" }}
+                  >
+                    Units Sold
+                  </th>
+                  <th
+                    className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
+                    style={{ color: "#d4af37" }}
+                  >
+                    Costs
+                  </th>
+                  <th
+                    className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
+                    style={{ color: "#d4af37" }}
+                  >
+                    Profit
+                  </th>
                 </tr>
               </thead>
               <tbody style={{ backgroundColor: "#1d1d1d" }}>
@@ -342,6 +383,33 @@ const ProductAnalytics = () => {
                       style={{ color: "#cccccc" }}
                     >
                       {product.total_comments}
+                    </td>
+                    <td
+                      className="px-6 py-4 whitespace-nowrap text-sm"
+                      style={{ color: "#d4af37" }}
+                    >
+                      ${product.total_revenue || 0}
+                    </td>
+                    <td
+                      className="px-6 py-4 whitespace-nowrap text-sm"
+                      style={{ color: "#cccccc" }}
+                    >
+                      {product.total_units_sold || 0}
+                    </td>
+                    <td
+                      className="px-6 py-4 whitespace-nowrap text-sm"
+                      style={{ color: "#cccccc" }}
+                    >
+                      ${product.total_costs || 0}
+                    </td>
+                    <td
+                      className="px-6 py-4 whitespace-nowrap text-sm"
+                      style={{
+                        color:
+                          product.total_profit >= 0 ? "#4ecdc4" : "#ff6b6b",
+                      }}
+                    >
+                      ${product.total_profit || 0}
                     </td>
                   </tr>
                 ))}

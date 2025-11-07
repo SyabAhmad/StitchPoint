@@ -2,10 +2,10 @@ from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from werkzeug.security import generate_password_hash
 from werkzeug.utils import secure_filename
-from models import db, User, Order, Product, PageView, ButtonClick, Review, Store, OrderItem, Address, PaymentMethod, Cart, CartItem, WishlistItem
+from models import db, User, Order, Product, PageView, ButtonClick, Review, Store, OrderItem, Address, PaymentMethod, Cart, CartItem, WishlistItem, Commission, CommissionRate
 from sqlalchemy import func
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 
 dashboard_bp = Blueprint('dashboard', __name__)
 
@@ -122,6 +122,34 @@ def admin_dashboard():
     # Total users (global for super_admin, store-specific for manager)
     total_users = User.query.count() if user.role == 'super_admin' else None
 
+    # Commission analytics for super_admin
+    if user.role == 'super_admin':
+        # Calculate total commission using product commissions
+        total_commission_earned = 0.0
+        
+        # Get all delivered orders with their items
+        orders_with_items = db.session.query(
+            OrderItem.product_id,
+            OrderItem.quantity,
+            OrderItem.price
+        ).join(Order, OrderItem.order_id == Order.id)\
+         .filter(Order.status == 'delivered').all()
+        
+        # Calculate commission for each order item using the product's commission
+        for item in orders_with_items:
+            # Get the commission record for this product
+            commission = Commission.query.filter_by(product_id=item.product_id).first()
+            
+            if commission and commission.commission_percentage:
+                # Calculate commission based on the order item total (price * quantity)
+                item_total = item.price * item.quantity
+                commission_earned = (item_total * commission.commission_percentage) / 100
+                total_commission_earned += commission_earned
+            elif commission and commission.commission_amount:
+                # Use fixed commission amount if percentage not set
+                commission_earned = commission.commission_amount * item.quantity
+                total_commission_earned += commission_earned
+
     # Total products (global for super_admin, store-specific for manager)
     if user.role == 'super_admin':
         total_products = Product.query.count()
@@ -131,6 +159,15 @@ def admin_dashboard():
         total_revenue = float(total_revenue) if total_revenue else 0.0
         revenue_today = db.session.query(func.sum(Order.total_amount)).filter(Order.status == 'delivered', func.date(Order.created_at) == func.date(func.now())).scalar()
         revenue_today = float(revenue_today) if revenue_today else 0.0
+        
+        # Financial metrics for super_admin including commission
+        total_units_sold = db.session.query(func.sum(OrderItem.quantity)).join(Order, OrderItem.order_id == Order.id).filter(Order.status == 'delivered').scalar()
+        total_units_sold = int(total_units_sold) if total_units_sold else 0
+        total_costs = db.session.query(func.sum(func.coalesce(Product.cost_price, Product.price) * OrderItem.quantity)).join(Order, OrderItem.order_id == Order.id).join(Product, OrderItem.product_id == Product.id).filter(Order.status == 'delivered').scalar()
+        total_costs = float(total_costs) if total_costs else 0.0
+        total_profit = total_revenue - total_costs
+        total_commission_revenue = total_commission_earned
+        
     else:
         total_products = Product.query.filter_by(store_id=store_filter).count()
         total_stock_value = db.session.query(func.sum(func.coalesce(Product.cost_price, 0) * Product.stock_quantity)).filter(Product.store_id == store_filter).scalar()
@@ -145,6 +182,7 @@ def admin_dashboard():
         total_costs = db.session.query(func.sum(func.coalesce(Product.cost_price, 0) * OrderItem.quantity)).join(Order, OrderItem.order_id == Order.id).join(Product, OrderItem.product_id == Product.id).filter(Order.store_id == store_filter, Order.status == 'delivered').scalar()
         total_costs = float(total_costs) if total_costs else 0.0
         total_profit = total_revenue - total_costs
+        total_commission_revenue = 0.0  # Managers don't earn commission
 
     # Total orders (global for super_admin, store-specific for manager)
     if user.role == 'super_admin':
@@ -262,13 +300,16 @@ def admin_dashboard():
         'cart_items': cart_items_data,
         'total_cart_value': total_cart_value,
         'total_cart_items': total_cart_items,
-        'total_wishlist_items': total_wishlist_items
+        'total_wishlist_items': total_wishlist_items,
+        'total_units_sold': total_units_sold,
+        'total_costs': total_costs,
+        'total_profit': total_profit,
+        'total_commission_revenue': total_commission_revenue
     }
     if user.role == 'manager':
+        # Managers don't have commission data
         analytics.update({
-            'total_units_sold': total_units_sold,
-            'total_costs': total_costs,
-            'total_profit': total_profit
+            'total_commission_revenue': 0.0
         })
     if user.role == 'super_admin':
         analytics['total_users'] = total_users
@@ -276,6 +317,169 @@ def admin_dashboard():
     return jsonify({
         'analytics': analytics,
         'recent_orders': orders_data
+    }), 200
+
+@dashboard_bp.route('/commissions', methods=['GET'])
+@jwt_required()
+def get_commission_analytics():
+    """Get detailed commission analytics for super admin"""
+    try:
+        user_id = int(get_jwt_identity())
+    except (TypeError, ValueError):
+        return jsonify({'message': 'Invalid token identity'}), 422
+    user = User.query.get(user_id)
+
+    if not user or user.role != 'super_admin':
+        return jsonify({'message': 'Unauthorized'}), 403
+
+    # Get commission data using tiered commission rates
+    commission_data = db.session.query(
+        Store.name.label('store_name'),
+        Product.name.label('product_name'),
+        Product.price.label('product_price'),
+        func.sum(Order.total_amount).label('total_revenue'),
+        func.sum(OrderItem.quantity).label('total_units_sold'),
+        func.count(Order.id).label('total_orders')
+    ).select_from(Product)\
+     .join(Store, Product.store_id == Store.id)\
+     .outerjoin(OrderItem, Product.id == OrderItem.product_id)\
+     .outerjoin(Order, OrderItem.order_id == Order.id)\
+     .filter(Order.status == 'delivered')\
+     .group_by(Store.name, Product.name, Product.price)\
+     .all()
+
+    # Calculate commission earnings using tiered rates
+    commission_summary = []
+    total_commission_earned = 0.0
+    
+    for row in commission_data:
+        # Find applicable commission rate for this product
+        applicable_rate = CommissionRate.query.filter(
+            CommissionRate.is_active == True,
+            CommissionRate.min_price <= row.product_price,
+            db.or_(CommissionRate.max_price.is_(None), CommissionRate.max_price >= row.product_price)
+        ).first()
+        
+        if applicable_rate and row.total_revenue:
+            commission_earned = (row.total_revenue * applicable_rate.commission_percentage) / 100
+            total_commission_earned += commission_earned
+        else:
+            commission_earned = 0.0
+            
+        commission_summary.append({
+            'store_name': row.store_name,
+            'product_name': row.product_name,
+            'product_price': float(row.product_price or 0),
+            'commission_rate': applicable_rate.commission_percentage if applicable_rate else 0,
+            'commission_type': 'tiered_rate',
+            'total_revenue': float(row.total_revenue or 0),
+            'total_units_sold': int(row.total_units_sold or 0),
+            'total_orders': int(row.total_orders or 0),
+            'commission_earned': round(commission_earned, 2)
+        })
+
+    # Get store-wise commission breakdown
+    store_commission_data = db.session.query(
+        Store.name.label('store_name'),
+        func.count(func.distinct(Product.id)).label('total_products'),
+        func.sum(Order.total_amount).label('total_revenue'),
+        func.sum(OrderItem.quantity).label('total_units_sold')
+    ).select_from(Store)\
+     .join(Product, Store.id == Product.store_id)\
+     .outerjoin(Commission, Product.id == Commission.product_id)\
+     .outerjoin(OrderItem, Product.id == OrderItem.product_id)\
+     .outerjoin(Order, OrderItem.order_id == Order.id)\
+     .filter(Order.status == 'delivered')\
+     .group_by(Store.name)\
+     .all()
+
+    store_breakdown = []
+    for row in store_commission_data:
+        store_breakdown.append({
+            'store_name': row.store_name,
+            'total_products': int(row.total_products or 0),
+            'total_revenue': float(row.total_revenue or 0),
+            'total_units_sold': int(row.total_units_sold or 0)
+        })
+
+    return jsonify({
+        'commission_summary': commission_summary,
+        'store_breakdown': store_breakdown,
+        'total_commission_earned': round(total_commission_earned, 2)
+    }), 200
+
+@dashboard_bp.route('/commission-trends', methods=['GET'])
+@jwt_required()
+def get_commission_trends():
+    """Get commission earnings trends over time"""
+    try:
+        user_id = int(get_jwt_identity())
+    except (TypeError, ValueError):
+        return jsonify({'message': 'Invalid token identity'}), 422
+    user = User.query.get(user_id)
+
+    if not user or user.role != 'super_admin':
+        return jsonify({'message': 'Unauthorized'}), 403
+
+    days = request.args.get('days', 30, type=int)
+    start_date = datetime.utcnow() - timedelta(days=days)
+
+    # Get daily commission trends using tiered rates
+    daily_commission_query = db.session.query(
+        func.date(Order.created_at).label('date'),
+        OrderItem.product_id,
+        OrderItem.quantity,
+        OrderItem.price,
+        Product.price.label('product_price')
+    ).select_from(Order)\
+     .join(OrderItem, Order.id == OrderItem.order_id)\
+     .join(Product, OrderItem.product_id == Product.id)\
+     .filter(Order.status == 'delivered')\
+     .filter(Order.created_at >= start_date)\
+     .order_by('date')
+
+    results = daily_commission_query.all()
+
+    # Process and aggregate the data using tiered commission rates
+    date_commission_map = {}
+    
+    for row in results:
+        date = row.date
+        
+        # Find applicable commission rate for this product
+        applicable_rate = CommissionRate.query.filter(
+            CommissionRate.is_active == True,
+            CommissionRate.min_price <= row.product_price,
+            db.or_(CommissionRate.max_price.is_(None), CommissionRate.max_price >= row.product_price)
+        ).first()
+        
+        if applicable_rate:
+            # Calculate commission based on the order item total
+            item_total = row.price * row.quantity
+            commission = (item_total * applicable_rate.commission_percentage) / 100
+        else:
+            commission = 0.0
+            
+        if date in date_commission_map:
+            date_commission_map[date] += commission
+        else:
+            date_commission_map[date] = commission
+
+    # Fill in missing dates with zero values and format data
+    commission_trends = []
+    current_date = start_date.date()
+    end_date = datetime.utcnow().date()
+
+    while current_date <= end_date:
+        commission = date_commission_map.get(current_date, 0.0)
+        commission_trends.append({
+            'date': current_date.isoformat(),
+            'commission_earned': round(commission, 2)
+        })
+        current_date += timedelta(days=1)
+
+    return jsonify({
+        'commission_trends': commission_trends
     }), 200
 
 @dashboard_bp.route('/users', methods=['GET'])

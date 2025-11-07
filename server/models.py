@@ -264,3 +264,49 @@ class PaymentMethod(db.Model):
 
     def __repr__(self):
         return f'<PaymentMethod {self.card_type} ****{self.card_number_last_four} for user {self.user_id}>'
+
+class Commission(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    product_id = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=False)
+    store_id = db.Column(db.Integer, db.ForeignKey('store.id'), nullable=False)
+    commission_percentage = db.Column(db.Float, nullable=True)  # Percentage commission (e.g., 5.0 for 5%)
+    commission_amount = db.Column(db.Float, nullable=True)  # Fixed amount commission (e.g., 100.0)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    # Relationships
+    product = db.relationship('Product', backref='commissions', lazy=True)
+    store = db.relationship('Store', backref='commissions', lazy=True)
+
+    def __repr__(self):
+        return f'<Commission {self.commission_percentage or self.commission_amount} for product {self.product_id}>'
+
+class CommissionRate(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)  # e.g., "Standard", "Premium"
+    min_price = db.Column(db.Float, nullable=False, default=0.0)  # Minimum product price for this rate
+    max_price = db.Column(db.Float, nullable=True)  # Maximum product price (null for unlimited)
+    commission_percentage = db.Column(db.Float, nullable=False)  # Commission percentage
+    is_active = db.Column(db.Boolean, default=True)
+    effective_date = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    def __repr__(self):
+        return f'<CommissionRate {self.name}: {self.commission_percentage}% for ${self.min_price}-${self.max_price or "unlimited"}>'
+
+class Notification(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)  # NULL for system-wide notifications
+    title = db.Column(db.String(200), nullable=False)
+    message = db.Column(db.Text, nullable=False)
+    type = db.Column(db.String(50), nullable=False)  # 'commission_change', 'order_status', 'product', 'system'
+    is_read = db.Column(db.Boolean, default=False)
+    data = db.Column(db.Text, nullable=True)  # JSON string for additional data
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    # Relationships
+    user = db.relationship('User', backref='notifications', lazy=True)
+
+    def __repr__(self):
+        return f'<Notification {self.type}: {self.title} for user {self.user_id}>'

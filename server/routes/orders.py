@@ -231,8 +231,8 @@ def update_order_status(order_id):
         if not order:
             return jsonify({'message': 'Order not found'}), 404
 
-        # Only store manager or admin can update order status
-        if order.store_id != user.store.id if user.store else False and user.role != 'super_admin':
+        # Only store manager can update order status (not super_admin - they can only view)
+        if user.role != 'manager' or (user.store and order.store_id != user.store.id):
             return jsonify({'message': 'Unauthorized'}), 403
 
         if 'status' in data:

@@ -52,6 +52,36 @@ const OverviewStats = ({ data }) => {
     },
   ];
 
+  // Add financial metrics if available
+  if (data.total_revenue !== undefined) {
+    stats.push(
+      {
+        label: "Total Revenue",
+        value: `$${data.total_revenue || 0}`,
+        color: "#4ecdc4",
+        icon: "💰",
+      },
+      {
+        label: "Total Profit",
+        value: `$${data.total_profit || 0}`,
+        color: data.total_profit >= 0 ? "#4ecdc4" : "#ff6b6b",
+        icon: "📈",
+      },
+      {
+        label: "Total Units Sold",
+        value: data.total_units_sold || 0,
+        color: "#45b7d1",
+        icon: "📦",
+      },
+      {
+        label: "Total Costs",
+        value: `$${data.total_costs || 0}`,
+        color: "#ff6b6b",
+        icon: "💸",
+      }
+    );
+  }
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
       {stats.map((stat, index) => (
