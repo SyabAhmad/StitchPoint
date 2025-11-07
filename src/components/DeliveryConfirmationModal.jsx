@@ -84,8 +84,7 @@ const DeliveryConfirmationModal = ({ order, onClose, onConfirmed }) => {
               {order.items?.length || 0}
             </p>
             <p className="text-sm text-gray-600 mt-2">
-              <span className="font-semibold">Amount:</span> PKR
-              {" "}
+              <span className="font-semibold">Amount:</span> PKR{" "}
               {order.total_amount?.toFixed(2)}
             </p>
           </div>

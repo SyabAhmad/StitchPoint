@@ -188,8 +188,7 @@ const Checkout = () => {
               ) : (
                 <>
                   <p className="text-gray-700 mb-4">
-                    <span className="font-semibold">Order Total:</span> PKR
-                    {" "}
+                    <span className="font-semibold">Order Total:</span> PKR{" "}
                     {(
                       (typeof total === "number" ? total : 0) * 1.08 +
                       (shippingMethod === "express" ? 15 : 0)
@@ -632,7 +631,10 @@ const Checkout = () => {
                 <div className="flex justify-between text-gray-700">
                   <span>Tax (8%)</span>
                   <span className="font-semibold">
-                    PKR {((typeof total === "number" ? total : 0) * 0.08).toFixed(2)}
+                    PKR{" "}
+                    {((typeof total === "number" ? total : 0) * 0.08).toFixed(
+                      2
+                    )}
                   </span>
                 </div>
                 <div className="flex justify-between text-gray-700">
@@ -651,7 +653,8 @@ const Checkout = () => {
               <div className="flex justify-between text-xl font-bold text-gray-900">
                 <span>Total</span>
                 <span>
-                  PKR {(
+                  PKR{" "}
+                  {(
                     (typeof total === "number" ? total : 0) * 1.08 +
                     (shippingMethod === "express" ? 15 : 0)
                   ).toFixed(2)}
