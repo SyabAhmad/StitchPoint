@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from models import db, Commission, Product, Store, User
+from models import db, Commission, Product, Store, User, CommissionRate
 import logging
 
 commissions_bp = Blueprint('commissions', __name__, url_prefix='/api/commissions')
@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 @commissions_bp.route('', methods=['GET'])
 @jwt_required()
 def get_commissions():
-    """Get all commissions with product and store details"""
+    """Get all commissions with product and store details (paginated)"""
     try:
         user_id = get_jwt_identity()
         user = User.query.get(int(user_id))
@@ -17,12 +17,31 @@ def get_commissions():
         if not user or user.role != 'super_admin':
             return jsonify({'message': 'Unauthorized'}), 403
 
-        # Get all products with their commissions
-        products = Product.query.join(Store).all()
+        # Get pagination parameters
+        page = request.args.get('page', 1, type=int)
+        per_page = request.args.get('per_page', 10, type=int)
+        
+        # Ensure reasonable pagination limits
+        per_page = min(max(per_page, 1), 100)  # Max 100 items per page
+
+        # Get total count for pagination
+        total_count = Product.query.join(Store).count()
+
+        # Get paginated products
+        products = Product.query.join(Store).paginate(
+            page=page,
+            per_page=per_page,
+            error_out=False
+        )
 
         commissions_data = []
-        for product in products:
+        for product in products.items:
             commission = Commission.query.filter_by(product_id=product.id).first()
+            applicable_rate = CommissionRate.query.filter(
+                CommissionRate.is_active == True,
+                CommissionRate.min_price <= product.price,
+                db.or_(CommissionRate.max_price.is_(None), CommissionRate.max_price >= product.price)
+            ).first()
             product_data = {
                 'product_id': product.id,
                 'product_name': product.name,
@@ -32,12 +51,25 @@ def get_commissions():
                 'commission_id': commission.id if commission else None,
                 'commission_percentage': commission.commission_percentage if commission else None,
                 'commission_amount': commission.commission_amount if commission else None,
+                'commission_is_manual': commission.is_manual if commission else False,
+                'tier_commission_percentage': applicable_rate.commission_percentage if applicable_rate else None,
                 'created_at': commission.created_at.isoformat() if commission else None,
                 'updated_at': commission.updated_at.isoformat() if commission else None
             }
             commissions_data.append(product_data)
 
-        return jsonify({'commissions': commissions_data}), 200
+        # Return paginated response with metadata
+        return jsonify({
+            'commissions': commissions_data,
+            'pagination': {
+                'page': page,
+                'per_page': per_page,
+                'total': total_count,
+                'pages': (total_count + per_page - 1) // per_page,
+                'has_next': products.has_next,
+                'has_prev': products.has_prev
+            }
+        }), 200
 
     except Exception as e:
         logger.error(f"Error fetching commissions: {str(e)}")
@@ -62,6 +94,38 @@ def create_or_update_commission():
         product_id = data['product_id']
         commission_percentage = data.get('commission_percentage')
         commission_amount = data.get('commission_amount')
+        reset_to_default = data.get('reset_to_default', False)
+
+        # Allow reset request
+        if reset_to_default:
+            existing_commission = Commission.query.filter_by(product_id=product_id).first()
+            applicable_rate = CommissionRate.query.filter(
+                CommissionRate.is_active == True,
+                CommissionRate.min_price <= product.price,
+                db.or_(CommissionRate.max_price.is_(None), CommissionRate.max_price >= product.price)
+            ).first()
+
+            if applicable_rate:
+                if existing_commission:
+                    existing_commission.commission_percentage = applicable_rate.commission_percentage
+                    existing_commission.commission_amount = None
+                    existing_commission.is_manual = False
+                    existing_commission.updated_at = db.func.now()
+                else:
+                    commission = Commission(
+                        product_id=product_id,
+                        store_id=product.store_id,
+                        commission_percentage=applicable_rate.commission_percentage,
+                        commission_amount=None,
+                        is_manual=False
+                    )
+                    db.session.add(commission)
+            elif existing_commission:
+                # No applicable rate; remove commission record entirely
+                db.session.delete(existing_commission)
+
+            db.session.commit()
+            return jsonify({'message': 'Commission reset to tier default'}), 200
 
         # Validate that at least one commission type is provided
         if commission_percentage is None and commission_amount is None:
@@ -87,6 +151,7 @@ def create_or_update_commission():
             # Update existing commission
             existing_commission.commission_percentage = commission_percentage
             existing_commission.commission_amount = commission_amount
+            existing_commission.is_manual = True
             existing_commission.updated_at = db.func.now()
             commission = existing_commission
             message = 'Commission updated successfully'
@@ -96,7 +161,8 @@ def create_or_update_commission():
                 product_id=product_id,
                 store_id=product.store_id,
                 commission_percentage=commission_percentage,
-                commission_amount=commission_amount
+                commission_amount=commission_amount,
+                is_manual=True
             )
             db.session.add(commission)
             message = 'Commission created successfully'

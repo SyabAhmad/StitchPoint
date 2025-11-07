@@ -23,7 +23,6 @@ from routes.wishlist import wishlist_bp
 from routes.commission_rates import commission_rates_bp
 from routes.notifications import notifications_bp
 from routes.commissions import commissions_bp
-from routes.cost_prices import cost_prices_bp
 from logger import setup_logger
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
@@ -119,7 +118,6 @@ app.register_blueprint(wishlist_bp, url_prefix='/api/wishlist')
 app.register_blueprint(commission_rates_bp)
 app.register_blueprint(notifications_bp)
 app.register_blueprint(commissions_bp)
-app.register_blueprint(cost_prices_bp, url_prefix='/api/cost-prices')
 
 with app.app_context():
 	ensure_default_commission_rates()

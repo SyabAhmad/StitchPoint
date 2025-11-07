@@ -135,19 +135,31 @@ def admin_dashboard():
         ).join(Order, OrderItem.order_id == Order.id)\
          .filter(Order.status == 'delivered').all()
         
-        # Calculate commission for each order item using the product's commission
+        # Calculate commission for each order item using overrides or tier defaults
         for item in orders_with_items:
-            # Get the commission record for this product
             commission = Commission.query.filter_by(product_id=item.product_id).first()
-            
-            if commission and commission.commission_percentage:
-                # Calculate commission based on the order item total (price * quantity)
+
+            if commission and commission.is_manual:
+                if commission.commission_amount is not None:
+                    commission_earned = commission.commission_amount * item.quantity
+                    total_commission_earned += commission_earned
+                    continue
+                if commission.commission_percentage is not None:
+                    item_total = item.price * item.quantity
+                    commission_earned = (item_total * commission.commission_percentage) / 100
+                    total_commission_earned += commission_earned
+                    continue
+
+            # Fall back to tier rate for non-manual or missing overrides
+            applicable_rate = CommissionRate.query.filter(
+                CommissionRate.is_active == True,
+                CommissionRate.min_price <= item.price,
+                db.or_(CommissionRate.max_price.is_(None), CommissionRate.max_price >= item.price)
+            ).first()
+
+            if applicable_rate:
                 item_total = item.price * item.quantity
-                commission_earned = (item_total * commission.commission_percentage) / 100
-                total_commission_earned += commission_earned
-            elif commission and commission.commission_amount:
-                # Use fixed commission amount if percentage not set
-                commission_earned = commission.commission_amount * item.quantity
+                commission_earned = (item_total * applicable_rate.commission_percentage) / 100
                 total_commission_earned += commission_earned
 
     # Total products (global for super_admin, store-specific for manager)

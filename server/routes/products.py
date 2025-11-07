@@ -152,7 +152,8 @@ def create_product():
             product_id=new_product.id,
             store_id=store_id,
             commission_percentage=applicable_rate.commission_percentage,
-            commission_amount=None
+            commission_amount=None,
+            is_manual=False
         )
         db.session.add(commission)
         db.session.commit()
@@ -251,19 +252,21 @@ def update_product(product_id):
     ).first()
     
     existing_commission = Commission.query.filter_by(product_id=product.id).first()
-    
+
     if applicable_rate:
-        if existing_commission:
-            # Update existing commission
+        if existing_commission and not existing_commission.is_manual:
+            # Update auto-generated commission to keep tier alignment
             existing_commission.commission_percentage = applicable_rate.commission_percentage
+            existing_commission.commission_amount = None
             db.session.commit()
-        else:
-            # Create new commission if none exists
+        elif not existing_commission:
+            # Create new commission record for tier defaults
             commission = Commission(
                 product_id=product.id,
                 store_id=product.store_id,
                 commission_percentage=applicable_rate.commission_percentage,
-                commission_amount=None
+                commission_amount=None,
+                is_manual=False
             )
             db.session.add(commission)
             db.session.commit()

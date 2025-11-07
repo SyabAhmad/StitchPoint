@@ -396,24 +396,6 @@ const SuperAdminDashboard = () => {
                     Commission Rates
                   </Link>
                 </li>
-                <li>
-                  <Link
-                    to="/super-admin-dashboard/cost-prices"
-                    className="flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200"
-                    style={{ color: "#ffffff" }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = "#2d2d2d";
-                      e.currentTarget.style.color = "#d4af37";
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = "transparent";
-                      e.currentTarget.style.color = "#ffffff";
-                    }}
-                  >
-                    <FaCog className="mr-3 h-5 w-5" />
-                    Cost Prices
-                  </Link>
-                </li>
               </ul>
             </div>
             <div className="px-6 py-2">

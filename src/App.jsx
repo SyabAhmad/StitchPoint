@@ -42,7 +42,6 @@ import Reviews from "./pages/super_admin/Reviews.jsx";
 import ReviewDetails from "./pages/super_admin/ReviewDetails.jsx";
 import CommissionRates from "./pages/super_admin/CommissionRates.jsx";
 import Commissions from "./pages/super_admin/Commissions.jsx";
-import CostPrices from "./pages/manager/CostPrices.jsx";
 
 function App() {
   return (
@@ -106,7 +105,6 @@ function App() {
             <Route path="reviews/:review_id" element={<ReviewDetails />} />
             <Route path="commission-rates" element={<CommissionRates />} />
             <Route path="commissions" element={<Commissions />} />
-            <Route path="cost-prices" element={<CostPrices />} />
           </Route>
         </Route>
       </Routes>

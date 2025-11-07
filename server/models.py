@@ -271,6 +271,7 @@ class Commission(db.Model):
     store_id = db.Column(db.Integer, db.ForeignKey('store.id'), nullable=False)
     commission_percentage = db.Column(db.Float, nullable=True)  # Percentage commission (e.g., 5.0 for 5%)
     commission_amount = db.Column(db.Float, nullable=True)  # Fixed amount commission (e.g., 100.0)
+    is_manual = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
