@@ -12,6 +12,7 @@ def get_products():
     # Get query parameters for filtering
     search = request.args.get('search', '')
     category = request.args.get('category', '')
+    district = request.args.get('district', '')
     min_price = request.args.get('min_price', type=float, default=0)
     max_price = request.args.get('max_price', type=float, default=float('inf'))
     stock = request.args.get('stock', '')
@@ -29,6 +30,9 @@ def get_products():
 
     if category:
         query = query.filter(Product.category == category)
+
+    if district:
+        query = query.filter(Product.district == district)
 
     query = query.filter(Product.price >= min_price, Product.price <= max_price)
 
@@ -57,11 +61,16 @@ def get_products():
             'stock_quantity': product.stock_quantity,
             'image_url': product.image_url,
             'category': product.category,
+            'district': product.district,
             'category_id': category_obj.id if category_obj else None,
             'store_name': product.store.name if product.store else 'Unknown Store',
             'store_id': product.store_id if product.store else None,
             'created_at': product.created_at.isoformat(),
-            'updated_at': product.updated_at.isoformat()
+            'updated_at': product.updated_at.isoformat(),
+            'sale_type': product.sale_type,
+            'sale_start_date': product.sale_start_date.isoformat() if product.sale_start_date else None,
+            'sale_end_date': product.sale_end_date.isoformat() if product.sale_end_date else None,
+            'sale_discount_percentage': product.sale_discount_percentage
         })
     return jsonify({'products': product_list, 'total': total, 'page': page, 'per_page': per_page}), 200
 
@@ -128,6 +137,46 @@ def create_product():
         else:
             return jsonify({'message': 'Invalid category_id'}), 400
 
+    # Validate sale fields
+    from datetime import datetime
+    sale_start = None
+    sale_end = None
+    sale_discount = None
+
+    # Get sale fields from request
+    sale_type = request.form.get('sale_type')
+    sale_start_date = request.form.get('sale_start_date')
+    sale_end_date = request.form.get('sale_end_date')
+    sale_discount_percentage = request.form.get('sale_discount_percentage')
+
+    if sale_start_date:
+        try:
+            sale_start = datetime.fromisoformat(sale_start_date.replace('Z', '+00:00'))
+        except ValueError:
+            return jsonify({'message': 'Invalid sale_start_date format. Use ISO format.'}), 400
+
+    if sale_end_date:
+        try:
+            sale_end = datetime.fromisoformat(sale_end_date.replace('Z', '+00:00'))
+        except ValueError:
+            return jsonify({'message': 'Invalid sale_end_date format. Use ISO format.'}), 400
+
+    if sale_discount_percentage:
+        try:
+            sale_discount = float(sale_discount_percentage)
+            if sale_discount < 0 or sale_discount > 100:
+                return jsonify({'message': 'sale_discount_percentage must be between 0 and 100'}), 400
+        except ValueError:
+            return jsonify({'message': 'Invalid sale_discount_percentage'}), 400
+
+    # Validate that if sale fields are provided, they are consistent
+    if sale_type and not (sale_start and sale_end and sale_discount is not None):
+        return jsonify({'message': 'If sale_type is provided, sale_start_date, sale_end_date, and sale_discount_percentage are required'}), 400
+    if (sale_start or sale_end or sale_discount is not None) and not sale_type:
+        return jsonify({'message': 'If sale dates or discount are provided, sale_type is required'}), 400
+    if sale_start and sale_end and sale_start >= sale_end:
+        return jsonify({'message': 'sale_start_date must be before sale_end_date'}), 400
+
     new_product = Product(
         name=name,
         description=description,
@@ -135,7 +184,12 @@ def create_product():
         stock_quantity=stock_quantity,
         image_url=image_url,
         category=category_name,
-        store_id=store_id
+        district=district,
+        store_id=store_id,
+        sale_type=sale_type,
+        sale_start_date=sale_start,
+        sale_end_date=sale_end,
+        sale_discount_percentage=sale_discount
     )
     db.session.add(new_product)
     db.session.commit()
@@ -166,8 +220,13 @@ def create_product():
         'stock_quantity': new_product.stock_quantity,
         'image_url': new_product.image_url,
         'category': new_product.category,
+        'district': new_product.district,
         'category_id': category_id,
-        'store_name': new_product.store.name if new_product.store else 'Unknown Store'
+        'store_name': new_product.store.name if new_product.store else 'Unknown Store',
+        'sale_type': new_product.sale_type,
+        'sale_start_date': new_product.sale_start_date.isoformat() if new_product.sale_start_date else None,
+        'sale_end_date': new_product.sale_end_date.isoformat() if new_product.sale_end_date else None,
+        'sale_discount_percentage': new_product.sale_discount_percentage
     }}), 201
 
 @products_bp.route('/products/<int:product_id>', methods=['PUT'])
@@ -196,6 +255,13 @@ def update_product(product_id):
     price = request.form.get('price')
     stock_quantity = request.form.get('stock_quantity', 0)
     category_id = request.form.get('category_id')
+    district = request.form.get('district')
+    district = request.form.get('district')
+    # Sale fields
+    sale_type = request.form.get('sale_type')
+    sale_start_date = request.form.get('sale_start_date')
+    sale_end_date = request.form.get('sale_end_date')
+    sale_discount_percentage = request.form.get('sale_discount_percentage')
 
     # Handle file upload: save image_1 to uploads/ and build image_url
     image_url = product.image_url  # Keep existing if no new image
@@ -234,6 +300,46 @@ def update_product(product_id):
         else:
             return jsonify({'message': 'Invalid category_id'}), 400
 
+    # Validate sale fields
+    from datetime import datetime
+    sale_start = None
+    sale_end = None
+    sale_discount = None
+
+    # Get sale fields from request
+    sale_type = request.form.get('sale_type')
+    sale_start_date = request.form.get('sale_start_date')
+    sale_end_date = request.form.get('sale_end_date')
+    sale_discount_percentage = request.form.get('sale_discount_percentage')
+
+    if sale_start_date:
+        try:
+            sale_start = datetime.fromisoformat(sale_start_date.replace('Z', '+00:00'))
+        except ValueError:
+            return jsonify({'message': 'Invalid sale_start_date format. Use ISO format.'}), 400
+
+    if sale_end_date:
+        try:
+            sale_end = datetime.fromisoformat(sale_end_date.replace('Z', '+00:00'))
+        except ValueError:
+            return jsonify({'message': 'Invalid sale_end_date format. Use ISO format.'}), 400
+
+    if sale_discount_percentage:
+        try:
+            sale_discount = float(sale_discount_percentage)
+            if sale_discount < 0 or sale_discount > 100:
+                return jsonify({'message': 'sale_discount_percentage must be between 0 and 100'}), 400
+        except ValueError:
+            return jsonify({'message': 'Invalid sale_discount_percentage'}), 400
+
+    # Validate that if sale fields are provided, they are consistent
+    if sale_type and not (sale_start and sale_end and sale_discount is not None):
+        return jsonify({'message': 'If sale_type is provided, sale_start_date, sale_end_date, and sale_discount_percentage are required'}), 400
+    if (sale_start or sale_end or sale_discount is not None) and not sale_type:
+        return jsonify({'message': 'If sale dates or discount are provided, sale_type is required'}), 400
+    if sale_start and sale_end and sale_start >= sale_end:
+        return jsonify({'message': 'sale_start_date must be before sale_end_date'}), 400
+
     # Update product
     product.name = name
     product.description = description
@@ -241,6 +347,11 @@ def update_product(product_id):
     product.stock_quantity = stock_quantity
     product.image_url = image_url
     product.category = category_name
+    product.district = district
+    product.sale_type = sale_type
+    product.sale_start_date = sale_start
+    product.sale_end_date = sale_end
+    product.sale_discount_percentage = sale_discount
 
     db.session.commit()
 
@@ -279,8 +390,13 @@ def update_product(product_id):
         'stock_quantity': product.stock_quantity,
         'image_url': product.image_url,
         'category': product.category,
+        'district': product.district,
         'category_id': category_id,
-        'store_name': product.store.name if product.store else 'Unknown Store'
+        'store_name': product.store.name if product.store else 'Unknown Store',
+        'sale_type': product.sale_type,
+        'sale_start_date': product.sale_start_date.isoformat() if product.sale_start_date else None,
+        'sale_end_date': product.sale_end_date.isoformat() if product.sale_end_date else None,
+        'sale_discount_percentage': product.sale_discount_percentage
     }}), 200
 
 @products_bp.route('/products/<int:product_id>', methods=['GET'])
@@ -346,6 +462,7 @@ def get_product(product_id):
         'stock_quantity': product.stock_quantity,
         'image_url': product.image_url,
         'category': product.category,
+        'district': product.district,
         'category_id': category_obj.id if category_obj else None,
         'store_name': product.store.name if product.store else 'Unknown Store',
         'store_id': product.store_id if product.store else None,
@@ -355,7 +472,11 @@ def get_product(product_id):
         'created_at': product.created_at.isoformat(),
         'updated_at': product.updated_at.isoformat(),
         'reviews': reviews_list,
-        'average_rating': avg_rating
+        'average_rating': avg_rating,
+        'sale_type': product.sale_type,
+        'sale_start_date': product.sale_start_date.isoformat() if product.sale_start_date else None,
+        'sale_end_date': product.sale_end_date.isoformat() if product.sale_end_date else None,
+        'sale_discount_percentage': product.sale_discount_percentage
     }
     return jsonify({'product': product_data}), 200
 
@@ -416,6 +537,11 @@ def get_recommendations(product_id):
             'image_url': p.image_url,
             'store_name': p.store.name if p.store else 'Unknown Store',
             'created_at': p.created_at.isoformat(),
+            'district': p.district,
+            'sale_type': p.sale_type,
+            'sale_start_date': p.sale_start_date.isoformat() if p.sale_start_date else None,
+            'sale_end_date': p.sale_end_date.isoformat() if p.sale_end_date else None,
+            'sale_discount_percentage': p.sale_discount_percentage
         })
 
     return jsonify({'recommendations': rec_list}), 200
@@ -722,11 +848,16 @@ def get_store(store_id):
             'stock_quantity': product.stock_quantity,
             'image_url': product.image_url,
             'category': product.category,
+            'district': product.district,
             'category_id': category_obj.id if category_obj else None,
             'store_name': store.name,
             'store_id': store.id,
             'created_at': product.created_at.isoformat(),
-            'updated_at': product.updated_at.isoformat()
+            'updated_at': product.updated_at.isoformat(),
+            'sale_type': product.sale_type,
+            'sale_start_date': product.sale_start_date.isoformat() if product.sale_start_date else None,
+            'sale_end_date': product.sale_end_date.isoformat() if product.sale_end_date else None,
+            'sale_discount_percentage': product.sale_discount_percentage
         })
 
     store_data = {
@@ -743,3 +874,143 @@ def get_store(store_id):
     }
 
     return jsonify({'store': store_data}), 200
+
+
+@products_bp.route('/products/featured', methods=['GET'])
+def get_featured_products():
+    """Get featured products for homepage display."""
+    try:
+        featured_products = Product.query.filter_by(is_featured=True).order_by(
+            Product.featured_order, Product.created_at.desc()
+        ).limit(6).all()
+
+        featured_list = []
+        for product in featured_products:
+            category_obj = Category.query.filter_by(name=product.category).first() if product.category else None
+            featured_list.append({
+                'id': product.id,
+                'name': product.name,
+                'description': product.description,
+                'price': product.price,
+                'stock_quantity': product.stock_quantity,
+                'image_url': product.image_url,
+                'category': product.category,
+                'category_id': category_obj.id if category_obj else None,
+                'store_name': product.store.name if product.store else 'Unknown Store',
+                'store_id': product.store_id if product.store else None,
+                'created_at': product.created_at.isoformat(),
+                'updated_at': product.updated_at.isoformat(),
+                'sale_type': product.sale_type,
+                'sale_start_date': product.sale_start_date.isoformat() if product.sale_start_date else None,
+                'sale_end_date': product.sale_end_date.isoformat() if product.sale_end_date else None,
+                'sale_discount_percentage': product.sale_discount_percentage,
+                'is_featured': product.is_featured,
+                'is_new_arrival': product.is_new_arrival,
+                'featured_order': product.featured_order,
+                'new_arrival_order': product.new_arrival_order
+            })
+
+        return jsonify({'products': featured_list}), 200
+    except Exception as e:
+        print(f"Error fetching featured products: {e}")
+        return jsonify({'message': 'Error fetching featured products', 'products': []}), 500
+
+
+@products_bp.route('/products/new-arrivals', methods=['GET'])
+def get_new_arrivals():
+    """Get new arrival products for homepage display."""
+    try:
+        from datetime import datetime, timedelta
+
+        # Products created in last 30 days OR explicitly marked as new arrival
+        thirty_days_ago = datetime.utcnow() - timedelta(days=30)
+
+        new_arrival_products = Product.query.filter(
+            db.or_(
+                Product.created_at >= thirty_days_ago,
+                Product.is_new_arrival == True
+            )
+        ).order_by(Product.created_at.desc()).limit(8).all()
+
+        new_arrival_list = []
+        for product in new_arrival_products:
+            category_obj = Category.query.filter_by(name=product.category).first() if product.category else None
+            new_arrival_list.append({
+                'id': product.id,
+                'name': product.name,
+                'description': product.description,
+                'price': product.price,
+                'stock_quantity': product.stock_quantity,
+                'image_url': product.image_url,
+                'category': product.category,
+                'category_id': category_obj.id if category_obj else None,
+                'store_name': product.store.name if product.store else 'Unknown Store',
+                'store_id': product.store_id if product.store else None,
+                'created_at': product.created_at.isoformat(),
+                'updated_at': product.updated_at.isoformat(),
+                'sale_type': product.sale_type,
+                'sale_start_date': product.sale_start_date.isoformat() if product.sale_start_date else None,
+                'sale_end_date': product.sale_end_date.isoformat() if product.sale_end_date else None,
+                'sale_discount_percentage': product.sale_discount_percentage,
+                'is_featured': product.is_featured,
+                'is_new_arrival': product.is_new_arrival,
+                'featured_order': product.featured_order,
+                'new_arrival_order': product.new_arrival_order
+            })
+
+        return jsonify({'products': new_arrival_list}), 200
+    except Exception as e:
+        print(f"Error fetching new arrivals: {e}")
+        return jsonify({'message': 'Error fetching new arrivals', 'products': []}), 500
+
+
+@products_bp.route('/products/top-sales', methods=['GET'])
+def get_top_sale_products():
+    """Get top sale products (products currently on sale with highest discount)."""
+    try:
+        from datetime import datetime
+
+        # Get current time for sale validation
+        now = datetime.utcnow()
+
+        # Products that are currently on sale (active sales)
+        top_sale_products = Product.query.filter(
+            Product.sale_type.isnot(None),
+            Product.sale_start_date <= now,
+            Product.sale_end_date >= now,
+            Product.sale_discount_percentage > 0
+        ).order_by(
+            Product.sale_discount_percentage.desc(),  # Highest discount first
+            Product.created_at.desc()  # Then by newest
+        ).limit(6).all()
+
+        top_sale_list = []
+        for product in top_sale_products:
+            category_obj = Category.query.filter_by(name=product.category).first() if product.category else None
+            top_sale_list.append({
+                'id': product.id,
+                'name': product.name,
+                'description': product.description,
+                'price': product.price,
+                'stock_quantity': product.stock_quantity,
+                'image_url': product.image_url,
+                'category': product.category,
+                'category_id': category_obj.id if category_obj else None,
+                'store_name': product.store.name if product.store else 'Unknown Store',
+                'store_id': product.store_id if product.store else None,
+                'created_at': product.created_at.isoformat(),
+                'updated_at': product.updated_at.isoformat(),
+                'sale_type': product.sale_type,
+                'sale_start_date': product.sale_start_date.isoformat() if product.sale_start_date else None,
+                'sale_end_date': product.sale_end_date.isoformat() if product.sale_end_date else None,
+                'sale_discount_percentage': product.sale_discount_percentage,
+                'is_featured': product.is_featured,
+                'is_new_arrival': product.is_new_arrival,
+                'featured_order': product.featured_order,
+                'new_arrival_order': product.new_arrival_order
+            })
+
+        return jsonify({'products': top_sale_list}), 200
+    except Exception as e:
+        print(f"Error fetching top sale products: {e}")
+        return jsonify({'message': 'Error fetching top sale products', 'products': []}), 500

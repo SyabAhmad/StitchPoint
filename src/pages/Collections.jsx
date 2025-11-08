@@ -6,16 +6,16 @@ import toast from "react-hot-toast";
 
 // Loading Skeleton Component
 const ProductSkeleton = () => (
-  <div className="rounded-3xl overflow-hidden bg-white shadow-xl border border-gold-500/10 animate-pulse">
-    <div className="h-72 bg-gradient-to-br from-gray-200 to-gray-300"></div>
-    <div className="p-7">
-      <div className="h-6 bg-gray-200 rounded mb-3"></div>
-      <div className="h-4 bg-gray-200 rounded mb-2"></div>
-      <div className="h-4 bg-gray-200 rounded w-3/4 mb-4"></div>
-      <div className="h-8 bg-gray-200 rounded mb-3"></div>
-      <div className="flex gap-3">
-        <div className="flex-1 h-12 bg-gray-200 rounded-xl"></div>
-        <div className="w-12 h-12 bg-gray-200 rounded-xl"></div>
+  <div className="rounded-2xl overflow-hidden bg-white shadow-lg border border-gold-500/10 animate-pulse">
+    <div className="h-48 bg-gradient-to-br from-gray-200 to-gray-300"></div>
+    <div className="p-4">
+      <div className="h-5 bg-gray-200 rounded mb-2"></div>
+      <div className="h-3 bg-gray-200 rounded mb-1"></div>
+      <div className="h-3 bg-gray-200 rounded w-2/3 mb-3"></div>
+      <div className="h-6 bg-gray-200 rounded mb-2"></div>
+      <div className="flex gap-2">
+        <div className="flex-1 h-8 bg-gray-200 rounded-lg"></div>
+        <div className="w-8 h-8 bg-gray-200 rounded-lg"></div>
       </div>
     </div>
   </div>
@@ -29,12 +29,23 @@ export default function Collections() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
   const [priceRange, setPriceRange] = useState([0, 1000]);
+  const [selectedDistrict, setSelectedDistrict] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [perPage, setPerPage] = useState(30); // Default to 30 as requested
+  const [totalProducts, setTotalProducts] = useState(0);
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await fetch("http://127.0.0.1:5000/api/products");
+        const queryParams = new URLSearchParams({
+          page: currentPage.toString(),
+          per_page: perPage.toString(),
+        });
+
+        const response = await fetch(
+          `http://127.0.0.1:5000/api/products?${queryParams.toString()}`
+        );
         if (!response.ok) {
           throw new Error("Failed to fetch products");
         }
@@ -42,6 +53,7 @@ export default function Collections() {
         const prods = data.products || [];
         setProducts(prods);
         setFilteredProducts(prods);
+        setTotalProducts(data.total || 0);
 
         // Dynamically set priceRange to cover all returned products so filtering
         // doesn't accidentally hide most items when default range is narrow.
@@ -59,9 +71,15 @@ export default function Collections() {
     };
 
     fetchProducts();
-  }, []);
+  }, [currentPage, perPage]);
 
   const [sortBy, setSortBy] = useState("name");
+
+  // Calculate pagination info
+  const totalPages = Math.ceil(totalProducts / perPage);
+  const startIndex = (currentPage - 1) * perPage;
+  const endIndex = startIndex + perPage;
+  const paginatedProducts = filteredProducts.slice(startIndex, endIndex);
 
   useEffect(() => {
     let filtered = products.filter((product) => {
@@ -77,6 +95,12 @@ export default function Collections() {
     if (selectedCategory) {
       filtered = filtered.filter(
         (product) => product.category === selectedCategory
+      );
+    }
+
+    if (selectedDistrict) {
+      filtered = filtered.filter(
+        (product) => product.district === selectedDistrict
       );
     }
 
@@ -100,9 +124,19 @@ export default function Collections() {
     });
 
     setFilteredProducts(filtered);
-  }, [searchTerm, selectedCategory, priceRange, products, sortBy]);
+  }, [
+    searchTerm,
+    selectedCategory,
+    selectedDistrict,
+    priceRange,
+    products,
+    sortBy,
+  ]);
 
   const categories = [...new Set(products.map((product) => product.category))];
+  const districts = [
+    ...new Set(products.map((product) => product.district).filter(Boolean)),
+  ];
 
   const handleProductClick = (product) => {
     // Navigate to product details page instead of opening an in-page modal
@@ -183,7 +217,7 @@ export default function Collections() {
                 <div className="h-10 bg-gray-200 rounded-xl w-40"></div>
               </div>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
               {Array.from({ length: 6 }).map((_, index) => (
                 <ProductSkeleton key={index} />
               ))}
@@ -243,16 +277,16 @@ export default function Collections() {
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Horizontal Filters Bar */}
         <div className="bg-white rounded-3xl shadow-xl border border-gold-500/10 p-6 mb-8">
-          <div className="flex flex-col lg:flex-row lg:items-center gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {/* Category Filter */}
-            <div className="flex-1 min-w-0">
-              <label className="flex items-center gap-2 mb-2 font-semibold text-black/80 text-sm uppercase tracking-wider">
+            <div className="min-w-0">
+              <label className="flex items-center gap-2 mb-2 font-semibold text-black/80 text-xs uppercase tracking-wider">
                 <span className="text-gold-500">🏷️</span> Category
               </label>
               <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
-                className="w-full px-4 py-3 border border-gold-500/30 rounded-xl bg-white cursor-pointer appearance-none focus:outline-none focus:border-gold-500 focus:ring-2 focus:ring-gold-500/20 transition-all duration-300 text-base hover:border-gold-400"
+                className="w-full px-3 py-2 border border-gold-500/30 rounded-lg bg-white cursor-pointer appearance-none focus:outline-none focus:border-gold-500 focus:ring-2 focus:ring-gold-500/20 transition-all duration-300 text-sm hover:border-gold-400"
               >
                 <option value="">All Categories</option>
                 {categories.map((category) => (
@@ -263,12 +297,31 @@ export default function Collections() {
               </select>
             </div>
 
+            {/* District Filter */}
+            <div className="min-w-0">
+              <label className="flex items-center gap-2 mb-2 font-semibold text-black/80 text-xs uppercase tracking-wider">
+                <span className="text-gold-500">📍</span> District/Area
+              </label>
+              <select
+                value={selectedDistrict}
+                onChange={(e) => setSelectedDistrict(e.target.value)}
+                className="w-full px-3 py-2 border border-gold-500/30 rounded-lg bg-white cursor-pointer appearance-none focus:outline-none focus:border-gold-500 focus:ring-2 focus:ring-gold-500/20 transition-all duration-300 text-sm hover:border-gold-400"
+              >
+                <option value="">All Districts</option>
+                {districts.map((district) => (
+                  <option key={district} value={district}>
+                    {district}
+                  </option>
+                ))}
+              </select>
+            </div>
+
             {/* Price Range Filter */}
-            <div className="flex-1 min-w-0">
-              <label className="flex items-center gap-2 mb-2 font-semibold text-black/80 text-sm uppercase tracking-wider">
+            <div className="min-w-0">
+              <label className="flex items-center gap-2 mb-2 font-semibold text-black/80 text-xs uppercase tracking-wider">
                 <span className="text-gold-500">💰</span> Price Range
               </label>
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2">
                 <input
                   type="number"
                   min="0"
@@ -280,10 +333,10 @@ export default function Collections() {
                       priceRange[1],
                     ])
                   }
-                  className="flex-1 px-3 py-2 border border-gold-500/30 rounded-xl text-center focus:outline-none focus:border-gold-500 focus:ring-2 focus:ring-gold-500/20 transition-all duration-300 text-base hover:border-gold-400"
+                  className="flex-1 px-2 py-2 border border-gold-500/30 rounded-lg text-center focus:outline-none focus:border-gold-500 focus:ring-2 focus:ring-gold-500/20 transition-all duration-300 text-sm hover:border-gold-400"
                   placeholder="Min"
                 />
-                <span className="text-gold-500 font-bold text-lg">-</span>
+                <span className="text-gold-500 font-bold text-sm">-</span>
                 <input
                   type="number"
                   min="0"
@@ -295,22 +348,23 @@ export default function Collections() {
                       parseInt(e.target.value) || 1000,
                     ])
                   }
-                  className="flex-1 px-3 py-2 border border-gold-500/30 rounded-xl text-center focus:outline-none focus:border-gold-500 focus:ring-2 focus:ring-gold-500/20 transition-all duration-300 text-base hover:border-gold-400"
+                  className="flex-1 px-2 py-2 border border-gold-500/30 rounded-lg text-center focus:outline-none focus:border-gold-500 focus:ring-2 focus:ring-gold-500/20 transition-all duration-300 text-sm hover:border-gold-400"
                   placeholder="Max"
                 />
               </div>
-              <div className="mt-2 text-sm text-black/60 text-center font-medium">
+              <div className="mt-1 text-xs text-black/60 text-center font-medium">
                 PKR {priceRange[0]} - PKR {priceRange[1]}
               </div>
             </div>
 
             {/* Clear Filters Button */}
-            <div className="flex-shrink-0">
+            <div className="min-w-0 flex items-end">
               <button
-                className="w-full lg:w-auto px-6 py-3 bg-gray-100 text-black/70 border border-gold-500/20 rounded-xl font-bold hover:bg-gold-500 hover:text-white transition-all duration-300 transform hover:-translate-y-1 shadow-md hover:shadow-lg uppercase tracking-wide text-sm"
+                className="w-full px-4 py-2 bg-gray-100 text-black/70 border border-gold-500/20 rounded-lg font-bold hover:bg-gold-500 hover:text-white transition-all duration-300 transform hover:-translate-y-0.5 shadow-md hover:shadow-lg uppercase tracking-wide text-xs"
                 onClick={() => {
                   setSearchTerm("");
                   setSelectedCategory("");
+                  setSelectedDistrict("");
                   setPriceRange([0, 1000]);
                 }}
               >
@@ -323,11 +377,34 @@ export default function Collections() {
         {/* Products Grid */}
         <main>
           <div className="flex justify-between items-center mb-8 flex-wrap gap-4">
-            <p className="text-black/70 text-lg font-medium">
-              Showing{" "}
-              <span className="font-bold">{filteredProducts.length}</span>{" "}
-              {filteredProducts.length === 1 ? "product" : "products"}
-            </p>
+            <div className="flex items-center gap-4">
+              <p className="text-black/70 text-lg font-medium">
+                Showing{" "}
+                <span className="font-bold">
+                  {startIndex + 1}-{Math.min(endIndex, totalProducts)}
+                </span>{" "}
+                of <span className="font-bold">{totalProducts}</span>{" "}
+                {totalProducts === 1 ? "product" : "products"}
+              </p>
+              <div className="flex items-center gap-2">
+                <label className="font-semibold text-black/80 text-sm uppercase tracking-wider">
+                  Per Page:
+                </label>
+                <select
+                  value={perPage}
+                  onChange={(e) => {
+                    setPerPage(parseInt(e.target.value));
+                    setCurrentPage(1); // Reset to first page when changing per_page
+                  }}
+                  className="px-3 py-2 border border-gold-500/30 rounded-lg bg-white cursor-pointer appearance-none focus:outline-none focus:border-gold-500 focus:ring-2 focus:ring-gold-500/20 transition-all duration-300 text-sm"
+                >
+                  <option value="20">20</option>
+                  <option value="30">30</option>
+                  <option value="50">50</option>
+                  <option value="60">60</option>
+                </select>
+              </div>
+            </div>
             <div className="flex items-center gap-3">
               <label className="font-semibold text-black/80 text-sm uppercase tracking-wider">
                 Sort by:
@@ -345,12 +422,12 @@ export default function Collections() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
-            {filteredProducts.length > 0 ? (
-              filteredProducts.map((product) => (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
+            {paginatedProducts.length > 0 ? (
+              paginatedProducts.map((product) => (
                 <div
                   key={product.id}
-                  className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-white via-gold-50/30 to-white shadow-2xl border border-gold-500/20 group hover:shadow-3xl hover:-translate-y-3 transition-all duration-500 ease-out transform hover:scale-105"
+                  className="relative rounded-2xl overflow-hidden bg-gradient-to-br from-white via-gold-50/30 to-white shadow-lg border border-gold-500/20 group hover:shadow-xl hover:-translate-y-2 transition-all duration-300 ease-out transform hover:scale-102"
                 >
                   {/* Premium Badge */}
                   <div className="absolute top-3 left-3 z-10 bg-gold-500 text-white px-2 py-1 rounded-full text-xs font-bold uppercase tracking-wider shadow-lg">
@@ -366,7 +443,7 @@ export default function Collections() {
                   </button>
 
                   <div
-                    className="h-64 bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center relative overflow-hidden cursor-pointer"
+                    className="h-40 bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center relative overflow-hidden cursor-pointer"
                     onClick={() => handleProductClick(product)}
                   >
                     {product.image_url ? (
@@ -409,26 +486,26 @@ export default function Collections() {
                     </div>
                   </div>
 
-                  <div className="p-5 flex flex-col gap-3">
+                  <div className="p-3 flex flex-col gap-2">
                     <div className="flex-1">
-                      <div className="flex items-start justify-between mb-2">
-                        <h4 className="text-lg font-bold text-black leading-tight font-serif">
+                      <div className="flex items-start justify-between mb-1">
+                        <h4 className="text-sm font-bold text-black leading-tight font-serif line-clamp-1">
                           {product.name}
                         </h4>
                         <div className="flex items-center gap-1">
-                          <span className="text-yellow-400 text-sm">⭐</span>
+                          <span className="text-yellow-400 text-xs">⭐</span>
                           <span className="text-xs font-semibold text-black/70">
                             4.8
                           </span>
                         </div>
                       </div>
 
-                      <p className="text-black/80 mb-3 leading-relaxed text-sm line-clamp-2">
+                      <p className="text-black/80 mb-2 leading-relaxed text-xs line-clamp-1">
                         {product.description}
                       </p>
 
-                      <div className="flex items-center justify-between mb-3">
-                        <p className="text-gold-600 font-bold text-xl">
+                      <div className="flex items-center justify-between mb-2">
+                        <p className="text-gold-600 font-bold text-sm">
                           PKR {product.price}
                         </p>
                         <div className="text-right">
@@ -438,30 +515,19 @@ export default function Collections() {
                               {product.stock_quantity}
                             </span>
                           </p>
-                          {product.store_name && (
-                            <p
-                              className="text-black/50 text-xs mt-1 cursor-pointer hover:text-gold-600 transition-colors"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                navigate(`/store/${product.store_id}`);
-                              }}
-                            >
-                              By: {product.store_name}
-                            </p>
-                          )}
                         </div>
                       </div>
                     </div>
 
-                    <div className="flex gap-3">
+                    <div className="flex gap-2">
                       <button
-                        className="flex-1 bg-gradient-to-r from-gold-500 to-gold-600 text-black px-4 py-2 rounded-xl font-bold hover:from-gold-600 hover:to-gold-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 uppercase text-xs tracking-wide"
+                        className="flex-1 bg-gradient-to-r from-gold-500 to-gold-600 text-black px-2 py-1.5 rounded-lg font-bold hover:from-gold-600 hover:to-gold-700 transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 uppercase text-xs tracking-wide"
                         onClick={() => handleAddToCart(product)}
                       >
-                        🛒 Add to Cart
+                        🛒 Add
                       </button>
                       <button
-                        className="bg-white border-2 border-gold-500 text-gold-600 px-4 py-2 rounded-xl font-bold hover:bg-gold-500 hover:text-white transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 text-base"
+                        className="bg-white border border-gold-500 text-gold-600 px-2 py-1.5 rounded-lg font-bold hover:bg-gold-500 hover:text-white transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 text-sm"
                         onClick={() => handleProductClick(product)}
                       >
                         👁️
@@ -484,6 +550,79 @@ export default function Collections() {
               </div>
             )}
           </div>
+
+          {/* Pagination Controls */}
+          {totalPages > 1 && (
+            <div className="flex justify-center mt-12 space-x-2">
+              <button
+                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+                className="px-4 py-2 rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{
+                  backgroundColor: currentPage === 1 ? "#cccccc" : "#d4af37",
+                  color: currentPage === 1 ? "#666666" : "#000000",
+                }}
+              >
+                Previous
+              </button>
+
+              {/* Page Numbers */}
+              {[...Array(totalPages)].map((_, i) => {
+                const pageNumber = i + 1;
+                const isCurrentPage = currentPage === pageNumber;
+                const isNearCurrent = Math.abs(currentPage - pageNumber) <= 2;
+                const isFirstOrLast =
+                  pageNumber === 1 || pageNumber === totalPages;
+
+                // Show first page, last page, current page, and pages near current
+                if (isFirstOrLast || isCurrentPage || isNearCurrent) {
+                  return (
+                    <button
+                      key={pageNumber}
+                      onClick={() => setCurrentPage(pageNumber)}
+                      className="px-4 py-2 rounded-lg transition-all duration-200"
+                      style={{
+                        backgroundColor: isCurrentPage ? "#d4af37" : "#f3f4f6",
+                        color: isCurrentPage ? "#000000" : "#374151",
+                        border: "1px solid #d4af37",
+                      }}
+                    >
+                      {pageNumber}
+                    </button>
+                  );
+                }
+
+                // Show ellipsis for gaps
+                if (
+                  pageNumber === currentPage - 3 ||
+                  pageNumber === currentPage + 3
+                ) {
+                  return (
+                    <span key={pageNumber} className="px-2 py-2 text-gray-500">
+                      ...
+                    </span>
+                  );
+                }
+
+                return null;
+              })}
+
+              <button
+                onClick={() =>
+                  setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                }
+                disabled={currentPage === totalPages}
+                className="px-4 py-2 rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{
+                  backgroundColor:
+                    currentPage === totalPages ? "#cccccc" : "#d4af37",
+                  color: currentPage === totalPages ? "#666666" : "#000000",
+                }}
+              >
+                Next
+              </button>
+            </div>
+          )}
         </main>
       </div>
 

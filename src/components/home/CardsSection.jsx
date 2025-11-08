@@ -6,22 +6,23 @@ export default function CardsSection() {
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
-    const fetchProducts = async () => {
+    const fetchFeaturedProducts = async () => {
       try {
-        const response = await fetch("http://127.0.0.1:5000/api/products");
+        const response = await fetch(
+          "http://127.0.0.1:5000/api/products/featured"
+        );
         if (!response.ok) {
-          throw new Error("Failed to fetch products");
+          throw new Error("Failed to fetch featured products");
         }
         const data = await response.json();
-        // Get the first 3 products for featured showcase
-        setProducts(data.slice(0, 3));
+        setProducts(data.products || []);
       } catch (err) {
-        console.error("Error fetching products:", err);
+        console.error("Error fetching featured products:", err);
         setProducts([]);
       }
     };
 
-    fetchProducts();
+    fetchFeaturedProducts();
   }, []);
 
   const handleAddToCart = async (product) => {
@@ -67,9 +68,37 @@ export default function CardsSection() {
                     <h3 className="text-xl font-semibold text-white mb-2">
                       {product.name}
                     </h3>
-                    <p className="text-gold-400 font-bold text-lg mb-1">
-                      ${product.price}
-                    </p>
+                    <div className="flex items-center gap-2 mb-1">
+                      {product.sale_type &&
+                        product.sale_discount_percentage && (
+                          <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full font-semibold">
+                            {product.sale_type} SALE
+                          </span>
+                        )}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {product.sale_type && product.sale_discount_percentage ? (
+                        <>
+                          <p className="text-red-300 font-bold text-lg line-through">
+                            ${product.price}
+                          </p>
+                          <p className="text-green-400 font-bold text-lg">
+                            $
+                            {(
+                              product.price *
+                              (1 - product.sale_discount_percentage / 100)
+                            ).toFixed(2)}
+                          </p>
+                          <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded font-semibold">
+                            {product.sale_discount_percentage}% OFF
+                          </span>
+                        </>
+                      ) : (
+                        <p className="text-gold-400 font-bold text-lg">
+                          ${product.price}
+                        </p>
+                      )}
+                    </div>
                     {product.store_name && (
                       <p className="text-white/70 text-sm">
                         By: {product.store_name}

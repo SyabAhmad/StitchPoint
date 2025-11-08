@@ -1,27 +1,30 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { addToCart } from "../../utils/cartUtils";
 import toast from "react-hot-toast";
 
 export default function NewArrivals() {
   const [products, setProducts] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchProducts = async () => {
+    const fetchNewArrivals = async () => {
       try {
-        const response = await fetch("http://127.0.0.1:5000/api/products");
+        const response = await fetch(
+          "http://127.0.0.1:5000/api/products/new-arrivals"
+        );
         if (!response.ok) {
-          throw new Error("Failed to fetch products");
+          throw new Error("Failed to fetch new arrivals");
         }
         const data = await response.json();
-        // Get the latest 6 products
-        setProducts(data.slice(0, 6));
+        setProducts(data.products || []);
       } catch (err) {
-        console.error("Error fetching products:", err);
+        console.error("Error fetching new arrivals:", err);
         setProducts([]);
       }
     };
 
-    fetchProducts();
+    fetchNewArrivals();
   }, []);
 
   const handleAddToCart = async (product) => {
@@ -31,6 +34,12 @@ export default function NewArrivals() {
     } catch (error) {
       console.error("Error adding to cart:", error);
       toast.error("Failed to add to cart");
+    }
+  };
+
+  const handleProductClick = (product) => {
+    if (product && product.id) {
+      navigate(`/product/${product.id}`);
     }
   };
 
@@ -46,7 +55,8 @@ export default function NewArrivals() {
           products.map((product) => (
             <div
               key={product.id}
-              className="rounded-2xl overflow-hidden bg-white shadow-lg border border-gold-500/10 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300"
+              className="rounded-2xl overflow-hidden bg-white shadow-lg border border-gold-500/10 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 cursor-pointer"
+              onClick={() => handleProductClick(product)}
             >
               <div
                 className="h-64 bg-cover bg-center"
@@ -61,9 +71,36 @@ export default function NewArrivals() {
                   <strong className="text-lg font-semibold text-black mb-2 block">
                     {product.name}
                   </strong>
-                  <p className="text-gold-500 font-bold text-lg mb-1">
-                    ${product.price}
-                  </p>
+                  <div className="flex items-center gap-2 mb-1">
+                    {product.sale_type && product.sale_discount_percentage && (
+                      <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full font-semibold">
+                        {product.sale_type} SALE
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {product.sale_type && product.sale_discount_percentage ? (
+                      <>
+                        <p className="text-red-500 font-bold text-lg line-through">
+                          PKR{product.price}
+                        </p>
+                        <p className="text-green-600 font-bold text-lg">
+                          PKR
+                          {(
+                            product.price *
+                            (1 - product.sale_discount_percentage / 100)
+                          ).toFixed(2)}
+                        </p>
+                        <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded font-semibold">
+                          {product.sale_discount_percentage}% OFF
+                        </span>
+                      </>
+                    ) : (
+                      <p className="text-gold-500 font-bold text-lg">
+                        PKR-{product.price}
+                      </p>
+                    )}
+                  </div>
                   {product.store_name && (
                     <p className="text-black/50 text-xs">
                       By: {product.store_name}

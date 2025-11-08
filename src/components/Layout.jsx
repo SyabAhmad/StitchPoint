@@ -1,6 +1,7 @@
 import { Outlet } from "react-router-dom";
 import NaqshCoutureNavbar from "./header/NaqshCoutureNavbar.jsx";
 import Footer from "./footer/Footer.jsx";
+import ScrollToTop from "./ScrollToTop.jsx";
 
 const Layout = () => {
   return (
@@ -14,6 +15,9 @@ const Layout = () => {
       </main>
 
       <Footer />
+
+      {/* Scroll to top button - appears on all pages */}
+      <ScrollToTop />
     </div>
   );
 };

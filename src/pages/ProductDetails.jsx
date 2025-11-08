@@ -454,20 +454,40 @@ const ProductDetails = ({
 
                   {/* Enhanced Price */}
                   <div className="mb-6">
-                    <div
-                      className="text-4xl font-bold mb-2"
-                      style={{ color: "#d4af37" }}
-                    >
-                      PKR {product.price}
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <span className="text-sm text-gray-500 line-through">
-                        PKR 299.99
-                      </span>
-                      <span className="text-sm font-semibold text-green-600 bg-green-50 px-2 py-1 rounded">
-                        Save 20%
-                      </span>
-                    </div>
+                    {product.sale_type && product.sale_discount_percentage ? (
+                      <>
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="bg-red-500 text-white text-sm px-3 py-1 rounded-full font-semibold">
+                            {product.sale_type} SALE
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <div className="text-4xl font-bold text-red-500 line-through">
+                            PKR {product.price}
+                          </div>
+                          <div
+                            className="text-4xl font-bold"
+                            style={{ color: "#d4af37" }}
+                          >
+                            PKR{" "}
+                            {(
+                              product.price *
+                              (1 - product.sale_discount_percentage / 100)
+                            ).toFixed(2)}
+                          </div>
+                          <span className="text-lg font-semibold text-green-600 bg-green-50 px-3 py-2 rounded-lg">
+                            {product.sale_discount_percentage}% OFF
+                          </span>
+                        </div>
+                      </>
+                    ) : (
+                      <div
+                        className="text-4xl font-bold mb-2"
+                        style={{ color: "#d4af37" }}
+                      >
+                        PKR {product.price}
+                      </div>
+                    )}
                   </div>
 
                   {/* Enhanced Stock Status */}
@@ -1039,12 +1059,40 @@ const ProductDetails = ({
                   <h3 className="font-semibold text-gray-900 mb-1 text-sm">
                     {rec.name}
                   </h3>
-                  <p
-                    className="font-bold text-base"
-                    style={{ color: "#d4af37" }}
-                  >
-                    PKR {rec.price}
-                  </p>
+                  <div className="flex items-center gap-2 mb-1">
+                    {rec.sale_type && rec.sale_discount_percentage && (
+                      <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full font-semibold">
+                        {rec.sale_type} SALE
+                      </span>
+                    )}
+                  </div>
+                  {rec.sale_type && rec.sale_discount_percentage ? (
+                    <div className="flex items-center gap-2">
+                      <p className="text-red-500 font-bold text-base line-through">
+                        PKR {rec.price}
+                      </p>
+                      <p
+                        className="font-bold text-base"
+                        style={{ color: "#d4af37" }}
+                      >
+                        PKR{" "}
+                        {(
+                          rec.price *
+                          (1 - rec.sale_discount_percentage / 100)
+                        ).toFixed(2)}
+                      </p>
+                      <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded font-semibold">
+                        {rec.sale_discount_percentage}% OFF
+                      </span>
+                    </div>
+                  ) : (
+                    <p
+                      className="font-bold text-base"
+                      style={{ color: "#d4af37" }}
+                    >
+                      PKR {rec.price}
+                    </p>
+                  )}
                 </div>
               </div>
             ))}

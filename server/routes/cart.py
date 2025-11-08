@@ -15,8 +15,8 @@ def get_cart():
         return jsonify({'message': 'Invalid token identity'}), 422
 
     user = User.query.get(user_id)
-    if not user or user.role != 'customer':
-        return jsonify({'message': 'Unauthorized'}), 403
+    if not user:
+        return jsonify({'message': 'User not found'}), 404
 
     # Get or create user's cart
     cart = user.carts[0] if user.carts else Cart(user_id=user_id)
@@ -53,8 +53,8 @@ def add_to_cart():
         return jsonify({'message': 'Invalid token identity'}), 422
 
     user = User.query.get(user_id)
-    if not user or user.role != 'customer':
-        return jsonify({'message': 'Unauthorized'}), 403
+    if not user:
+        return jsonify({'message': 'User not found'}), 404
 
     data = request.get_json() or {}
     product_id = data.get('product_id')
@@ -103,8 +103,8 @@ def update_cart_item():
         return jsonify({'message': 'Invalid token identity'}), 422
 
     user = User.query.get(user_id)
-    if not user or user.role != 'customer':
-        return jsonify({'message': 'Unauthorized'}), 403
+    if not user:
+        return jsonify({'message': 'User not found'}), 404
 
     data = request.get_json() or {}
     product_id = data.get('product_id')
@@ -148,8 +148,8 @@ def remove_from_cart(product_id):
         return jsonify({'message': 'Invalid token identity'}), 422
 
     user = User.query.get(user_id)
-    if not user or user.role != 'customer':
-        return jsonify({'message': 'Unauthorized'}), 403
+    if not user:
+        return jsonify({'message': 'User not found'}), 404
 
     # Get user's cart
     cart = user.carts[0] if user.carts else None
@@ -179,8 +179,8 @@ def clear_cart():
         return jsonify({'message': 'Invalid token identity'}), 422
 
     user = User.query.get(user_id)
-    if not user or user.role != 'customer':
-        return jsonify({'message': 'Unauthorized'}), 403
+    if not user:
+        return jsonify({'message': 'User not found'}), 404
 
     # Get user's cart
     cart = user.carts[0] if user.carts else None

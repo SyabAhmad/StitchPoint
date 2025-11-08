@@ -16,6 +16,7 @@ const ManagerProducts = () => {
     description: "",
     price: "",
     category_id: "",
+    district: "",
     stock_quantity: "",
     image_1: null,
     image_2: null,
@@ -26,6 +27,11 @@ const ManagerProducts = () => {
     dimensions: "",
     weight: "",
     care_instructions: "",
+    // Sale fields
+    sale_type: "",
+    sale_start_date: "",
+    sale_end_date: "",
+    sale_discount_percentage: "",
   });
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -237,12 +243,16 @@ const ManagerProducts = () => {
           image_1: null,
           image_2: null,
           image_3: null,
-          artisan_name: "",
-          artisan_location: "",
+          artisan_name: user?.store_name || "",
+          artisan_location: user?.store_address || "",
           materials: "",
           dimensions: "",
           weight: "",
           care_instructions: "",
+          sale_type: "",
+          sale_start_date: "",
+          sale_end_date: "",
+          sale_discount_percentage: "",
         });
         alert(editingProduct ? "Product updated!" : "Product added!");
       } else {
@@ -261,16 +271,30 @@ const ManagerProducts = () => {
       description: product.description || "",
       price: product.price || "",
       category_id: product.category_id || "",
-      stock_quantity: product.stock_quantity || "",
-      image_1: null,
+      stock_quantity: product.stock_quantity || 0, // Ensure it's a number
+      image_1: null, // Keep as null for file input, existing image will be shown separately
       image_2: null,
       image_3: null,
-      artisan_name: product.artisan_name || "",
-      artisan_location: product.artisan_location || "",
+      artisan_name:
+        product.artisan_name || product.store_name || user?.store_name || "",
+      artisan_location:
+        product.artisan_location ||
+        product.store_address ||
+        user?.store_address ||
+        "",
       materials: product.materials || "",
       dimensions: product.dimensions || "",
       weight: product.weight || "",
       care_instructions: product.care_instructions || "",
+      sale_type: product.sale_type || "",
+      sale_start_date: product.sale_start_date
+        ? new Date(product.sale_start_date).toISOString().slice(0, 16)
+        : "",
+      sale_end_date: product.sale_end_date
+        ? new Date(product.sale_end_date).toISOString().slice(0, 16)
+        : "",
+      sale_discount_percentage: product.sale_discount_percentage || "",
+      district: product.district || "",
     });
     setShowAddForm(true);
   };
@@ -337,6 +361,7 @@ const ManagerProducts = () => {
                 description: "",
                 price: "",
                 category_id: "",
+                district: "",
                 stock_quantity: "",
                 image_1: null,
                 image_2: null,
@@ -347,6 +372,10 @@ const ManagerProducts = () => {
                 dimensions: "",
                 weight: "",
                 care_instructions: "",
+                sale_type: "",
+                sale_start_date: "",
+                sale_end_date: "",
+                sale_discount_percentage: "",
               });
             }}
             className="flex items-center px-4 py-2 rounded-md transition-all duration-200"
@@ -513,12 +542,11 @@ const ManagerProducts = () => {
                     className="block text-sm font-medium mb-2"
                     style={{ color: "#ffffff" }}
                   >
-                    Artisan Name
+                    District/Area
                   </label>
-                  <input
-                    type="text"
-                    name="artisan_name"
-                    value={formData.artisan_name}
+                  <select
+                    name="district"
+                    value={formData.district}
                     onChange={handleInputChange}
                     className="w-full px-3 py-2 rounded transition-colors duration-200"
                     style={{
@@ -532,7 +560,34 @@ const ManagerProducts = () => {
                     onBlur={(e) => {
                       e.currentTarget.style.borderColor = "#3d3d3d";
                     }}
-                  />
+                  >
+                    <option value="">Select District/Area</option>
+                    <option value="Karachi">Karachi</option>
+                    <option value="Lahore">Lahore</option>
+                    <option value="Islamabad">Islamabad</option>
+                    <option value="Rawalpindi">Rawalpindi</option>
+                    <option value="Faisalabad">Faisalabad</option>
+                    <option value="Multan">Multan</option>
+                    <option value="Peshawar">Peshawar</option>
+                    <option value="Quetta">Quetta</option>
+                    <option value="Sialkot">Sialkot</option>
+                    <option value="Gujranwala">Gujranwala</option>
+                    <option value="Bahawalpur">Bahawalpur</option>
+                    <option value="Sargodha">Sargodha</option>
+                    <option value="Jhang">Jhang</option>
+                    <option value="Sheikhupura">Sheikhupura</option>
+                    <option value="Abbottabad">Abbottabad</option>
+                    <option value="Sukkur">Sukkur</option>
+                    <option value="Hyderabad">Hyderabad</option>
+                    <option value="Larkana">Larkana</option>
+                    <option value="Nawabshah">Nawabshah</option>
+                    <option value="Mirpur Khas">Mirpur Khas</option>
+                    <option value="Jacobabad">Jacobabad</option>
+                    <option value="Shikarpur">Shikarpur</option>
+                    <option value="Khairpur">Khairpur</option>
+                    <option value="Dadu">Dadu</option>
+                    <option value="Other">Other</option>
+                  </select>
                 </div>
               </div>
 
@@ -543,6 +598,19 @@ const ManagerProducts = () => {
                 >
                   Image 1 (Required) *
                 </label>
+                {editingProduct && editingProduct.image_url && (
+                  <div className="mb-2">
+                    <p className="text-sm" style={{ color: "#cccccc" }}>
+                      Current image: {editingProduct.image_url.split("/").pop()}
+                    </p>
+                    <img
+                      src={`http://localhost:5000${editingProduct.image_url}`}
+                      alt="Current product image"
+                      className="w-20 h-20 object-cover rounded border"
+                      style={{ borderColor: "#3d3d3d" }}
+                    />
+                  </div>
+                )}
                 <input
                   type="file"
                   name="image_1"
@@ -560,8 +628,13 @@ const ManagerProducts = () => {
                   onBlur={(e) => {
                     e.currentTarget.style.borderColor = "#3d3d3d";
                   }}
-                  required
+                  required={!editingProduct}
                 />
+                {editingProduct && (
+                  <p className="text-xs mt-1" style={{ color: "#999999" }}>
+                    Leave empty to keep current image
+                  </p>
+                )}
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -785,7 +858,142 @@ const ManagerProducts = () => {
                 </div>
               </div>
 
-              <div className="flex justify-end space-x-4">
+              {/* Sale Information Section */}
+              <div
+                className="mt-6 p-4 rounded-lg"
+                style={{ backgroundColor: "#2d2d2d" }}
+              >
+                <h4
+                  className="text-md font-medium mb-4"
+                  style={{ color: "#d4af37" }}
+                >
+                  Special Sale Information (Optional)
+                </h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label
+                      className="block text-sm font-medium mb-2"
+                      style={{ color: "#ffffff" }}
+                    >
+                      Sale Type
+                    </label>
+                    <select
+                      name="sale_type"
+                      value={formData.sale_type}
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2 rounded transition-colors duration-200"
+                      style={{
+                        backgroundColor: "#1d1d1d",
+                        color: "#ffffff",
+                        border: "1px solid #3d3d3d",
+                      }}
+                      onFocus={(e) => {
+                        e.currentTarget.style.borderColor = "#d4af37";
+                      }}
+                      onBlur={(e) => {
+                        e.currentTarget.style.borderColor = "#3d3d3d";
+                      }}
+                    >
+                      <option value="">No Sale</option>
+                      <option value="EID">EID Sale</option>
+                      <option value="Friday">Friday Sale</option>
+                      <option value="Christmas">Christmas Sale</option>
+                      <option value="New Year">New Year Sale</option>
+                      <option value="Ramadan">Ramadan Sale</option>
+                      <option value="Independence Day">
+                        Independence Day Sale
+                      </option>
+                      <option value="Custom">Custom Sale</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label
+                      className="block text-sm font-medium mb-2"
+                      style={{ color: "#ffffff" }}
+                    >
+                      Discount Percentage (%)
+                    </label>
+                    <input
+                      type="number"
+                      name="sale_discount_percentage"
+                      value={formData.sale_discount_percentage}
+                      onChange={handleInputChange}
+                      min="0"
+                      max="100"
+                      step="0.1"
+                      placeholder="e.g., 15.5"
+                      className="w-full px-3 py-2 rounded transition-colors duration-200"
+                      style={{
+                        backgroundColor: "#1d1d1d",
+                        color: "#ffffff",
+                        border: "1px solid #3d3d3d",
+                      }}
+                      onFocus={(e) => {
+                        e.currentTarget.style.borderColor = "#d4af37";
+                      }}
+                      onBlur={(e) => {
+                        e.currentTarget.style.borderColor = "#3d3d3d";
+                      }}
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                  <div>
+                    <label
+                      className="block text-sm font-medium mb-2"
+                      style={{ color: "#ffffff" }}
+                    >
+                      Sale Start Date & Time
+                    </label>
+                    <input
+                      type="datetime-local"
+                      name="sale_start_date"
+                      value={formData.sale_start_date}
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2 rounded transition-colors duration-200"
+                      style={{
+                        backgroundColor: "#1d1d1d",
+                        color: "#ffffff",
+                        border: "1px solid #3d3d3d",
+                      }}
+                      onFocus={(e) => {
+                        e.currentTarget.style.borderColor = "#d4af37";
+                      }}
+                      onBlur={(e) => {
+                        e.currentTarget.style.borderColor = "#3d3d3d";
+                      }}
+                    />
+                  </div>
+                  <div>
+                    <label
+                      className="block text-sm font-medium mb-2"
+                      style={{ color: "#ffffff" }}
+                    >
+                      Sale End Date & Time
+                    </label>
+                    <input
+                      type="datetime-local"
+                      name="sale_end_date"
+                      value={formData.sale_end_date}
+                      onChange={handleInputChange}
+                      className="w-full px-3 py-2 rounded transition-colors duration-200"
+                      style={{
+                        backgroundColor: "#1d1d1d",
+                        color: "#ffffff",
+                        border: "1px solid #3d3d3d",
+                      }}
+                      onFocus={(e) => {
+                        e.currentTarget.style.borderColor = "#d4af37";
+                      }}
+                      onBlur={(e) => {
+                        e.currentTarget.style.borderColor = "#3d3d3d";
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex justify-end space-x-4 mt-6">
                 <button
                   type="button"
                   onClick={() => {

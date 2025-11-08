@@ -285,6 +285,19 @@ const ManagerProfile = () => {
               >
                 Store Logo
               </label>
+              {user && user.store_logo && (
+                <div className="mb-2">
+                  <p className="text-sm" style={{ color: "#cccccc" }}>
+                    Current logo: {user.store_logo.split("/").pop()}
+                  </p>
+                  <img
+                    src={`http://localhost:5000${user.store_logo}`}
+                    alt="Current store logo"
+                    className="w-20 h-20 object-cover rounded border"
+                    style={{ borderColor: "#3d3d3d" }}
+                  />
+                </div>
+              )}
               <input
                 type="file"
                 name="store_logo"
@@ -303,6 +316,11 @@ const ManagerProfile = () => {
                   e.currentTarget.style.borderColor = "#3d3d3d";
                 }}
               />
+              {user && user.store_logo && (
+                <p className="text-xs mt-1" style={{ color: "#999999" }}>
+                  Leave empty to keep current logo
+                </p>
+              )}
             </div>
 
             <div>

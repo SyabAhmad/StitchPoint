@@ -53,7 +53,20 @@ class Product(db.Model):
     stock_quantity = db.Column(db.Integer, default=0)
     image_url = db.Column(db.String(500), nullable=True)
     category = db.Column(db.String(100), nullable=True)
+    district = db.Column(db.String(100), nullable=True)  # e.g., 'Karachi', 'Sindh', 'Lahore'
     store_id = db.Column(db.Integer, db.ForeignKey('store.id'), nullable=False)
+    # Sale fields
+    sale_type = db.Column(db.String(100), nullable=True)  # e.g., 'EID', 'Friday', 'Christmas'
+    sale_start_date = db.Column(db.DateTime, nullable=True)
+    sale_end_date = db.Column(db.DateTime, nullable=True)
+    sale_discount_percentage = db.Column(db.Float, nullable=True)  # e.g., 10.0 for 10%
+
+    # Display control fields
+    is_featured = db.Column(db.Boolean, default=False)  # For featured products section
+    is_new_arrival = db.Column(db.Boolean, default=True)  # For new arrivals section
+    featured_order = db.Column(db.Integer, default=0)  # Display order for featured products
+    new_arrival_order = db.Column(db.Integer, default=0)  # Display order for new arrivals
+
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 

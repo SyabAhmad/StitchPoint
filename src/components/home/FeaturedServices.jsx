@@ -67,7 +67,7 @@ export default function FeaturedServices() {
                 </ul>
               </div>
               <div>
-                <button className="bg-gradient-to-r from-gold-500 to-gold-600 text-white border-none px-6 py-3 rounded-lg font-semibold hover:from-gold-600 hover:to-gold-500 transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-1">
+                <button className="bg-gradient-to-r from-gold-500 to-gold-600 text-black/80 border-none px-6 py-3 rounded-lg font-semibold hover:from-gold-600 hover:to-gold-500 transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-1">
                   Learn More
                 </button>
               </div>
