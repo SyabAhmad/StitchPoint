@@ -5,6 +5,7 @@ import { Toaster } from "react-hot-toast";
 import Layout from "./components/Layout.jsx";
 import HomePage from "./pages/HomePage.jsx";
 import About from "./pages/About.jsx";
+import Shop from "./pages/Shop.jsx";
 import Collections from "./pages/Collections.jsx";
 import ProductDetails from "./pages/ProductDetails.jsx";
 import StoreDetails from "./pages/StoreDetails.jsx";
@@ -51,6 +52,7 @@ function App() {
         <Route path="/" element={<Layout />}>
           <Route index element={<HomePage />} />
           <Route path="about" element={<About />} />
+          <Route path="shop" element={<Shop />} />
           <Route path="collections" element={<Collections />} />
           <Route path="product/:id" element={<ProductDetails />} />
           <Route path="store/:store_id" element={<StoreDetails />} />
@@ -60,52 +62,52 @@ function App() {
           <Route path="wishlist" element={<Wishlist />} />
           <Route path="login" element={<Login />} />
           <Route path="signup" element={<Signup />} />
-          <Route path="dashboard" element={<CustomerDashboard />} />
-          <Route path="customer/dashboard" element={<CustomerDashboard />} />
-          <Route path="profile" element={<CustomerProfile />} />
-          <Route path="customer/profile" element={<CustomerProfile />} />
-          <Route path="customer/orders" element={<CustomerOrders />} />
-          <Route path="customer/orders/:orderId" element={<CustomerOrders />} />
-          <Route path="manager-dashboard" element={<ManagerDashboard />}>
-            <Route index element={<div />} />
-            <Route path="products" element={<ManagerProducts />} />
-            <Route path="orders" element={<ManagerOrders />} />
-            <Route path="categories" element={<ManagerCategories />} />
-            <Route path="analytics" element={<ManagerAnalytics />} />
-            <Route path="comments" element={<ManagerComments />} />
-            <Route path="reviews" element={<ManagerReviews />} />
-            <Route path="profile" element={<ManagerProfile />} />
-          </Route>
-          <Route path="super-admin-dashboard" element={<SuperAdminDashboard />}>
-            <Route index element={<QuickActions />} />
-            <Route path="analytics" element={<Analytics />} />
-            <Route path="user-management" element={<UserManagement />} />
-            <Route path="products" element={<Products />} />
-            <Route path="orders" element={<Orders />} />
-            <Route path="product-analytics" element={<ProductAnalytics />} />
-            <Route path="store-analytics" element={<StoreAnalytics />} />
-            <Route
-              path="store-analytics/:store_id"
-              element={<StoreAnalyticsDetail />}
-            />
-            <Route
-              path="store-analytics/:store_id/reviews"
-              element={<StoreReviews />}
-            />
-            <Route
-              path="store-analytics/:store_id/comments"
-              element={<StoreComments />}
-            />
-            <Route
-              path="store-analytics/:store_id/products"
-              element={<StoreProducts />}
-            />
-            <Route path="comments" element={<Comments />} />
-            <Route path="reviews" element={<Reviews />} />
-            <Route path="reviews/:review_id" element={<ReviewDetails />} />
-            <Route path="commission-rates" element={<CommissionRates />} />
-            <Route path="commissions" element={<Commissions />} />
-          </Route>
+        </Route>
+        <Route path="dashboard" element={<CustomerDashboard />} />
+        <Route path="customer/dashboard" element={<CustomerDashboard />} />
+        <Route path="profile" element={<CustomerProfile />} />
+        <Route path="customer/profile" element={<CustomerProfile />} />
+        <Route path="customer/orders" element={<CustomerOrders />} />
+        <Route path="customer/orders/:orderId" element={<CustomerOrders />} />
+        <Route path="manager-dashboard" element={<ManagerDashboard />}>
+          <Route index element={<div />} />
+          <Route path="products" element={<ManagerProducts />} />
+          <Route path="orders" element={<ManagerOrders />} />
+          <Route path="categories" element={<ManagerCategories />} />
+          <Route path="analytics" element={<ManagerAnalytics />} />
+          <Route path="comments" element={<ManagerComments />} />
+          <Route path="reviews" element={<ManagerReviews />} />
+          <Route path="profile" element={<ManagerProfile />} />
+        </Route>
+        <Route path="super-admin-dashboard" element={<SuperAdminDashboard />}>
+          <Route index element={<QuickActions />} />
+          <Route path="analytics" element={<Analytics />} />
+          <Route path="user-management" element={<UserManagement />} />
+          <Route path="products" element={<Products />} />
+          <Route path="orders" element={<Orders />} />
+          <Route path="product-analytics" element={<ProductAnalytics />} />
+          <Route path="store-analytics" element={<StoreAnalytics />} />
+          <Route
+            path="store-analytics/:store_id"
+            element={<StoreAnalyticsDetail />}
+          />
+          <Route
+            path="store-analytics/:store_id/reviews"
+            element={<StoreReviews />}
+          />
+          <Route
+            path="store-analytics/:store_id/comments"
+            element={<StoreComments />}
+          />
+          <Route
+            path="store-analytics/:store_id/products"
+            element={<StoreProducts />}
+          />
+          <Route path="comments" element={<Comments />} />
+          <Route path="reviews" element={<Reviews />} />
+          <Route path="reviews/:review_id" element={<ReviewDetails />} />
+          <Route path="commission-rates" element={<CommissionRates />} />
+          <Route path="commissions" element={<Commissions />} />
         </Route>
       </Routes>
     </Router>

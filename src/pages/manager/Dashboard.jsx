@@ -18,6 +18,7 @@ import { fetchWithAuth } from "../../utils/fetchWithAuth.js";
 import CostChart from "../../components/analytics/CostChart.jsx";
 import SalesChart from "../../components/analytics/SalesChart.jsx";
 import ProfitChart from "../../components/analytics/ProfitChart.jsx";
+import SmartFooter from "../../components/footer/SmartFooter.jsx";
 
 const ManagerDashboard = () => {
   const location = useLocation();
@@ -109,6 +110,32 @@ const ManagerDashboard = () => {
           </div>
           <div className="flex items-center space-x-4">
             <Link
+              to="/"
+              className="px-4 py-2 rounded-lg transition-all"
+              style={{ backgroundColor: "white", color: "#000000" }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = "#b8860b";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = "#d4af37";
+              }}
+            >
+              Home
+            </Link>
+            <Link
+              to="/shop"
+              className="px-4 py-2 rounded-lg transition-all"
+              style={{ backgroundColor: "white", color: "#000000" }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = "#b8860b";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = "#d4af37";
+              }}
+            >
+              Shop
+            </Link>
+            <Link
               to="/manager-dashboard/profile"
               className="px-4 py-2 rounded-lg transition-all"
               style={{ backgroundColor: "#d4af37", color: "#000000" }}
@@ -126,7 +153,7 @@ const ManagerDashboard = () => {
                 localStorage.clear();
                 window.location.href = "/login";
               }}
-              className="px-4 py-2 rounded-lg transition-all"
+              className="px-4 py-2 rounded-lg transition-all hover:cursor-pointer"
               style={{ backgroundColor: "#dc3545", color: "#ffffff" }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.backgroundColor = "#c82333";
@@ -764,6 +791,8 @@ const ManagerDashboard = () => {
           </div>
         </main>
       </div>
+
+      <SmartFooter variant="simple" />
     </div>
   );
 };

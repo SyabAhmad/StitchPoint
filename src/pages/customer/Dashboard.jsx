@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { fetchWithAuth } from "../../utils/fetchWithAuth.js";
+import SmartFooter from "../../components/footer/SmartFooter.jsx";
 
 const CustomerDashboard = () => {
   const navigate = useNavigate();
@@ -91,6 +92,32 @@ const CustomerDashboard = () => {
           </div>
           <div className="flex items-center space-x-4">
             <Link
+              to="/"
+              className="px-4 py-2 rounded-lg transition-all"
+              style={{ backgroundColor: "white", color: "#000000" }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = "#b8860b";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = "#d4af37";
+              }}
+            >
+              Home
+            </Link>
+            <Link
+              to="/shop"
+              className="px-4 py-2 rounded-lg transition-all"
+              style={{ backgroundColor: "white", color: "#000000" }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = "#b8860b";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = "#d4af37";
+              }}
+            >
+              Shop
+            </Link>
+            <Link
               to="/profile"
               className="px-4 py-2 rounded-lg transition-all"
               style={{ backgroundColor: "#d4af37", color: "#000000" }}
@@ -108,7 +135,7 @@ const CustomerDashboard = () => {
                 localStorage.clear();
                 window.location.href = "/login";
               }}
-              className="px-4 py-2 rounded-lg transition-all"
+              className="px-4 py-2 rounded-lg transition-all hover:cursor-pointer"
               style={{ backgroundColor: "#dc3545", color: "#ffffff" }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.backgroundColor = "#c82333";
@@ -643,6 +670,8 @@ const CustomerDashboard = () => {
           </div>
         </main>
       </div>
+
+      <SmartFooter variant="simple" />
     </div>
   );
 };

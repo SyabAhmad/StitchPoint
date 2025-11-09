@@ -64,8 +64,8 @@ const NaqshCoutureNavbar = () => {
             </Link>
           </li>
           <li>
-            <Link to="/collections" className="nav-link">
-              Collections
+            <Link to="/shop" className="nav-link">
+              Shop
             </Link>
           </li>
           <li>
@@ -89,8 +89,8 @@ const NaqshCoutureNavbar = () => {
               </Link>
             </li>
             <li>
-              <Link to="/collections" className="nav-link" onClick={toggleMenu}>
-                Collections
+              <Link to="/shop" className="nav-link" onClick={toggleMenu}>
+                Shop
               </Link>
             </li>
             <li>
