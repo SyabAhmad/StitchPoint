@@ -177,18 +177,84 @@ const SuperAdminDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: "#000000" }}>
-      <div className="flex">
-        {/* Sidebar */}
+    <div
+      className="h-screen flex flex-col"
+      style={{ backgroundColor: "#000000" }}
+    >
+      {/* Fixed Header */}
+      <header
+        className="shadow-lg px-6 py-4 flex-shrink-0"
+        style={{
+          backgroundColor: "#1d1d1d",
+          borderBottom: "1px solid #2d2d2d",
+        }}
+      >
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <h1 className="text-white text-2xl font-bold">Naqsh Couture</h1>
+            <span style={{ color: "#cccccc" }}>Super Admin Panel</span>
+          </div>
+          <div className="flex items-center space-x-4">
+            <Link
+              to="/super-admin-dashboard/user-management"
+              className="px-4 py-2 rounded-lg transition-all"
+              style={{ backgroundColor: "#d4af37", color: "#000000" }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = "#b8860b";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = "#d4af37";
+              }}
+            >
+              Settings
+            </Link>
+            <button
+              onClick={() => {
+                localStorage.clear();
+                window.location.href = "/login";
+              }}
+              className="px-4 py-2 rounded-lg transition-all"
+              style={{ backgroundColor: "#dc3545", color: "#ffffff" }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = "#c82333";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = "#dc3545";
+              }}
+            >
+              Logout
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <div className="flex-1 flex overflow-hidden">
+        {/* Fixed Aside */}
         <aside
-          className="w-64 shadow-lg min-h-screen"
+          className="w-64 shadow-lg flex-shrink-0 overflow-y-auto"
           style={{ backgroundColor: "#1d1d1d" }}
         >
           <div className="p-6 border-b" style={{ borderColor: "#2d2d2d" }}>
-            <h2 className="text-xl font-bold" style={{ color: "#d4af37" }}>
-              Super Admin Panel
-            </h2>
+            <div className="flex items-center space-x-3">
+              <div
+                className="w-12 h-12 rounded-full flex items-center justify-center"
+                style={{ backgroundColor: "#d4af37" }}
+              >
+                <span className="text-black font-bold text-lg">
+                  {userData?.name?.charAt(0)?.toUpperCase() || "S"}
+                </span>
+              </div>
+              <div>
+                <p className="font-semibold" style={{ color: "#ffffff" }}>
+                  {userData?.name || "Super Admin"}
+                </p>
+                <p className="text-sm" style={{ color: "#cccccc" }}>
+                  {userData?.email}
+                </p>
+              </div>
+            </div>
           </div>
+
           <nav className="mt-6">
             <div className="px-6 py-2">
               <h3
@@ -360,42 +426,46 @@ const SuperAdminDashboard = () => {
                     Reviews
                   </Link>
                 </li>
-                <li>
-                  <Link
-                    to="/super-admin-dashboard/commissions"
-                    className="flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200"
-                    style={{ color: "#ffffff" }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = "#2d2d2d";
-                      e.currentTarget.style.color = "#d4af37";
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = "transparent";
-                      e.currentTarget.style.color = "#ffffff";
-                    }}
-                  >
-                    <FaMoneyBillWave className="mr-3 h-5 w-5" />
-                    Commissions
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/super-admin-dashboard/commission-rates"
-                    className="flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200"
-                    style={{ color: "#ffffff" }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = "#2d2d2d";
-                      e.currentTarget.style.color = "#d4af37";
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = "transparent";
-                      e.currentTarget.style.color = "#ffffff";
-                    }}
-                  >
-                    <FaChartLine className="mr-3 h-5 w-5" />
-                    Commission Rates
-                  </Link>
-                </li>
+                {userData && userData.role === "super_admin" && (
+                  <>
+                    <li>
+                      <Link
+                        to="/super-admin-dashboard/commissions"
+                        className="flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200"
+                        style={{ color: "#ffffff" }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = "#2d2d2d";
+                          e.currentTarget.style.color = "#d4af37";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = "transparent";
+                          e.currentTarget.style.color = "#ffffff";
+                        }}
+                      >
+                        <FaMoneyBillWave className="mr-3 h-5 w-5" />
+                        Commissions
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        to="/super-admin-dashboard/commission-rates"
+                        className="flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200"
+                        style={{ color: "#ffffff" }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = "#2d2d2d";
+                          e.currentTarget.style.color = "#d4af37";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = "transparent";
+                          e.currentTarget.style.color = "#ffffff";
+                        }}
+                      >
+                        <FaChartLine className="mr-3 h-5 w-5" />
+                        Commission Rates
+                      </Link>
+                    </li>
+                  </>
+                )}
               </ul>
             </div>
             <div className="px-6 py-2">
@@ -447,8 +517,8 @@ const SuperAdminDashboard = () => {
           </nav>
         </aside>
 
-        {/* Main Content: render nested route content here */}
-        <main className="flex-1 p-8">
+        {/* Scrollable Main Content */}
+        <main className="flex-1 p-8 overflow-y-auto">
           <div className="max-w-7xl mx-auto">
             {location.pathname === "/super-admin-dashboard" ? (
               <>

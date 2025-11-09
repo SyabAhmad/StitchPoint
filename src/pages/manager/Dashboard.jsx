@@ -25,14 +25,18 @@ const ManagerDashboard = () => {
   const [analytics, setAnalytics] = useState({});
   const [recentOrders, setRecentOrders] = useState([]);
   const [financialTrends, setFinancialTrends] = useState([]);
+  const [userData, setUserData] = useState(null);
+
   useEffect(() => {
     const token = localStorage.getItem("token");
-    const userData = JSON.parse(localStorage.getItem("user"));
+    const storedUserData = JSON.parse(localStorage.getItem("user"));
 
-    if (!token || !userData || userData.role !== "manager") {
+    if (!token || !storedUserData || storedUserData.role !== "manager") {
       window.location.href = "/login";
       return;
     }
+
+    setUserData(storedUserData);
 
     // Fetch dashboard data only if on the main dashboard route
     if (location.pathname === "/manager-dashboard") {
@@ -86,27 +90,93 @@ const ManagerDashboard = () => {
   }
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: "#000000" }}>
-      <div className="flex">
-        {/* Sidebar */}
+    <div
+      className="h-screen flex flex-col"
+      style={{ backgroundColor: "#000000" }}
+    >
+      {/* Fixed Header */}
+      <header
+        className="shadow-lg px-6 py-4 flex-shrink-0"
+        style={{
+          backgroundColor: "#1d1d1d",
+          borderBottom: "1px solid #2d2d2d",
+        }}
+      >
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <h1 className="text-white text-2xl font-bold">Naqsh Couture</h1>
+            <span style={{ color: "#cccccc" }}>Manager Dashboard</span>
+          </div>
+          <div className="flex items-center space-x-4">
+            <Link
+              to="/manager-dashboard/profile"
+              className="px-4 py-2 rounded-lg transition-all"
+              style={{ backgroundColor: "#d4af37", color: "#000000" }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = "#b8860b";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = "#d4af37";
+              }}
+            >
+              Profile
+            </Link>
+            <button
+              onClick={() => {
+                localStorage.clear();
+                window.location.href = "/login";
+              }}
+              className="px-4 py-2 rounded-lg transition-all"
+              style={{ backgroundColor: "#dc3545", color: "#ffffff" }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = "#c82333";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = "#dc3545";
+              }}
+            >
+              Logout
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <div className="flex-1 flex overflow-hidden">
+        {/* Fixed Aside */}
         <aside
-          className="w-64 shadow-lg min-h-screen"
+          className="w-64 shadow-lg flex-shrink-0 overflow-y-auto"
           style={{ backgroundColor: "#1d1d1d" }}
         >
           <div className="p-6 border-b" style={{ borderColor: "#2d2d2d" }}>
-            <h2 className="text-xl font-bold" style={{ color: "#d4af37" }}>
-              Manager Panel
-            </h2>
+            <div className="flex items-center space-x-3">
+              <div
+                className="w-12 h-12 rounded-full flex items-center justify-center"
+                style={{ backgroundColor: "#d4af37" }}
+              >
+                <span className="text-black font-bold text-lg">
+                  {userData?.name?.charAt(0)?.toUpperCase() || "M"}
+                </span>
+              </div>
+              <div>
+                <p className="font-semibold" style={{ color: "#ffffff" }}>
+                  {userData?.name || "Manager"}
+                </p>
+                <p className="text-sm" style={{ color: "#cccccc" }}>
+                  {userData?.email}
+                </p>
+              </div>
+            </div>
           </div>
+
           <nav className="mt-6">
-            <div className="px-6 py-2">
+            <div className="px-6">
               <h3
-                className="text-xs font-semibold uppercase tracking-wider"
+                className="text-xs font-semibold uppercase tracking-wider mb-3"
                 style={{ color: "#d4af37" }}
               >
                 Management
               </h3>
-              <ul className="mt-2 space-y-1">
+              <ul className="space-y-1">
                 <li>
                   <Link
                     to="/manager-dashboard"
@@ -256,8 +326,8 @@ const ManagerDashboard = () => {
           </nav>
         </aside>
 
-        {/* Main Content */}
-        <main className="flex-1 p-8">
+        {/* Scrollable Main Content */}
+        <main className="flex-1 p-8 overflow-y-auto">
           <div className="max-w-7xl mx-auto">
             {location.pathname === "/manager-dashboard" && (
               <>
@@ -297,7 +367,7 @@ const ManagerDashboard = () => {
                             className="text-lg font-medium"
                             style={{ color: "#ffffff" }}
                           >
-                            {analytics.total_products}
+                            {analytics.total_products || 0}
                           </dd>
                         </dl>
                       </div>
@@ -332,7 +402,7 @@ const ManagerDashboard = () => {
                             className="text-lg font-medium"
                             style={{ color: "#ffffff" }}
                           >
-                            {analytics.total_orders}
+                            {analytics.total_orders || 0}
                           </dd>
                         </dl>
                       </div>
