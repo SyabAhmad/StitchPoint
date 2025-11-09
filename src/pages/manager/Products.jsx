@@ -27,6 +27,7 @@ const ManagerProducts = () => {
     dimensions: "",
     weight: "",
     care_instructions: "",
+    is_featured: false,
     // Sale fields
     sale_type: "",
     sale_start_date: "",
@@ -192,9 +193,11 @@ const ManagerProducts = () => {
   };
 
   const handleInputChange = (e) => {
-    const { name, value, type, files } = e.target;
+    const { name, value, type, files, checked } = e.target;
     if (type === "file") {
       setFormData((prev) => ({ ...prev, [name]: files[0] }));
+    } else if (type === "checkbox") {
+      setFormData((prev) => ({ ...prev, [name]: checked }));
     } else {
       setFormData((prev) => ({ ...prev, [name]: value }));
     }
@@ -249,6 +252,7 @@ const ManagerProducts = () => {
           dimensions: "",
           weight: "",
           care_instructions: "",
+          is_featured: false,
           sale_type: "",
           sale_start_date: "",
           sale_end_date: "",
@@ -286,6 +290,7 @@ const ManagerProducts = () => {
       dimensions: product.dimensions || "",
       weight: product.weight || "",
       care_instructions: product.care_instructions || "",
+      is_featured: product.is_featured || false,
       sale_type: product.sale_type || "",
       sale_start_date: product.sale_start_date
         ? new Date(product.sale_start_date).toISOString().slice(0, 16)
@@ -372,6 +377,7 @@ const ManagerProducts = () => {
                 dimensions: "",
                 weight: "",
                 care_instructions: "",
+                is_featured: false,
                 sale_type: "",
                 sale_start_date: "",
                 sale_end_date: "",
@@ -856,6 +862,31 @@ const ManagerProducts = () => {
                     }}
                   />
                 </div>
+              </div>
+
+              <div className="flex items-center space-x-3 mt-4">
+                <input
+                  type="checkbox"
+                  name="is_featured"
+                  checked={formData.is_featured}
+                  onChange={handleInputChange}
+                  className="w-4 h-4 rounded transition-colors duration-200"
+                  style={{
+                    backgroundColor: formData.is_featured
+                      ? "#d4af37"
+                      : "#2d2d2d",
+                    border: "1px solid #3d3d3d",
+                  }}
+                />
+                <label
+                  className="text-sm font-medium"
+                  style={{ color: "#ffffff" }}
+                >
+                  Mark as Featured Product
+                </label>
+                <span className="text-xs" style={{ color: "#999999" }}>
+                  (Will appear in homepage featured section)
+                </span>
               </div>
 
               {/* Sale Information Section */}

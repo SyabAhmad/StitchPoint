@@ -186,6 +186,7 @@ def create_product():
         category=category_name,
         district=district,
         store_id=store_id,
+        is_featured=is_featured,
         sale_type=sale_type,
         sale_start_date=sale_start,
         sale_end_date=sale_end,
@@ -256,7 +257,8 @@ def update_product(product_id):
     stock_quantity = request.form.get('stock_quantity', 0)
     category_id = request.form.get('category_id')
     district = request.form.get('district')
-    district = request.form.get('district')
+    # Get is_featured field
+    is_featured = request.form.get('is_featured', 'false').lower() == 'true'
     # Sale fields
     sale_type = request.form.get('sale_type')
     sale_start_date = request.form.get('sale_start_date')
@@ -299,6 +301,9 @@ def update_product(product_id):
             category_name = category_obj.name
         else:
             return jsonify({'message': 'Invalid category_id'}), 400
+
+    # Get is_featured field
+    is_featured = request.form.get('is_featured', 'false').lower() == 'true'
 
     # Validate sale fields
     from datetime import datetime
@@ -348,6 +353,7 @@ def update_product(product_id):
     product.image_url = image_url
     product.category = category_name
     product.district = district
+    product.is_featured = is_featured
     product.sale_type = sale_type
     product.sale_start_date = sale_start
     product.sale_end_date = sale_end
