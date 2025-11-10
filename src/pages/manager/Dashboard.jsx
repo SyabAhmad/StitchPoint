@@ -100,7 +100,7 @@ const ManagerDashboard = () => {
     >
       {/* Fixed Header */}
       <header
-        className="shadow-lg px-6 py-4 flex-shrink-0"
+        className="shadow-lg px-6 py-4 flex-shrink-0 relative z-60"
         style={{
           backgroundColor: "#1d1d1d",
           borderBottom: "1px solid #2d2d2d",
@@ -197,7 +197,7 @@ const ManagerDashboard = () => {
 
         {/* Fixed Aside */}
         <aside
-          className={`fixed inset-y-0 left-0 z-50 w-64 shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 ${
+          className={`fixed inset-y-0 left-0 z-50 w-64 shadow-lg transform transition-transform duration-300 ease-in-out ${
             sidebarOpen ? "translate-x-0" : "-translate-x-full"
           }`}
           style={{ backgroundColor: "#1d1d1d" }}
@@ -250,15 +250,32 @@ const ManagerDashboard = () => {
                 <li>
                   <Link
                     to="/manager-dashboard"
-                    className="flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200"
-                    style={{ color: "#ffffff" }}
+                    className={`flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
+                      location.pathname === "/manager-dashboard"
+                        ? "active-menu-item"
+                        : ""
+                    }`}
+                    style={{
+                      color:
+                        location.pathname === "/manager-dashboard"
+                          ? "#d4af37"
+                          : "#ffffff",
+                      backgroundColor:
+                        location.pathname === "/manager-dashboard"
+                          ? "#2d2d2d"
+                          : "transparent",
+                    }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = "#2d2d2d";
-                      e.currentTarget.style.color = "#d4af37";
+                      if (location.pathname !== "/manager-dashboard") {
+                        e.currentTarget.style.backgroundColor = "#2d2d2d";
+                        e.currentTarget.style.color = "#d4af37";
+                      }
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = "transparent";
-                      e.currentTarget.style.color = "#ffffff";
+                      if (location.pathname !== "/manager-dashboard") {
+                        e.currentTarget.style.backgroundColor = "transparent";
+                        e.currentTarget.style.color = "#ffffff";
+                      }
                     }}
                   >
                     <FaUsers className="mr-3 h-5 w-5" />
@@ -268,15 +285,32 @@ const ManagerDashboard = () => {
                 <li>
                   <Link
                     to="/manager-dashboard/products"
-                    className="flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200"
-                    style={{ color: "#ffffff" }}
+                    className={`flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
+                      location.pathname === "/manager-dashboard/products"
+                        ? "active-menu-item"
+                        : ""
+                    }`}
+                    style={{
+                      color:
+                        location.pathname === "/manager-dashboard/products"
+                          ? "#d4af37"
+                          : "#ffffff",
+                      backgroundColor:
+                        location.pathname === "/manager-dashboard/products"
+                          ? "#2d2d2d"
+                          : "transparent",
+                    }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = "#2d2d2d";
-                      e.currentTarget.style.color = "#d4af37";
+                      if (location.pathname !== "/manager-dashboard/products") {
+                        e.currentTarget.style.backgroundColor = "#2d2d2d";
+                        e.currentTarget.style.color = "#d4af37";
+                      }
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = "transparent";
-                      e.currentTarget.style.color = "#ffffff";
+                      if (location.pathname !== "/manager-dashboard/products") {
+                        e.currentTarget.style.backgroundColor = "transparent";
+                        e.currentTarget.style.color = "#ffffff";
+                      }
                     }}
                   >
                     <FaBox className="mr-3 h-5 w-5" />
@@ -286,15 +320,32 @@ const ManagerDashboard = () => {
                 <li>
                   <Link
                     to="/manager-dashboard/orders"
-                    className="flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200"
-                    style={{ color: "#ffffff" }}
+                    className={`flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
+                      location.pathname === "/manager-dashboard/orders"
+                        ? "active-menu-item"
+                        : ""
+                    }`}
+                    style={{
+                      color:
+                        location.pathname === "/manager-dashboard/orders"
+                          ? "#d4af37"
+                          : "#ffffff",
+                      backgroundColor:
+                        location.pathname === "/manager-dashboard/orders"
+                          ? "#2d2d2d"
+                          : "transparent",
+                    }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = "#2d2d2d";
-                      e.currentTarget.style.color = "#d4af37";
+                      if (location.pathname !== "/manager-dashboard/orders") {
+                        e.currentTarget.style.backgroundColor = "#2d2d2d";
+                        e.currentTarget.style.color = "#d4af37";
+                      }
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = "transparent";
-                      e.currentTarget.style.color = "#ffffff";
+                      if (location.pathname !== "/manager-dashboard/orders") {
+                        e.currentTarget.style.backgroundColor = "transparent";
+                        e.currentTarget.style.color = "#ffffff";
+                      }
                     }}
                   >
                     <FaShoppingCart className="mr-3 h-5 w-5" />
@@ -304,15 +355,36 @@ const ManagerDashboard = () => {
                 <li>
                   <Link
                     to="/manager-dashboard/categories"
-                    className="flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200"
-                    style={{ color: "#ffffff" }}
+                    className={`flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
+                      location.pathname === "/manager-dashboard/categories"
+                        ? "active-menu-item"
+                        : ""
+                    }`}
+                    style={{
+                      color:
+                        location.pathname === "/manager-dashboard/categories"
+                          ? "#d4af37"
+                          : "#ffffff",
+                      backgroundColor:
+                        location.pathname === "/manager-dashboard/categories"
+                          ? "#2d2d2d"
+                          : "transparent",
+                    }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = "#2d2d2d";
-                      e.currentTarget.style.color = "#d4af37";
+                      if (
+                        location.pathname !== "/manager-dashboard/categories"
+                      ) {
+                        e.currentTarget.style.backgroundColor = "#2d2d2d";
+                        e.currentTarget.style.color = "#d4af37";
+                      }
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = "transparent";
-                      e.currentTarget.style.color = "#ffffff";
+                      if (
+                        location.pathname !== "/manager-dashboard/categories"
+                      ) {
+                        e.currentTarget.style.backgroundColor = "transparent";
+                        e.currentTarget.style.color = "#ffffff";
+                      }
                     }}
                   >
                     <FaStore className="mr-3 h-5 w-5" />
@@ -322,15 +394,36 @@ const ManagerDashboard = () => {
                 <li>
                   <Link
                     to="/manager-dashboard/analytics"
-                    className="flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200"
-                    style={{ color: "#ffffff" }}
+                    className={`flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
+                      location.pathname === "/manager-dashboard/analytics"
+                        ? "active-menu-item"
+                        : ""
+                    }`}
+                    style={{
+                      color:
+                        location.pathname === "/manager-dashboard/analytics"
+                          ? "#d4af37"
+                          : "#ffffff",
+                      backgroundColor:
+                        location.pathname === "/manager-dashboard/analytics"
+                          ? "#2d2d2d"
+                          : "transparent",
+                    }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = "#2d2d2d";
-                      e.currentTarget.style.color = "#d4af37";
+                      if (
+                        location.pathname !== "/manager-dashboard/analytics"
+                      ) {
+                        e.currentTarget.style.backgroundColor = "#2d2d2d";
+                        e.currentTarget.style.color = "#d4af37";
+                      }
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = "transparent";
-                      e.currentTarget.style.color = "#ffffff";
+                      if (
+                        location.pathname !== "/manager-dashboard/analytics"
+                      ) {
+                        e.currentTarget.style.backgroundColor = "transparent";
+                        e.currentTarget.style.color = "#ffffff";
+                      }
                     }}
                   >
                     <FaChartLine className="mr-3 h-5 w-5" />
@@ -340,15 +433,32 @@ const ManagerDashboard = () => {
                 <li>
                   <Link
                     to="/manager-dashboard/comments"
-                    className="flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200"
-                    style={{ color: "#ffffff" }}
+                    className={`flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
+                      location.pathname === "/manager-dashboard/comments"
+                        ? "active-menu-item"
+                        : ""
+                    }`}
+                    style={{
+                      color:
+                        location.pathname === "/manager-dashboard/comments"
+                          ? "#d4af37"
+                          : "#ffffff",
+                      backgroundColor:
+                        location.pathname === "/manager-dashboard/comments"
+                          ? "#2d2d2d"
+                          : "transparent",
+                    }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = "#2d2d2d";
-                      e.currentTarget.style.color = "#d4af37";
+                      if (location.pathname !== "/manager-dashboard/comments") {
+                        e.currentTarget.style.backgroundColor = "#2d2d2d";
+                        e.currentTarget.style.color = "#d4af37";
+                      }
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = "transparent";
-                      e.currentTarget.style.color = "#ffffff";
+                      if (location.pathname !== "/manager-dashboard/comments") {
+                        e.currentTarget.style.backgroundColor = "transparent";
+                        e.currentTarget.style.color = "#ffffff";
+                      }
                     }}
                   >
                     <FaComment className="mr-3 h-5 w-5" />
@@ -358,15 +468,32 @@ const ManagerDashboard = () => {
                 <li>
                   <Link
                     to="/manager-dashboard/reviews"
-                    className="flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200"
-                    style={{ color: "#ffffff" }}
+                    className={`flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
+                      location.pathname === "/manager-dashboard/reviews"
+                        ? "active-menu-item"
+                        : ""
+                    }`}
+                    style={{
+                      color:
+                        location.pathname === "/manager-dashboard/reviews"
+                          ? "#d4af37"
+                          : "#ffffff",
+                      backgroundColor:
+                        location.pathname === "/manager-dashboard/reviews"
+                          ? "#2d2d2d"
+                          : "transparent",
+                    }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = "#2d2d2d";
-                      e.currentTarget.style.color = "#d4af37";
+                      if (location.pathname !== "/manager-dashboard/reviews") {
+                        e.currentTarget.style.backgroundColor = "#2d2d2d";
+                        e.currentTarget.style.color = "#d4af37";
+                      }
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = "transparent";
-                      e.currentTarget.style.color = "#ffffff";
+                      if (location.pathname !== "/manager-dashboard/reviews") {
+                        e.currentTarget.style.backgroundColor = "transparent";
+                        e.currentTarget.style.color = "#ffffff";
+                      }
                     }}
                   >
                     <FaStar className="mr-3 h-5 w-5" />
@@ -376,15 +503,32 @@ const ManagerDashboard = () => {
                 <li>
                   <Link
                     to="/manager-dashboard/profile"
-                    className="flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200"
-                    style={{ color: "#ffffff" }}
+                    className={`flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
+                      location.pathname === "/manager-dashboard/profile"
+                        ? "active-menu-item"
+                        : ""
+                    }`}
+                    style={{
+                      color:
+                        location.pathname === "/manager-dashboard/profile"
+                          ? "#d4af37"
+                          : "#ffffff",
+                      backgroundColor:
+                        location.pathname === "/manager-dashboard/profile"
+                          ? "#2d2d2d"
+                          : "transparent",
+                    }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = "#2d2d2d";
-                      e.currentTarget.style.color = "#d4af37";
+                      if (location.pathname !== "/manager-dashboard/profile") {
+                        e.currentTarget.style.backgroundColor = "#2d2d2d";
+                        e.currentTarget.style.color = "#d4af37";
+                      }
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = "transparent";
-                      e.currentTarget.style.color = "#ffffff";
+                      if (location.pathname !== "/manager-dashboard/profile") {
+                        e.currentTarget.style.backgroundColor = "transparent";
+                        e.currentTarget.style.color = "#ffffff";
+                      }
                     }}
                   >
                     <FaUserCog className="mr-3 h-5 w-5" />

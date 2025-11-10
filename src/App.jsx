@@ -63,12 +63,14 @@ function App() {
           <Route path="login" element={<Login />} />
           <Route path="signup" element={<Signup />} />
         </Route>
-        <Route path="dashboard" element={<CustomerDashboard />} />
-        <Route path="customer/dashboard" element={<CustomerDashboard />} />
-        <Route path="profile" element={<CustomerProfile />} />
-        <Route path="customer/profile" element={<CustomerProfile />} />
-        <Route path="customer/orders" element={<CustomerOrders />} />
-        <Route path="customer/orders/:orderId" element={<CustomerOrders />} />
+        <Route path="customer-dashboard" element={<CustomerDashboard />}>
+          <Route index element={<div />} />
+          <Route path="orders" element={<CustomerOrders />} />
+          <Route path="orders/:orderId" element={<CustomerOrders />} />
+          <Route path="profile" element={<CustomerProfile />} />
+          <Route path="cart" element={<Cart />} />
+          <Route path="wishlist" element={<Wishlist />} />
+        </Route>
         <Route path="manager-dashboard" element={<ManagerDashboard />}>
           <Route index element={<div />} />
           <Route path="products" element={<ManagerProducts />} />

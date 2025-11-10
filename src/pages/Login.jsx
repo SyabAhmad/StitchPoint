@@ -79,7 +79,7 @@ const Login = () => {
               } else if (user.role === "manager") {
                 window.location.href = "/manager-dashboard";
               } else {
-                window.location.href = "/dashboard";
+                window.location.href = "/customer-dashboard";
               }
             }, 1000);
           } else {

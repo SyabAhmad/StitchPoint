@@ -35,6 +35,7 @@ import SmartFooter from "../../components/footer/SmartFooter.jsx";
 
 const SuperAdminDashboard = () => {
   const location = useLocation();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [analytics, setAnalytics] = useState({});
   const [recentOrders, setRecentOrders] = useState([]);
@@ -186,7 +187,7 @@ const SuperAdminDashboard = () => {
     >
       {/* Fixed Header */}
       <header
-        className="shadow-lg px-6 py-4 flex-shrink-0"
+        className="shadow-lg px-6 py-4 flex-shrink-0 relative z-60"
         style={{
           backgroundColor: "#1d1d1d",
           borderBottom: "1px solid #2d2d2d",
@@ -194,6 +195,21 @@ const SuperAdminDashboard = () => {
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
+            <button
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              className="p-2 rounded-lg transition-colors"
+              style={{ backgroundColor: "#2d2d2d", color: "#ffffff" }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = "#d4af37";
+                e.currentTarget.style.color = "#000000";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = "#2d2d2d";
+                e.currentTarget.style.color = "#ffffff";
+              }}
+            >
+              {sidebarOpen ? <FaTimes /> : <FaBars />}
+            </button>
             <h1 className="text-white text-2xl font-bold">Naqsh Couture</h1>
             <span style={{ color: "#cccccc" }}>Super Admin Panel</span>
           </div>
@@ -257,12 +273,38 @@ const SuperAdminDashboard = () => {
         </div>
       </header>
 
+      {/* Mobile Overlay */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
+          onClick={() => setSidebarOpen(false)}
+        ></div>
+      )}
+
       <div className="flex-1 flex overflow-hidden">
         {/* Fixed Aside */}
         <aside
-          className="w-64 shadow-lg flex-shrink-0 overflow-y-auto"
+          className={`w-64 shadow-lg overflow-y-auto md:block md:relative md:flex-shrink-0 fixed inset-y-0 left-0 z-50 transform transition-transform duration-300 ease-in-out ${
+            sidebarOpen ? "translate-x-0" : "-translate-x-full"
+          } md:translate-x-0 md:z-auto`}
           style={{ backgroundColor: "#1d1d1d" }}
         >
+          {/* Mobile Header */}
+          <div
+            className="flex items-center justify-between p-6 border-b md:hidden"
+            style={{ borderColor: "#2d2d2d" }}
+          >
+            <h2 className="text-lg font-semibold" style={{ color: "#ffffff" }}>
+              Menu
+            </h2>
+            <button
+              onClick={() => setSidebarOpen(false)}
+              className="p-2 rounded-lg transition-colors"
+              style={{ backgroundColor: "#2d2d2d", color: "#ffffff" }}
+            >
+              <FaTimes />
+            </button>
+          </div>
           <div className="p-6 border-b" style={{ borderColor: "#2d2d2d" }}>
             <div className="flex items-center space-x-3">
               <div
@@ -296,15 +338,32 @@ const SuperAdminDashboard = () => {
                 <li>
                   <Link
                     to="/super-admin-dashboard"
-                    className="flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200"
-                    style={{ color: "#ffffff" }}
+                    className={`flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
+                      location.pathname === "/super-admin-dashboard"
+                        ? "active-menu-item"
+                        : ""
+                    }`}
+                    style={{
+                      color:
+                        location.pathname === "/super-admin-dashboard"
+                          ? "#d4af37"
+                          : "#ffffff",
+                      backgroundColor:
+                        location.pathname === "/super-admin-dashboard"
+                          ? "#2d2d2d"
+                          : "transparent",
+                    }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = "#2d2d2d";
-                      e.currentTarget.style.color = "#d4af37";
+                      if (location.pathname !== "/super-admin-dashboard") {
+                        e.currentTarget.style.backgroundColor = "#2d2d2d";
+                        e.currentTarget.style.color = "#d4af37";
+                      }
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = "transparent";
-                      e.currentTarget.style.color = "#ffffff";
+                      if (location.pathname !== "/super-admin-dashboard") {
+                        e.currentTarget.style.backgroundColor = "transparent";
+                        e.currentTarget.style.color = "#ffffff";
+                      }
                     }}
                   >
                     <FaUsers className="mr-3 h-5 w-5" />
@@ -314,15 +373,36 @@ const SuperAdminDashboard = () => {
                 <li>
                   <Link
                     to="/super-admin-dashboard/analytics"
-                    className="flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200"
-                    style={{ color: "#ffffff" }}
+                    className={`flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
+                      location.pathname === "/super-admin-dashboard/analytics"
+                        ? "active-menu-item"
+                        : ""
+                    }`}
+                    style={{
+                      color:
+                        location.pathname === "/super-admin-dashboard/analytics"
+                          ? "#d4af37"
+                          : "#ffffff",
+                      backgroundColor:
+                        location.pathname === "/super-admin-dashboard/analytics"
+                          ? "#2d2d2d"
+                          : "transparent",
+                    }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = "#2d2d2d";
-                      e.currentTarget.style.color = "#d4af37";
+                      if (
+                        location.pathname !== "/super-admin-dashboard/analytics"
+                      ) {
+                        e.currentTarget.style.backgroundColor = "#2d2d2d";
+                        e.currentTarget.style.color = "#d4af37";
+                      }
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = "transparent";
-                      e.currentTarget.style.color = "#ffffff";
+                      if (
+                        location.pathname !== "/super-admin-dashboard/analytics"
+                      ) {
+                        e.currentTarget.style.backgroundColor = "transparent";
+                        e.currentTarget.style.color = "#ffffff";
+                      }
                     }}
                   >
                     <FaChartLine className="mr-3 h-5 w-5" />
@@ -332,15 +412,41 @@ const SuperAdminDashboard = () => {
                 <li>
                   <Link
                     to="/super-admin-dashboard/user-management"
-                    className="flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200"
-                    style={{ color: "#ffffff" }}
+                    className={`flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
+                      location.pathname ===
+                      "/super-admin-dashboard/user-management"
+                        ? "active-menu-item"
+                        : ""
+                    }`}
+                    style={{
+                      color:
+                        location.pathname ===
+                        "/super-admin-dashboard/user-management"
+                          ? "#d4af37"
+                          : "#ffffff",
+                      backgroundColor:
+                        location.pathname ===
+                        "/super-admin-dashboard/user-management"
+                          ? "#2d2d2d"
+                          : "transparent",
+                    }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = "#2d2d2d";
-                      e.currentTarget.style.color = "#d4af37";
+                      if (
+                        location.pathname !==
+                        "/super-admin-dashboard/user-management"
+                      ) {
+                        e.currentTarget.style.backgroundColor = "#2d2d2d";
+                        e.currentTarget.style.color = "#d4af37";
+                      }
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = "transparent";
-                      e.currentTarget.style.color = "#ffffff";
+                      if (
+                        location.pathname !==
+                        "/super-admin-dashboard/user-management"
+                      ) {
+                        e.currentTarget.style.backgroundColor = "transparent";
+                        e.currentTarget.style.color = "#ffffff";
+                      }
                     }}
                   >
                     <FaUserCog className="mr-3 h-5 w-5" />
@@ -350,15 +456,36 @@ const SuperAdminDashboard = () => {
                 <li>
                   <Link
                     to="/super-admin-dashboard/products"
-                    className="flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200"
-                    style={{ color: "#ffffff" }}
+                    className={`flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
+                      location.pathname === "/super-admin-dashboard/products"
+                        ? "active-menu-item"
+                        : ""
+                    }`}
+                    style={{
+                      color:
+                        location.pathname === "/super-admin-dashboard/products"
+                          ? "#d4af37"
+                          : "#ffffff",
+                      backgroundColor:
+                        location.pathname === "/super-admin-dashboard/products"
+                          ? "#2d2d2d"
+                          : "transparent",
+                    }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = "#2d2d2d";
-                      e.currentTarget.style.color = "#d4af37";
+                      if (
+                        location.pathname !== "/super-admin-dashboard/products"
+                      ) {
+                        e.currentTarget.style.backgroundColor = "#2d2d2d";
+                        e.currentTarget.style.color = "#d4af37";
+                      }
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = "transparent";
-                      e.currentTarget.style.color = "#ffffff";
+                      if (
+                        location.pathname !== "/super-admin-dashboard/products"
+                      ) {
+                        e.currentTarget.style.backgroundColor = "transparent";
+                        e.currentTarget.style.color = "#ffffff";
+                      }
                     }}
                   >
                     <FaBox className="mr-3 h-5 w-5" />
@@ -368,15 +495,36 @@ const SuperAdminDashboard = () => {
                 <li>
                   <Link
                     to="/super-admin-dashboard/orders"
-                    className="flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200"
-                    style={{ color: "#ffffff" }}
+                    className={`flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
+                      location.pathname === "/super-admin-dashboard/orders"
+                        ? "active-menu-item"
+                        : ""
+                    }`}
+                    style={{
+                      color:
+                        location.pathname === "/super-admin-dashboard/orders"
+                          ? "#d4af37"
+                          : "#ffffff",
+                      backgroundColor:
+                        location.pathname === "/super-admin-dashboard/orders"
+                          ? "#2d2d2d"
+                          : "transparent",
+                    }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = "#2d2d2d";
-                      e.currentTarget.style.color = "#d4af37";
+                      if (
+                        location.pathname !== "/super-admin-dashboard/orders"
+                      ) {
+                        e.currentTarget.style.backgroundColor = "#2d2d2d";
+                        e.currentTarget.style.color = "#d4af37";
+                      }
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = "transparent";
-                      e.currentTarget.style.color = "#ffffff";
+                      if (
+                        location.pathname !== "/super-admin-dashboard/orders"
+                      ) {
+                        e.currentTarget.style.backgroundColor = "transparent";
+                        e.currentTarget.style.color = "#ffffff";
+                      }
                     }}
                   >
                     <FaShoppingCart className="mr-3 h-5 w-5" />
@@ -386,15 +534,41 @@ const SuperAdminDashboard = () => {
                 <li>
                   <Link
                     to="/super-admin-dashboard/product-analytics"
-                    className="flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200"
-                    style={{ color: "#ffffff" }}
+                    className={`flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
+                      location.pathname ===
+                      "/super-admin-dashboard/product-analytics"
+                        ? "active-menu-item"
+                        : ""
+                    }`}
+                    style={{
+                      color:
+                        location.pathname ===
+                        "/super-admin-dashboard/product-analytics"
+                          ? "#d4af37"
+                          : "#ffffff",
+                      backgroundColor:
+                        location.pathname ===
+                        "/super-admin-dashboard/product-analytics"
+                          ? "#2d2d2d"
+                          : "transparent",
+                    }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = "#2d2d2d";
-                      e.currentTarget.style.color = "#d4af37";
+                      if (
+                        location.pathname !==
+                        "/super-admin-dashboard/product-analytics"
+                      ) {
+                        e.currentTarget.style.backgroundColor = "#2d2d2d";
+                        e.currentTarget.style.color = "#d4af37";
+                      }
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = "transparent";
-                      e.currentTarget.style.color = "#ffffff";
+                      if (
+                        location.pathname !==
+                        "/super-admin-dashboard/product-analytics"
+                      ) {
+                        e.currentTarget.style.backgroundColor = "transparent";
+                        e.currentTarget.style.color = "#ffffff";
+                      }
                     }}
                   >
                     <FaChartBar className="mr-3 h-5 w-5" />
@@ -404,15 +578,44 @@ const SuperAdminDashboard = () => {
                 <li>
                   <Link
                     to="/super-admin-dashboard/store-analytics"
-                    className="flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200"
-                    style={{ color: "#ffffff" }}
+                    className={`flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
+                      location.pathname.startsWith(
+                        "/super-admin-dashboard/store-analytics"
+                      )
+                        ? "active-menu-item"
+                        : ""
+                    }`}
+                    style={{
+                      color: location.pathname.startsWith(
+                        "/super-admin-dashboard/store-analytics"
+                      )
+                        ? "#d4af37"
+                        : "#ffffff",
+                      backgroundColor: location.pathname.startsWith(
+                        "/super-admin-dashboard/store-analytics"
+                      )
+                        ? "#2d2d2d"
+                        : "transparent",
+                    }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = "#2d2d2d";
-                      e.currentTarget.style.color = "#d4af37";
+                      if (
+                        !location.pathname.startsWith(
+                          "/super-admin-dashboard/store-analytics"
+                        )
+                      ) {
+                        e.currentTarget.style.backgroundColor = "#2d2d2d";
+                        e.currentTarget.style.color = "#d4af37";
+                      }
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = "transparent";
-                      e.currentTarget.style.color = "#ffffff";
+                      if (
+                        !location.pathname.startsWith(
+                          "/super-admin-dashboard/store-analytics"
+                        )
+                      ) {
+                        e.currentTarget.style.backgroundColor = "transparent";
+                        e.currentTarget.style.color = "#ffffff";
+                      }
                     }}
                   >
                     <FaStoreAlt className="mr-3 h-5 w-5" />
@@ -422,15 +625,36 @@ const SuperAdminDashboard = () => {
                 <li>
                   <Link
                     to="/super-admin-dashboard/comments"
-                    className="flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200"
-                    style={{ color: "#ffffff" }}
+                    className={`flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
+                      location.pathname === "/super-admin-dashboard/comments"
+                        ? "active-menu-item"
+                        : ""
+                    }`}
+                    style={{
+                      color:
+                        location.pathname === "/super-admin-dashboard/comments"
+                          ? "#d4af37"
+                          : "#ffffff",
+                      backgroundColor:
+                        location.pathname === "/super-admin-dashboard/comments"
+                          ? "#2d2d2d"
+                          : "transparent",
+                    }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = "#2d2d2d";
-                      e.currentTarget.style.color = "#d4af37";
+                      if (
+                        location.pathname !== "/super-admin-dashboard/comments"
+                      ) {
+                        e.currentTarget.style.backgroundColor = "#2d2d2d";
+                        e.currentTarget.style.color = "#d4af37";
+                      }
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = "transparent";
-                      e.currentTarget.style.color = "#ffffff";
+                      if (
+                        location.pathname !== "/super-admin-dashboard/comments"
+                      ) {
+                        e.currentTarget.style.backgroundColor = "transparent";
+                        e.currentTarget.style.color = "#ffffff";
+                      }
                     }}
                   >
                     <FaComments className="mr-3 h-5 w-5" />
@@ -440,15 +664,44 @@ const SuperAdminDashboard = () => {
                 <li>
                   <Link
                     to="/super-admin-dashboard/reviews"
-                    className="flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200"
-                    style={{ color: "#ffffff" }}
+                    className={`flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
+                      location.pathname.startsWith(
+                        "/super-admin-dashboard/reviews"
+                      )
+                        ? "active-menu-item"
+                        : ""
+                    }`}
+                    style={{
+                      color: location.pathname.startsWith(
+                        "/super-admin-dashboard/reviews"
+                      )
+                        ? "#d4af37"
+                        : "#ffffff",
+                      backgroundColor: location.pathname.startsWith(
+                        "/super-admin-dashboard/reviews"
+                      )
+                        ? "#2d2d2d"
+                        : "transparent",
+                    }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = "#2d2d2d";
-                      e.currentTarget.style.color = "#d4af37";
+                      if (
+                        !location.pathname.startsWith(
+                          "/super-admin-dashboard/reviews"
+                        )
+                      ) {
+                        e.currentTarget.style.backgroundColor = "#2d2d2d";
+                        e.currentTarget.style.color = "#d4af37";
+                      }
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = "transparent";
-                      e.currentTarget.style.color = "#ffffff";
+                      if (
+                        !location.pathname.startsWith(
+                          "/super-admin-dashboard/reviews"
+                        )
+                      ) {
+                        e.currentTarget.style.backgroundColor = "transparent";
+                        e.currentTarget.style.color = "#ffffff";
+                      }
                     }}
                   >
                     <FaStar className="mr-3 h-5 w-5" />
@@ -460,15 +713,42 @@ const SuperAdminDashboard = () => {
                     <li>
                       <Link
                         to="/super-admin-dashboard/commissions"
-                        className="flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200"
-                        style={{ color: "#ffffff" }}
+                        className={`flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
+                          location.pathname ===
+                          "/super-admin-dashboard/commissions"
+                            ? "active-menu-item"
+                            : ""
+                        }`}
+                        style={{
+                          color:
+                            location.pathname ===
+                            "/super-admin-dashboard/commissions"
+                              ? "#d4af37"
+                              : "#ffffff",
+                          backgroundColor:
+                            location.pathname ===
+                            "/super-admin-dashboard/commissions"
+                              ? "#2d2d2d"
+                              : "transparent",
+                        }}
                         onMouseEnter={(e) => {
-                          e.currentTarget.style.backgroundColor = "#2d2d2d";
-                          e.currentTarget.style.color = "#d4af37";
+                          if (
+                            location.pathname !==
+                            "/super-admin-dashboard/commissions"
+                          ) {
+                            e.currentTarget.style.backgroundColor = "#2d2d2d";
+                            e.currentTarget.style.color = "#d4af37";
+                          }
                         }}
                         onMouseLeave={(e) => {
-                          e.currentTarget.style.backgroundColor = "transparent";
-                          e.currentTarget.style.color = "#ffffff";
+                          if (
+                            location.pathname !==
+                            "/super-admin-dashboard/commissions"
+                          ) {
+                            e.currentTarget.style.backgroundColor =
+                              "transparent";
+                            e.currentTarget.style.color = "#ffffff";
+                          }
                         }}
                       >
                         <FaMoneyBillWave className="mr-3 h-5 w-5" />
@@ -478,15 +758,42 @@ const SuperAdminDashboard = () => {
                     <li>
                       <Link
                         to="/super-admin-dashboard/commission-rates"
-                        className="flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200"
-                        style={{ color: "#ffffff" }}
+                        className={`flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
+                          location.pathname ===
+                          "/super-admin-dashboard/commission-rates"
+                            ? "active-menu-item"
+                            : ""
+                        }`}
+                        style={{
+                          color:
+                            location.pathname ===
+                            "/super-admin-dashboard/commission-rates"
+                              ? "#d4af37"
+                              : "#ffffff",
+                          backgroundColor:
+                            location.pathname ===
+                            "/super-admin-dashboard/commission-rates"
+                              ? "#2d2d2d"
+                              : "transparent",
+                        }}
                         onMouseEnter={(e) => {
-                          e.currentTarget.style.backgroundColor = "#2d2d2d";
-                          e.currentTarget.style.color = "#d4af37";
+                          if (
+                            location.pathname !==
+                            "/super-admin-dashboard/commission-rates"
+                          ) {
+                            e.currentTarget.style.backgroundColor = "#2d2d2d";
+                            e.currentTarget.style.color = "#d4af37";
+                          }
                         }}
                         onMouseLeave={(e) => {
-                          e.currentTarget.style.backgroundColor = "transparent";
-                          e.currentTarget.style.color = "#ffffff";
+                          if (
+                            location.pathname !==
+                            "/super-admin-dashboard/commission-rates"
+                          ) {
+                            e.currentTarget.style.backgroundColor =
+                              "transparent";
+                            e.currentTarget.style.color = "#ffffff";
+                          }
                         }}
                       >
                         <FaChartLine className="mr-3 h-5 w-5" />

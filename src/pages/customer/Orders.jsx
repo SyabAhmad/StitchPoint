@@ -99,7 +99,7 @@ const Orders = () => {
           {/* Header */}
           <div className="mb-8">
             <button
-              onClick={() => navigate("/customer/dashboard")}
+              onClick={() => navigate("/customer-dashboard")}
               className="text-gray-600 hover:text-gray-900 font-semibold mb-4 flex items-center gap-2"
             >
               ← Back to Dashboard

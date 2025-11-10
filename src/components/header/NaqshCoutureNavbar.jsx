@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import {
   FaShoppingCart,
   FaHeart,
@@ -10,6 +10,7 @@ import {
 } from "react-icons/fa";
 
 const NaqshCoutureNavbar = () => {
+  const location = useLocation();
   const [user, setUser] = useState(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -54,22 +55,42 @@ const NaqshCoutureNavbar = () => {
         {/* Desktop Nav Items */}
         <ul className="hidden md:flex nav-items font-sans">
           <li>
-            <Link to="/" className="nav-link">
+            <Link
+              to="/"
+              className={`nav-link ${
+                location.pathname === "/" ? "nav-link-active" : ""
+              }`}
+            >
               Home
             </Link>
           </li>
           <li>
-            <Link to="/about" className="nav-link">
+            <Link
+              to="/about"
+              className={`nav-link ${
+                location.pathname === "/about" ? "nav-link-active" : ""
+              }`}
+            >
               About
             </Link>
           </li>
           <li>
-            <Link to="/shop" className="nav-link">
+            <Link
+              to="/shop"
+              className={`nav-link ${
+                location.pathname === "/shop" ? "nav-link-active" : ""
+              }`}
+            >
               Shop
             </Link>
           </li>
           <li>
-            <Link to="/contact" className="nav-link">
+            <Link
+              to="/contact"
+              className={`nav-link ${
+                location.pathname === "/contact" ? "nav-link-active" : ""
+              }`}
+            >
               Contact
             </Link>
           </li>
@@ -79,22 +100,46 @@ const NaqshCoutureNavbar = () => {
         {isMenuOpen && (
           <ul className="md:hidden absolute top-full left-0 w-full bg-black-naqsh text-white flex flex-col items-center space-y-4 py-4 font-sans">
             <li>
-              <Link to="/" className="nav-link" onClick={toggleMenu}>
+              <Link
+                to="/"
+                className={`nav-link ${
+                  location.pathname === "/" ? "nav-link-active" : ""
+                }`}
+                onClick={toggleMenu}
+              >
                 Home
               </Link>
             </li>
             <li>
-              <Link to="/about" className="nav-link" onClick={toggleMenu}>
+              <Link
+                to="/about"
+                className={`nav-link ${
+                  location.pathname === "/about" ? "nav-link-active" : ""
+                }`}
+                onClick={toggleMenu}
+              >
                 About
               </Link>
             </li>
             <li>
-              <Link to="/shop" className="nav-link" onClick={toggleMenu}>
+              <Link
+                to="/shop"
+                className={`nav-link ${
+                  location.pathname === "/shop" ? "nav-link-active" : ""
+                }`}
+                onClick={toggleMenu}
+              >
                 Shop
               </Link>
             </li>
             <li>
-              <Link to="/contact" className="nav-link" onClick={toggleMenu}>
+              <Link
+                to="/contact"
+                className={`nav-link ${
+                  location.pathname === "/contact" ? "nav-link-active" : ""
+                }`}
+                onClick={toggleMenu}
+              >
                 Contact
               </Link>
             </li>
@@ -107,12 +152,21 @@ const NaqshCoutureNavbar = () => {
               <Link
                 to={
                   user.role === "customer"
-                    ? "/dashboard"
+                    ? "/customer-dashboard"
                     : user.role === "manager"
                     ? "/manager-dashboard"
                     : "/super-admin-dashboard"
                 }
-                className="flex items-center space-x-2 text-white hover:text-gold-500 transition-colors duration-300"
+                className={`flex items-center space-x-2 transition-colors duration-300 ${
+                  (user.role === "customer" &&
+                    location.pathname === "/customer-dashboard") ||
+                  (user.role === "manager" &&
+                    location.pathname.startsWith("/manager-dashboard")) ||
+                  (user.role === "super_admin" &&
+                    location.pathname.startsWith("/super-admin-dashboard"))
+                    ? "text-gold-500"
+                    : "text-white hover:text-gold-500"
+                }`}
                 title="Go to Dashboard"
               >
                 <FaTachometerAlt />
@@ -120,11 +174,40 @@ const NaqshCoutureNavbar = () => {
               </Link>
 
               {/* Cart Icon */}
-              <Link to="/cart" className="btn-icon" title="View Cart">
+              <Link
+                to={
+                  user.role === "customer"
+                    ? "/customer-dashboard/cart"
+                    : "/cart"
+                }
+                className={`btn-icon ${
+                  (user.role === "customer" &&
+                    location.pathname === "/customer-dashboard/cart") ||
+                  (user.role !== "customer" && location.pathname === "/cart")
+                    ? "active"
+                    : ""
+                }`}
+                title="View Cart"
+              >
                 <FaShoppingCart />
               </Link>
               {/* Wishlist Icon */}
-              <Link to="/wishlist" className="btn-icon" title="View Wishlist">
+              <Link
+                to={
+                  user.role === "customer"
+                    ? "/customer-dashboard/wishlist"
+                    : "/wishlist"
+                }
+                className={`btn-icon ${
+                  (user.role === "customer" &&
+                    location.pathname === "/customer-dashboard/wishlist") ||
+                  (user.role !== "customer" &&
+                    location.pathname === "/wishlist")
+                    ? "active"
+                    : ""
+                }`}
+                title="View Wishlist"
+              >
                 <FaHeart />
               </Link>
               {/* Logout Button */}

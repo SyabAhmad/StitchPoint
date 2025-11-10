@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation, Outlet } from "react-router-dom";
 import { FaBars, FaTimes } from "react-icons/fa";
 import { fetchWithAuth } from "../../utils/fetchWithAuth.js";
 import SmartFooter from "../../components/footer/SmartFooter.jsx";
 
 const CustomerDashboard = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [orders, setOrders] = useState([]);
   const [cartItems, setCartItems] = useState([]);
@@ -15,6 +16,13 @@ const CustomerDashboard = () => {
   const [recommendedProducts, setRecommendedProducts] = useState([]);
   const [profilePicture, setProfilePicture] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  // Toggle sidebar function
+  const toggleSidebar = () => {
+    console.log("Toggling sidebar. Current state:", sidebarOpen);
+    setSidebarOpen(!sidebarOpen);
+    console.log("New sidebar state will be:", !sidebarOpen);
+  };
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -81,7 +89,7 @@ const CustomerDashboard = () => {
     >
       {/* Fixed Header */}
       <header
-        className="shadow-lg px-6 py-4 flex-shrink-0"
+        className="shadow-lg px-6 py-4 flex-shrink-0 relative z-60"
         style={{
           backgroundColor: "#1d1d1d",
           borderBottom: "1px solid #2d2d2d",
@@ -90,7 +98,7 @@ const CustomerDashboard = () => {
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <button
-              onClick={() => setSidebarOpen(!sidebarOpen)}
+              onClick={toggleSidebar}
               className="p-2 rounded-lg transition-colors"
               style={{ backgroundColor: "#2d2d2d", color: "#ffffff" }}
               onMouseEnter={(e) => {
@@ -135,14 +143,24 @@ const CustomerDashboard = () => {
               Shop
             </Link>
             <Link
-              to="/profile"
+              to="/customer-dashboard/profile"
               className="px-4 py-2 rounded-lg transition-all"
-              style={{ backgroundColor: "#d4af37", color: "#000000" }}
+              style={{
+                backgroundColor:
+                  location.pathname === "/customer-dashboard/profile"
+                    ? "#b8860b"
+                    : "#d4af37",
+                color: "#000000",
+              }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = "#b8860b";
+                if (location.pathname !== "/customer-dashboard/profile") {
+                  e.currentTarget.style.backgroundColor = "#b8860b";
+                }
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = "#d4af37";
+                if (location.pathname !== "/customer-dashboard/profile") {
+                  e.currentTarget.style.backgroundColor = "#d4af37";
+                }
               }}
             >
               Profile
@@ -178,7 +196,7 @@ const CustomerDashboard = () => {
 
         {/* Fixed Aside */}
         <aside
-          className={`fixed inset-y-0 left-0 z-50 w-64 shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 ${
+          className={`fixed inset-y-0 left-0 z-50 w-64 shadow-lg transform transition-transform duration-300 ease-in-out ${
             sidebarOpen ? "translate-x-0" : "-translate-x-full"
           }`}
           style={{ backgroundColor: "#1d1d1d" }}
@@ -236,67 +254,153 @@ const CustomerDashboard = () => {
                 <li>
                   <Link
                     to="/customer-dashboard"
-                    className="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all"
-                    style={{ color: "#ffffff" }}
+                    className={`flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all ${
+                      location.pathname === "/customer-dashboard"
+                        ? "active-menu-item"
+                        : ""
+                    }`}
+                    style={{
+                      color:
+                        location.pathname === "/customer-dashboard"
+                          ? "#d4af37"
+                          : "#ffffff",
+                      backgroundColor:
+                        location.pathname === "/customer-dashboard"
+                          ? "#2d2d2d"
+                          : "transparent",
+                    }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = "#2d2d2d";
-                      e.currentTarget.style.color = "#d4af37";
+                      if (location.pathname !== "/customer-dashboard") {
+                        e.currentTarget.style.backgroundColor = "#2d2d2d";
+                        e.currentTarget.style.color = "#d4af37";
+                      }
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = "transparent";
-                      e.currentTarget.style.color = "#ffffff";
+                      if (location.pathname !== "/customer-dashboard") {
+                        e.currentTarget.style.backgroundColor = "transparent";
+                        e.currentTarget.style.color = "#ffffff";
+                      }
                     }}
+                    onClick={() => setSidebarOpen(false)}
                   >
                     📊 Overview
                   </Link>
                 </li>
                 <li>
                   <Link
-                    to="/cart"
-                    className="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all"
-                    style={{ color: "#ffffff" }}
+                    to="/customer-dashboard/cart"
+                    className={`flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all ${
+                      location.pathname === "/customer-dashboard/cart"
+                        ? "active-menu-item"
+                        : ""
+                    }`}
+                    style={{
+                      color:
+                        location.pathname === "/customer-dashboard/cart"
+                          ? "#d4af37"
+                          : "#ffffff",
+                      backgroundColor:
+                        location.pathname === "/customer-dashboard/cart"
+                          ? "#2d2d2d"
+                          : "transparent",
+                    }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = "#2d2d2d";
-                      e.currentTarget.style.color = "#d4af37";
+                      if (location.pathname !== "/customer-dashboard/cart") {
+                        e.currentTarget.style.backgroundColor = "#2d2d2d";
+                        e.currentTarget.style.color = "#d4af37";
+                      }
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = "transparent";
-                      e.currentTarget.style.color = "#ffffff";
+                      if (location.pathname !== "/customer-dashboard/cart") {
+                        e.currentTarget.style.backgroundColor = "transparent";
+                        e.currentTarget.style.color = "#ffffff";
+                      }
                     }}
+                    onClick={() => setSidebarOpen(false)}
                   >
                     🛒 Cart ({cartItems.length})
                   </Link>
                 </li>
                 <li>
                   <Link
-                    to="/wishlist"
-                    className="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all"
-                    style={{ color: "#ffffff" }}
+                    to="/customer-dashboard/wishlist"
+                    className={`flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all ${
+                      location.pathname === "/customer-dashboard/wishlist"
+                        ? "active-menu-item"
+                        : ""
+                    }`}
+                    style={{
+                      color:
+                        location.pathname === "/customer-dashboard/wishlist"
+                          ? "#d4af37"
+                          : "#ffffff",
+                      backgroundColor:
+                        location.pathname === "/customer-dashboard/wishlist"
+                          ? "#2d2d2d"
+                          : "transparent",
+                    }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = "#2d2d2d";
-                      e.currentTarget.style.color = "#d4af37";
+                      if (
+                        location.pathname !== "/customer-dashboard/wishlist"
+                      ) {
+                        e.currentTarget.style.backgroundColor = "#2d2d2d";
+                        e.currentTarget.style.color = "#d4af37";
+                      }
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = "transparent";
-                      e.currentTarget.style.color = "#ffffff";
+                      if (
+                        location.pathname !== "/customer-dashboard/wishlist"
+                      ) {
+                        e.currentTarget.style.backgroundColor = "transparent";
+                        e.currentTarget.style.color = "#ffffff";
+                      }
                     }}
+                    onClick={() => setSidebarOpen(false)}
                   >
                     ❤️ Wishlist ({wishlistItems.length})
                   </Link>
                 </li>
                 <li>
                   <Link
-                    to="/customer/orders"
-                    className="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all"
-                    style={{ color: "#ffffff" }}
+                    to="/customer-dashboard/orders"
+                    className={`flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all ${
+                      location.pathname.startsWith("/customer-dashboard/orders")
+                        ? "active-menu-item"
+                        : ""
+                    }`}
+                    style={{
+                      color: location.pathname.startsWith(
+                        "/customer-dashboard/orders"
+                      )
+                        ? "#d4af37"
+                        : "#ffffff",
+                      backgroundColor: location.pathname.startsWith(
+                        "/customer-dashboard/orders"
+                      )
+                        ? "#2d2d2d"
+                        : "transparent",
+                    }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = "#2d2d2d";
-                      e.currentTarget.style.color = "#d4af37";
+                      if (
+                        !location.pathname.startsWith(
+                          "/customer-dashboard/orders"
+                        )
+                      ) {
+                        e.currentTarget.style.backgroundColor = "#2d2d2d";
+                        e.currentTarget.style.color = "#d4af37";
+                      }
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = "transparent";
-                      e.currentTarget.style.color = "#ffffff";
+                      if (
+                        !location.pathname.startsWith(
+                          "/customer-dashboard/orders"
+                        )
+                      ) {
+                        e.currentTarget.style.backgroundColor = "transparent";
+                        e.currentTarget.style.color = "#ffffff";
+                      }
                     }}
+                    onClick={() => setSidebarOpen(false)}
                   >
                     📦 Orders ({totalOrders})
                   </Link>
@@ -312,17 +416,35 @@ const CustomerDashboard = () => {
               <ul className="space-y-2">
                 <li>
                   <Link
-                    to="/profile"
-                    className="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all"
-                    style={{ color: "#ffffff" }}
+                    to="/customer-dashboard/profile"
+                    className={`flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all ${
+                      location.pathname === "/customer-dashboard/profile"
+                        ? "active-menu-item"
+                        : ""
+                    }`}
+                    style={{
+                      color:
+                        location.pathname === "/customer-dashboard/profile"
+                          ? "#d4af37"
+                          : "#ffffff",
+                      backgroundColor:
+                        location.pathname === "/customer-dashboard/profile"
+                          ? "#2d2d2d"
+                          : "transparent",
+                    }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = "#2d2d2d";
-                      e.currentTarget.style.color = "#d4af37";
+                      if (location.pathname !== "/customer-dashboard/profile") {
+                        e.currentTarget.style.backgroundColor = "#2d2d2d";
+                        e.currentTarget.style.color = "#d4af37";
+                      }
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = "transparent";
-                      e.currentTarget.style.color = "#ffffff";
+                      if (location.pathname !== "/customer-dashboard/profile") {
+                        e.currentTarget.style.backgroundColor = "transparent";
+                        e.currentTarget.style.color = "#ffffff";
+                      }
                     }}
+                    onClick={() => setSidebarOpen(false)}
                   >
                     ⚙️ Profile Settings
                   </Link>
@@ -330,16 +452,34 @@ const CustomerDashboard = () => {
                 <li>
                   <Link
                     to="/collections"
-                    className="flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all"
-                    style={{ color: "#ffffff" }}
+                    className={`flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all ${
+                      location.pathname === "/collections"
+                        ? "active-menu-item"
+                        : ""
+                    }`}
+                    style={{
+                      color:
+                        location.pathname === "/collections"
+                          ? "#d4af37"
+                          : "#ffffff",
+                      backgroundColor:
+                        location.pathname === "/collections"
+                          ? "#2d2d2d"
+                          : "transparent",
+                    }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = "#2d2d2d";
-                      e.currentTarget.style.color = "#d4af37";
+                      if (location.pathname !== "/collections") {
+                        e.currentTarget.style.backgroundColor = "#2d2d2d";
+                        e.currentTarget.style.color = "#d4af37";
+                      }
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = "transparent";
-                      e.currentTarget.style.color = "#ffffff";
+                      if (location.pathname !== "/collections") {
+                        e.currentTarget.style.backgroundColor = "transparent";
+                        e.currentTarget.style.color = "#ffffff";
+                      }
                     }}
+                    onClick={() => setSidebarOpen(false)}
                   >
                     🛍️ Browse Collections
                   </Link>
@@ -349,366 +489,382 @@ const CustomerDashboard = () => {
           </nav>
         </aside>
 
-        {/* Scrollable Main Content */}
-        <main className="flex-1 p-8 overflow-y-auto">
+        {/* Main content area */}
+        <main className="flex-1 overflow-y-auto bg-gray-50 p-6">
           <div className="max-w-7xl mx-auto">
-            {/* User Header */}
-            <div
-              className="shadow-lg rounded-2xl mb-8 p-8"
-              style={{ backgroundColor: "#1d1d1d" }}
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center">
-                  <div className="flex-shrink-0">
-                    <img
-                      className="h-20 w-20 rounded-full object-cover border-4 shadow-lg"
-                      style={{ borderColor: "#d4af37" }}
-                      src={
-                        profilePicture ||
-                        userData?.profile_picture ||
-                        "/placeholder-avatar.svg"
-                      }
-                      alt="Profile"
-                      onError={(e) => {
-                        e.target.src = "/placeholder-avatar.svg";
-                      }}
-                    />
-                  </div>
-                  <div className="ml-6 flex-1">
-                    <h2
-                      className="text-4xl font-extrabold"
-                      style={{ color: "#d4af37" }}
-                    >
-                      Welcome back, {userData?.name || "Customer"}! 👋
-                    </h2>
-                    <p className="mt-2" style={{ color: "#cccccc" }}>
-                      {userData?.email}
-                    </p>
-                  </div>
-                </div>
-                <Link
-                  to="/profile"
-                  className="px-6 py-3 rounded-lg font-semibold transition-all transform hover:scale-105"
-                  style={{ backgroundColor: "#d4af37", color: "#000000" }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = "#b8860b";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = "#d4af37";
-                  }}
+            {/* Customer Dashboard Overview - Only show on main dashboard route */}
+            {location.pathname === "/customer-dashboard" && (
+              <>
+                {/* User Header */}
+                <div
+                  className="shadow-lg rounded-2xl mb-8 p-8"
+                  style={{ backgroundColor: "#1d1d1d" }}
                 >
-                  ⚙️ Manage Profile
-                </Link>
-              </div>
-            </div>
-
-            <h1
-              className="text-3xl font-extrabold mb-8"
-              style={{ color: "#d4af37" }}
-            >
-              📊 Dashboard
-            </h1>
-
-            {/* Stats Grid - Clickable Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
-              {/* Cart Items */}
-              <div
-                onClick={() => navigate("/cart")}
-                className="shadow-md hover:shadow-xl transition-all transform hover:scale-105 cursor-pointer p-6 rounded-2xl"
-                style={{
-                  backgroundColor: "#1d1d1d",
-                  border: "1px solid #2d2d2d",
-                }}
-              >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p
-                      className="text-sm font-semibold"
-                      style={{ color: "#cccccc" }}
-                    >
-                      🛒 Cart Items
-                    </p>
-                    <p
-                      className="text-4xl font-extrabold mt-2"
-                      style={{ color: "#ffffff" }}
-                    >
-                      {cartItems.length}
-                    </p>
-                  </div>
-                  <div className="text-4xl">🛍️</div>
-                </div>
-                <p className="text-xs mt-4" style={{ color: "#999999" }}>
-                  Click to view cart
-                </p>
-              </div>
-
-              {/* Wishlist Items */}
-              <div
-                onClick={() => navigate("/wishlist")}
-                className="shadow-md hover:shadow-xl transition-all transform hover:scale-105 cursor-pointer p-6 rounded-2xl"
-                style={{
-                  backgroundColor: "#1d1d1d",
-                  border: "1px solid #2d2d2d",
-                }}
-              >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p
-                      className="text-sm font-semibold"
-                      style={{ color: "#cccccc" }}
-                    >
-                      ❤️ Wishlist
-                    </p>
-                    <p
-                      className="text-4xl font-extrabold mt-2"
-                      style={{ color: "#ffffff" }}
-                    >
-                      {wishlistItems.length}
-                    </p>
-                  </div>
-                  <div className="text-4xl">💝</div>
-                </div>
-                <p className="text-xs mt-4" style={{ color: "#999999" }}>
-                  Click to view wishlist
-                </p>
-              </div>
-
-              {/* Total Orders */}
-              <div
-                onClick={() => navigate("/customer/orders")}
-                className="shadow-md hover:shadow-xl transition-all transform hover:scale-105 cursor-pointer p-6 rounded-2xl"
-                style={{
-                  backgroundColor: "#1d1d1d",
-                  border: "1px solid #2d2d2d",
-                }}
-              >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p
-                      className="text-sm font-semibold"
-                      style={{ color: "#cccccc" }}
-                    >
-                      📦 Total Orders
-                    </p>
-                    <p
-                      className="text-4xl font-extrabold mt-2"
-                      style={{ color: "#ffffff" }}
-                    >
-                      {totalOrders}
-                    </p>
-                  </div>
-                  <div className="text-4xl">📋</div>
-                </div>
-                <p className="text-xs mt-4" style={{ color: "#999999" }}>
-                  Click to view all orders
-                </p>
-              </div>
-
-              {/* Total Spent */}
-              <div
-                className="shadow-md p-6 rounded-2xl"
-                style={{
-                  backgroundColor: "#1d1d1d",
-                  border: "1px solid #2d2d2d",
-                }}
-              >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p
-                      className="text-sm font-semibold"
-                      style={{ color: "#cccccc" }}
-                    >
-                      💰 Total Spent
-                    </p>
-                    <p
-                      className="text-4xl font-extrabold mt-2"
-                      style={{ color: "#ffffff" }}
-                    >
-                      PKR {totalSpent.toFixed(2)}
-                    </p>
-                  </div>
-                  <div className="text-4xl">💳</div>
-                </div>
-                <p className="text-xs mt-4" style={{ color: "#999999" }}>
-                  Lifetime spending
-                </p>
-              </div>
-            </div>
-
-            {recommendedProducts.length > 0 && (
-              <div
-                className="shadow-lg border mb-12 rounded-2xl"
-                style={{ backgroundColor: "#1d1d1d", borderColor: "#2d2d2d" }}
-              >
-                <div className="px-8 py-6 sm:px-8">
-                  <h3
-                    className="text-2xl font-bold"
-                    style={{ color: "#d4af37" }}
-                  >
-                    ✨ You Might Also Like
-                  </h3>
-                  <p className="mt-2" style={{ color: "#cccccc" }}>
-                    Recommended products based on your preferences
-                  </p>
-                </div>
-                <div className="px-8 py-6 sm:px-8">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                    {recommendedProducts.map((product) => (
-                      <div
-                        key={product.id}
-                        onClick={() => navigate(`/product/${product.id}`)}
-                        className="hover:shadow-xl transition-all transform hover:scale-105 cursor-pointer p-4 rounded-xl"
-                        style={{ backgroundColor: "#2d2d2d" }}
-                      >
-                        <div className="mb-4 overflow-hidden rounded-lg">
-                          <img
-                            src={
-                              product.image_url || "/placeholder-product.jpg"
-                            }
-                            alt={product.name}
-                            className="w-full h-40 object-cover hover:scale-110 transition-transform"
-                          />
-                        </div>
-                        <h4
-                          className="text-sm font-bold truncate"
-                          style={{ color: "#ffffff" }}
-                        >
-                          {product.name}
-                        </h4>
-                        <p
-                          className="text-xs truncate mt-1"
-                          style={{ color: "#cccccc" }}
-                        >
-                          {product.store_name}
-                        </p>
-                        <p
-                          className="text-lg font-bold mt-3"
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center">
+                      <div className="flex-shrink-0">
+                        <img
+                          className="h-20 w-20 rounded-full object-cover border-4 shadow-lg"
+                          style={{ borderColor: "#d4af37" }}
+                          src={
+                            profilePicture ||
+                            userData?.profile_picture ||
+                            "/placeholder-avatar.svg"
+                          }
+                          alt="Profile"
+                          onError={(e) => {
+                            e.target.src = "/placeholder-avatar.svg";
+                          }}
+                        />
+                      </div>
+                      <div className="ml-6 flex-1">
+                        <h2
+                          className="text-4xl font-extrabold"
                           style={{ color: "#d4af37" }}
                         >
-                          PKR {product.price}
+                          Welcome back, {userData?.name || "Customer"}! 👋
+                        </h2>
+                        <p className="mt-2" style={{ color: "#cccccc" }}>
+                          {userData?.email}
                         </p>
-                        <button
-                          className="mt-3 w-full py-2 px-4 rounded-lg text-sm font-bold transition-all transform hover:scale-105"
+                      </div>
+                    </div>
+                    <Link
+                      to="/customer-dashboard/profile"
+                      className="px-6 py-3 rounded-lg font-semibold transition-all transform hover:scale-105"
+                      style={{ backgroundColor: "#d4af37", color: "#000000" }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = "#b8860b";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = "#d4af37";
+                      }}
+                    >
+                      ⚙️ Manage Profile
+                    </Link>
+                  </div>
+                </div>
+
+                <h1
+                  className="text-3xl font-extrabold mb-8"
+                  style={{ color: "#d4af37" }}
+                >
+                  📊 Dashboard
+                </h1>
+
+                {/* Stats Grid - Clickable Cards */}
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
+                  {/* Cart Items */}
+                  <div
+                    onClick={() => navigate("/customer-dashboard/cart")}
+                    className="shadow-md hover:shadow-xl transition-all transform hover:scale-105 cursor-pointer p-6 rounded-2xl"
+                    style={{
+                      backgroundColor: "#1d1d1d",
+                      border: "1px solid #2d2d2d",
+                    }}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p
+                          className="text-sm font-semibold"
+                          style={{ color: "#cccccc" }}
+                        >
+                          🛒 Cart Items
+                        </p>
+                        <p
+                          className="text-4xl font-extrabold mt-2"
+                          style={{ color: "#ffffff" }}
+                        >
+                          {cartItems.length}
+                        </p>
+                      </div>
+                      <div className="text-4xl">🛍️</div>
+                    </div>
+                    <p className="text-xs mt-4" style={{ color: "#999999" }}>
+                      Click to view cart
+                    </p>
+                  </div>
+
+                  {/* Wishlist Items */}
+                  <div
+                    onClick={() => navigate("/customer-dashboard/wishlist")}
+                    className="shadow-md hover:shadow-xl transition-all transform hover:scale-105 cursor-pointer p-6 rounded-2xl"
+                    style={{
+                      backgroundColor: "#1d1d1d",
+                      border: "1px solid #2d2d2d",
+                    }}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p
+                          className="text-sm font-semibold"
+                          style={{ color: "#cccccc" }}
+                        >
+                          ❤️ Wishlist
+                        </p>
+                        <p
+                          className="text-4xl font-extrabold mt-2"
+                          style={{ color: "#ffffff" }}
+                        >
+                          {wishlistItems.length}
+                        </p>
+                      </div>
+                      <div className="text-4xl">💝</div>
+                    </div>
+                    <p className="text-xs mt-4" style={{ color: "#999999" }}>
+                      Click to view wishlist
+                    </p>
+                  </div>
+
+                  {/* Total Orders */}
+                  <div
+                    onClick={() => navigate("/customer-dashboard/orders")}
+                    className="shadow-md hover:shadow-xl transition-all transform hover:scale-105 cursor-pointer p-6 rounded-2xl"
+                    style={{
+                      backgroundColor: "#1d1d1d",
+                      border: "1px solid #2d2d2d",
+                    }}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p
+                          className="text-sm font-semibold"
+                          style={{ color: "#cccccc" }}
+                        >
+                          📦 Total Orders
+                        </p>
+                        <p
+                          className="text-4xl font-extrabold mt-2"
+                          style={{ color: "#ffffff" }}
+                        >
+                          {totalOrders}
+                        </p>
+                      </div>
+                      <div className="text-4xl">📋</div>
+                    </div>
+                    <p className="text-xs mt-4" style={{ color: "#999999" }}>
+                      Click to view all orders
+                    </p>
+                  </div>
+
+                  {/* Total Spent */}
+                  <div
+                    className="shadow-md p-6 rounded-2xl"
+                    style={{
+                      backgroundColor: "#1d1d1d",
+                      border: "1px solid #2d2d2d",
+                    }}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p
+                          className="text-sm font-semibold"
+                          style={{ color: "#cccccc" }}
+                        >
+                          💰 Total Spent
+                        </p>
+                        <p
+                          className="text-4xl font-extrabold mt-2"
+                          style={{ color: "#ffffff" }}
+                        >
+                          PKR {totalSpent.toFixed(2)}
+                        </p>
+                      </div>
+                      <div className="text-4xl">💳</div>
+                    </div>
+                    <p className="text-xs mt-4" style={{ color: "#999999" }}>
+                      Lifetime spending
+                    </p>
+                  </div>
+                </div>
+
+                {recommendedProducts.length > 0 && (
+                  <div
+                    className="shadow-lg border mb-12 rounded-2xl"
+                    style={{
+                      backgroundColor: "#1d1d1d",
+                      borderColor: "#2d2d2d",
+                    }}
+                  >
+                    <div className="px-8 py-6 sm:px-8">
+                      <h3
+                        className="text-2xl font-bold"
+                        style={{ color: "#d4af37" }}
+                      >
+                        ✨ You Might Also Like
+                      </h3>
+                      <p className="mt-2" style={{ color: "#cccccc" }}>
+                        Recommended products based on your preferences
+                      </p>
+                    </div>
+                    <div className="px-8 py-6 sm:px-8">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                        {recommendedProducts.map((product) => (
+                          <div
+                            key={product.id}
+                            onClick={() => navigate(`/product/${product.id}`)}
+                            className="hover:shadow-xl transition-all transform hover:scale-105 cursor-pointer p-4 rounded-xl"
+                            style={{ backgroundColor: "#2d2d2d" }}
+                          >
+                            <div className="mb-4 overflow-hidden rounded-lg">
+                              <img
+                                src={
+                                  product.image_url ||
+                                  "/placeholder-product.jpg"
+                                }
+                                alt={product.name}
+                                className="w-full h-40 object-cover hover:scale-110 transition-transform"
+                              />
+                            </div>
+                            <h4
+                              className="text-sm font-bold truncate"
+                              style={{ color: "#ffffff" }}
+                            >
+                              {product.name}
+                            </h4>
+                            <p
+                              className="text-xs truncate mt-1"
+                              style={{ color: "#cccccc" }}
+                            >
+                              {product.store_name}
+                            </p>
+                            <p
+                              className="text-lg font-bold mt-3"
+                              style={{ color: "#d4af37" }}
+                            >
+                              PKR {product.price}
+                            </p>
+                            <button
+                              className="mt-3 w-full py-2 px-4 rounded-lg text-sm font-bold transition-all transform hover:scale-105"
+                              style={{
+                                backgroundColor: "#d4af37",
+                                color: "#000000",
+                              }}
+                            >
+                              👁️ View Product
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Recent Orders Section */}
+                <div
+                  className="shadow-lg border rounded-2xl"
+                  style={{ backgroundColor: "#1d1d1d", borderColor: "#2d2d2d" }}
+                >
+                  <div className="px-8 py-6 sm:px-8">
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <h3
+                          className="text-2xl font-bold"
+                          style={{ color: "#d4af37" }}
+                        >
+                          📦 Recent Orders
+                        </h3>
+                        <p className="mt-2" style={{ color: "#cccccc" }}>
+                          Your latest order history
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => navigate("/customer-dashboard/orders")}
+                        className="px-6 py-2 rounded-lg font-bold transition-all transform hover:scale-105"
+                        style={{ backgroundColor: "#d4af37", color: "#000000" }}
+                      >
+                        View All →
+                      </button>
+                    </div>
+                  </div>
+                  <div className="divide-y" style={{ borderColor: "#2d2d2d" }}>
+                    {orders.length > 0 ? (
+                      orders.slice(0, 5).map((order) => (
+                        <div
+                          key={order.id}
+                          onClick={() =>
+                            navigate(`/customer-dashboard/orders/${order.id}`)
+                          }
+                          className="px-8 py-6 hover:bg-gray-800/50 transition-all cursor-pointer border-l-4 border-l-transparent hover:border-l-d4af37"
+                        >
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-6">
+                              <div>
+                                <p
+                                  className="text-lg font-bold"
+                                  style={{ color: "#ffffff" }}
+                                >
+                                  Order #{order.id}
+                                </p>
+                                <p
+                                  className="text-sm mt-1"
+                                  style={{ color: "#cccccc" }}
+                                >
+                                  📅{" "}
+                                  {new Date(
+                                    order.created_at
+                                  ).toLocaleDateString("en-US", {
+                                    year: "numeric",
+                                    month: "short",
+                                    day: "numeric",
+                                  })}
+                                </p>
+                              </div>
+                            </div>
+                            <div className="text-right">
+                              <p
+                                className="text-2xl font-bold"
+                                style={{ color: "#d4af37" }}
+                              >
+                                PKR {order.total_amount}
+                              </p>
+                              <span
+                                className={`inline-block mt-2 px-4 py-1 text-sm font-bold rounded-full ${
+                                  order.status === "delivered"
+                                    ? "bg-green-900 text-green-200"
+                                    : order.status === "shipped"
+                                    ? "bg-blue-900 text-blue-200"
+                                    : order.status === "processing"
+                                    ? "bg-yellow-900 text-yellow-200"
+                                    : order.status === "cancelled"
+                                    ? "bg-red-900 text-red-200"
+                                    : "bg-gray-900 text-gray-200"
+                                }`}
+                              >
+                                {order.status.charAt(0).toUpperCase() +
+                                  order.status.slice(1)}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="px-8 py-12 text-center">
+                        <p className="text-2xl" style={{ color: "#999999" }}>
+                          🛒
+                        </p>
+                        <p className="mt-3" style={{ color: "#cccccc" }}>
+                          No orders yet
+                        </p>
+                        <Link
+                          to="/collections"
+                          className="inline-block mt-4 px-6 py-2 rounded-lg font-bold transition-all"
                           style={{
                             backgroundColor: "#d4af37",
                             color: "#000000",
                           }}
                         >
-                          👁️ View Product
-                        </button>
+                          Start Shopping
+                        </Link>
                       </div>
-                    ))}
+                    )}
                   </div>
                 </div>
-              </div>
+              </>
             )}
 
-            {/* Recent Orders Section */}
-            <div
-              className="shadow-lg border rounded-2xl"
-              style={{ backgroundColor: "#1d1d1d", borderColor: "#2d2d2d" }}
-            >
-              <div className="px-8 py-6 sm:px-8">
-                <div className="flex justify-between items-center">
-                  <div>
-                    <h3
-                      className="text-2xl font-bold"
-                      style={{ color: "#d4af37" }}
-                    >
-                      📦 Recent Orders
-                    </h3>
-                    <p className="mt-2" style={{ color: "#cccccc" }}>
-                      Your latest order history
-                    </p>
-                  </div>
-                  <button
-                    onClick={() => navigate("/customer/orders")}
-                    className="px-6 py-2 rounded-lg font-bold transition-all transform hover:scale-105"
-                    style={{ backgroundColor: "#d4af37", color: "#000000" }}
-                  >
-                    View All →
-                  </button>
-                </div>
-              </div>
-              <div className="divide-y" style={{ borderColor: "#2d2d2d" }}>
-                {orders.length > 0 ? (
-                  orders.slice(0, 5).map((order) => (
-                    <div
-                      key={order.id}
-                      onClick={() => navigate(`/customer/orders/${order.id}`)}
-                      className="px-8 py-6 hover:bg-gray-800/50 transition-all cursor-pointer border-l-4 border-l-transparent hover:border-l-d4af37"
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-6">
-                          <div>
-                            <p
-                              className="text-lg font-bold"
-                              style={{ color: "#ffffff" }}
-                            >
-                              Order #{order.id}
-                            </p>
-                            <p
-                              className="text-sm mt-1"
-                              style={{ color: "#cccccc" }}
-                            >
-                              📅{" "}
-                              {new Date(order.created_at).toLocaleDateString(
-                                "en-US",
-                                {
-                                  year: "numeric",
-                                  month: "short",
-                                  day: "numeric",
-                                }
-                              )}
-                            </p>
-                          </div>
-                        </div>
-                        <div className="text-right">
-                          <p
-                            className="text-2xl font-bold"
-                            style={{ color: "#d4af37" }}
-                          >
-                            PKR {order.total_amount}
-                          </p>
-                          <span
-                            className={`inline-block mt-2 px-4 py-1 text-sm font-bold rounded-full ${
-                              order.status === "delivered"
-                                ? "bg-green-900 text-green-200"
-                                : order.status === "shipped"
-                                ? "bg-blue-900 text-blue-200"
-                                : order.status === "processing"
-                                ? "bg-yellow-900 text-yellow-200"
-                                : order.status === "cancelled"
-                                ? "bg-red-900 text-red-200"
-                                : "bg-gray-900 text-gray-200"
-                            }`}
-                          >
-                            {order.status.charAt(0).toUpperCase() +
-                              order.status.slice(1)}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <div className="px-8 py-12 text-center">
-                    <p className="text-2xl" style={{ color: "#999999" }}>
-                      🛒
-                    </p>
-                    <p className="mt-3" style={{ color: "#cccccc" }}>
-                      No orders yet
-                    </p>
-                    <Link
-                      to="/collections"
-                      className="inline-block mt-4 px-6 py-2 rounded-lg font-bold transition-all"
-                      style={{ backgroundColor: "#d4af37", color: "#000000" }}
-                    >
-                      Start Shopping
-                    </Link>
-                  </div>
-                )}
-              </div>
-            </div>
+            {/* Render nested routes for other customer dashboard pages */}
+            <Outlet />
           </div>
         </main>
       </div>
