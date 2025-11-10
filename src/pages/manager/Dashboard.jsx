@@ -12,6 +12,8 @@ import {
   FaComment,
   FaStar,
   FaMoneyBillWave,
+  FaBars,
+  FaTimes,
 } from "react-icons/fa";
 import { Link, Outlet, useLocation } from "react-router-dom";
 import { fetchWithAuth } from "../../utils/fetchWithAuth.js";
@@ -22,6 +24,7 @@ import SmartFooter from "../../components/footer/SmartFooter.jsx";
 
 const ManagerDashboard = () => {
   const location = useLocation();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [analytics, setAnalytics] = useState({});
   const [recentOrders, setRecentOrders] = useState([]);
@@ -105,6 +108,21 @@ const ManagerDashboard = () => {
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
+            <button
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              className="p-2 rounded-lg transition-colors"
+              style={{ backgroundColor: "#2d2d2d", color: "#ffffff" }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = "#d4af37";
+                e.currentTarget.style.color = "#000000";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = "#2d2d2d";
+                e.currentTarget.style.color = "#ffffff";
+              }}
+            >
+              {sidebarOpen ? <FaTimes /> : <FaBars />}
+            </button>
             <h1 className="text-white text-2xl font-bold">Naqsh Couture</h1>
             <span style={{ color: "#cccccc" }}>Manager Dashboard</span>
           </div>
@@ -168,12 +186,37 @@ const ManagerDashboard = () => {
         </div>
       </header>
 
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex-1 flex overflow-hidden relative">
+        {/* Mobile Overlay */}
+        {sidebarOpen && (
+          <div
+            className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+            onClick={() => setSidebarOpen(false)}
+          ></div>
+        )}
+
         {/* Fixed Aside */}
         <aside
-          className="w-64 shadow-lg flex-shrink-0 overflow-y-auto"
+          className={`fixed inset-y-0 left-0 z-50 w-64 shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 ${
+            sidebarOpen ? "translate-x-0" : "-translate-x-full"
+          }`}
           style={{ backgroundColor: "#1d1d1d" }}
         >
+          <div
+            className="flex items-center justify-between p-6 border-b lg:hidden"
+            style={{ borderColor: "#2d2d2d" }}
+          >
+            <h2 className="text-lg font-semibold" style={{ color: "#ffffff" }}>
+              Menu
+            </h2>
+            <button
+              onClick={() => setSidebarOpen(false)}
+              className="p-2 rounded-lg transition-colors"
+              style={{ backgroundColor: "#2d2d2d", color: "#ffffff" }}
+            >
+              <FaTimes />
+            </button>
+          </div>
           <div className="p-6 border-b" style={{ borderColor: "#2d2d2d" }}>
             <div className="flex items-center space-x-3">
               <div

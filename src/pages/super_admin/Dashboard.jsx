@@ -19,6 +19,8 @@ import {
   FaBuilding,
   FaCalendarAlt,
   FaMoneyBillWave,
+  FaBars,
+  FaTimes,
 } from "react-icons/fa";
 import { Link, Outlet, useLocation } from "react-router-dom";
 import { fetchWithAuth } from "../../utils/fetchWithAuth.js";

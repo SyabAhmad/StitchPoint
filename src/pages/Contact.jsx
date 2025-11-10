@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { APP_DATA } from "../data/ConstantValues";
-import Footer from "../components/footer/Footer.jsx";
 
 const MailIcon = () => (
   <svg
@@ -351,7 +350,6 @@ export default function Contact() {
           </div>
         </div>
       </section>
-      <Footer />
     </div>
   );
 }

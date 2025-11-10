@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import Footer from "../components/footer/Footer.jsx";
 import heroImage from "../assets/hero.jpg";
 import team1 from "../assets/1.jpg";
 import workshop from "../assets/contactus.jpg";
@@ -813,7 +812,6 @@ export default function About() {
           </div>
         </div>
       </section>
-      <Footer />
     </div>
   );
 }
