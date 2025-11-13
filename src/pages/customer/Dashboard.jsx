@@ -519,7 +519,7 @@ const CustomerDashboard = () => {
                       </div>
                       <div className="ml-6 flex-1">
                         <h2
-                          className="text-4xl font-extrabold"
+                          className="text-3xl font-extrabold"
                           style={{ color: "#d4af37" }}
                         >
                           Welcome back, {userData?.name || "Customer"}! 👋
@@ -546,7 +546,7 @@ const CustomerDashboard = () => {
                 </div>
 
                 <h1
-                  className="text-3xl font-extrabold mb-8"
+                  className="text-2xl font-extrabold mb-8"
                   style={{ color: "#d4af37" }}
                 >
                   📊 Dashboard
@@ -557,30 +557,20 @@ const CustomerDashboard = () => {
                   {/* Cart Items */}
                   <div
                     onClick={() => navigate("/customer-dashboard/cart")}
-                    className="shadow-md hover:shadow-xl transition-all transform hover:scale-105 cursor-pointer p-6 rounded-2xl"
-                    style={{
-                      backgroundColor: "#1d1d1d",
-                      border: "1px solid #2d2d2d",
-                    }}
+                    className="bg-white border-2 rounded-2xl p-6 shadow-md hover:shadow-xl transition-all transform hover:scale-102 cursor-pointer"
                   >
                     <div className="flex items-center justify-between">
                       <div>
-                        <p
-                          className="text-sm font-semibold"
-                          style={{ color: "#cccccc" }}
-                        >
+                        <p className="text-sm font-semibold text-gray-600">
                           🛒 Cart Items
                         </p>
-                        <p
-                          className="text-4xl font-extrabold mt-2"
-                          style={{ color: "#ffffff" }}
-                        >
+                        <p className="text-2xl font-extrabold mt-2 text-gray-900">
                           {cartItems.length}
                         </p>
                       </div>
-                      <div className="text-4xl">🛍️</div>
+                      <div className="text-2xl">🛍️</div>
                     </div>
-                    <p className="text-xs mt-4" style={{ color: "#999999" }}>
+                    <p className="text-xs mt-4 text-gray-500">
                       Click to view cart
                     </p>
                   </div>
@@ -588,30 +578,20 @@ const CustomerDashboard = () => {
                   {/* Wishlist Items */}
                   <div
                     onClick={() => navigate("/customer-dashboard/wishlist")}
-                    className="shadow-md hover:shadow-xl transition-all transform hover:scale-105 cursor-pointer p-6 rounded-2xl"
-                    style={{
-                      backgroundColor: "#1d1d1d",
-                      border: "1px solid #2d2d2d",
-                    }}
+                    className="bg-white border-2 rounded-2xl p-6 shadow-md hover:shadow-xl transition-all transform hover:scale-102 cursor-pointer"
                   >
                     <div className="flex items-center justify-between">
                       <div>
-                        <p
-                          className="text-sm font-semibold"
-                          style={{ color: "#cccccc" }}
-                        >
+                        <p className="text-sm font-semibold text-gray-600">
                           ❤️ Wishlist
                         </p>
-                        <p
-                          className="text-4xl font-extrabold mt-2"
-                          style={{ color: "#ffffff" }}
-                        >
+                        <p className="text-2xl font-extrabold mt-2 text-gray-900">
                           {wishlistItems.length}
                         </p>
                       </div>
-                      <div className="text-4xl">💝</div>
+                      <div className="text-2xl">💝</div>
                     </div>
-                    <p className="text-xs mt-4" style={{ color: "#999999" }}>
+                    <p className="text-xs mt-4 text-gray-500">
                       Click to view wishlist
                     </p>
                   </div>
@@ -619,60 +599,40 @@ const CustomerDashboard = () => {
                   {/* Total Orders */}
                   <div
                     onClick={() => navigate("/customer-dashboard/orders")}
-                    className="shadow-md hover:shadow-xl transition-all transform hover:scale-105 cursor-pointer p-6 rounded-2xl"
-                    style={{
-                      backgroundColor: "#1d1d1d",
-                      border: "1px solid #2d2d2d",
-                    }}
+                    className="bg-white border-2 rounded-2xl p-6 shadow-md hover:shadow-xl transition-all transform hover:scale-102 cursor-pointer"
                   >
                     <div className="flex items-center justify-between">
                       <div>
-                        <p
-                          className="text-sm font-semibold"
-                          style={{ color: "#cccccc" }}
-                        >
+                        <p className="text-sm font-semibold text-gray-600">
                           📦 Total Orders
                         </p>
-                        <p
-                          className="text-4xl font-extrabold mt-2"
-                          style={{ color: "#ffffff" }}
-                        >
+                        <p className="text-2xl font-extrabold mt-2 text-gray-900">
                           {totalOrders}
                         </p>
                       </div>
-                      <div className="text-4xl">📋</div>
+                      <div className="text-2xl">📋</div>
                     </div>
-                    <p className="text-xs mt-4" style={{ color: "#999999" }}>
+                    <p className="text-xs mt-4 text-gray-500">
                       Click to view all orders
                     </p>
                   </div>
 
                   {/* Total Spent */}
                   <div
-                    className="shadow-md p-6 rounded-2xl"
-                    style={{
-                      backgroundColor: "#1d1d1d",
-                      border: "1px solid #2d2d2d",
-                    }}
+                    className="bg-white border-2 rounded-2xl p-6 shadow-md"
                   >
                     <div className="flex items-center justify-between">
                       <div>
-                        <p
-                          className="text-sm font-semibold"
-                          style={{ color: "#cccccc" }}
-                        >
+                        <p className="text-sm font-semibold text-gray-600">
                           💰 Total Spent
                         </p>
-                        <p
-                          className="text-4xl font-extrabold mt-2"
-                          style={{ color: "#ffffff" }}
-                        >
+                        <p className="text-2xl font-extrabold mt-2 text-gray-900">
                           PKR {totalSpent.toFixed(2)}
                         </p>
                       </div>
-                      <div className="text-4xl">💳</div>
+                      <div className="text-2xl">💳</div>
                     </div>
-                    <p className="text-xs mt-4" style={{ color: "#999999" }}>
+                    <p className="text-xs mt-4 text-gray-500">
                       Lifetime spending
                     </p>
                   </div>
@@ -751,33 +711,26 @@ const CustomerDashboard = () => {
                 )}
 
                 {/* Recent Orders Section */}
-                <div
-                  className="shadow-lg border rounded-2xl"
-                  style={{ backgroundColor: "#1d1d1d", borderColor: "#2d2d2d" }}
-                >
+                <div className="bg-white border-2 rounded-2xl shadow-lg">
                   <div className="px-8 py-6 sm:px-8">
                     <div className="flex justify-between items-center">
                       <div>
-                        <h3
-                          className="text-2xl font-bold"
-                          style={{ color: "#d4af37" }}
-                        >
+                        <h3 className="text-xl font-bold text-gray-900">
                           📦 Recent Orders
                         </h3>
-                        <p className="mt-2" style={{ color: "#cccccc" }}>
+                        <p className="mt-2 text-gray-600">
                           Your latest order history
                         </p>
                       </div>
                       <button
                         onClick={() => navigate("/customer-dashboard/orders")}
-                        className="px-6 py-2 rounded-lg font-bold transition-all transform hover:scale-105"
-                        style={{ backgroundColor: "#d4af37", color: "#000000" }}
+                        className="px-6 py-2 rounded-lg font-bold transition-all transform hover:scale-105 bg-gray-900 hover:bg-gray-800 text-white"
                       >
                         View All →
                       </button>
                     </div>
                   </div>
-                  <div className="divide-y" style={{ borderColor: "#2d2d2d" }}>
+                  <div className="divide-y divide-gray-200">
                     {orders.length > 0 ? (
                       orders.slice(0, 5).map((order) => (
                         <div
@@ -785,21 +738,15 @@ const CustomerDashboard = () => {
                           onClick={() =>
                             navigate(`/customer-dashboard/orders/${order.id}`)
                           }
-                          className="px-8 py-6 hover:bg-gray-800/50 transition-all cursor-pointer border-l-4 border-l-transparent hover:border-l-d4af37"
+                          className="px-8 py-6 hover:bg-gray-50 transition-all cursor-pointer border-l-4 border-l-transparent hover:border-l-gray-900"
                         >
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-6">
                               <div>
-                                <p
-                                  className="text-lg font-bold"
-                                  style={{ color: "#ffffff" }}
-                                >
+                                <p className="text-base font-bold text-gray-900">
                                   Order #{order.id}
                                 </p>
-                                <p
-                                  className="text-sm mt-1"
-                                  style={{ color: "#cccccc" }}
-                                >
+                                <p className="text-sm mt-1 text-gray-600">
                                   📅{" "}
                                   {new Date(
                                     order.created_at
@@ -812,23 +759,20 @@ const CustomerDashboard = () => {
                               </div>
                             </div>
                             <div className="text-right">
-                              <p
-                                className="text-2xl font-bold"
-                                style={{ color: "#d4af37" }}
-                              >
+                              <p className="text-xl font-bold text-gray-900">
                                 PKR {order.total_amount}
                               </p>
                               <span
                                 className={`inline-block mt-2 px-4 py-1 text-sm font-bold rounded-full ${
                                   order.status === "delivered"
-                                    ? "bg-green-900 text-green-200"
+                                    ? "bg-green-100 text-green-800"
                                     : order.status === "shipped"
-                                    ? "bg-blue-900 text-blue-200"
+                                    ? "bg-blue-100 text-blue-800"
                                     : order.status === "processing"
-                                    ? "bg-yellow-900 text-yellow-200"
+                                    ? "bg-yellow-100 text-yellow-800"
                                     : order.status === "cancelled"
-                                    ? "bg-red-900 text-red-200"
-                                    : "bg-gray-900 text-gray-200"
+                                    ? "bg-red-100 text-red-800"
+                                    : "bg-gray-100 text-gray-800"
                                 }`}
                               >
                                 {order.status.charAt(0).toUpperCase() +

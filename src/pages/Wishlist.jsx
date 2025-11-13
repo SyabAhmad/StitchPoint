@@ -47,7 +47,7 @@ const Wishlist = () => {
   if (loading) {
     return (
       <div className="container mx-auto p-4">
-        <h1 className="text-3xl font-bold mb-4">My Wishlist</h1>
+        <h1 className="text-2xl font-bold mb-4">My Wishlist</h1>
         <div className="text-center py-12">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
           <p className="text-gray-500 mt-4">Loading wishlist...</p>
@@ -59,12 +59,12 @@ const Wishlist = () => {
   if (wishlistItems.length === 0) {
     return (
       <div className="container mx-auto p-4">
-        <h1 className="text-3xl font-bold mb-4">My Wishlist</h1>
+        <h1 className="text-2xl font-bold mb-4">My Wishlist</h1>
         <div className="text-center py-12">
-          <div className="text-gray-400 text-6xl mb-4">
+          <div className="text-gray-400 text-4xl mb-4">
             <FaHeart />
           </div>
-          <h2 className="text-2xl font-semibold text-gray-600 mb-2">
+          <h2 className="text-xl font-semibold text-gray-600 mb-2">
             Your wishlist is empty
           </h2>
           <p className="text-gray-500">Save items you love for later!</p>
@@ -76,7 +76,7 @@ const Wishlist = () => {
   return (
     <div className="container mx-auto p-4">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">My Wishlist</h1>
+        <h1 className="text-2xl font-bold">My Wishlist</h1>
         <span className="text-gray-600">{wishlistItems.length} items</span>
       </div>
 
@@ -108,7 +108,7 @@ const Wishlist = () => {
             </div>
 
             <div className="p-4">
-              <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">
+              <h3 className="text-base font-semibold text-gray-900 mb-2 line-clamp-2">
                 {item.name}
               </h3>
 
@@ -118,7 +118,7 @@ const Wishlist = () => {
                 </p>
               )}
 
-              <p className="text-xl font-bold text-gray-900 mb-4">
+              <p className="text-lg font-bold text-gray-900 mb-4">
                 PKR {item.price}
               </p>
 

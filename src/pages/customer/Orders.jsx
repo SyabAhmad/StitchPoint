@@ -104,7 +104,7 @@ const Orders = () => {
             >
               ← Back to Dashboard
             </button>
-            <h1 className="text-5xl font-extrabold text-gray-900">
+            <h1 className="text-3xl font-extrabold text-gray-900">
               📦 My Orders
             </h1>
             <p className="text-gray-600 mt-2">
@@ -129,7 +129,7 @@ const Orders = () => {
                     >
                       <div className="flex justify-between items-start">
                         <div className="flex-1">
-                          <p className="text-lg font-bold text-gray-900">
+                          <p className="text-base font-bold text-gray-900">
                             Order #{order.id}
                           </p>
                           <p className="text-sm text-gray-600 mt-2">
@@ -149,7 +149,7 @@ const Orders = () => {
                           </p>
                         </div>
                         <div className="text-right">
-                          <p className="text-2xl font-bold text-gray-900">
+                          <p className="text-xl font-bold text-gray-900">
                             PKR {order.total_amount?.toFixed(2)}
                           </p>
                           <span
@@ -175,8 +175,8 @@ const Orders = () => {
                 </div>
               ) : (
                 <div className="bg-gray-50 rounded-2xl p-12 text-center border-2 border-dashed border-gray-300">
-                  <p className="text-6xl mb-4">📭</p>
-                  <p className="text-2xl font-bold text-gray-900 mb-2">
+                  <p className="text-4xl mb-4">📭</p>
+                  <p className="text-xl font-bold text-gray-900 mb-2">
                     No orders yet
                   </p>
                   <p className="text-gray-600 mb-6">
@@ -196,7 +196,7 @@ const Orders = () => {
             {selectedOrder ? (
               <div className="lg:col-span-1">
                 <div className="bg-gray-50 rounded-2xl p-6 border border-gray-200 sticky top-6">
-                  <h3 className="text-2xl font-bold text-gray-900 mb-6">
+                  <h3 className="text-xl font-bold text-gray-900 mb-4">
                     📋 Order Details
                   </h3>
 

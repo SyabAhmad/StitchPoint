@@ -8,82 +8,6 @@ import {
 } from "../utils/wishlistUtils";
 import toast from "react-hot-toast";
 
-// Quick filter definitions (moved outside component to avoid useEffect dependency issues)
-const quickFilters = {
-  az: {
-    label: "📝 A-Z",
-    action: (
-      setSortBy,
-      setPriceRange,
-      setSelectedCategory,
-      setSelectedDistrict,
-      setActiveQuickFilter
-    ) => {
-      setSortBy("name");
-      setPriceRange([0, 10000]);
-      setSelectedCategory("");
-      setSelectedDistrict("");
-      setActiveQuickFilter("az");
-    },
-    isActive: (sortBy, priceRange, selectedCategory, selectedDistrict) =>
-      sortBy === "name" && !selectedCategory && !selectedDistrict,
-  },
-  priceLow: {
-    label: "� Low to High",
-    action: (
-      setSortBy,
-      setPriceRange,
-      setSelectedCategory,
-      setSelectedDistrict,
-      setActiveQuickFilter
-    ) => {
-      setSortBy("price-low");
-      setPriceRange([0, 10000]);
-      setSelectedCategory("");
-      setSelectedDistrict("");
-      setActiveQuickFilter("priceLow");
-    },
-    isActive: (sortBy, priceRange, selectedCategory, selectedDistrict) =>
-      sortBy === "price-low" && !selectedCategory && !selectedDistrict,
-  },
-  priceHigh: {
-    label: "💎 High to Low",
-    action: (
-      setSortBy,
-      setPriceRange,
-      setSelectedCategory,
-      setSelectedDistrict,
-      setActiveQuickFilter
-    ) => {
-      setSortBy("price-high");
-      setPriceRange([0, 10000]);
-      setSelectedCategory("");
-      setSelectedDistrict("");
-      setActiveQuickFilter("priceHigh");
-    },
-    isActive: (sortBy, priceRange, selectedCategory, selectedDistrict) =>
-      sortBy === "price-high" && !selectedCategory && !selectedDistrict,
-  },
-  newest: {
-    label: "� Newest",
-    action: (
-      setSortBy,
-      setPriceRange,
-      setSelectedCategory,
-      setSelectedDistrict,
-      setActiveQuickFilter
-    ) => {
-      setSortBy("newest");
-      setPriceRange([0, 10000]);
-      setSelectedCategory("");
-      setSelectedDistrict("");
-      setActiveQuickFilter("newest");
-    },
-    isActive: (sortBy, priceRange, selectedCategory, selectedDistrict) =>
-      sortBy === "newest" && !selectedCategory && !selectedDistrict,
-  },
-};
-
 // Loading Skeleton Component
 const ProductSkeleton = () => (
   <div className="rounded-2xl overflow-hidden bg-white shadow-lg border border-gold-500/10 animate-pulse">
@@ -108,46 +32,18 @@ export default function Collections() {
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
-  const [priceRange, setPriceRange] = useState([0, 10000]);
-  const [maxPrice, setMaxPrice] = useState(10000); // Track max price from products
+  const [priceRange, setPriceRange] = useState([0, 1000]);
   const [selectedDistrict, setSelectedDistrict] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [perPage, setPerPage] = useState(30); // Default to 30 as requested
+  const [totalProducts, setTotalProducts] = useState(0);
   const [wishlistItems, setWishlistItems] = useState([]);
   const [viewMode, setViewMode] = useState("grid"); // "grid" or "list"
   const [showFilters, setShowFilters] = useState(true); // Show/hide filters panel
   const [activeQuickFilter, setActiveQuickFilter] = useState(null); // Track active quick filter
-  const [sortBy, setSortBy] = useState("name");
+  const [categorySearch, setCategorySearch] = useState(""); // Search term for categories
+  const [districtSearch, setDistrictSearch] = useState(""); // Search term for districts
   const navigate = useNavigate();
-
-  // Clear all filters
-  const clearAllFilters = () => {
-    setSearchTerm("");
-    setSelectedCategory("");
-    setSelectedDistrict("");
-    setPriceRange([0, maxPrice]);
-    setSortBy("name");
-    setActiveQuickFilter(null);
-    setCurrentPage(1);
-  };
-
-  // Apply quick filter (clears other filters)
-  const applyQuickFilter = (filterKey) => {
-    // Clear all other filters first
-    setSearchTerm("");
-    setSelectedCategory("");
-    setSelectedDistrict("");
-    setCurrentPage(1);
-
-    // Apply the quick filter
-    quickFilters[filterKey].action(
-      setSortBy,
-      setPriceRange,
-      setSelectedCategory,
-      setSelectedDistrict,
-      setActiveQuickFilter
-    );
-  };
 
   useEffect(() => {
     const fetchProductsAndWishlist = async () => {
@@ -176,21 +72,15 @@ export default function Collections() {
         const prods = data.products || [];
         setProducts(prods);
         setFilteredProducts(prods);
+        setTotalProducts(data.total || 0);
 
         // Dynamically set priceRange to cover all returned products so filtering
         // doesn't accidentally hide most items when default range is narrow.
-        // But ensure it doesn't go below 0 or above a reasonable maximum.
         if (prods.length > 0) {
-          const prices = prods
-            .map((p) => Number(p.price) || 0)
-            .filter((p) => p >= 0);
-          if (prices.length > 0) {
-            const min = Math.max(0, Math.floor(Math.min(...prices) / 10) * 10); // Round down to nearest 10
-            const max = Math.ceil(Math.max(...prices) / 10) * 10; // Round up to nearest 10
-            const safeMax = Math.min(max, 10000); // Cap at 10,000 to prevent extreme ranges
-            setPriceRange([min, safeMax]);
-            setMaxPrice(safeMax);
-          }
+          const prices = prods.map((p) => Number(p.price) || 0);
+          const min = Math.min(...prices);
+          const max = Math.max(...prices);
+          setPriceRange([Math.floor(min), Math.ceil(max)]);
         }
       } catch (err) {
         setError(err.message);
@@ -203,25 +93,10 @@ export default function Collections() {
     fetchProductsAndWishlist();
   }, [currentPage, perPage]);
 
-  // Reset active quick filter when manual changes are made
-  useEffect(() => {
-    if (activeQuickFilter) {
-      const currentFilter = quickFilters[activeQuickFilter];
-      if (!currentFilter.isActive) {
-        setActiveQuickFilter(null);
-      }
-    }
-  }, [
-    searchTerm,
-    selectedCategory,
-    selectedDistrict,
-    priceRange,
-    sortBy,
-    activeQuickFilter,
-  ]);
+  const [sortBy, setSortBy] = useState("name");
 
   // Calculate pagination info
-  const totalPages = Math.ceil(filteredProducts.length / perPage);
+  const totalPages = Math.ceil(totalProducts / perPage);
   const startIndex = (currentPage - 1) * perPage;
   const endIndex = startIndex + perPage;
   const paginatedProducts = filteredProducts.slice(startIndex, endIndex);
@@ -327,6 +202,40 @@ export default function Collections() {
     }
   };
 
+  // Apply quick filter function
+  const applyQuickFilter = (filterType) => {
+    setActiveQuickFilter(filterType);
+    
+    switch(filterType) {
+      case "newest":
+        setSortBy("newest");
+        setPriceRange([0, 1000]);
+        setSelectedCategory("");
+        setSelectedDistrict("");
+        break;
+      case "trending":
+        setSortBy("name");
+        setPriceRange([0, 500]);
+        setSelectedCategory("");
+        setSelectedDistrict("");
+        break;
+      case "premium":
+        setSortBy("price-high");
+        setPriceRange([500, 1000]);
+        setSelectedCategory("");
+        setSelectedDistrict("");
+        break;
+      case "deals":
+        setSortBy("price-low");
+        setPriceRange([0, 300]);
+        setSelectedCategory("");
+        setSelectedDistrict("");
+        break;
+      default:
+        break;
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen">
@@ -422,8 +331,7 @@ export default function Collections() {
             Our Collections
           </h1>
           <p className="text-sm md:text-base text-black/70 max-w-xl mx-auto leading-relaxed font-light mb-5">
-            Discover timeless elegance in our curated selection of couture
-            pieces.
+            Discover timeless elegance in our curated selection of couture pieces.
           </p>
 
           {/* Enhanced Search with Suggestions */}
@@ -445,7 +353,7 @@ export default function Collections() {
             <div className="mt-3 text-sm text-gray-600">
               Popular searches:
               <span className="ml-2">
-                {["Dresses", "Bridal", "Formal Wear"].map((term) => (
+                {["Dresses", "Bridal", "Formal Wear"].map((term, index) => (
                   <button
                     key={term}
                     onClick={() => setSearchTerm(term)}
@@ -466,11 +374,7 @@ export default function Collections() {
         <div className="bg-white rounded-2xl shadow-md border border-gray-200 p-4 mb-6 overflow-x-auto">
           <div className="flex items-center gap-3 min-w-max">
             {/* Active Filter Tags */}
-            {(searchTerm ||
-              selectedCategory ||
-              selectedDistrict ||
-              priceRange[0] > 0 ||
-              priceRange[1] < 999999) && (
+            {(searchTerm || selectedCategory || selectedDistrict || priceRange[0] > 0 || priceRange[1] < 1000 || activeQuickFilter) && (
               <>
                 {searchTerm && (
                   <span className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-gold-100 text-gold-800">
@@ -505,17 +409,45 @@ export default function Collections() {
                     </button>
                   </span>
                 )}
-                {(priceRange[0] > 0 || priceRange[1] < maxPrice) && (
+                {(priceRange[0] > 0 || priceRange[1] < 1000) && (
                   <span className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-gold-100 text-gold-800">
                     Price: {priceRange[0]} - {priceRange[1]}
                     <button
-                      onClick={() => setPriceRange([0, maxPrice])}
+                      onClick={() => setPriceRange([0, 1000])}
                       className="ml-2 text-gold-600 hover:text-gold-900"
                     >
                       ✕
                     </button>
                   </span>
                 )}
+                {activeQuickFilter && (
+                  <span className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-gold-100 text-gold-800">
+                    {activeQuickFilter === "newest" && "🎉 New Arrivals"}
+                    {activeQuickFilter === "trending" && "🔥 Trending Now"}
+                    {activeQuickFilter === "premium" && "💎 Premium Collection"}
+                    {activeQuickFilter === "deals" && "💰 Best Deals"}
+                    <button
+                      onClick={() => setActiveQuickFilter(null)}
+                      className="ml-2 text-gold-600 hover:text-gold-900"
+                    >
+                      ✕
+                    </button>
+                  </span>
+                )}
+                <button
+                  onClick={() => {
+                    setSearchTerm("");
+                    setSelectedCategory("");
+                    setSelectedDistrict("");
+                    setPriceRange([0, 1000]);
+                    setSortBy("name");
+                    setCurrentPage(1);
+                    setActiveQuickFilter(null);
+                  }}
+                  className="text-sm text-gray-600 hover:text-black font-medium"
+                >
+                  Clear All
+                </button>
               </>
             )}
           </div>
@@ -526,51 +458,46 @@ export default function Collections() {
           <div className="bg-gradient-to-br from-white to-gold-50/20 rounded-3xl shadow-xl border border-gold-500/20 p-6 mb-8 relative overflow-hidden">
             {/* Decorative background element */}
             <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-gold-400/10 to-transparent rounded-full -mr-16 -mt-16"></div>
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-bold text-gray-900">Filters</h2>
+            
+            <div className="flex items-center justify-between mb-6 relative z-10">
               <div className="flex items-center gap-2">
-                <button
-                  onClick={clearAllFilters}
-                  className="text-sm bg-gold-100 text-gold-700 hover:bg-gold-200 px-3 py-1.5 rounded-lg font-medium transition-colors"
-                >
-                  Clear All
-                </button>
-                <button
-                  onClick={() => setShowFilters(false)}
-                  className="text-sm text-gold-600 hover:text-gold-800 font-medium"
-                >
-                  Hide Filters
-                </button>
+                <div className="w-8 h-8 bg-gold-500/20 rounded-lg flex items-center justify-center">
+                  <svg className="w-5 h-5 text-gold-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
+                  </svg>
+                </div>
+                <h2 className="text-xl font-bold text-gray-900">Filters</h2>
               </div>
+              <button
+                onClick={() => setShowFilters(false)}
+                className="text-sm text-gold-600 hover:text-gold-800 font-medium flex items-center gap-1 bg-white/80 backdrop-blur-sm px-3 py-1.5 rounded-full transition-all hover:bg-gold-100"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+                Hide Filters
+              </button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 relative z-10">
               {/* Category Filter */}
-              <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-4 border border-gold-500/10 shadow-sm hover:shadow-md transition-shadow relative z-10">
-                <label className="flex items-center gap-2 mb-3 font-bold text-gray-800 text-sm">
-                  <span className="w-5 h-5 bg-gold-500/20 rounded-full flex items-center justify-center text-xs">
-                    🏷️
-                  </span>
+              <div className="bg-white/60 backdrop-blur-sm rounded-xl p-4 border border-gold-500/10">
+                <label className="block mb-3 font-semibold text-gray-800 text-sm flex items-center gap-2">
+                  <svg className="w-4 h-4 text-gold-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+                  </svg>
                   Category
                 </label>
-                <div className="space-y-2 max-h-40 overflow-y-auto custom-scrollbar">
+                <div className="space-y-2 max-h-48 overflow-y-auto pr-1 custom-scrollbar">
                   {categories.slice(0, 5).map((category) => (
-                    <label
-                      key={category}
-                      className="flex items-center cursor-pointer hover:bg-gray-50 p-2 rounded"
-                    >
+                    <label key={category} className="flex items-center cursor-pointer hover:bg-gold-50 p-2 rounded-lg transition-colors">
                       <input
-                        type="checkbox"
+                        type="radio"
+                        name="category"
                         value={category}
                         checked={selectedCategory === category}
-                        onChange={(e) => {
-                          if (e.target.checked) {
-                            setSelectedCategory(category);
-                          } else {
-                            setSelectedCategory("");
-                          }
-                        }}
-                        className="mr-2 text-gold-600 focus:ring-gold-500 rounded"
+                        onChange={(e) => setSelectedCategory(e.target.value)}
+                        className="mr-2 text-gold-600 focus:ring-gold-500 w-4 h-4"
                       />
                       <span className="text-sm">{category}</span>
                     </label>
@@ -593,28 +520,24 @@ export default function Collections() {
               </div>
 
               {/* District Filter */}
-              <div>
-                <label className="block mb-2 font-semibold text-gray-700 text-sm">
+              <div className="bg-white/60 backdrop-blur-sm rounded-xl p-4 border border-gold-500/10">
+                <label className="block mb-3 font-semibold text-gray-800 text-sm flex items-center gap-2">
+                  <svg className="w-4 h-4 text-gold-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                  </svg>
                   District/Area
                 </label>
-                <div className="space-y-2">
+                <div className="space-y-2 max-h-48 overflow-y-auto pr-1 custom-scrollbar">
                   {districts.slice(0, 5).map((district) => (
-                    <label
-                      key={district}
-                      className="flex items-center cursor-pointer hover:bg-gray-50 p-2 rounded"
-                    >
+                    <label key={district} className="flex items-center cursor-pointer hover:bg-gold-50 p-2 rounded-lg transition-colors">
                       <input
-                        type="checkbox"
+                        type="radio"
+                        name="district"
                         value={district}
                         checked={selectedDistrict === district}
-                        onChange={(e) => {
-                          if (e.target.checked) {
-                            setSelectedDistrict(district);
-                          } else {
-                            setSelectedDistrict("");
-                          }
-                        }}
-                        className="mr-2 text-gold-600 focus:ring-gold-500 rounded"
+                        onChange={(e) => setSelectedDistrict(e.target.value)}
+                        className="mr-2 text-gold-600 focus:ring-gold-500 w-4 h-4"
                       />
                       <span className="text-sm">{district}</span>
                     </label>
@@ -637,8 +560,11 @@ export default function Collections() {
               </div>
 
               {/* Price Range Filter */}
-              <div>
-                <label className="block mb-2 font-semibold text-gray-700 text-sm">
+              <div className="bg-white/60 backdrop-blur-sm rounded-xl p-4 border border-gold-500/10">
+                <label className="block mb-3 font-semibold text-gray-800 text-sm flex items-center gap-2">
+                  <svg className="w-4 h-4 text-gold-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  </svg>
                   Price Range
                 </label>
                 <div className="space-y-3">
@@ -646,7 +572,7 @@ export default function Collections() {
                     <input
                       type="number"
                       min="0"
-                      max={maxPrice}
+                      max="1000"
                       value={priceRange[0]}
                       onChange={(e) =>
                         setPriceRange([
@@ -661,12 +587,12 @@ export default function Collections() {
                     <input
                       type="number"
                       min="0"
-                      max={maxPrice}
+                      max="1000"
                       value={priceRange[1]}
                       onChange={(e) =>
                         setPriceRange([
                           priceRange[0],
-                          parseInt(e.target.value) || maxPrice,
+                          parseInt(e.target.value) || 1000,
                         ])
                       }
                       className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-gold-500 focus:ring-2 focus:ring-gold-500/20 transition-all text-sm"
@@ -678,16 +604,14 @@ export default function Collections() {
                   <div className="pt-2">
                     <div className="flex justify-between text-xs text-gray-600 mb-1">
                       <span>PKR 0</span>
-                      <span>PKR {maxPrice}+</span>
+                      <span>PKR 1000+</span>
                     </div>
                     <div className="relative h-2 bg-gray-200 rounded-full">
                       <div
                         className="absolute h-2 bg-gold-500 rounded-full"
                         style={{
-                          left: `${(priceRange[0] / maxPrice) * 100}%`,
-                          width: `${
-                            ((priceRange[1] - priceRange[0]) / maxPrice) * 100
-                          }%`,
+                          left: `${(priceRange[0] / 1000) * 100}%`,
+                          width: `${((priceRange[1] - priceRange[0]) / 1000) * 100}%`
                         }}
                       ></div>
                     </div>
@@ -696,29 +620,54 @@ export default function Collections() {
               </div>
 
               {/* Quick Filter Tags */}
-              <div>
-                <label className="block mb-2 font-semibold text-gray-700 text-sm">
+              <div className="bg-white/60 backdrop-blur-sm rounded-xl p-4 border border-gold-500/10">
+                <label className="block mb-3 font-semibold text-gray-800 text-sm flex items-center gap-2">
+                  <svg className="w-4 h-4 text-gold-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                  </svg>
                   Quick Filters
                 </label>
                 <div className="space-y-2">
-                  {Object.entries(quickFilters).map(([key, filter]) => (
-                    <button
-                      key={key}
-                      onClick={() => applyQuickFilter(key)}
-                      className={`block w-full text-left px-3 py-2 text-sm rounded-lg transition-colors ${
-                        filter.isActive(
-                          sortBy,
-                          priceRange,
-                          selectedCategory,
-                          selectedDistrict
-                        )
-                          ? "bg-gold-100 text-gold-700"
-                          : "bg-gray-50 hover:bg-gold-50 hover:text-gold-700"
-                      }`}
-                    >
-                      {filter.label}
-                    </button>
-                  ))}
+                  <button 
+                    onClick={() => applyQuickFilter("newest")}
+                    className={`block w-full text-left px-3 py-2 text-sm rounded-lg transition-all ${
+                      activeQuickFilter === "newest" 
+                        ? "bg-gold-100 text-gold-700 shadow-sm border border-gold-200" 
+                        : "bg-gray-50 hover:bg-gold-50 hover:text-gold-700"
+                    }`}
+                  >
+                    🎉 New Arrivals
+                  </button>
+                  <button 
+                    onClick={() => applyQuickFilter("trending")}
+                    className={`block w-full text-left px-3 py-2 text-sm rounded-lg transition-all ${
+                      activeQuickFilter === "trending" 
+                        ? "bg-gold-100 text-gold-700 shadow-sm border border-gold-200" 
+                        : "bg-gray-50 hover:bg-gold-50 hover:text-gold-700"
+                    }`}
+                  >
+                    🔥 Trending Now
+                  </button>
+                  <button 
+                    onClick={() => applyQuickFilter("premium")}
+                    className={`block w-full text-left px-3 py-2 text-sm rounded-lg transition-all ${
+                      activeQuickFilter === "premium" 
+                        ? "bg-gold-100 text-gold-700 shadow-sm border border-gold-200" 
+                        : "bg-gray-50 hover:bg-gold-50 hover:text-gold-700"
+                    }`}
+                  >
+                    💎 Premium Collection
+                  </button>
+                  <button 
+                    onClick={() => applyQuickFilter("deals")}
+                    className={`block w-full text-left px-3 py-2 text-sm rounded-lg transition-all ${
+                      activeQuickFilter === "deals" 
+                        ? "bg-gold-100 text-gold-700 shadow-sm border border-gold-200" 
+                        : "bg-gray-50 hover:bg-gold-50 hover:text-gold-700"
+                    }`}
+                  >
+                    💰 Best Deals
+                  </button>
                 </div>
               </div>
             </div>
@@ -726,21 +675,10 @@ export default function Collections() {
         ) : (
           <button
             onClick={() => setShowFilters(true)}
-            className="bg-white rounded-2xl shadow-md border border-gray-200 p-4 mb-8 text-gold-600 hover:text-gold-800 font-medium flex items-center justify-center gap-2"
+            className="bg-white rounded-2xl shadow-md border border-gray-200 p-4 mb-8 text-gold-600 hover:text-gold-800 font-medium flex items-center justify-center gap-2 transition-all hover:shadow-lg"
           >
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"
-              ></path>
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
             </svg>
             Show Filters
           </button>
@@ -752,42 +690,10 @@ export default function Collections() {
           <div className="flex justify-between items-center mb-6 flex-wrap gap-4 bg-white rounded-lg shadow-sm border border-gray-200 p-4">
             <div className="flex items-center gap-4">
               <p className="text-gray-700 font-medium">
-                <span className="font-bold">{filteredProducts.length}</span>{" "}
-                results
-                {(searchTerm ||
-                  selectedCategory ||
-                  selectedDistrict ||
-                  priceRange[0] > 0 ||
-                  priceRange[1] < maxPrice) && (
+                <span className="font-bold">{filteredProducts.length}</span> results
+                {searchTerm && (
                   <span className="ml-2 text-gray-500">
-                    {searchTerm && (
-                      <>
-                        for "<span className="font-medium">{searchTerm}</span>"
-                      </>
-                    )}
-                    {selectedCategory && (
-                      <>
-                        {" "}
-                        in{" "}
-                        <span className="font-medium">{selectedCategory}</span>
-                      </>
-                    )}
-                    {selectedDistrict && (
-                      <>
-                        {" "}
-                        in{" "}
-                        <span className="font-medium">{selectedDistrict}</span>
-                      </>
-                    )}
-                    {(priceRange[0] > 0 || priceRange[1] < maxPrice) && (
-                      <>
-                        {" "}
-                        priced{" "}
-                        <span className="font-medium">
-                          PKR {priceRange[0]}-{priceRange[1]}
-                        </span>
-                      </>
-                    )}
+                    for "<span className="font-medium">{searchTerm}</span>"
                   </span>
                 )}
               </p>
@@ -803,11 +709,7 @@ export default function Collections() {
                   onClick={() => setViewMode("grid")}
                 >
                   <span className="flex items-center gap-1">
-                    <svg
-                      className="w-4 h-4"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                    >
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                       <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM13 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2h-2z" />
                     </svg>
                     Grid
@@ -820,16 +722,8 @@ export default function Collections() {
                   onClick={() => setViewMode("list")}
                 >
                   <span className="flex items-center gap-1">
-                    <svg
-                      className="w-4 h-4"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"
-                        clipRule="evenodd"
-                      />
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" />
                     </svg>
                     List
                   </span>
@@ -875,12 +769,7 @@ export default function Collections() {
           <div className="flex justify-between items-center mb-6 flex-wrap gap-4">
             <div className="flex items-center gap-4">
               <p className="text-gray-700 text-sm font-medium">
-                Showing{" "}
-                <span className="font-bold">
-                  {startIndex + 1}-{Math.min(endIndex, filteredProducts.length)}
-                </span>{" "}
-                of <span className="font-bold">{filteredProducts.length}</span>{" "}
-                products
+                Showing <span className="font-bold">{startIndex + 1}-{Math.min(endIndex, totalProducts)}</span> of <span className="font-bold">{totalProducts}</span> products
               </p>
 
               {/* View Toggle */}
@@ -892,19 +781,8 @@ export default function Collections() {
                   }`}
                 >
                   <span className="flex items-center gap-1">
-                    <svg
-                      className="w-4 h-4"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"
-                      />
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
                     </svg>
                     Grid
                   </span>
@@ -916,19 +794,8 @@ export default function Collections() {
                   }`}
                 >
                   <span className="flex items-center gap-1">
-                    <svg
-                      className="w-4 h-4"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M4 6h16M4 12h16M4 18h16"
-                      />
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
                     </svg>
                     List
                   </span>
@@ -938,9 +805,7 @@ export default function Collections() {
 
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-2">
-                <label className="font-semibold text-gray-700 text-sm">
-                  Per Page:
-                </label>
+                <label className="font-semibold text-gray-700 text-sm">Per Page:</label>
                 <select
                   value={perPage}
                   onChange={(e) => {
@@ -957,9 +822,7 @@ export default function Collections() {
               </div>
 
               <div className="flex items-center gap-2">
-                <label className="font-semibold text-gray-700 text-sm">
-                  Sort by:
-                </label>
+                <label className="font-semibold text-gray-700 text-sm">Sort by:</label>
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
@@ -979,139 +842,139 @@ export default function Collections() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
               {paginatedProducts.length > 0 ? (
                 paginatedProducts.map((product) => (
-                  <div
-                    key={product.id}
-                    className="relative rounded-2xl overflow-hidden bg-gradient-to-br from-white via-gold-50/30 to-white shadow-lg border border-gold-500/20 group hover:shadow-xl hover:-translate-y-2 transition-all duration-300 ease-out transform hover:scale-102"
+                <div
+                  key={product.id}
+                  className="relative rounded-2xl overflow-hidden bg-gradient-to-br from-white via-gold-50/30 to-white shadow-lg border border-gold-500/20 group hover:shadow-xl hover:-translate-y-2 transition-all duration-300 ease-out transform hover:scale-102"
+                >
+                  {/* Premium Badge */}
+                  <div className="absolute top-3 left-3 z-10 bg-gold-500 text-white px-2 py-1 rounded-full text-xs font-bold uppercase tracking-wider shadow-lg">
+                    Premium
+                  </div>
+
+                  {/* Wishlist Button */}
+                  <button
+                    className={`absolute top-3 right-3 z-10 bg-white/90 backdrop-blur-sm p-1.5 rounded-full shadow-lg transition-all duration-300 hover:scale-110 ${
+                      wishlistItems.some((item) => item.id === product.id)
+                        ? "text-red-500"
+                        : "text-gray-600 hover:text-red-500"
+                    }`}
+                    onClick={() => handleAddToWishlist(product)}
                   >
-                    {/* Premium Badge */}
-                    <div className="absolute top-3 left-3 z-10 bg-gold-500 text-white px-2 py-1 rounded-full text-xs font-bold uppercase tracking-wider shadow-lg">
-                      Premium
-                    </div>
+                    <span className="text-lg">
+                      {wishlistItems.some((item) => item.id === product.id)
+                        ? "❤️"
+                        : "🤍"}
+                    </span>
+                  </button>
 
-                    {/* Wishlist Button */}
-                    <button
-                      className={`absolute top-3 right-3 z-10 bg-white/90 backdrop-blur-sm p-1.5 rounded-full shadow-lg transition-all duration-300 hover:scale-110 ${
-                        wishlistItems.some((item) => item.id === product.id)
-                          ? "text-red-500"
-                          : "text-gray-600 hover:text-red-500"
-                      }`}
-                      onClick={() => handleAddToWishlist(product)}
-                    >
-                      <span className="text-lg">
-                        {wishlistItems.some((item) => item.id === product.id)
-                          ? "❤️"
-                          : "🤍"}
-                      </span>
-                    </button>
-
+                  <div
+                    className="h-40 bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center relative overflow-hidden cursor-pointer"
+                    onClick={() => handleProductClick(product)}
+                  >
+                    {product.image_url ? (
+                      <img
+                        src={`http://127.0.0.1:5000${product.image_url}`}
+                        alt={product.name}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 ease-out"
+                        onError={(e) => {
+                          e.target.style.display = "none";
+                          e.target.nextSibling.style.display = "flex";
+                        }}
+                      />
+                    ) : null}
                     <div
-                      className="h-40 bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center relative overflow-hidden cursor-pointer"
-                      onClick={() => handleProductClick(product)}
+                      className={`absolute inset-0 flex items-center justify-center ${
+                        product.image_url ? "hidden" : "flex"
+                      } bg-gradient-to-br from-gold-100 to-gold-200`}
                     >
-                      {product.image_url ? (
-                        <img
-                          src={`http://127.0.0.1:5000${product.image_url}`}
-                          alt={product.name}
-                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 ease-out"
-                          onError={(e) => {
-                            e.target.style.display = "none";
-                            e.target.nextSibling.style.display = "flex";
-                          }}
-                        />
-                      ) : null}
-                      <div
-                        className={`absolute inset-0 flex items-center justify-center ${
-                          product.image_url ? "hidden" : "flex"
-                        } bg-gradient-to-br from-gold-100 to-gold-200`}
-                      >
-                        <div className="text-center">
-                          <div className="w-16 h-16 bg-gold-500 rounded-full flex items-center justify-center mx-auto mb-2 shadow-lg">
-                            <span className="text-white text-2xl font-bold">
-                              {product.name &&
-                              product.name.charAt &&
-                              product.name.charAt(0)
-                                ? product.name.charAt(0).toUpperCase()
-                                : "?"}
-                            </span>
-                          </div>
-                          <p className="text-gray-600 text-sm font-medium">
-                            No Image Available
-                          </p>
+                      <div className="text-center">
+                        <div className="w-16 h-16 bg-gold-500 rounded-full flex items-center justify-center mx-auto mb-2 shadow-lg">
+                          <span className="text-white text-2xl font-bold">
+                            {product.name &&
+                            product.name.charAt &&
+                            product.name.charAt(0)
+                              ? product.name.charAt(0).toUpperCase()
+                              : "?"}
+                          </span>
                         </div>
-                      </div>
-
-                      {/* Overlay on hover */}
-                      <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                        <span className="text-white text-sm font-bold bg-black/50 px-3 py-1 rounded-full">
-                          View Details
-                        </span>
+                        <p className="text-gray-600 text-sm font-medium">
+                          No Image Available
+                        </p>
                       </div>
                     </div>
 
-                    <div className="p-3 flex flex-col gap-2">
-                      <div className="flex-1">
-                        <div className="flex items-start justify-between mb-1">
-                          <h4 className="text-sm font-bold text-black leading-tight font-serif line-clamp-1">
-                            {product.name}
-                          </h4>
-                          <div className="flex items-center gap-1">
-                            <span className="text-yellow-400 text-xs">⭐</span>
-                            <span className="text-xs font-semibold text-black/70">
-                              4.8
-                            </span>
-                          </div>
-                        </div>
-
-                        <p className="text-black/80 mb-2 leading-relaxed text-xs line-clamp-1">
-                          {product.description}
-                        </p>
-
-                        <div className="flex items-center justify-between mb-2">
-                          <p className="text-gold-600 font-bold text-sm">
-                            PKR {product.price}
-                          </p>
-                          <div className="text-right">
-                            <p className="text-black/70 text-xs font-medium">
-                              Stock:{" "}
-                              <span className="text-green-600 font-bold">
-                                {product.stock_quantity}
-                              </span>
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="flex gap-2">
-                        <button
-                          className="flex-1 bg-black text-yellow-500 px-2 py-1.5 rounded-lg font-bold hover:bg-gray-800 transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 uppercase text-xs tracking-wide"
-                          onClick={() => handleAddToCart(product)}
-                        >
-                          🛒 Add
-                        </button>
-                        <button
-                          className="bg-white border border-gold-500 text-gold-600 px-2 py-1.5 rounded-lg font-bold hover:bg-gold-500 hover:text-white transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 text-sm"
-                          onClick={() => handleProductClick(product)}
-                        >
-                          👁️
-                        </button>
-                      </div>
+                    {/* Overlay on hover */}
+                    <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                      <span className="text-white text-sm font-bold bg-black/50 px-3 py-1 rounded-full">
+                        View Details
+                      </span>
                     </div>
                   </div>
-                ))
-              ) : (
-                <div className="col-span-full text-center py-20 text-black/60 bg-white rounded-3xl shadow-xl border border-gold-500/10">
-                  <p className="text-2xl font-semibold mb-4 text-gold-500">
-                    No products found!
-                  </p>
-                  <p className="text-lg mb-3">
-                    It seems there are no items matching your current criteria.
-                  </p>
-                  <p className="text-md">
-                    Try broadening your search or clearing some filters.
-                  </p>
+
+                  <div className="p-3 flex flex-col gap-2">
+                    <div className="flex-1">
+                      <div className="flex items-start justify-between mb-1">
+                        <h4 className="text-sm font-bold text-black leading-tight font-serif line-clamp-1">
+                          {product.name}
+                        </h4>
+                        <div className="flex items-center gap-1">
+                          <span className="text-yellow-400 text-xs">⭐</span>
+                          <span className="text-xs font-semibold text-black/70">
+                            4.8
+                          </span>
+                        </div>
+                      </div>
+
+                      <p className="text-black/80 mb-2 leading-relaxed text-xs line-clamp-1">
+                        {product.description}
+                      </p>
+
+                      <div className="flex items-center justify-between mb-2">
+                        <p className="text-gold-600 font-bold text-sm">
+                          PKR {product.price}
+                        </p>
+                        <div className="text-right">
+                          <p className="text-black/70 text-xs font-medium">
+                            Stock:{" "}
+                            <span className="text-green-600 font-bold">
+                              {product.stock_quantity}
+                            </span>
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex gap-2">
+                      <button
+                        className="flex-1 bg-black text-yellow-500 px-2 py-1.5 rounded-lg font-bold hover:bg-gray-800 transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 uppercase text-xs tracking-wide"
+                        onClick={() => handleAddToCart(product)}
+                      >
+                        🛒 Add
+                      </button>
+                      <button
+                        className="bg-white border border-gold-500 text-gold-600 px-2 py-1.5 rounded-lg font-bold hover:bg-gold-500 hover:text-white transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5 text-sm"
+                        onClick={() => handleProductClick(product)}
+                      >
+                        👁️
+                      </button>
+                    </div>
+                  </div>
                 </div>
-              )}
-            </div>
+              ))
+            ) : (
+              <div className="col-span-full text-center py-20 text-black/60 bg-white rounded-3xl shadow-xl border border-gold-500/10">
+                <p className="text-2xl font-semibold mb-4 text-gold-500">
+                  No products found!
+                </p>
+                <p className="text-lg mb-3">
+                  It seems there are no items matching your current criteria.
+                </p>
+                <p className="text-md">
+                  Try broadening your search or clearing some filters.
+                </p>
+              </div>
+            )}
+          </div>
           ) : (
             <div className="space-y-4">
               {paginatedProducts.length > 0 ? (
@@ -1164,9 +1027,7 @@ export default function Collections() {
                               {product.name}
                             </h4>
                             <div className="flex items-center gap-1">
-                              <span className="text-yellow-400 text-sm">
-                                ⭐
-                              </span>
+                              <span className="text-yellow-400 text-sm">⭐</span>
                               <span className="text-sm font-semibold text-gray-700">
                                 4.8
                               </span>

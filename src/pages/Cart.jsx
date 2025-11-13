@@ -96,11 +96,11 @@ const Cart = () => {
       <div className="min-h-screen bg-white">
         <div className="max-w-7xl mx-auto py-12 sm:px-6 lg:px-8">
           <div className="text-center py-20">
-            <div className="text-gray-400 text-8xl mb-6">🛒</div>
-            <h2 className="text-4xl font-extrabold text-gray-900 mb-3">
+            <div className="text-gray-400 text-6xl mb-4">🛒</div>
+            <h2 className="text-3xl font-extrabold text-gray-900 mb-2">
               Your cart is empty
             </h2>
-            <p className="text-xl text-gray-600 mb-8">
+            <p className="text-lg text-gray-600 mb-6">
               Add some awesome products to get started!
             </p>
             <a
@@ -121,7 +121,7 @@ const Cart = () => {
         {/* Header */}
         <div className="flex justify-between items-center mb-12">
           <div>
-            <h1 className="text-5xl font-extrabold text-gray-900">
+            <h1 className="text-3xl font-extrabold text-gray-900">
               🛒 Shopping Cart
             </h1>
             <p className="text-gray-600 mt-2">
@@ -164,7 +164,7 @@ const Cart = () => {
 
                   {/* Product Info */}
                   <div className="flex-1">
-                    <h3 className="text-lg font-bold text-gray-900">
+                    <h3 className="text-base font-bold text-gray-900">
                       {item.name}
                     </h3>
                     {item.store && (
@@ -175,7 +175,7 @@ const Cart = () => {
                         </span>
                       </p>
                     )}
-                    <p className="text-xl font-bold text-gray-900 mt-2">
+                    <p className="text-lg font-bold text-gray-900 mt-2">
                       PKR {item.price.toFixed(2)}
                     </p>
                   </div>
@@ -205,7 +205,7 @@ const Cart = () => {
 
                   {/* Item Total */}
                   <div className="text-right">
-                    <p className="text-xl font-bold text-gray-900">
+                    <p className="text-lg font-bold text-gray-900">
                       PKR {(item.price * item.quantity).toFixed(2)}
                     </p>
                     <button
@@ -223,7 +223,7 @@ const Cart = () => {
           {/* Order Summary - Sticky */}
           <div className="lg:col-span-1">
             <div className="bg-gray-50 border border-gray-200 rounded-2xl shadow-lg p-8 sticky top-6">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6">
+              <h2 className="text-xl font-bold text-gray-900 mb-4">
                 📋 Order Summary
               </h2>
 
@@ -252,7 +252,7 @@ const Cart = () => {
 
               <hr className="my-6 border-gray-300" />
 
-              <div className="flex justify-between text-2xl font-bold text-gray-900 mb-8">
+              <div className="flex justify-between text-xl font-bold text-gray-900 mb-6">
                 <span>Total</span>
                 <span className="text-gray-900">
                   PKR {(total * 1.08).toFixed(2)}
@@ -261,7 +261,7 @@ const Cart = () => {
 
               <button
                 onClick={handleCheckout}
-                className="w-full bg-gray-900 hover:bg-gray-800 text-white py-4 px-4 rounded-xl font-bold text-lg transition-all transform hover:scale-105 shadow-lg"
+                className="w-full bg-gray-900 hover:bg-gray-800 text-white py-3 px-4 rounded-xl font-bold transition-all transform hover:scale-105 shadow-lg"
               >
                 ✓ Proceed to Checkout
               </button>
