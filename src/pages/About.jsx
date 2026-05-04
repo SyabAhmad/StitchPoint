@@ -167,11 +167,18 @@ export default function About() {
   const team = [
     {
       name: "Sara Ali",
-      role: "Frontend Developer & Designer",
+      role: "UI/UX Designer & Developer",
       image: team1,
       description:
-        "Sara creates stunning user interfaces and designs that bring our vision to life with creativity and technical expertise.",
-      specialties: ["UI/UX Design", "React Development", "Creative Frontend"],
+        "Sara is a passionate UI/UX designer and developer crafting beautiful digital experiences that blend aesthetics with functionality. As a Computer Science student at University of Swat, she excels in creating visually appealing designs and user-friendly interfaces.",
+      specialties: [
+        "UI/UX Design",
+        "React Development",
+        "Figma",
+        "Adobe XD",
+        "Graphic Design",
+      ],
+      portfolio: "https://saraali.vercel.app/",
     },
     {
       name: "Mahroosh",
@@ -698,6 +705,18 @@ export default function About() {
                       </span>
                     ))}
                   </div>
+                  {member.portfolio && (
+                    <div className="text-center mt-4">
+                      <a
+                        href={member.portfolio}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center px-4 py-2 bg-black text-white rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors"
+                      >
+                        View Portfolio
+                      </a>
+                    </div>
+                  )}
                 </div>
               </div>
             ))}

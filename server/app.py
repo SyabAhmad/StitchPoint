@@ -11,6 +11,7 @@ import os
 
 from config import Config
 from models import db, CommissionRate
+from sqlalchemy.exc import ProgrammingError
 from routes.auth import auth_bp
 from routes.products import products_bp
 from routes.dashboard import dashboard_bp
@@ -120,7 +121,10 @@ app.register_blueprint(notifications_bp)
 app.register_blueprint(commissions_bp)
 
 with app.app_context():
-	ensure_default_commission_rates()
+	try:
+		ensure_default_commission_rates()
+	except ProgrammingError:
+		pass  # tables not created yet; run flask db upgrade first
 
 @app.route('/uploads/<path:filename>')
 def serve_uploaded_file(filename):

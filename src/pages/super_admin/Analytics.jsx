@@ -6,6 +6,7 @@ import ProductViewsChart from "../../components/analytics/ProductViewsChart";
 import ProductClicksChart from "../../components/analytics/ProductClicksChart";
 import ReviewTrendsChart from "../../components/analytics/ReviewTrendsChart";
 import CommentTrendsChart from "../../components/analytics/CommentTrendsChart";
+import AdvancedFilters from "../../components/analytics/AdvancedFilters";
 import {
   FaUsers,
   FaBox,
@@ -37,11 +38,66 @@ const Analytics = () => {
   const [recentOrders, setRecentOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedPeriod, setSelectedPeriod] = useState("month");
+  const [filters, setFilters] = useState({
+    dateRange: { start: null, end: null },
+    customerSegment: "all",
+    location: { country: "", city: "" },
+    device: "all",
+    trafficSource: "all",
+    productCategory: "all",
+    priceRange: { min: 0, max: 1000 },
+    rating: "all",
+    status: "all",
+    search: "",
+    active: false,
+  });
+  const [filteredAnalyticsData, setFilteredAnalyticsData] = useState(null);
 
   const periodToDays = (p) => {
     if (p === "today") return 1;
     if (p === "week") return 7;
     return 30;
+  };
+
+  const handleFiltersChange = (newFilters) => {
+    setFilters(newFilters);
+
+    // Apply filters to analytics data
+    const filteredData = {
+      ...analyticsData,
+      overview: {
+        ...analyticsData.overview,
+        top_products: analyticsData.overview.top_products.filter((product) => {
+          // Apply product category filter
+          if (
+            newFilters.productCategory !== "all" &&
+            product.category !== newFilters.productCategory
+          ) {
+            return false;
+          }
+
+          // Apply price range filter
+          if (
+            product.price < newFilters.priceRange.min ||
+            product.price > newFilters.priceRange.max
+          ) {
+            return false;
+          }
+
+          // Apply rating filter
+          if (
+            newFilters.rating !== "all" &&
+            product.rating < parseInt(newFilters.rating)
+          ) {
+            return false;
+          }
+
+          return true;
+        }),
+      },
+    };
+
+    setFilteredAnalyticsData(filteredData);
   };
 
   useEffect(() => {
@@ -64,23 +120,23 @@ const Analytics = () => {
           }),
           fetch(
             `http://localhost:5000/api/analytics/product-views?days=${days}`,
-            { headers: { Authorization: `Bearer ${token}` } }
+            { headers: { Authorization: `Bearer ${token}` } },
           ),
           fetch(
             `http://localhost:5000/api/analytics/product-clicks?days=${days}`,
-            { headers: { Authorization: `Bearer ${token}` } }
+            { headers: { Authorization: `Bearer ${token}` } },
           ),
           fetch(
             `http://localhost:5000/api/analytics/reviews-overview?days=${days}`,
-            { headers: { Authorization: `Bearer ${token}` } }
+            { headers: { Authorization: `Bearer ${token}` } },
           ),
           fetch(
             `http://localhost:5000/api/analytics/reviews-trends?days=${days}`,
-            { headers: { Authorization: `Bearer ${token}` } }
+            { headers: { Authorization: `Bearer ${token}` } },
           ),
           fetch(
             `http://localhost:5000/api/analytics/comments-trends?days=${days}`,
-            { headers: { Authorization: `Bearer ${token}` } }
+            { headers: { Authorization: `Bearer ${token}` } },
           ),
           fetch("http://localhost:5000/api/dashboard/admin", {
             headers: { Authorization: `Bearer ${token}` },
@@ -226,6 +282,12 @@ const Analytics = () => {
             </button>
           </div>
         </div>
+
+        {/* Advanced Filters */}
+        <AdvancedFilters
+          onFiltersChange={handleFiltersChange}
+          initialFilters={filters}
+        />
 
         {/* Overview Stats */}
         <OverviewStats data={analyticsData.overview} />
