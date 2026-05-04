@@ -112,7 +112,7 @@ const CustomerDashboard = () => {
             >
               {sidebarOpen ? <FaTimes /> : <FaBars />}
             </button>
-            <h1 className="text-white text-2xl font-bold">Naqsh Couture</h1>
+            <h1 className="text-white text-2xl font-bold">Naqsh Studio</h1>
             <span style={{ color: "#cccccc" }}>Customer Dashboard</span>
           </div>
           <div className="flex items-center space-x-4">

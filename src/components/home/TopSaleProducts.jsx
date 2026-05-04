@@ -44,7 +44,7 @@ export default function TopSaleProducts() {
   };
 
   return (
-    <section className="py-20 px-6 bg-gradient-to-br from-red-500/3 to-white/97">
+    <section className="py-20 px-6 bg-gradient-to-br from-red-50 to-white">
       <div className="max-w-7xl mx-auto">
         <h3 className="text-3xl md:text-4xl lg:text-5xl font-bold font-serif text-red-500 text-center mb-12 tracking-wide">
           🔥 Top Sale Products

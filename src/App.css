@@ -1,18 +1,27 @@
 /* Layout helpers to keep footer at bottom */
 .app-root {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
+ min-height: 100vh;
+ display: flex;
+ flex-direction: column;
 }
 
 .app-content {
-  /* allow page content to grow and push footer to bottom */
-  flex: 1 1 auto;
+ /* allow page content to grow and push footer to bottom */
+ flex: 1 1 auto;
 }
 
 /* Small responsive tweak: make footer links wrap on narrow screens */
 .footer .footer-links {
-  flex-wrap: wrap;
+ flex-wrap: wrap;
 }
 /* Home-specific styles moved to src/styles/home.css */
 /* This file keeps app-level layout rules only. */
+
+.fade-in {
+ opacity: 0;
+ transition: opacity 0.5s ease;
+}
+
+.fade-in.visible {
+ opacity: 1;
+}

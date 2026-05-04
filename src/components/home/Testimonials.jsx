@@ -46,7 +46,7 @@ const StarRating = ({ rating }) => {
 
 export default function Testimonials() {
   return (
-    <section className="py-20 px-4 bg-gradient-to-br from-black-silk/3 to-white/98">
+    <section className="py-20 px-4 bg-gradient-to-br from-gray-50 to-white">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold font-serif text-gold-500 mb-4">

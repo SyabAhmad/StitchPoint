@@ -252,7 +252,7 @@ export default function About() {
           <div className="max-w-4xl mx-auto text-center text-white">
             <div className="transition-all duration-1000 opacity-100 translate-y-0">
               <div className="inline-block px-6 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white text-sm font-medium mb-8">
-                ✨ Welcome to Naqsh Couture
+                ✨ Welcome to Naqsh Studio
               </div>
 
               <h1 className="text-6xl md:text-7xl lg:text-8xl font-bold font-serif leading-tight mb-8">
@@ -320,7 +320,7 @@ export default function About() {
                     The Dream
                   </h3>
                   <p className="text-lg text-gray-700 leading-relaxed">
-                    Founded by Sarah Khan in 2008, Naqsh Couture emerged from a
+                    Founded by Sarah Khan in 2008, Naqsh Studio emerged from a
                     passion for preserving Pakistan's rich textile heritage
                     while embracing contemporary design aesthetics.
                   </p>

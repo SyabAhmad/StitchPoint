@@ -101,7 +101,7 @@ const SmartFooter = ({ variant = "default" }) => {
             className="flex items-center space-x-4"
             style={{ color: "#cccccc" }}
           >
-            <span>&copy; {currentYear} Naqsh Couture</span>
+            <span>&copy; {currentYear} Naqsh Studio</span>
             <span>•</span>
             <span>All rights reserved</span>
           </div>
@@ -129,7 +129,7 @@ const SmartFooter = ({ variant = "default" }) => {
           <div className="lg:col-span-1">
             <div className="mb-6">
               <h3 className="text-2xl font-bold text-white mb-4">
-                Naqsh Couture
+                Naqsh Studio
               </h3>
               <p className="text-gray-300 leading-relaxed mb-6">
                 Crafting timeless elegance through bespoke fashion. Where
@@ -336,7 +336,7 @@ const SmartFooter = ({ variant = "default" }) => {
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <div className="flex items-center space-x-2 text-gray-300">
               <span>
-                &copy; {currentYear} Naqsh Couture. All rights reserved.
+                &copy; {currentYear} Naqsh Studio. All rights reserved.
               </span>
               <HeartIcon className="w-4 h-4 text-red-400" />
             </div>
