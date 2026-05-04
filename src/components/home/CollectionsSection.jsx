@@ -93,23 +93,17 @@ export default function CollectionsSection() {
   const limitedCategories = categories.slice(0, 6); // Show up to 6 categories
 
   return (
-    <section className="py-24 px-4 bg-gradient-to-br from-white via-gold-500/5 to-white relative overflow-hidden">
-      {/* Background Pattern */}
-      <div className="absolute inset-0 opacity-30">
-        <div className="absolute top-20 left-20 w-80 h-80 bg-gold-500/10 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-20 right-20 w-96 h-96 bg-gold-500/10 rounded-full blur-3xl"></div>
-      </div>
-
-      <div className="relative z-10 max-w-7xl mx-auto">
+    <section className="py-24 px-4 bg-white relative overflow-hidden">
+      <div className="max-w-7xl mx-auto">
         {/* Section Header */}
         <div className="text-center mb-20">
-          <div className="inline-block px-6 py-2 bg-gold-500/10 border border-gold-500/20 rounded-full text-gold-500 text-sm font-medium tracking-wide uppercase mb-6">
+          <div className="inline-block px-6 py-2 border border-black/20 text-black text-sm font-bold tracking-[0.3em] uppercase mb-6">
             Explore Categories
           </div>
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold font-serif text-gray-800 mb-6 tracking-wide">
-            Our <span className="text-gold-500">Collections</span>
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-black mb-6 tracking-wider" style={{ fontFamily: '"Playfair Display", serif' }}>
+            OUR COLLECTIONS
           </h2>
-          <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-base md:text-lg text-gray-500 max-w-2xl mx-auto leading-relaxed" style={{ fontFamily: '"Cormorant Garamond", serif' }}>
             Discover our curated collections, each showcasing the finest
             craftsmanship and traditional designs.
           </p>
@@ -118,24 +112,24 @@ export default function CollectionsSection() {
         {/* Collections Grid */}
         {limitedCategories.length > 0 ? (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10 mb-16">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
               {limitedCategories.map((category) => {
                 const categoryProducts = groupedProducts[category];
                 return (
                   <div
                     key={category}
-                    className="group relative bg-white/5 backdrop-blur-sm border border-white/10 rounded-3xl overflow-hidden hover:bg-white/10 hover:border-gold-500/20 transition-all duration-500 cursor-pointer hover:-translate-y-3 hover:shadow-2xl hover:shadow-gold-500/10"
+                    className="group relative bg-black/5 border border-black/10 hover:border-black/30 transition-all duration-500 cursor-pointer"
                     onClick={() => handleCategoryClick(category)}
                   >
                     {/* Top Accent Line */}
-                    <div className="absolute top-0 left-8 right-8 h-[2px] bg-gradient-to-r from-transparent via-gold-500 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    <div className="absolute top-0 left-8 right-8 h-[2px] bg-black scale-x-0 group-hover:scale-x-100 transition-transform duration-500"></div>
 
                     {/* Category Header */}
-                    <div className="bg-gradient-to-r from-gold-500/10 to-gold-500/5 p-6 border-b border-gold-500/10">
-                      <h3 className="text-2xl font-bold font-serif text-gray-800 mb-2 group-hover:text-gold-500 transition-colors duration-300">
-                        {category}
+                    <div className="p-6 border-b border-black/10">
+                      <h3 className="text-xl font-bold text-black mb-2 tracking-wide group-hover:text-gray-700 transition-colors duration-300" style={{ fontFamily: '"Playfair Display", serif' }}>
+                        {category.toUpperCase()}
                       </h3>
-                      <p className="text-gray-600 text-sm">
+                      <p className="text-gray-500 text-sm tracking-wider">
                         {categoryProducts.length}{" "}
                         {categoryProducts.length === 1 ? "item" : "items"}
                       </p>
@@ -147,7 +141,7 @@ export default function CollectionsSection() {
                         {categoryProducts.slice(0, 4).map((product) => (
                           <div
                             key={product.id}
-                            className="aspect-square rounded-xl overflow-hidden bg-white/5 relative group/product border border-white/10"
+                            className="aspect-square bg-black/5 border border-black/10 overflow-hidden relative group/product"
                             onClick={(e) => {
                               e.stopPropagation();
                               handleProductClick(product);
@@ -157,7 +151,7 @@ export default function CollectionsSection() {
                               <img
                                 src={`http://127.0.0.1:5000${product.image_url}`}
                                 alt={product.name}
-                                className="w-full h-full object-cover group-hover/product:scale-110 transition-transform duration-500"
+                                className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
                                 onError={(e) => {
                                   e.target.style.display = "none";
                                   e.target.nextSibling.style.display = "flex";
@@ -167,9 +161,9 @@ export default function CollectionsSection() {
                             <div
                               className={`absolute inset-0 flex items-center justify-center ${
                                 product.image_url ? "hidden" : "flex"
-                              } bg-gradient-to-br from-gold-500/20 to-gold-500/5`}
+                              } bg-black/5`}
                             >
-                              <span className="text-2xl font-bold text-gold-500">
+                              <span className="text-xl font-bold text-black">
                                 {product.name && product.name.charAt
                                   ? product.name.charAt(0).toUpperCase()
                                   : "?"}
@@ -177,8 +171,8 @@ export default function CollectionsSection() {
                             </div>
                             {/* Overlay on hover */}
                             <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/product:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                              <span className="text-white text-sm font-semibold bg-black/60 px-4 py-2 rounded-full backdrop-blur-sm">
-                                View
+                              <span className="text-white text-sm font-bold bg-black/60 px-4 py-2">
+                                VIEW
                               </span>
                             </div>
                           </div>
@@ -187,7 +181,7 @@ export default function CollectionsSection() {
 
                       {/* View Category Button */}
                       <button
-                        className="w-full py-3 bg-transparent border border-gold-500/30 text-gold-500 rounded-xl font-semibold hover:bg-gold-500 hover:text-black-naqsh transition-all duration-300 group-hover:shadow-lg group-hover:shadow-gold-500/25"
+                        className="w-full py-3 bg-black text-white font-bold tracking-widest uppercase text-sm hover:bg-gray-800 transition-all duration-300"
                         onClick={(e) => {
                           e.stopPropagation();
                           handleCategoryClick(category);
@@ -205,7 +199,7 @@ export default function CollectionsSection() {
             <div className="text-center">
               <button
                 onClick={handleViewAllCollections}
-                className="inline-flex items-center gap-3 px-10 py-4 bg-gold-500 text-black-naqsh font-bold rounded-xl hover:bg-gold-600 hover:shadow-2xl hover:shadow-gold-500/25 transition-all duration-300 transform hover:-translate-y-1"
+                className="inline-flex items-center gap-3 px-10 py-4 bg-black text-white font-bold tracking-widest uppercase hover:bg-gray-800 transition-all duration-300"
               >
                 View All Collections
                 <span className="text-xl">→</span>
@@ -213,15 +207,15 @@ export default function CollectionsSection() {
             </div>
           </>
         ) : (
-          <div className="text-center py-20 bg-white rounded-3xl shadow-xl border border-gold-500/10">
+          <div className="text-center py-20 bg-black/5 border border-black/10">
             <div className="text-6xl mb-6">📦</div>
-            <p className="text-2xl font-bold text-gray-800 mb-4">
+            <p className="text-2xl font-bold text-black mb-4">
               No collections found!
             </p>
-            <p className="text-lg text-gray-600 mb-3">
+            <p className="text-lg text-gray-500 mb-3">
               It seems there are no products available at the moment.
             </p>
-            <p className="text-md text-gray-500">
+            <p className="text-md text-gray-400">
               Please check back later for our latest collections.
             </p>
           </div>

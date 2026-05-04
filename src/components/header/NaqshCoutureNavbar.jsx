@@ -38,51 +38,48 @@ const NaqshCoutureNavbar = () => {
   };
 
     return (
-<nav className="sticky top-0 z-50 bg-gray-950 backdrop-blur-md border-b border-gray-800 shadow-lg">
+<nav className="sticky top-0 z-50 bg-black border-b border-white/20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 lg:h-20">
           {/* Logo */}
           <div className="flex-shrink-0">
             <Link to="/" className="group flex items-center gap-2">
               <div className="relative">
-                <h1 className="text-xl sm:text-2xl lg:text-3xl font-serif font-bold tracking-wide text-white group-hover:text-gray-300 transition-colors duration-300">
-                  Naqsh
+                <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold tracking-widest text-white group-hover:text-gray-300 transition-colors duration-300" style={{ fontFamily: '"Playfair Display", serif' }}>
+                  NAQSH
                 </h1>
                 <div className="absolute -bottom-1 left-0 w-0 group-hover:w-full h-[2px] bg-white transition-all duration-300"></div>
               </div>
-              <span className="text-lg sm:text-xl lg:text-2xl font-light tracking-[0.2em] text-gray-400 group-hover:text-white transition-colors duration-300">
-                Studio
+              <span className="text-lg sm:text-xl lg:text-2xl font-light tracking-[0.3em] text-gray-400 group-hover:text-white transition-colors duration-300" style={{ fontFamily: '"Cormorant Garamond", serif' }}>
+                STUDIO
               </span>
             </Link>
           </div>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex md:items-center md:space-x-1">
+          <div className="hidden md:flex md:items-center md:space-x-8">
             {[
-              { path: "/", label: "Home" },
-              { path: "/about", label: "About" },
-              { path: "/shop", label: "Shop" },
-              { path: "/contact", label: "Contact" },
+              { path: "/", label: "HOME" },
+              { path: "/about", label: "ABOUT" },
+              { path: "/shop", label: "SHOP" },
+              { path: "/contact", label: "CONTACT" },
             ].map(({ path, label }) => (
               <Link
                 key={path}
                 to={path}
-                className={`relative px-4 py-2 text-sm font-medium tracking-wide uppercase transition-all duration-300 rounded-md ${
+                className={`text-sm font-medium tracking-widest uppercase transition-all duration-300 ${
                   location.pathname === path
-                    ? "text-white bg-gray-800"
-                    : "text-gray-400 hover:text-white hover:bg-gray-800"
+                    ? "text-white border-b-2 border-white pb-1"
+                    : "text-gray-400 hover:text-white"
                 }`}
               >
                 {label}
-                {location.pathname === path && (
-                  <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-6 h-[2px] bg-white rounded-full"></span>
-                )}
               </Link>
             ))}
           </div>
 
           {/* Right Side Icons/Buttons */}
-          <div className="hidden md:flex md:items-center md:space-x-2">
+          <div className="hidden md:flex md:items-center md:space-x-4">
             {user ? (
               <>
                 <Link
@@ -93,16 +90,7 @@ const NaqshCoutureNavbar = () => {
                       ? "/manager-dashboard"
                       : "/super-admin-dashboard"
                   }
-                  className={`p-2 rounded-lg transition-all duration-300 ${
-                    (user.role === "customer" &&
-                      location.pathname === "/customer-dashboard") ||
-                    (user.role === "manager" &&
-                      location.pathname.startsWith("/manager-dashboard")) ||
-                    (user.role === "super_admin" &&
-                      location.pathname.startsWith("/super-admin-dashboard"))
-                      ? "text-white bg-gray-800"
-                      : "text-gray-400 hover:text-white hover:bg-gray-800"
-                  }`}
+                  className="p-2 text-gray-400 hover:text-white transition-colors duration-300"
                   title="Dashboard"
                 >
                   <FaTachometerAlt size={18} />
@@ -114,13 +102,7 @@ const NaqshCoutureNavbar = () => {
                       ? "/customer-dashboard/cart"
                       : "/cart"
                   }
-                  className={`p-2 rounded-lg transition-all duration-300 relative ${
-                    (user.role === "customer" &&
-                      location.pathname === "/customer-dashboard/cart") ||
-                    (user.role !== "customer" && location.pathname === "/cart")
-                      ? "text-white bg-gray-800"
-                      : "text-gray-400 hover:text-white hover:bg-gray-800"
-                  }`}
+                  className="p-2 text-gray-400 hover:text-white transition-colors duration-300"
                   title="Cart"
                 >
                   <FaShoppingCart size={18} />
@@ -132,15 +114,7 @@ const NaqshCoutureNavbar = () => {
                       ? "/customer-dashboard/wishlist"
                       : "/wishlist"
                   }
-                  className={`p-2 rounded-lg transition-all duration-300 ${
-                    (user.role === "customer" &&
-                      location.pathname ===
-                        "/customer-dashboard/wishlist") ||
-                    (user.role !== "customer" &&
-                      location.pathname === "/wishlist")
-                      ? "text-white bg-gray-800"
-                      : "text-gray-400 hover:text-white hover:bg-gray-800"
-                  }`}
+                  className="p-2 text-gray-400 hover:text-white transition-colors duration-300"
                   title="Wishlist"
                 >
                   <FaHeart size={18} />
@@ -148,25 +122,25 @@ const NaqshCoutureNavbar = () => {
 
                 <button
                   onClick={handleLogout}
-                  className="p-2 rounded-lg text-gray-400 hover:text-red-400 hover:bg-red-400/10 transition-all duration-300"
+                  className="p-2 text-gray-400 hover:text-red-500 transition-colors duration-300"
                   title="Logout"
                 >
                   <FaSignOutAlt size={18} />
                 </button>
               </>
             ) : (
-              <div className="flex items-center space-x-3">
+              <div className="flex items-center space-x-4">
                 <Link
                   to="/login"
-                  className="px-4 py-2 text-sm font-medium text-gray-400 hover:text-white transition-colors duration-300"
+                  className="text-sm font-medium tracking-wider text-gray-400 hover:text-white transition-colors duration-300"
                 >
-                  Login
+                  LOGIN
                 </Link>
                 <Link
                   to="/signup"
-                  className="px-5 py-2 text-sm font-medium text-gray-900 bg-white rounded-lg hover:bg-gray-200 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-[1px]"
+                  className="px-5 py-2 text-sm font-bold tracking-wider text-black bg-white hover:bg-gray-200 transition-all duration-300"
                 >
-                  Signup
+                  SIGN UP
                 </Link>
               </div>
             )}
@@ -176,10 +150,10 @@ const NaqshCoutureNavbar = () => {
           <div className="md:hidden">
             <button
               onClick={toggleMenu}
-              className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 transition-all duration-300"
+              className="p-2 text-white hover:text-gray-300 transition-colors duration-300"
               aria-label="Toggle menu"
             >
-              {isMenuOpen ? <FaTimes size={22} /> : <FaBars size={22} />}
+              {isMenuOpen ? <FaTimes size={24} /> : <FaBars size={24} />}
             </button>
           </div>
         </div>
@@ -191,23 +165,23 @@ const NaqshCoutureNavbar = () => {
     isMenuOpen
     ? "max-h-[20rem] opacity-100"
     : "max-h-0 opacity-0"
-  } overflow-hidden bg-gray-950 border-t border-gray-800 backdrop-blur-sm`}
+  } overflow-hidden bg-black border-t border-white/20`}
   >
-        <div className="px-4 py-3 space-y-1">
+        <div className="px-4 py-3 space-y-2">
           {[
-            { path: "/", label: "Home" },
-            { path: "/about", label: "About" },
-            { path: "/shop", label: "Shop" },
-            { path: "/contact", label: "Contact" },
+            { path: "/", label: "HOME" },
+            { path: "/about", label: "ABOUT" },
+            { path: "/shop", label: "SHOP" },
+            { path: "/contact", label: "CONTACT" },
           ].map(({ path, label }) => (
             <Link
               key={path}
               to={path}
               onClick={closeMenu}
-              className={`block px-4 py-3 rounded-lg text-base font-medium transition-all duration-300 ${
+              className={`block px-4 py-3 text-sm font-medium tracking-wider uppercase transition-colors duration-300 ${
                 location.pathname === path
-                  ? "text-white bg-gray-800"
-                  : "text-gray-400 hover:text-white hover:bg-gray-800"
+                  ? "text-white border-l-2 border-white pl-3"
+                  : "text-gray-400 hover:text-white hover:pl-3 hover:border-l-2 hover:border-white/50"
               }`}
             >
               {label}
@@ -215,7 +189,7 @@ const NaqshCoutureNavbar = () => {
           ))}
 
           {user ? (
-            <div className="pt-3 mt-3 border-t border-gray-800 space-y-1">
+            <div className="pt-3 mt-3 border-t border-white/20 space-y-2">
               <Link
                 to={
                   user.role === "customer"
@@ -225,7 +199,7 @@ const NaqshCoutureNavbar = () => {
                     : "/super-admin-dashboard"
                 }
                 onClick={closeMenu}
-                className="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 transition-all duration-300"
+                className="flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-white transition-colors duration-300"
               >
                 <FaTachometerAlt size={18} />
                 <span>Dashboard</span>
@@ -237,7 +211,7 @@ const NaqshCoutureNavbar = () => {
                     : "/cart"
                 }
                 onClick={closeMenu}
-                className="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 transition-all duration-300"
+                className="flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-white transition-colors duration-300"
               >
                 <FaShoppingCart size={18} />
                 <span>Cart</span>
@@ -249,7 +223,7 @@ const NaqshCoutureNavbar = () => {
                     : "/wishlist"
                 }
                 onClick={closeMenu}
-                className="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 transition-all duration-300"
+                className="flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-white transition-colors duration-300"
               >
                 <FaHeart size={18} />
                 <span>Wishlist</span>
@@ -259,27 +233,27 @@ const NaqshCoutureNavbar = () => {
                   handleLogout();
                   closeMenu();
                 }}
-                className="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-400 hover:text-red-400 hover:bg-red-400/10 transition-all duration-300 w-full text-left"
+                className="flex items-center gap-3 px-4 py-3 text-gray-400 hover:text-red-500 transition-colors duration-300 w-full text-left"
               >
                 <FaSignOutAlt size={18} />
                 <span>Logout</span>
               </button>
             </div>
           ) : (
-            <div className="pt-3 mt-3 border-t border-gray-800 flex flex-col space-y-2">
+            <div className="pt-3 mt-3 border-t border-white/20 flex flex-col space-y-2">
               <Link
                 to="/login"
                 onClick={closeMenu}
-                className="px-4 py-3 rounded-lg text-center text-gray-400 hover:text-white hover:bg-gray-800 transition-all duration-300 font-medium"
+                className="px-4 py-3 text-center text-gray-400 hover:text-white hover:bg-white/5 transition-colors duration-300 font-medium"
               >
-                Login
+                LOGIN
               </Link>
               <Link
                 to="/signup"
                 onClick={closeMenu}
-                className="px-4 py-3 rounded-lg text-center text-gray-900 bg-white hover:bg-gray-200 transition-all duration-300 font-medium"
+                className="px-4 py-3 text-center text-black bg-white hover:bg-gray-200 transition-colors duration-300 font-bold"
               >
-                Signup
+                SIGN UP
               </Link>
             </div>
           )}

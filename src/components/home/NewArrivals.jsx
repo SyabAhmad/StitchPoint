@@ -44,10 +44,10 @@ export default function NewArrivals() {
   };
 
   return (
-    <section className="py-20 px-6 bg-gradient-to-br from-gold-50 to-white">
+    <section className="py-20 px-4 bg-black">
       <div className="max-w-7xl mx-auto">
-        <h3 className="text-3xl md:text-4xl lg:text-5xl font-bold font-serif text-gold-500 text-center mb-12 tracking-wide">
-          New Arrivals
+        <h3 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white text-center mb-12 tracking-wider" style={{ fontFamily: '"Playfair Display", serif' }}>
+          NEW ARRIVALS
         </h3>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
@@ -55,11 +55,11 @@ export default function NewArrivals() {
           products.map((product) => (
             <div
               key={product.id}
-              className="rounded-2xl overflow-hidden bg-white shadow-lg border border-gold-500/10 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 cursor-pointer"
+              className="group relative bg-white/5 border border-white/10 hover:border-white/30 transition-all duration-300 cursor-pointer"
               onClick={() => handleProductClick(product)}
             >
               <div
-                className="h-64 bg-cover bg-center"
+                className="h-64 bg-cover bg-center grayscale group-hover:grayscale-0 transition-all duration-500"
                 style={{
                   backgroundImage: `url(${
                     product.image_url || "/placeholder.jpg"
@@ -68,48 +68,48 @@ export default function NewArrivals() {
               />
               <div className="p-6 flex flex-col gap-4">
                 <div className="flex-1">
-                  <strong className="text-lg font-semibold text-black mb-2 block">
-                    {product.name}
+                  <strong className="text-lg font-bold text-white mb-2 block tracking-wide">
+                    {product.name.toUpperCase()}
                   </strong>
                   <div className="flex items-center gap-2 mb-1">
                     {product.sale_type && product.sale_discount_percentage && (
-                      <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full font-semibold">
-                        {product.sale_type} SALE
+                      <span className="bg-red-500 text-white text-xs px-2 py-1 rounded font-bold tracking-wide">
+                        SALE
                       </span>
                     )}
                   </div>
                   <div className="flex items-center gap-2">
                     {product.sale_type && product.sale_discount_percentage ? (
                       <>
-                        <p className="text-red-500 font-bold text-lg line-through">
+                        <p className="text-gray-500 font-bold text-lg line-through">
                           PKR{product.price}
                         </p>
-                        <p className="text-green-600 font-bold text-lg">
+                        <p className="text-white font-bold text-lg">
                           PKR
                           {(
                             product.price *
                             (1 - product.sale_discount_percentage / 100)
                           ).toFixed(2)}
                         </p>
-                        <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded font-semibold">
+                        <span className="bg-white text-black text-xs px-2 py-1 font-bold">
                           {product.sale_discount_percentage}% OFF
                         </span>
                       </>
                     ) : (
-                      <p className="text-gold-500 font-bold text-lg">
-                        PKR-{product.price}
+                      <p className="text-white font-bold text-lg">
+                        PKR {product.price}
                       </p>
                     )}
                   </div>
                   {product.store_name && (
-                    <p className="text-black/50 text-xs">
-                      By: {product.store_name}
+                    <p className="text-gray-500 text-xs tracking-wider">
+                      BY: {product.store_name.toUpperCase()}
                     </p>
                   )}
                 </div>
                 <button
                   onClick={() => handleAddToCart(product)}
-                  className="bg-gold-500 text-black px-4 py-2 rounded-lg font-semibold hover:bg-gold-600 transition-colors duration-300 shadow-md hover:shadow-lg hover:-translate-y-1"
+                  className="w-full py-3 bg-white text-black font-bold tracking-widest uppercase text-sm hover:bg-gray-200 transition-all duration-300"
                 >
                   Add to Cart
                 </button>
@@ -117,7 +117,7 @@ export default function NewArrivals() {
             </div>
           ))
         ) : (
-          <div className="col-span-full text-center py-16 text-black/60">
+          <div className="col-span-full text-center py-16 text-gray-500">
             <p className="text-lg mb-2">No new arrivals available.</p>
             <p className="text-sm">Please check back later for new arrivals.</p>
           </div>
