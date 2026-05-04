@@ -22,7 +22,6 @@ const Signup = () => {
       [name]: type === "checkbox" ? checked : value,
     }));
 
-    // Clear error when user starts typing
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: "" }));
     }
@@ -54,7 +53,7 @@ const Signup = () => {
     }
 
     if (!formData.agreeToTerms) {
-      newErrors.agreeToTerms = "You must agree to the terms and conditions";
+      newErrors.agreeToTerms = "You must agree to the terms";
     }
 
     return newErrors;
@@ -67,7 +66,6 @@ const Signup = () => {
     if (Object.keys(newErrors).length === 0) {
       setIsLoading(true);
 
-      // API call to backend
       fetch("http://localhost:5000/api/auth/signup", {
         method: "POST",
         headers: {
@@ -101,59 +99,29 @@ const Signup = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-4">
-      <div className="bg-white rounded-xl shadow-2xl overflow-hidden max-w-6xl w-full">
-        <div className="grid grid-cols-1 lg:grid-cols-2 min-h-[600px]">
-          {/* Left Column - Welcome Section */}
-          <div className="bg-gradient-to-br from-[var(--gold-500)] to-[var(--gold-600)] flex flex-col justify-center items-center p-8 lg:p-12 text-black">
-            <div className="text-center max-w-md">
-              <h1 className="text-4xl lg:text-5xl font-bold mb-6">
-                Join Us Today!
+    <div className="min-h-screen bg-black flex items-center justify-center p-4">
+      <div className="bg-white w-full max-w-4xl">
+        <div className="grid grid-cols-1 lg:grid-cols-2">
+          {/* Left Column - Welcome */}
+          <div className="bg-black p-12 flex flex-col justify-center items-center text-white">
+            <div className="text-center">
+              <h1 className="text-3xl lg:text-4xl font-bold mb-6 tracking-wider" style={{ fontFamily: '"Playfair Display", serif' }}>
+                JOIN US
               </h1>
-              <p className="text-lg lg:text-xl mb-8 opacity-90">
+              <p className="text-gray-400 mb-8" style={{ fontFamily: '"Cormorant Garamond", serif' }}>
                 Create your account and discover a world of possibilities
               </p>
-              <div className="space-y-4 text-sm lg:text-base">
-                <div className="flex items-center justify-center">
-                  <svg
-                    className="w-5 h-5 mr-3"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
+              <div className="space-y-4 text-sm text-gray-400">
+                <div className="flex items-center justify-center gap-2">
+                  <span className="w-1.5 h-1.5 bg-white rounded-full"></span>
                   Personalized shopping experience
                 </div>
-                <div className="flex items-center justify-center">
-                  <svg
-                    className="w-5 h-5 mr-3"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
+                <div className="flex items-center justify-center gap-2">
+                  <span className="w-1.5 h-1.5 bg-white rounded-full"></span>
                   Exclusive offers and deals
                 </div>
-                <div className="flex items-center justify-center">
-                  <svg
-                    className="w-5 h-5 mr-3"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
+                <div className="flex items-center justify-center gap-2">
+                  <span className="w-1.5 h-1.5 bg-white rounded-full"></span>
                   Fast and secure checkout
                 </div>
               </div>
@@ -161,24 +129,17 @@ const Signup = () => {
           </div>
 
           {/* Right Column - Signup Form */}
-          <div className="flex flex-col justify-center p-8 lg:p-12">
+          <div className="bg-white p-12">
             <div className="w-full max-w-md mx-auto">
               <div className="text-center mb-8">
-                <h2 className="text-3xl font-bold text-gray-900 mb-2">
-                  Create Account
-                </h2>
-                <p className="text-gray-600">
-                  Fill in the details below to get started
-                </p>
+                <h2 className="text-2xl font-bold text-black mb-2 tracking-wide">CREATE ACCOUNT</h2>
+                <p className="text-gray-500 text-sm">Fill in your details</p>
               </div>
 
-              <form onSubmit={handleSubmit} className="space-y-6">
+              <form onSubmit={handleSubmit} className="space-y-5">
                 <div>
-                  <label
-                    htmlFor="name"
-                    className="block text-sm font-medium text-gray-700 mb-2"
-                  >
-                    Full Name
+                  <label htmlFor="name" className="block text-sm font-bold text-black mb-2 tracking-widest uppercase">
+                    Name
                   </label>
                   <input
                     type="text"
@@ -186,22 +147,17 @@ const Signup = () => {
                     name="name"
                     value={formData.name}
                     onChange={handleChange}
-                    className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--gold-500)] focus:border-transparent transition duration-200 ${
-                      errors.name ? "border-red-500" : "border-gray-300"
+                    className={`w-full px-4 py-3 border bg-transparent focus:border-black transition-all duration-300 ${
+                      errors.name ? "border-red-500" : "border-black/20"
                     }`}
-                    placeholder="Your full name"
+                    placeholder="Your name"
                   />
-                  {errors.name && (
-                    <p className="mt-1 text-sm text-red-500">{errors.name}</p>
-                  )}
+                  {errors.name && <p className="mt-1 text-xs text-red-500">{errors.name}</p>}
                 </div>
 
                 <div>
-                  <label
-                    htmlFor="email"
-                    className="block text-sm font-medium text-gray-700 mb-2"
-                  >
-                    Email Address
+                  <label htmlFor="email" className="block text-sm font-bold text-black mb-2 tracking-widest uppercase">
+                    Email
                   </label>
                   <input
                     type="email"
@@ -209,21 +165,16 @@ const Signup = () => {
                     name="email"
                     value={formData.email}
                     onChange={handleChange}
-                    className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--gold-500)] focus:border-transparent transition duration-200 ${
-                      errors.email ? "border-red-500" : "border-gray-300"
+                    className={`w-full px-4 py-3 border bg-transparent focus:border-black transition-all duration-300 ${
+                      errors.email ? "border-red-500" : "border-black/20"
                     }`}
                     placeholder="your@email.com"
                   />
-                  {errors.email && (
-                    <p className="mt-1 text-sm text-red-500">{errors.email}</p>
-                  )}
+                  {errors.email && <p className="mt-1 text-xs text-red-500">{errors.email}</p>}
                 </div>
 
                 <div>
-                  <label
-                    htmlFor="password"
-                    className="block text-sm font-medium text-gray-700 mb-2"
-                  >
+                  <label htmlFor="password" className="block text-sm font-bold text-black mb-2 tracking-widest uppercase">
                     Password
                   </label>
                   <div className="relative">
@@ -233,31 +184,24 @@ const Signup = () => {
                       name="password"
                       value={formData.password}
                       onChange={handleChange}
-                      className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--gold-500)] focus:border-transparent transition duration-200 ${
-                        errors.password ? "border-red-500" : "border-gray-300"
+                      className={`w-full px-4 py-3 border bg-transparent focus:border-black transition-all duration-300 ${
+                        errors.password ? "border-red-500" : "border-black/20"
                       }`}
                       placeholder="••••••••"
                     />
                     <button
                       type="button"
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
                       onClick={() => setShowPassword(!showPassword)}
                     >
                       {showPassword ? <FaEyeSlash /> : <FaEye />}
                     </button>
                   </div>
-                  {errors.password && (
-                    <p className="mt-1 text-sm text-red-500">
-                      {errors.password}
-                    </p>
-                  )}
+                  {errors.password && <p className="mt-1 text-xs text-red-500">{errors.password}</p>}
                 </div>
 
                 <div>
-                  <label
-                    htmlFor="confirmPassword"
-                    className="block text-sm font-medium text-gray-700 mb-2"
-                  >
+                  <label htmlFor="confirmPassword" className="block text-sm font-bold text-black mb-2 tracking-widest uppercase">
                     Confirm Password
                   </label>
                   <div className="relative">
@@ -267,28 +211,20 @@ const Signup = () => {
                       name="confirmPassword"
                       value={formData.confirmPassword}
                       onChange={handleChange}
-                      className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--gold-500)] focus:border-transparent transition duration-200 ${
-                        errors.confirmPassword
-                          ? "border-red-500"
-                          : "border-gray-300"
+                      className={`w-full px-4 py-3 border bg-transparent focus:border-black transition-all duration-300 ${
+                        errors.confirmPassword ? "border-red-500" : "border-black/20"
                       }`}
                       placeholder="••••••••"
                     />
                     <button
                       type="button"
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
-                      onClick={() =>
-                        setShowConfirmPassword(!showConfirmPassword)
-                      }
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                     >
                       {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
                     </button>
                   </div>
-                  {errors.confirmPassword && (
-                    <p className="mt-1 text-sm text-red-500">
-                      {errors.confirmPassword}
-                    </p>
-                  )}
+                  {errors.confirmPassword && <p className="mt-1 text-xs text-red-500">{errors.confirmPassword}</p>}
                 </div>
 
                 <div className="flex items-start">
@@ -299,68 +235,32 @@ const Signup = () => {
                       name="agreeToTerms"
                       checked={formData.agreeToTerms}
                       onChange={handleChange}
-                      className="h-4 w-4 text-[var(--gold-500)] focus:ring-[var(--gold-500)] border-gray-300 rounded"
+                      className="w-4 h-4 border-black/20"
                     />
                   </div>
                   <div className="ml-3 text-sm">
-                    <label htmlFor="agreeToTerms" className="text-gray-700">
+                    <label htmlFor="agreeToTerms" className="text-gray-500">
                       I agree to the{" "}
-                      <a
-                        href="#"
-                        className="text-[var(--gold-600)] hover:text-[var(--gold-500)] font-medium"
-                      >
-                        Terms and Conditions
-                      </a>
+                      <a href="#" className="text-black underline">Terms</a>
                     </label>
-                    {errors.agreeToTerms && (
-                      <p className="mt-1 text-red-500">{errors.agreeToTerms}</p>
-                    )}
+                    {errors.agreeToTerms && <p className="mt-1 text-xs text-red-500">{errors.agreeToTerms}</p>}
                   </div>
                 </div>
 
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full bg-gradient-to-r from-[var(--gold-500)] to-[var(--gold-600)] text-black font-medium py-3 px-4 rounded-lg hover:from-[var(--gold-600)] hover:to-[var(--gold-500)] focus:outline-none focus:ring-2 focus:ring-[var(--gold-500)] focus:ring-offset-2 transition duration-200 transform hover:scale-105"
+                  className="w-full bg-black text-white font-bold py-3 tracking-widest uppercase text-sm hover:bg-gray-800 transition-all duration-300 disabled:opacity-50"
                 >
-                  {isLoading ? (
-                    <span className="flex items-center justify-center">
-                      <svg
-                        className="animate-spin -ml-1 mr-2 h-5 w-5 text-white"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                      >
-                        <circle
-                          className="opacity-25"
-                          cx="12"
-                          cy="12"
-                          r="10"
-                          stroke="currentColor"
-                          strokeWidth="4"
-                        ></circle>
-                        <path
-                          className="opacity-75"
-                          fill="currentColor"
-                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                        ></path>
-                      </svg>
-                      Creating account...
-                    </span>
-                  ) : (
-                    "Create Account"
-                  )}
+                  {isLoading ? "CREATING..." : "CREATE ACCOUNT"}
                 </button>
               </form>
 
               <div className="mt-8 text-center">
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-gray-500">
                   Already have an account?{" "}
-                  <a
-                    href="/login"
-                    className="font-medium text-[var(--gold-500)] hover:text-[var(--gold-600)] transition duration-200"
-                  >
-                    Sign in here
+                  <a href="/login" className="text-black underline font-bold">
+                    SIGN IN
                   </a>
                 </p>
               </div>

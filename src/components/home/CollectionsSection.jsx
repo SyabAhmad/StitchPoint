@@ -54,17 +54,17 @@ export default function CollectionsSection() {
 
   if (loading) {
     return (
-      <section className="py-24 px-4 bg-gradient-to-br from-white via-gold-500/5 to-white relative">
+      <section className="py-24 px-4 bg-white relative">
         <div className="max-w-7xl mx-auto text-center">
-          <div className="inline-block px-6 py-2 bg-gold-500/10 border border-gold-500/20 rounded-full text-gold-500 text-sm font-medium tracking-wide uppercase mb-6">
-            Curated For You
+          <div className="inline-block px-6 py-2 border border-black/20 text-black text-sm font-bold tracking-widest uppercase mb-6">
+            CURATED FOR YOU
           </div>
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold font-serif text-gray-800 mb-6 tracking-wide">
-            Our <span className="text-gold-500">Collections</span>
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-black mb-6" style={{ fontFamily: '"Playfair Display", serif' }}>
+            OUR <span className="italic">COLLECTIONS</span>
           </h2>
-          <div className="flex items-center justify-center gap-2 text-gray-600">
-            <div className="w-2 h-2 bg-gold-500 rounded-full animate-pulse"></div>
-            <p className="text-lg">Loading collections...</p>
+          <div className="flex items-center justify-center gap-2 text-gray-400">
+            <div className="w-2 h-2 bg-black rounded-full animate-pulse"></div>
+            <p className="text-lg" style={{ fontFamily: '"Cormorant Garamond", serif' }}>Loading collections...</p>
           </div>
         </div>
       </section>
@@ -73,15 +73,15 @@ export default function CollectionsSection() {
 
   if (error) {
     return (
-      <section className="py-24 px-4 bg-gradient-to-br from-white via-gold-500/5 to-white relative">
+      <section className="py-24 px-4 bg-white relative">
         <div className="max-w-7xl mx-auto text-center">
-          <div className="inline-block px-6 py-2 bg-red-500/10 border border-red-500/20 rounded-full text-red-500 text-sm font-medium tracking-wide uppercase mb-6">
-            Error
+          <div className="inline-block px-6 py-2 border border-red-500/20 text-red-500 text-sm font-bold tracking-widest uppercase mb-6">
+            ERROR
           </div>
-          <h2 className="text-4xl md:text-5xl font-bold font-serif text-gray-800 mb-6">
-            Our <span className="text-gold-500">Collections</span>
+          <h2 className="text-4xl md:text-5xl font-bold text-black mb-6" style={{ fontFamily: '"Playfair Display", serif' }}>
+            OUR <span className="italic">COLLECTIONS</span>
           </h2>
-          <p className="text-lg text-gray-600">
+          <p className="text-lg text-gray-500">
             Error loading collections: {error}
           </p>
         </div>

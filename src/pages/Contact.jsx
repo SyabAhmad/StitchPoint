@@ -2,88 +2,27 @@ import React, { useState } from "react";
 import { APP_DATA } from "../data/ConstantValues";
 
 const MailIcon = () => (
-  <svg
-    className="w-6 h-6"
-    fill="none"
-    stroke="currentColor"
-    viewBox="0 0 24 24"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={2}
-      d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-    />
+  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
   </svg>
 );
 
 const PhoneIcon = () => (
-  <svg
-    className="w-6 h-6"
-    fill="none"
-    stroke="currentColor"
-    viewBox="0 0 24 24"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={2}
-      d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
-    />
+  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
   </svg>
 );
 
 const LocationIcon = () => (
-  <svg
-    className="w-6 h-6"
-    fill="none"
-    stroke="currentColor"
-    viewBox="0 0 24 24"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={2}
-      d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-    />
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={2}
-      d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-    />
+  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
   </svg>
 );
 
 const ClockIcon = () => (
-  <svg
-    className="w-6 h-6"
-    fill="none"
-    stroke="currentColor"
-    viewBox="0 0 24 24"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={2}
-      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-    />
-  </svg>
-);
-
-const SendIcon = () => (
-  <svg
-    className="w-5 h-5"
-    fill="none"
-    stroke="currentColor"
-    viewBox="0 0 24 24"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={2}
-      d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
-    />
+  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
   </svg>
 );
 
@@ -104,46 +43,18 @@ export default function Contact() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-
-    // Simulate form submission
     setTimeout(() => {
-      alert(
-        "Thank you for your message! We'll get back to you within 24 hours."
-      );
+      alert("Thank you for your message! We'll get back to you within 24 hours.");
       setFormData({ name: "", email: "", subject: "", message: "" });
       setIsSubmitting(false);
     }, 1500);
   };
 
   const contactMethods = [
-    {
-      icon: <MailIcon />,
-      title: "Email Us",
-      description: "Send us an email and we'll respond within 24 hours",
-      detail: contact.email,
-      action: `mailto:${contact.email}`,
-    },
-    {
-      icon: <PhoneIcon />,
-      title: "Call Us",
-      description: "Speak directly with our customer service team",
-      detail: contact.phone,
-      action: `tel:${contact.phone}`,
-    },
-    {
-      icon: <LocationIcon />,
-      title: "Visit Us",
-      description: "Come see our atelier and discuss your custom requirements",
-      detail: contact.address,
-      action: "#",
-    },
-    {
-      icon: <ClockIcon />,
-      title: "Business Hours",
-      description: "We're here to help during these hours",
-      detail: contact.hours,
-      action: "#",
-    },
+    { icon: <MailIcon />, title: "EMAIL", description: "We'll respond within 24 hours", detail: contact.email, action: `mailto:${contact.email}` },
+    { icon: <PhoneIcon />, title: "CALL", description: "Speak with our team", detail: contact.phone, action: `tel:${contact.phone}` },
+    { icon: <LocationIcon />, title: "VISIT", description: "Come to our atelier", detail: contact.address, action: "#" },
+    { icon: <ClockIcon />, title: "HOURS", description: "We're here to help", detail: contact.hours, action: "#" },
   ];
 
   return (
@@ -151,52 +62,39 @@ export default function Contact() {
       {/* Hero Section */}
       <section className="relative bg-black py-32 px-4">
         <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold text-white font-serif leading-tight mb-8">
-            Let's Create Together
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-8 tracking-wider" style={{ fontFamily: '"Playfair Display", serif' }}>
+            LET'S CREATE TOGETHER
           </h1>
-          <p className="text-xl md:text-2xl text-white/90 leading-relaxed mb-12 max-w-3xl mx-auto">
-            Ready to bring your vision to life? We're here to help with every
-            step of your bespoke fashion journey.
+          <p className="text-base md:text-lg text-gray-400 mb-12 max-w-2xl mx-auto" style={{ fontFamily: '"Cormorant Garamond", serif' }}>
+            Ready to bring your vision to life? We're here to help with every step of your bespoke fashion journey.
           </p>
-          <a
-            href="#contact-form"
-            className="inline-block bg-white text-black px-8 py-4 rounded-lg font-semibold hover:bg-gray-200 transition-all duration-300 shadow-2xl"
-          >
+          <a href="#contact-form" className="inline-block bg-white text-black px-8 py-4 font-bold tracking-widest uppercase text-sm hover:bg-gray-200 transition-all duration-300">
             Get In Touch
           </a>
         </div>
       </section>
 
       {/* Contact Methods Section */}
-      <section className="py-20 px-4 bg-white">
+      <section className="py-24 px-4 bg-white">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-black font-serif mb-6">
-              How Can We Help You?
+            <h2 className="text-3xl md:text-4xl lg:text-5xl text-black font-bold mb-6 tracking-wider" style={{ fontFamily: '"Playfair Display", serif' }}>
+              HOW CAN WE HELP?
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-              Choose the way that works best for you - we're here to assist with
-              your fashion needs
+            <p className="text-base text-gray-500 max-w-2xl mx-auto" style={{ fontFamily: '"Cormorant Garamond", serif' }}>
+              Choose the way that works best for you - we're here to assist with your fashion needs
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {contactMethods.map((method, index) => (
-              <a
-                key={index}
-                href={method.action}
-                className="group block bg-white rounded-lg p-8 shadow-lg border border-gray-200 hover:shadow-2xl hover:border-black transition-all duration-500 hover:-translate-y-2"
-              >
-                <div className="w-16 h-16 bg-black rounded-lg flex items-center justify-center text-white mb-6 group-hover:bg-gray-800 transition-all duration-300">
+              <a key={index} href={method.action} className="group block bg-black/5 border border-black/10 p-8 hover:border-black transition-all duration-300">
+                <div className="w-12 h-12 bg-black flex items-center justify-center text-white mb-6 group-hover:scale-110 transition-transform duration-300">
                   {method.icon}
                 </div>
-                <h3 className="text-xl font-bold text-black mb-3 group-hover:text-gray-800">
-                  {method.title}
-                </h3>
-                <p className="text-gray-600 mb-4 leading-relaxed">
-                  {method.description}
-                </p>
-                <p className="text-black font-semibold">{method.detail}</p>
+                <h3 className="text-sm font-bold text-black mb-2 tracking-widest">{method.title}</h3>
+                <p className="text-gray-500 text-sm mb-2">{method.description}</p>
+                <p className="text-black font-bold text-sm tracking-wide">{method.detail}</p>
               </a>
             ))}
           </div>
@@ -204,27 +102,23 @@ export default function Contact() {
       </section>
 
       {/* Contact Form Section */}
-      <section id="contact-form" className="py-20 px-4 bg-gray-50">
-        <div className="max-w-4xl mx-auto">
+      <section id="contact-form" className="py-24 px-4 bg-black">
+        <div className="max-w-3xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-black font-serif mb-6">
-              Send Us a Message
+            <h2 className="text-3xl md:text-4xl lg:text-5xl text-white font-bold mb-6 tracking-wider" style={{ fontFamily: '"Playfair Display", serif' }}>
+              SEND US A MESSAGE
             </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
-              Tell us about your vision and we'll get back to you with a
-              personalized response
+            <p className="text-base text-gray-400 max-w-xl mx-auto" style={{ fontFamily: '"Cormorant Garamond", serif' }}>
+              Tell us about your vision and we'll get back to you with a personalized response
             </p>
           </div>
 
-          <div className="bg-white rounded-lg shadow-2xl p-8 md:p-12 border border-gray-200">
-            <form onSubmit={handleSubmit} className="space-y-8">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="bg-white p-8 md:p-12">
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label
-                    htmlFor="name"
-                    className="block text-sm font-semibold text-black mb-3"
-                  >
-                    Full Name *
+                  <label htmlFor="name" className="block text-sm font-bold text-black mb-3 tracking-widest uppercase">
+                    Name *
                   </label>
                   <input
                     type="text"
@@ -233,16 +127,13 @@ export default function Contact() {
                     value={formData.name}
                     onChange={handleChange}
                     required
-                    className="w-full px-6 py-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent transition-all duration-300 text-black bg-white"
-                    placeholder="Your full name"
+                    className="w-full px-4 py-3 border border-black/20 bg-transparent focus:border-black transition-all duration-300 text-black"
+                    placeholder="Your name"
                   />
                 </div>
                 <div>
-                  <label
-                    htmlFor="email"
-                    className="block text-sm font-semibold text-black mb-3"
-                  >
-                    Email Address *
+                  <label htmlFor="email" className="block text-sm font-bold text-black mb-3 tracking-widest uppercase">
+                    Email *
                   </label>
                   <input
                     type="email"
@@ -251,17 +142,14 @@ export default function Contact() {
                     value={formData.email}
                     onChange={handleChange}
                     required
-                    className="w-full px-6 py-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent transition-all duration-300 text-black bg-white"
+                    className="w-full px-4 py-3 border border-black/20 bg-transparent focus:border-black transition-all duration-300 text-black"
                     placeholder="your@email.com"
                   />
                 </div>
               </div>
 
               <div>
-                <label
-                  htmlFor="subject"
-                  className="block text-sm font-semibold text-black mb-3"
-                >
+                <label htmlFor="subject" className="block text-sm font-bold text-black mb-3 tracking-widest uppercase">
                   Subject *
                 </label>
                 <select
@@ -270,22 +158,19 @@ export default function Contact() {
                   value={formData.subject}
                   onChange={handleChange}
                   required
-                  className="w-full px-6 py-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent transition-all duration-300 text-black bg-white"
+                  className="w-full px-4 py-3 border border-black/20 bg-transparent focus:border-black transition-all duration-300 text-black"
                 >
                   <option value="">Select a subject</option>
-                  <option value="custom-order">Custom Order Inquiry</option>
+                  <option value="custom-order">Custom Order</option>
                   <option value="bridal">Bridal Collection</option>
-                  <option value="alterations">Alterations & Restyling</option>
-                  <option value="consultation">Design Consultation</option>
+                  <option value="alterations">Alterations</option>
+                  <option value="consultation">Consultation</option>
                   <option value="other">Other</option>
                 </select>
               </div>
 
               <div>
-                <label
-                  htmlFor="message"
-                  className="block text-sm font-semibold text-black mb-3"
-                >
+                <label htmlFor="message" className="block text-sm font-bold text-black mb-3 tracking-widest uppercase">
                   Message *
                 </label>
                 <textarea
@@ -295,27 +180,17 @@ export default function Contact() {
                   onChange={handleChange}
                   required
                   rows="6"
-                  className="w-full px-6 py-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent transition-all duration-300 text-black bg-white resize-none"
-                  placeholder="Tell us about your vision, requirements, timeline, and any specific details..."
+                  className="w-full px-4 py-3 border border-black/20 bg-transparent focus:border-black transition-all duration-300 text-black resize-none"
+                  placeholder="Tell us about your vision..."
                 ></textarea>
               </div>
 
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full bg-black text-white font-semibold py-4 px-8 rounded-lg hover:bg-gray-800 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
+                className="w-full bg-black text-white font-bold py-4 tracking-widest uppercase text-sm hover:bg-gray-800 transition-all duration-300 flex items-center justify-center gap-3 disabled:opacity-50"
               >
-                {isSubmitting ? (
-                  <>
-                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                    Sending Message...
-                  </>
-                ) : (
-                  <>
-                    <SendIcon />
-                    Send Message
-                  </>
-                )}
+                {isSubmitting ? "SENDING..." : "SEND MESSAGE"}
               </button>
             </form>
           </div>
@@ -323,28 +198,19 @@ export default function Contact() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 px-4 bg-black">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl md:text-5xl font-bold text-white font-serif mb-6">
-            Ready to Start Your Journey?
+      <section className="py-24 px-4 bg-white border-t border-gray-200">
+        <div className="max-w-3xl mx-auto text-center">
+          <h2 className="text-3xl md:text-4xl lg:text-5xl text-black font-bold mb-6 tracking-wider" style={{ fontFamily: '"Playfair Display", serif' }}>
+            READY TO START?
           </h2>
-          <p className="text-xl text-white/90 mb-12 max-w-2xl mx-auto leading-relaxed">
-            From concept to creation, we're here to make your fashion dreams a
-            reality. Let's discuss your vision over a personal consultation.
+          <p className="text-base text-gray-500 mb-12 max-w-xl mx-auto" style={{ fontFamily: '"Cormorant Garamond", serif' }}>
+            Let's discuss your vision over a personal consultation
           </p>
-          <div className="flex flex-col sm:flex-row gap-6 justify-center">
-            <a
-              href={`tel:${contact.phone}`}
-              className="inline-flex items-center gap-3 bg-white text-black px-8 py-4 rounded-lg font-semibold hover:bg-gray-200 transition-all duration-300 shadow-2xl"
-            >
-              <PhoneIcon />
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <a href={`tel:${contact.phone}`} className="bg-black text-white px-8 py-4 font-bold tracking-widest uppercase text-sm hover:bg-gray-800 transition-all duration-300">
               Call Now
             </a>
-            <a
-              href={`mailto:${contact.email}`}
-              className="inline-flex items-center gap-3 border-2 border-white text-white px-8 py-4 rounded-lg font-semibold hover:bg-white hover:text-black transition-all duration-300"
-            >
-              <MailIcon />
+            <a href={`mailto:${contact.email}`} className="border border-black text-black px-8 py-4 font-bold tracking-widest uppercase text-sm hover:bg-black hover:text-white transition-all duration-300">
               Email Us
             </a>
           </div>
