@@ -192,7 +192,7 @@ const Analytics = () => {
         style={{ backgroundColor: "#000000", color: "#ffffff" }}
       >
         <div className="flex flex-col items-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-yellow-500 mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-white mb-4"></div>
           <span>Loading analytics...</span>
         </div>
       </div>
@@ -203,23 +203,23 @@ const Analytics = () => {
     switch (status) {
       case "delivered":
         return {
-          backgroundColor: "rgba(72, 187, 120, 0.2)",
-          color: "#48bb78",
+          backgroundColor: "rgba(255, 255, 255, 0.1)",
+          color: "#ffffff",
         };
       case "shipped":
         return {
-          backgroundColor: "rgba(66, 153, 225, 0.2)",
-          color: "#4299e1",
+          backgroundColor: "rgba(255, 255, 255, 0.1)",
+          color: "#cccccc",
         };
       case "processing":
         return {
-          backgroundColor: "rgba(237, 137, 54, 0.2)",
-          color: "#ed8936",
+          backgroundColor: "rgba(255, 255, 255, 0.1)",
+          color: "#aaaaaa",
         };
       default:
         return {
-          backgroundColor: "rgba(160, 174, 192, 0.2)",
-          color: "#a0aec0",
+          backgroundColor: "rgba(255, 255, 255, 0.1)",
+          color: "#888888",
         };
     }
   };
@@ -231,54 +231,54 @@ const Analytics = () => {
     >
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold" style={{ color: "#d4af37" }}>
-            Analytics
+          <h1 className="text-3xl font-bold" style={{ color: "#ffffff" }}>
+            ANALYTICS
           </h1>
           <div className="flex items-center space-x-2">
             <button
-              className={`px-3 py-1 rounded-md text-sm transition-colors duration-200 ${
+              className={`px-3 py-1 rounded-md text-sm font-bold tracking-widest uppercase transition-colors duration-200 ${
                 selectedPeriod === "today"
-                  ? "bg-yellow-500 text-black"
-                  : "text-gray-400 hover:text-white"
+                  ? "bg-white text-black"
+                  : "text-gray-500 hover:text-white"
               }`}
               style={{
                 backgroundColor:
-                  selectedPeriod === "today" ? "#d4af37" : "transparent",
-                color: selectedPeriod === "today" ? "#000000" : "#999999",
+                  selectedPeriod === "today" ? "#ffffff" : "transparent",
+                color: selectedPeriod === "today" ? "#000000" : "#888888",
               }}
               onClick={() => setSelectedPeriod("today")}
             >
-              Today
+              TODAY
             </button>
             <button
-              className={`px-3 py-1 rounded-md text-sm transition-colors duration-200 ${
+              className={`px-3 py-1 rounded-md text-sm font-bold tracking-widest uppercase transition-colors duration-200 ${
                 selectedPeriod === "week"
-                  ? "bg-yellow-500 text-black"
-                  : "text-gray-400 hover:text-white"
+                  ? "bg-white text-black"
+                  : "text-gray-500 hover:text-white"
               }`}
               style={{
                 backgroundColor:
-                  selectedPeriod === "week" ? "#d4af37" : "transparent",
-                color: selectedPeriod === "week" ? "#000000" : "#999999",
+                  selectedPeriod === "week" ? "#ffffff" : "transparent",
+                color: selectedPeriod === "week" ? "#000000" : "#888888",
               }}
               onClick={() => setSelectedPeriod("week")}
             >
-              Week
+              WEEK
             </button>
             <button
-              className={`px-3 py-1 rounded-md text-sm transition-colors duration-200 ${
+              className={`px-3 py-1 rounded-md text-sm font-bold tracking-widest uppercase transition-colors duration-200 ${
                 selectedPeriod === "month"
-                  ? "bg-yellow-500 text-black"
-                  : "text-gray-400 hover:text-white"
+                  ? "bg-white text-black"
+                  : "text-gray-500 hover:text-white"
               }`}
               style={{
                 backgroundColor:
-                  selectedPeriod === "month" ? "#d4af37" : "transparent",
-                color: selectedPeriod === "month" ? "#000000" : "#999999",
+                  selectedPeriod === "month" ? "#ffffff" : "transparent",
+                color: selectedPeriod === "month" ? "#000000" : "#888888",
               }}
               onClick={() => setSelectedPeriod("month")}
             >
-              Month
+              MONTH
             </button>
           </div>
         </div>
@@ -296,15 +296,15 @@ const Analytics = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           <div
             className="shadow rounded-lg p-6"
-            style={{ backgroundColor: "#1d1d1d" }}
+            style={{ backgroundColor: "#111111" }}
           >
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-medium" style={{ color: "#ffffff" }}>
-                Product Views
+              <h3 className="text-lg font-bold" style={{ color: "#ffffff" }}>
+                PRODUCT VIEWS
               </h3>
               <button
                 className="p-2 rounded-md transition-colors duration-200"
-                style={{ color: "#d4af37" }}
+                style={{ color: "#ffffff" }}
               >
                 <FaEye />
               </button>
@@ -314,15 +314,15 @@ const Analytics = () => {
 
           <div
             className="shadow rounded-lg p-6"
-            style={{ backgroundColor: "#1d1d1d" }}
+            style={{ backgroundColor: "#111111" }}
           >
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-medium" style={{ color: "#ffffff" }}>
-                Product Clicks
+              <h3 className="text-lg font-bold" style={{ color: "#ffffff" }}>
+                PRODUCT CLICKS
               </h3>
               <button
                 className="p-2 rounded-md transition-colors duration-200"
-                style={{ color: "#d4af37" }}
+                style={{ color: "#ffffff" }}
               >
                 <FaMousePointer />
               </button>
@@ -335,13 +335,13 @@ const Analytics = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           <div
             className="shadow rounded-lg p-6"
-            style={{ backgroundColor: "#1d1d1d" }}
+            style={{ backgroundColor: "#111111" }}
           >
             <h3
-              className="text-lg font-medium mb-4"
+              className="text-lg font-bold mb-4"
               style={{ color: "#ffffff" }}
             >
-              Top Products
+              TOP PRODUCTS
             </h3>
             <TopProductsList products={analyticsData.overview.top_products} />
           </div>
@@ -388,19 +388,19 @@ const Analytics = () => {
                 </p>
               </div>
               <button
-                className="px-3 py-1 rounded-md text-sm transition-colors duration-200"
+                className="px-3 py-1 rounded-md text-sm font-bold tracking-widest uppercase transition-colors duration-200"
                 style={{
-                  backgroundColor: "#d4af37",
+                  backgroundColor: "#ffffff",
                   color: "#000000",
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = "#b8860b";
+                  e.currentTarget.style.backgroundColor = "#cccccc";
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = "#d4af37";
+                  e.currentTarget.style.backgroundColor = "#ffffff";
                 }}
               >
-                View All
+                VIEW ALL
               </button>
             </div>
           </div>
@@ -425,14 +425,14 @@ const Analytics = () => {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center">
                         <p
-                          className="text-sm font-medium truncate mr-2 transition-colors duration-200"
-                          style={{ color: "#d4af37" }}
+                          className="text-sm font-bold truncate mr-2 transition-colors duration-200 tracking-widest"
+                          style={{ color: "#ffffff" }}
                         >
-                          Order #{order.id}
+                          ORDER #{order.id}
                         </p>
                         <p className="flex-shrink-0 flex">
                           <span
-                            className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
+                            className="px-2 inline-flex text-xs font-bold uppercase tracking-wider rounded-full"
                             style={getStatusStyle(order.status)}
                           >
                             {order.status}
@@ -441,7 +441,7 @@ const Analytics = () => {
                       </div>
                       <div className="ml-2 flex-shrink-0 flex">
                         <p
-                          className="text-sm font-medium"
+                          className="text-sm font-bold"
                           style={{ color: "#ffffff" }}
                         >
                           ${order.total_amount}
@@ -465,7 +465,7 @@ const Analytics = () => {
                           <span className="ml-1 flex items-center">
                             <FaCalendarAlt
                               className="mr-1"
-                              style={{ color: "#d4af37" }}
+                              style={{ color: "#888888" }}
                             />
                             {new Date(order.created_at).toLocaleDateString()}
                           </span>

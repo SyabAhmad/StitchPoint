@@ -89,8 +89,8 @@ const StoreAnalytics = () => {
       style={{ backgroundColor: "#000000", minHeight: "100vh" }}
     >
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-3xl font-bold mb-6" style={{ color: "#d4af37" }}>
-          Store Analytics
+        <h1 className="text-3xl font-bold mb-6 tracking-widest uppercase" style={{ color: "#ffffff" }}>
+          STORE ANALYTICS
         </h1>
 
         {/* Two Column Layout */}
@@ -111,7 +111,7 @@ const StoreAnalytics = () => {
                   onChange={(e) => setFilterDays(Number(e.target.value))}
                   className="w-full px-3 py-2 rounded"
                   style={{
-                    backgroundColor: "#2d2d2d",
+                    backgroundColor: "#222222",
                     color: "#ffffff",
                     border: "1px solid #3d3d3d",
                   }}
@@ -143,7 +143,7 @@ const StoreAnalytics = () => {
                     }}
                     className="w-full pl-10 pr-3 py-2 rounded"
                     style={{
-                      backgroundColor: "#2d2d2d",
+                      backgroundColor: "#222222",
                       color: "#ffffff",
                       border: "1px solid #3d3d3d",
                     }}
@@ -155,11 +155,11 @@ const StoreAnalytics = () => {
             {/* Stores Table */}
             <div
               className="shadow overflow-hidden sm:rounded-md"
-              style={{ backgroundColor: "#1d1d1d" }}
+              style={{ backgroundColor: "#111111" }}
             >
               <div
                 className="px-4 py-5 sm:px-6 border-b"
-                style={{ borderColor: "#2d2d2d" }}
+                style={{ borderColor: "#222222" }}
               >
                 <h3
                   className="text-lg leading-6 font-medium"
@@ -178,85 +178,85 @@ const StoreAnalytics = () => {
               </div>
               <div className="overflow-x-auto">
                 <table className="min-w-full">
-                  <thead style={{ backgroundColor: "#2d2d2d" }}>
+                  <thead style={{ backgroundColor: "#222222" }}>
                     <tr>
                       <th
                         className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
-                        style={{ color: "#d4af37" }}
+                        style={{ color: "#ffffff" }}
                       >
                         Store
                       </th>
                       <th
                         className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
-                        style={{ color: "#d4af37" }}
+                        style={{ color: "#ffffff" }}
                       >
                         Products
                       </th>
                       <th
                         className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
-                        style={{ color: "#d4af37" }}
+                        style={{ color: "#ffffff" }}
                       >
                         Views
                       </th>
                       <th
                         className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
-                        style={{ color: "#d4af37" }}
+                        style={{ color: "#ffffff" }}
                       >
                         Clicks
                       </th>
                       <th
                         className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
-                        style={{ color: "#d4af37" }}
+                        style={{ color: "#ffffff" }}
                       >
                         Cart Adds
                       </th>
                       <th
                         className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
-                        style={{ color: "#d4af37" }}
+                        style={{ color: "#ffffff" }}
                       >
                         Reviews
                       </th>
                       <th
                         className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
-                        style={{ color: "#d4af37" }}
+                        style={{ color: "#ffffff" }}
                       >
                         Rating
                       </th>
                       <th
                         className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
-                        style={{ color: "#d4af37" }}
+                        style={{ color: "#ffffff" }}
                       >
                         Comments
                       </th>
                       <th
                         className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
-                        style={{ color: "#d4af37" }}
+                        style={{ color: "#ffffff" }}
                       >
                         Revenue
                       </th>
                       <th
                         className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
-                        style={{ color: "#d4af37" }}
+                        style={{ color: "#ffffff" }}
                       >
                         Units Sold
                       </th>
                       <th
                         className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
-                        style={{ color: "#d4af37" }}
+                        style={{ color: "#ffffff" }}
                       >
                         Profit
                       </th>
                     </tr>
                   </thead>
-                  <tbody style={{ backgroundColor: "#1d1d1d" }}>
+                  <tbody style={{ backgroundColor: "#111111" }}>
                     {currentStores.map((store, index) => (
                       <tr
                         key={store.store_id}
                         className="transition-colors duration-150"
                         style={{
-                          borderBottom: "1px solid #2d2d2d",
+                          borderBottom: "1px solid #222222",
                           backgroundColor:
-                            index % 2 === 0 ? "#1d1d1d" : "#2d2d2d",
+                            index % 2 === 0 ? "#111111" : "#222222",
                           cursor: "pointer",
                         }}
                         onMouseEnter={(e) => {
@@ -264,7 +264,7 @@ const StoreAnalytics = () => {
                         }}
                         onMouseLeave={(e) => {
                           e.currentTarget.style.backgroundColor =
-                            index % 2 === 0 ? "#1d1d1d" : "#2d2d2d";
+                            index % 2 === 0 ? "#111111" : "#222222";
                         }}
                         onClick={() =>
                           navigate(
@@ -322,7 +322,7 @@ const StoreAnalytics = () => {
                         </td>
                         <td
                           className="px-6 py-4 whitespace-nowrap text-sm"
-                          style={{ color: "#d4af37" }}
+                          style={{ color: "#ffffff" }}
                         >
                           PKR {store.total_revenue || 0}
                         </td>
@@ -359,14 +359,14 @@ const StoreAnalytics = () => {
               {totalPages > 1 && (
                 <div
                   className="px-4 py-4 border-t flex items-center justify-between"
-                  style={{ borderColor: "#2d2d2d" }}
+                  style={{ borderColor: "#222222" }}
                 >
                   <button
                     onClick={() => handlePageChange(currentPage - 1)}
                     disabled={currentPage === 1}
                     className="px-4 py-2 rounded text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                     style={{
-                      backgroundColor: "#2d2d2d",
+                      backgroundColor: "#222222",
                       color: "#ffffff",
                       border: "1px solid #3d3d3d",
                     }}
@@ -381,7 +381,7 @@ const StoreAnalytics = () => {
                         className="px-3 py-1 rounded text-sm font-medium"
                         style={{
                           backgroundColor:
-                            currentPage === i + 1 ? "#d4af37" : "#2d2d2d",
+                            currentPage === i + 1 ? "#d4af37" : "#222222",
                           color: currentPage === i + 1 ? "#000000" : "#ffffff",
                           border: "1px solid #3d3d3d",
                         }}
@@ -395,7 +395,7 @@ const StoreAnalytics = () => {
                     disabled={currentPage === totalPages}
                     className="px-4 py-2 rounded text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                     style={{
-                      backgroundColor: "#2d2d2d",
+                      backgroundColor: "#222222",
                       color: "#ffffff",
                       border: "1px solid #3d3d3d",
                     }}
@@ -411,11 +411,11 @@ const StoreAnalytics = () => {
           <div className="lg:col-span-1">
             <div
               className="shadow rounded-lg p-4 sticky top-8"
-              style={{ backgroundColor: "#1d1d1d" }}
+              style={{ backgroundColor: "#111111" }}
             >
               <h3
                 className="text-lg font-semibold mb-4"
-                style={{ color: "#d4af37" }}
+                style={{ color: "#ffffff" }}
               >
                 Top 10 Stores
               </h3>
@@ -423,7 +423,7 @@ const StoreAnalytics = () => {
               {/* Reviews Card */}
               <div
                 className="mb-4 p-4 rounded-lg cursor-pointer transition-transform hover:scale-105"
-                style={{ backgroundColor: "#2d2d2d" }}
+                style={{ backgroundColor: "#222222" }}
                 onClick={() => {
                   // Could open a modal or navigate to filtered view
                 }}
@@ -432,7 +432,7 @@ const StoreAnalytics = () => {
                   <h4 style={{ color: "#ffffff" }} className="font-medium">
                     By Reviews
                   </h4>
-                  <FaStar style={{ color: "#d4af37" }} size={20} />
+                  <FaStar style={{ color: "#ffffff" }} size={20} />
                 </div>
                 <div className="space-y-2">
                   {topStoresByReviews.slice(0, 3).map((store) => (
@@ -450,7 +450,7 @@ const StoreAnalytics = () => {
                         {store.store_name}
                       </span>
                       <span
-                        style={{ color: "#d4af37" }}
+                        style={{ color: "#ffffff" }}
                         className="font-medium"
                       >
                         {store.total_reviews}
@@ -463,7 +463,7 @@ const StoreAnalytics = () => {
               {/* Comments Card */}
               <div
                 className="mb-4 p-4 rounded-lg cursor-pointer transition-transform hover:scale-105"
-                style={{ backgroundColor: "#2d2d2d" }}
+                style={{ backgroundColor: "#222222" }}
                 onClick={() => {
                   // Could open a modal or navigate to filtered view
                 }}
@@ -472,7 +472,7 @@ const StoreAnalytics = () => {
                   <h4 style={{ color: "#ffffff" }} className="font-medium">
                     By Comments
                   </h4>
-                  <FaComment style={{ color: "#d4af37" }} size={20} />
+                  <FaComment style={{ color: "#ffffff" }} size={20} />
                 </div>
                 <div className="space-y-2">
                   {topStoresByComments.slice(0, 3).map((store) => (
@@ -490,7 +490,7 @@ const StoreAnalytics = () => {
                         {store.store_name}
                       </span>
                       <span
-                        style={{ color: "#d4af37" }}
+                        style={{ color: "#ffffff" }}
                         className="font-medium"
                       >
                         {store.total_comments}
@@ -503,7 +503,7 @@ const StoreAnalytics = () => {
               {/* Sells (Cart Adds) Card */}
               <div
                 className="mb-4 p-4 rounded-lg cursor-pointer transition-transform hover:scale-105"
-                style={{ backgroundColor: "#2d2d2d" }}
+                style={{ backgroundColor: "#222222" }}
                 onClick={() => {
                   // Could open a modal or navigate to filtered view
                 }}
@@ -512,7 +512,7 @@ const StoreAnalytics = () => {
                   <h4 style={{ color: "#ffffff" }} className="font-medium">
                     By Cart Adds
                   </h4>
-                  <FaShoppingCart style={{ color: "#d4af37" }} size={20} />
+                  <FaShoppingCart style={{ color: "#ffffff" }} size={20} />
                 </div>
                 <div className="space-y-2">
                   {topStoresBySells.slice(0, 3).map((store) => (
@@ -530,7 +530,7 @@ const StoreAnalytics = () => {
                         {store.store_name}
                       </span>
                       <span
-                        style={{ color: "#d4af37" }}
+                        style={{ color: "#ffffff" }}
                         className="font-medium"
                       >
                         {store.total_cart_adds}
@@ -543,7 +543,7 @@ const StoreAnalytics = () => {
               {/* Views Card */}
               <div
                 className="p-4 rounded-lg cursor-pointer transition-transform hover:scale-105"
-                style={{ backgroundColor: "#2d2d2d" }}
+                style={{ backgroundColor: "#222222" }}
                 onClick={() => {
                   // Could open a modal or navigate to filtered view
                 }}
@@ -552,7 +552,7 @@ const StoreAnalytics = () => {
                   <h4 style={{ color: "#ffffff" }} className="font-medium">
                     By Views
                   </h4>
-                  <FaEye style={{ color: "#d4af37" }} size={20} />
+                  <FaEye style={{ color: "#ffffff" }} size={20} />
                 </div>
                 <div className="space-y-2">
                   {topStoresByViews.slice(0, 3).map((store) => (
@@ -570,7 +570,7 @@ const StoreAnalytics = () => {
                         {store.store_name}
                       </span>
                       <span
-                        style={{ color: "#d4af37" }}
+                        style={{ color: "#ffffff" }}
                         className="font-medium"
                       >
                         {store.total_views}

@@ -3,106 +3,86 @@ import React from "react";
 const OverviewStats = ({ data }) => {
   const stats = [
     {
-      label: "Total Views",
+      label: "TOTAL VIEWS",
       value: data.total_views,
-      color: "#d4af37",
-      icon: "👁️",
+      color: "#ffffff",
     },
     {
-      label: "Total Clicks",
+      label: "TOTAL CLICKS",
       value: data.total_clicks,
-      color: "#b8860b",
-      icon: "🖱️",
+      color: "#ffffff",
     },
     {
-      label: "Cart Adds",
+      label: "CART ADDS",
       value: data.total_cart_adds,
-      color: "#daa520",
-      icon: "🛒",
+      color: "#ffffff",
     },
     {
-      label: "Avg Time Spent",
+      label: "AVG TIME SPENT",
       value: `${data.avg_time_spent}s`,
-      color: "#f4e4bc",
-      icon: "⏱️",
+      color: "#ffffff",
     },
     {
-      label: "Total Reviews",
+      label: "TOTAL REVIEWS",
       value: data.total_reviews,
-      color: "#ffd700",
-      icon: "⭐",
+      color: "#ffffff",
     },
     {
-      label: "Avg Rating",
+      label: "AVG RATING",
       value: data.avg_rating || 0,
-      color: "#ffb347",
-      icon: "📊",
+      color: "#ffffff",
     },
     {
-      label: "Total Comments",
+      label: "TOTAL COMMENTS",
       value: data.total_comments,
-      color: "#ff8c00",
-      icon: "💬",
+      color: "#ffffff",
     },
     {
-      label: "Avg Comments/Product",
+      label: "AVG COMMENTS/PRODUCT",
       value: data.avg_comments_per_product,
-      color: "#ff6347",
-      icon: "📝",
+      color: "#ffffff",
     },
   ];
 
-  // Add financial metrics if available
   if (data.total_revenue !== undefined) {
     stats.push(
       {
-        label: "Total Revenue",
+        label: "TOTAL REVENUE",
         value: `PKR ${data.total_revenue || 0}`,
-        color: "#4ecdc4",
-        icon: "💰",
+        color: "#ffffff",
       },
       {
-        label: "Total Profit",
+        label: "TOTAL PROFIT",
         value: `PKR ${data.total_profit || 0}`,
-        color: data.total_profit >= 0 ? "#4ecdc4" : "#ff6b6b",
+        color: data.total_profit >= 0 ? "#ffffff" : "#ff0000",
         icon: "📈",
       },
       {
-        label: "Total Units Sold",
+        label: "UNITS SOLD",
         value: data.total_units_sold || 0,
-        color: "#45b7d1",
-        icon: "📦",
+        color: "#ffffff",
       },
       {
-        label: "Total Costs",
+        label: "TOTAL COSTS",
         value: `PKR ${data.total_costs || 0}`,
-        color: "#ff6b6b",
-        icon: "💸",
+        color: "#ffffff",
       }
     );
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
       {stats.map((stat, index) => (
         <div
           key={index}
-          className="shadow rounded-lg p-6 transition-transform hover:scale-105"
-          style={{ backgroundColor: "#1d1d1d" }}
+          className="border border-white/20 p-4"
+          style={{ backgroundColor: "#111111" }}
         >
-          <div className="flex items-center justify-between">
-            <div>
-              <div
-                className="text-3xl font-bold mb-2"
-                style={{ color: stat.color }}
-              >
-                {stat.value}
-              </div>
-              <div className="text-sm" style={{ color: "#cccccc" }}>
-                {stat.label}
-              </div>
-            </div>
-            <div className="text-4xl">{stat.icon}</div>
+          <div className="text-2xl font-bold mb-1" style={{ color: stat.color }}>
+            {stat.value}
+          </div>
+          <div className="text-xs font-bold tracking-widest uppercase" style={{ color: "#888888" }}>
+            {stat.label}
           </div>
         </div>
       ))}

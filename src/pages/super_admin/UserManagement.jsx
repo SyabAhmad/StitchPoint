@@ -308,7 +308,7 @@ const UserManagement = () => {
         style={{ backgroundColor: "#000000", color: "#ffffff" }}
       >
         <div className="flex flex-col items-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-yellow-500 mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-white mb-4"></div>
           <span>Loading users...</span>
         </div>
       </div>
@@ -321,29 +321,29 @@ const UserManagement = () => {
       style={{ backgroundColor: "#000000", minHeight: "100vh" }}
     >
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-3xl font-bold mb-6" style={{ color: "#d4af37" }}>
-          User Management
+        <h1 className="text-3xl font-bold mb-6 tracking-widest uppercase" style={{ color: "#ffffff" }}>
+          USER MANAGEMENT
         </h1>
 
         <div
-          className="shadow overflow-hidden sm:rounded-md"
-          style={{ backgroundColor: "#1d1d1d" }}
+          className="border border-white/10"
+          style={{ backgroundColor: "#111111" }}
         >
           <div
-            className="px-4 py-5 sm:px-6 border-b"
-            style={{ borderColor: "#2d2d2d" }}
+            className="px-6 py-4 border-b"
+            style={{ borderColor: "#333333" }}
           >
             <div className="flex justify-between items-center">
               <div>
                 <h3
-                  className="text-lg leading-6 font-medium"
+                  className="text-lg font-bold tracking-widest uppercase"
                   style={{ color: "#ffffff" }}
                 >
-                  Manage Users
+                  MANAGE USERS
                 </h3>
                 <p
-                  className="mt-1 max-w-2xl text-sm"
-                  style={{ color: "#999999" }}
+                  className="mt-1 text-sm"
+                  style={{ color: "#888888" }}
                 >
                   Manage user roles and permissions
                 </p>
@@ -356,7 +356,7 @@ const UserManagement = () => {
                     onClick={() => setShowCreateForm((s) => !s)}
                     className="inline-flex items-center px-3 py-1 border border-transparent text-sm leading-4 font-medium rounded-md transition-all duration-200"
                     style={{
-                      backgroundColor: "#d4af37",
+                      backgroundColor: "#ffffff",
                       color: "#000000",
                     }}
                     onMouseEnter={(e) => {
@@ -364,7 +364,7 @@ const UserManagement = () => {
                       e.currentTarget.style.transform = "translateY(-1px)";
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = "#d4af37";
+                      e.currentTarget.style.backgroundColor = "#ffffff";
                       e.currentTarget.style.transform = "translateY(0)";
                     }}
                   >
@@ -392,7 +392,7 @@ const UserManagement = () => {
                     border: "1px solid #3d3d3d",
                   }}
                   onFocus={(e) => {
-                    e.currentTarget.style.borderColor = "#d4af37";
+                    e.currentTarget.style.borderColor = "#ffffff";
                   }}
                   onBlur={(e) => {
                     e.currentTarget.style.borderColor = "#3d3d3d";
@@ -413,7 +413,7 @@ const UserManagement = () => {
                     border: "1px solid #3d3d3d",
                   }}
                   onFocus={(e) => {
-                    e.currentTarget.style.borderColor = "#d4af37";
+                    e.currentTarget.style.borderColor = "#ffffff";
                   }}
                   onBlur={(e) => {
                     e.currentTarget.style.borderColor = "#3d3d3d";
@@ -434,7 +434,7 @@ const UserManagement = () => {
                     border: "1px solid #3d3d3d",
                   }}
                   onFocus={(e) => {
-                    e.currentTarget.style.borderColor = "#d4af37";
+                    e.currentTarget.style.borderColor = "#ffffff";
                   }}
                   onBlur={(e) => {
                     e.currentTarget.style.borderColor = "#3d3d3d";
@@ -480,7 +480,7 @@ const UserManagement = () => {
                         border: "1px solid #3d3d3d",
                       }}
                       onFocus={(e) => {
-                        e.currentTarget.style.borderColor = "#d4af37";
+                        e.currentTarget.style.borderColor = "#ffffff";
                       }}
                       onBlur={(e) => {
                         e.currentTarget.style.borderColor = "#3d3d3d";
@@ -502,7 +502,7 @@ const UserManagement = () => {
                         border: "1px solid #3d3d3d",
                       }}
                       onFocus={(e) => {
-                        e.currentTarget.style.borderColor = "#d4af37";
+                        e.currentTarget.style.borderColor = "#ffffff";
                       }}
                       onBlur={(e) => {
                         e.currentTarget.style.borderColor = "#3d3d3d";
@@ -524,7 +524,7 @@ const UserManagement = () => {
                         border: "1px solid #3d3d3d",
                       }}
                       onFocus={(e) => {
-                        e.currentTarget.style.borderColor = "#d4af37";
+                        e.currentTarget.style.borderColor = "#ffffff";
                       }}
                       onBlur={(e) => {
                         e.currentTarget.style.borderColor = "#3d3d3d";
@@ -546,7 +546,7 @@ const UserManagement = () => {
                         border: "1px solid #3d3d3d",
                       }}
                       onFocus={(e) => {
-                        e.currentTarget.style.borderColor = "#d4af37";
+                        e.currentTarget.style.borderColor = "#ffffff";
                       }}
                       onBlur={(e) => {
                         e.currentTarget.style.borderColor = "#3d3d3d";
@@ -568,7 +568,7 @@ const UserManagement = () => {
                         border: "1px solid #3d3d3d",
                       }}
                       onFocus={(e) => {
-                        e.currentTarget.style.borderColor = "#d4af37";
+                        e.currentTarget.style.borderColor = "#ffffff";
                       }}
                       onBlur={(e) => {
                         e.currentTarget.style.borderColor = "#3d3d3d";
@@ -605,7 +605,7 @@ const UserManagement = () => {
             )}
 
             <div className="mt-4 flex items-center space-x-3">
-              <FaSearch style={{ color: "#d4af37" }} />
+              <FaSearch style={{ color: "#ffffff" }} />
               <input
                 type="text"
                 placeholder="Search by name or email..."
@@ -619,7 +619,7 @@ const UserManagement = () => {
                   width: "250px",
                 }}
                 onFocus={(e) => {
-                  e.currentTarget.style.borderColor = "#d4af37";
+                  e.currentTarget.style.borderColor = "#ffffff";
                 }}
                 onBlur={(e) => {
                   e.currentTarget.style.borderColor = "#3d3d3d";
@@ -628,7 +628,7 @@ const UserManagement = () => {
             </div>
 
             <div className="mt-4 flex items-center space-x-3">
-              <FaFilter style={{ color: "#d4af37" }} />
+              <FaFilter style={{ color: "#ffffff" }} />
               <span className="text-sm" style={{ color: "#cccccc" }}>
                 Filter:
               </span>
@@ -640,7 +640,7 @@ const UserManagement = () => {
                   }`}
                   style={{
                     backgroundColor:
-                      roleFilter === "all" ? "#d4af37" : "#2d2d2d",
+                      roleFilter === "all" ? "#ffffff" : "#222222",
                   }}
                   onMouseEnter={(e) => {
                     if (roleFilter !== "all") {
@@ -662,7 +662,7 @@ const UserManagement = () => {
                   }`}
                   style={{
                     backgroundColor:
-                      roleFilter === "manager" ? "#d4af37" : "#2d2d2d",
+                      roleFilter === "manager" ? "#ffffff" : "#222222",
                   }}
                   onMouseEnter={(e) => {
                     if (roleFilter !== "manager") {
@@ -686,7 +686,7 @@ const UserManagement = () => {
                   }`}
                   style={{
                     backgroundColor:
-                      roleFilter === "super_admin" ? "#d4af37" : "#2d2d2d",
+                      roleFilter === "super_admin" ? "#ffffff" : "#222222",
                   }}
                   onMouseEnter={(e) => {
                     if (roleFilter !== "super_admin") {
@@ -708,7 +708,7 @@ const UserManagement = () => {
                   }`}
                   style={{
                     backgroundColor:
-                      roleFilter === "customer" ? "#d4af37" : "#2d2d2d",
+                      roleFilter === "customer" ? "#ffffff" : "#222222",
                   }}
                   onMouseEnter={(e) => {
                     if (roleFilter !== "customer") {
@@ -732,31 +732,31 @@ const UserManagement = () => {
                 <tr>
                   <th
                     className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
-                    style={{ color: "#d4af37" }}
+                    style={{ color: "#ffffff" }}
                   >
                     Name
                   </th>
                   <th
                     className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
-                    style={{ color: "#d4af37" }}
+                    style={{ color: "#ffffff" }}
                   >
                     Email
                   </th>
                   <th
                     className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
-                    style={{ color: "#d4af37" }}
+                    style={{ color: "#ffffff" }}
                   >
                     Store
                   </th>
                   <th
                     className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
-                    style={{ color: "#d4af37" }}
+                    style={{ color: "#ffffff" }}
                   >
                     Current Role
                   </th>
                   <th
                     className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
-                    style={{ color: "#d4af37" }}
+                    style={{ color: "#ffffff" }}
                   >
                     Actions
                   </th>
@@ -819,7 +819,7 @@ const UserManagement = () => {
                               border: "1px solid #4d4d4d",
                             }}
                             onFocus={(e) => {
-                              e.currentTarget.style.borderColor = "#d4af37";
+                              e.currentTarget.style.borderColor = "#ffffff";
                             }}
                             onBlur={(e) => {
                               e.currentTarget.style.borderColor = "#4d4d4d";
@@ -852,7 +852,7 @@ const UserManagement = () => {
                               border: "1px solid #4d4d4d",
                             }}
                             onFocus={(e) => {
-                              e.currentTarget.style.borderColor = "#d4af37";
+                              e.currentTarget.style.borderColor = "#ffffff";
                             }}
                             onBlur={(e) => {
                               e.currentTarget.style.borderColor = "#4d4d4d";
@@ -881,7 +881,7 @@ const UserManagement = () => {
                                 border: "1px solid #4d4d4d",
                               }}
                               onFocus={(e) => {
-                                e.currentTarget.style.borderColor = "#d4af37";
+                                e.currentTarget.style.borderColor = "#ffffff";
                               }}
                               onBlur={(e) => {
                                 e.currentTarget.style.borderColor = "#4d4d4d";
@@ -918,7 +918,7 @@ const UserManagement = () => {
                                 border: "1px solid #4d4d4d",
                               }}
                               onFocus={(e) => {
-                                e.currentTarget.style.borderColor = "#d4af37";
+                                e.currentTarget.style.borderColor = "#ffffff";
                               }}
                               onBlur={(e) => {
                                 e.currentTarget.style.borderColor = "#4d4d4d";
@@ -941,7 +941,7 @@ const UserManagement = () => {
                                   border: "1px solid #4d4d4d",
                                 }}
                                 onFocus={(e) => {
-                                  e.currentTarget.style.borderColor = "#d4af37";
+                                  e.currentTarget.style.borderColor = "#ffffff";
                                 }}
                                 onBlur={(e) => {
                                   e.currentTarget.style.borderColor = "#4d4d4d";
@@ -1009,12 +1009,12 @@ const UserManagement = () => {
                                   handleRoleChange(user.id, newRole);
                               }}
                               className="transition-colors duration-200"
-                              style={{ color: "#d4af37" }}
+                              style={{ color: "#ffffff" }}
                               onMouseEnter={(e) => {
                                 e.currentTarget.style.color = "#b8860b";
                               }}
                               onMouseLeave={(e) => {
-                                e.currentTarget.style.color = "#d4af37";
+                                e.currentTarget.style.color = "#cccccc";
                               }}
                             >
                               Save
@@ -1038,12 +1038,12 @@ const UserManagement = () => {
                             <button
                               onClick={() => startEditing(user)}
                               className="transition-colors duration-200"
-                              style={{ color: "#d4af37" }}
+                              style={{ color: "#ffffff" }}
                               onMouseEnter={(e) => {
                                 e.currentTarget.style.color = "#b8860b";
                               }}
                               onMouseLeave={(e) => {
-                                e.currentTarget.style.color = "#d4af37";
+                                e.currentTarget.style.color = "#cccccc";
                               }}
                             >
                               <FaEdit className="inline mr-1" />

@@ -43,7 +43,7 @@ const Comments = () => {
         style={{ backgroundColor: "#000000", color: "#ffffff" }}
       >
         <div className="flex flex-col items-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-yellow-500 mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-white mb-4"></div>
           <span>Loading comments...</span>
         </div>
       </div>
@@ -56,8 +56,8 @@ const Comments = () => {
       style={{ backgroundColor: "#000000", minHeight: "100vh" }}
     >
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-3xl font-bold mb-6" style={{ color: "#d4af37" }}>
-          Comments Management
+        <h1 className="text-3xl font-bold mb-6 tracking-widest uppercase" style={{ color: "#ffffff" }}>
+          COMMENTS
         </h1>
 
         {/* Filter */}
@@ -109,31 +109,31 @@ const Comments = () => {
                 <tr>
                   <th
                     className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
-                    style={{ color: "#d4af37" }}
+                    style={{ color: "#ffffff" }}
                   >
                     Comment
                   </th>
                   <th
                     className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
-                    style={{ color: "#d4af37" }}
+                    style={{ color: "#ffffff" }}
                   >
                     User
                   </th>
                   <th
                     className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
-                    style={{ color: "#d4af37" }}
+                    style={{ color: "#ffffff" }}
                   >
                     Product
                   </th>
                   <th
                     className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
-                    style={{ color: "#d4af37" }}
+                    style={{ color: "#ffffff" }}
                   >
                     Store
                   </th>
                   <th
                     className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
-                    style={{ color: "#d4af37" }}
+                    style={{ color: "#ffffff" }}
                   >
                     Date
                   </th>

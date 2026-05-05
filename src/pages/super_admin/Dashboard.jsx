@@ -3,8 +3,6 @@ import {
   FaUsers,
   FaBox,
   FaShoppingCart,
-  FaEye,
-  FaMousePointer,
   FaChartLine,
   FaCog,
   FaStore,
@@ -13,13 +11,8 @@ import {
   FaStoreAlt,
   FaComments,
   FaStar,
-  FaPlus,
-  FaList,
-  FaClipboardList,
-  FaBuilding,
-  FaCalendarAlt,
   FaMoneyBillWave,
-  FaBars,
+  FaCalendarAlt,
   FaTimes,
 } from "react-icons/fa";
 import { Link, Outlet, useLocation } from "react-router-dom";
@@ -35,7 +28,6 @@ import SmartFooter from "../../components/footer/SmartFooter.jsx";
 
 const SuperAdminDashboard = () => {
   const location = useLocation();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [analytics, setAnalytics] = useState({});
   const [recentOrders, setRecentOrders] = useState([]);
@@ -173,7 +165,7 @@ const SuperAdminDashboard = () => {
         style={{ backgroundColor: "#000000", color: "#ffffff" }}
       >
         <div className="flex flex-col items-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-yellow-500 mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-white mb-4"></div>
           <span>Loading...</span>
         </div>
       </div>
@@ -189,69 +181,54 @@ const SuperAdminDashboard = () => {
       <header
         className="shadow-lg px-6 py-4 flex-shrink-0 relative z-60"
         style={{
-          backgroundColor: "#1d1d1d",
-          borderBottom: "1px solid #2d2d2d",
+          backgroundColor: "#111111",
+          borderBottom: "1px solid #333333",
         }}
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
-            <button
-              onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="p-2 rounded-lg transition-colors"
-              style={{ backgroundColor: "#2d2d2d", color: "#ffffff" }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = "#d4af37";
-                e.currentTarget.style.color = "#000000";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = "#2d2d2d";
-                e.currentTarget.style.color = "#ffffff";
-              }}
-            >
-              {sidebarOpen ? <FaTimes /> : <FaBars />}
-            </button>
-            <h1 className="text-white text-2xl font-bold">Naqsh Studio</h1>
-            <span style={{ color: "#cccccc" }}>Super Admin Panel</span>
+            <h1 className="text-white text-2xl font-bold">NAQSH STUDIO</h1>
+            <span style={{ color: "#888888" }}>SUPER ADMIN PANEL</span>
           </div>
           <div className="flex items-center space-x-4">
             <Link
               to="/"
               className="px-4 py-2 rounded-lg transition-all"
-              style={{ backgroundColor: "#d4af37", color: "#000000" }}
+              style={{ backgroundColor: "#ffffff", color: "#000000" }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = "#b8860b";
+                e.currentTarget.style.backgroundColor = "#cccccc";
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = "#d4af37";
+                e.currentTarget.style.backgroundColor = "#ffffff";
               }}
             >
-              Home
+              HOME
             </Link>
             <Link
-              to="/shope"
+              to="/shop"
               className="px-4 py-2 rounded-lg transition-all"
-              style={{ backgroundColor: "#d4af37", color: "#000000" }}
+              style={{ backgroundColor: "#ffffff", color: "#000000" }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = "#b8860b";
+                e.currentTarget.style.backgroundColor = "#cccccc";
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = "#d4af37";
+                e.currentTarget.style.backgroundColor = "#ffffff";
               }}
             >
-              Shop
+              SHOP
             </Link>
             <Link
               to="/super-admin-dashboard/user-management"
               className="px-4 py-2 rounded-lg transition-all"
-              style={{ backgroundColor: "#d4af37", color: "#000000" }}
+              style={{ backgroundColor: "#ffffff", color: "#000000" }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = "#b8860b";
+                e.currentTarget.style.backgroundColor = "#cccccc";
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = "#d4af37";
+                e.currentTarget.style.backgroundColor = "#ffffff";
               }}
             >
-              Settings
+              SETTINGS
             </Link>
             <button
               onClick={() => {
@@ -259,57 +236,40 @@ const SuperAdminDashboard = () => {
                 window.location.href = "/login";
               }}
               className="px-4 py-2 rounded-lg transition-all hover:cursor-pointer"
-              style={{ backgroundColor: "#dc3545", color: "#ffffff" }}
+              style={{ backgroundColor: "#333333", color: "#ffffff" }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = "#c82333";
-              }}
-              onMouseLeave={(e) => {
                 e.currentTarget.style.backgroundColor = "#dc3545";
               }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = "#333333";
+              }}
             >
-              Logout
+              LOGOUT
             </button>
           </div>
         </div>
       </header>
 
-      {/* Mobile Overlay */}
-      {sidebarOpen && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
-          onClick={() => setSidebarOpen(false)}
-        ></div>
-      )}
-
       <div className="flex-1 flex overflow-hidden">
-        {/* Fixed Aside */}
+        {/* Sidebar - always visible */}
         <aside
-          className={`w-64 shadow-lg overflow-y-auto md:block md:relative md:flex-shrink-0 fixed inset-y-0 left-0 z-50 transform transition-transform duration-300 ease-in-out ${
-            sidebarOpen ? "translate-x-0" : "-translate-x-full"
-          } md:translate-x-0 md:z-auto`}
-          style={{ backgroundColor: "#1d1d1d" }}
+          className="w-64 shadow-lg overflow-y-auto flex-shrink-0"
+          style={{ backgroundColor: "#111111" }}
         >
           {/* Mobile Header */}
           <div
             className="flex items-center justify-between p-6 border-b md:hidden"
-            style={{ borderColor: "#2d2d2d" }}
+            style={{ borderColor: "#333333" }}
           >
             <h2 className="text-lg font-semibold" style={{ color: "#ffffff" }}>
-              Menu
+              MENU
             </h2>
-            <button
-              onClick={() => setSidebarOpen(false)}
-              className="p-2 rounded-lg transition-colors"
-              style={{ backgroundColor: "#2d2d2d", color: "#ffffff" }}
-            >
-              <FaTimes />
-            </button>
           </div>
-          <div className="p-6 border-b" style={{ borderColor: "#2d2d2d" }}>
+          <div className="p-6 border-b" style={{ borderColor: "#333333" }}>
             <div className="flex items-center space-x-3">
               <div
                 className="w-12 h-12 rounded-full flex items-center justify-center"
-                style={{ backgroundColor: "#d4af37" }}
+                style={{ backgroundColor: "#ffffff" }}
               >
                 <span className="text-black font-bold text-lg">
                   {userData?.name?.charAt(0)?.toUpperCase() || "S"}
@@ -319,7 +279,7 @@ const SuperAdminDashboard = () => {
                 <p className="font-semibold" style={{ color: "#ffffff" }}>
                   {userData?.name || "Super Admin"}
                 </p>
-                <p className="text-sm" style={{ color: "#cccccc" }}>
+                <p className="text-sm" style={{ color: "#888888" }}>
                   {userData?.email}
                 </p>
               </div>
@@ -330,9 +290,9 @@ const SuperAdminDashboard = () => {
             <div className="px-6 py-2">
               <h3
                 className="text-xs font-semibold uppercase tracking-wider"
-                style={{ color: "#d4af37" }}
+                style={{ color: "#ffffff" }}
               >
-                Management
+                MANAGEMENT
               </h3>
               <ul className="mt-2 space-y-1">
                 <li>
@@ -346,23 +306,23 @@ const SuperAdminDashboard = () => {
                     style={{
                       color:
                         location.pathname === "/super-admin-dashboard"
-                          ? "#d4af37"
-                          : "#ffffff",
+                          ? "#ffffff"
+                          : "#aaaaaa",
                       backgroundColor:
                         location.pathname === "/super-admin-dashboard"
-                          ? "#2d2d2d"
+                          ? "#333333"
                           : "transparent",
                     }}
                     onMouseEnter={(e) => {
                       if (location.pathname !== "/super-admin-dashboard") {
-                        e.currentTarget.style.backgroundColor = "#2d2d2d";
-                        e.currentTarget.style.color = "#d4af37";
+                        e.currentTarget.style.backgroundColor = "#222222";
+                        e.currentTarget.style.color = "#ffffff";
                       }
                     }}
                     onMouseLeave={(e) => {
                       if (location.pathname !== "/super-admin-dashboard") {
                         e.currentTarget.style.backgroundColor = "transparent";
-                        e.currentTarget.style.color = "#ffffff";
+                        e.currentTarget.style.color = "#aaaaaa";
                       }
                     }}
                   >
@@ -381,19 +341,19 @@ const SuperAdminDashboard = () => {
                     style={{
                       color:
                         location.pathname === "/super-admin-dashboard/analytics"
-                          ? "#d4af37"
-                          : "#ffffff",
+                          ? "#ffffff"
+                          : "#aaaaaa",
                       backgroundColor:
                         location.pathname === "/super-admin-dashboard/analytics"
-                          ? "#2d2d2d"
+                          ? "#333333"
                           : "transparent",
                     }}
                     onMouseEnter={(e) => {
                       if (
                         location.pathname !== "/super-admin-dashboard/analytics"
                       ) {
-                        e.currentTarget.style.backgroundColor = "#2d2d2d";
-                        e.currentTarget.style.color = "#d4af37";
+                        e.currentTarget.style.backgroundColor = "#222222";
+                        e.currentTarget.style.color = "#ffffff";
                       }
                     }}
                     onMouseLeave={(e) => {
@@ -401,7 +361,7 @@ const SuperAdminDashboard = () => {
                         location.pathname !== "/super-admin-dashboard/analytics"
                       ) {
                         e.currentTarget.style.backgroundColor = "transparent";
-                        e.currentTarget.style.color = "#ffffff";
+                        e.currentTarget.style.color = "#aaaaaa";
                       }
                     }}
                   >
@@ -422,12 +382,12 @@ const SuperAdminDashboard = () => {
                       color:
                         location.pathname ===
                         "/super-admin-dashboard/user-management"
-                          ? "#d4af37"
-                          : "#ffffff",
+                          ? "#ffffff"
+                          : "#aaaaaa",
                       backgroundColor:
                         location.pathname ===
                         "/super-admin-dashboard/user-management"
-                          ? "#2d2d2d"
+                          ? "#333333"
                           : "transparent",
                     }}
                     onMouseEnter={(e) => {
@@ -435,8 +395,8 @@ const SuperAdminDashboard = () => {
                         location.pathname !==
                         "/super-admin-dashboard/user-management"
                       ) {
-                        e.currentTarget.style.backgroundColor = "#2d2d2d";
-                        e.currentTarget.style.color = "#d4af37";
+                        e.currentTarget.style.backgroundColor = "#222222";
+                        e.currentTarget.style.color = "#ffffff";
                       }
                     }}
                     onMouseLeave={(e) => {
@@ -445,7 +405,7 @@ const SuperAdminDashboard = () => {
                         "/super-admin-dashboard/user-management"
                       ) {
                         e.currentTarget.style.backgroundColor = "transparent";
-                        e.currentTarget.style.color = "#ffffff";
+                        e.currentTarget.style.color = "#aaaaaa";
                       }
                     }}
                   >
@@ -464,19 +424,19 @@ const SuperAdminDashboard = () => {
                     style={{
                       color:
                         location.pathname === "/super-admin-dashboard/products"
-                          ? "#d4af37"
-                          : "#ffffff",
+                          ? "#ffffff"
+                          : "#aaaaaa",
                       backgroundColor:
                         location.pathname === "/super-admin-dashboard/products"
-                          ? "#2d2d2d"
+                          ? "#333333"
                           : "transparent",
                     }}
                     onMouseEnter={(e) => {
                       if (
                         location.pathname !== "/super-admin-dashboard/products"
                       ) {
-                        e.currentTarget.style.backgroundColor = "#2d2d2d";
-                        e.currentTarget.style.color = "#d4af37";
+                        e.currentTarget.style.backgroundColor = "#222222";
+                        e.currentTarget.style.color = "#ffffff";
                       }
                     }}
                     onMouseLeave={(e) => {
@@ -484,7 +444,7 @@ const SuperAdminDashboard = () => {
                         location.pathname !== "/super-admin-dashboard/products"
                       ) {
                         e.currentTarget.style.backgroundColor = "transparent";
-                        e.currentTarget.style.color = "#ffffff";
+                        e.currentTarget.style.color = "#aaaaaa";
                       }
                     }}
                   >
@@ -503,19 +463,19 @@ const SuperAdminDashboard = () => {
                     style={{
                       color:
                         location.pathname === "/super-admin-dashboard/orders"
-                          ? "#d4af37"
-                          : "#ffffff",
+                          ? "#ffffff"
+                          : "#aaaaaa",
                       backgroundColor:
                         location.pathname === "/super-admin-dashboard/orders"
-                          ? "#2d2d2d"
+                          ? "#333333"
                           : "transparent",
                     }}
                     onMouseEnter={(e) => {
                       if (
                         location.pathname !== "/super-admin-dashboard/orders"
                       ) {
-                        e.currentTarget.style.backgroundColor = "#2d2d2d";
-                        e.currentTarget.style.color = "#d4af37";
+                        e.currentTarget.style.backgroundColor = "#222222";
+                        e.currentTarget.style.color = "#ffffff";
                       }
                     }}
                     onMouseLeave={(e) => {
@@ -523,56 +483,12 @@ const SuperAdminDashboard = () => {
                         location.pathname !== "/super-admin-dashboard/orders"
                       ) {
                         e.currentTarget.style.backgroundColor = "transparent";
-                        e.currentTarget.style.color = "#ffffff";
+                        e.currentTarget.style.color = "#aaaaaa";
                       }
                     }}
                   >
                     <FaShoppingCart className="mr-3 h-5 w-5" />
                     Orders
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/super-admin-dashboard/product-analytics"
-                    className={`flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
-                      location.pathname ===
-                      "/super-admin-dashboard/product-analytics"
-                        ? "active-menu-item"
-                        : ""
-                    }`}
-                    style={{
-                      color:
-                        location.pathname ===
-                        "/super-admin-dashboard/product-analytics"
-                          ? "#d4af37"
-                          : "#ffffff",
-                      backgroundColor:
-                        location.pathname ===
-                        "/super-admin-dashboard/product-analytics"
-                          ? "#2d2d2d"
-                          : "transparent",
-                    }}
-                    onMouseEnter={(e) => {
-                      if (
-                        location.pathname !==
-                        "/super-admin-dashboard/product-analytics"
-                      ) {
-                        e.currentTarget.style.backgroundColor = "#2d2d2d";
-                        e.currentTarget.style.color = "#d4af37";
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (
-                        location.pathname !==
-                        "/super-admin-dashboard/product-analytics"
-                      ) {
-                        e.currentTarget.style.backgroundColor = "transparent";
-                        e.currentTarget.style.color = "#ffffff";
-                      }
-                    }}
-                  >
-                    <FaChartBar className="mr-3 h-5 w-5" />
-                    Product Analytics
                   </Link>
                 </li>
                 <li>
@@ -589,12 +505,12 @@ const SuperAdminDashboard = () => {
                       color: location.pathname.startsWith(
                         "/super-admin-dashboard/store-analytics"
                       )
-                        ? "#d4af37"
-                        : "#ffffff",
+                        ? "#ffffff"
+                        : "#aaaaaa",
                       backgroundColor: location.pathname.startsWith(
                         "/super-admin-dashboard/store-analytics"
                       )
-                        ? "#2d2d2d"
+                        ? "#333333"
                         : "transparent",
                     }}
                     onMouseEnter={(e) => {
@@ -603,8 +519,8 @@ const SuperAdminDashboard = () => {
                           "/super-admin-dashboard/store-analytics"
                         )
                       ) {
-                        e.currentTarget.style.backgroundColor = "#2d2d2d";
-                        e.currentTarget.style.color = "#d4af37";
+                        e.currentTarget.style.backgroundColor = "#222222";
+                        e.currentTarget.style.color = "#ffffff";
                       }
                     }}
                     onMouseLeave={(e) => {
@@ -614,7 +530,7 @@ const SuperAdminDashboard = () => {
                         )
                       ) {
                         e.currentTarget.style.backgroundColor = "transparent";
-                        e.currentTarget.style.color = "#ffffff";
+                        e.currentTarget.style.color = "#aaaaaa";
                       }
                     }}
                   >
@@ -633,19 +549,19 @@ const SuperAdminDashboard = () => {
                     style={{
                       color:
                         location.pathname === "/super-admin-dashboard/comments"
-                          ? "#d4af37"
-                          : "#ffffff",
+                          ? "#ffffff"
+                          : "#aaaaaa",
                       backgroundColor:
                         location.pathname === "/super-admin-dashboard/comments"
-                          ? "#2d2d2d"
+                          ? "#333333"
                           : "transparent",
                     }}
                     onMouseEnter={(e) => {
                       if (
                         location.pathname !== "/super-admin-dashboard/comments"
                       ) {
-                        e.currentTarget.style.backgroundColor = "#2d2d2d";
-                        e.currentTarget.style.color = "#d4af37";
+                        e.currentTarget.style.backgroundColor = "#222222";
+                        e.currentTarget.style.color = "#ffffff";
                       }
                     }}
                     onMouseLeave={(e) => {
@@ -653,7 +569,7 @@ const SuperAdminDashboard = () => {
                         location.pathname !== "/super-admin-dashboard/comments"
                       ) {
                         e.currentTarget.style.backgroundColor = "transparent";
-                        e.currentTarget.style.color = "#ffffff";
+                        e.currentTarget.style.color = "#aaaaaa";
                       }
                     }}
                   >
@@ -675,12 +591,12 @@ const SuperAdminDashboard = () => {
                       color: location.pathname.startsWith(
                         "/super-admin-dashboard/reviews"
                       )
-                        ? "#d4af37"
-                        : "#ffffff",
+                        ? "#ffffff"
+                        : "#aaaaaa",
                       backgroundColor: location.pathname.startsWith(
                         "/super-admin-dashboard/reviews"
                       )
-                        ? "#2d2d2d"
+                        ? "#333333"
                         : "transparent",
                     }}
                     onMouseEnter={(e) => {
@@ -689,8 +605,8 @@ const SuperAdminDashboard = () => {
                           "/super-admin-dashboard/reviews"
                         )
                       ) {
-                        e.currentTarget.style.backgroundColor = "#2d2d2d";
-                        e.currentTarget.style.color = "#d4af37";
+                        e.currentTarget.style.backgroundColor = "#222222";
+                        e.currentTarget.style.color = "#ffffff";
                       }
                     }}
                     onMouseLeave={(e) => {
@@ -700,7 +616,7 @@ const SuperAdminDashboard = () => {
                         )
                       ) {
                         e.currentTarget.style.backgroundColor = "transparent";
-                        e.currentTarget.style.color = "#ffffff";
+                        e.currentTarget.style.color = "#aaaaaa";
                       }
                     }}
                   >
@@ -723,12 +639,12 @@ const SuperAdminDashboard = () => {
                           color:
                             location.pathname ===
                             "/super-admin-dashboard/commissions"
-                              ? "#d4af37"
-                              : "#ffffff",
+                              ? "#ffffff"
+                              : "#aaaaaa",
                           backgroundColor:
                             location.pathname ===
                             "/super-admin-dashboard/commissions"
-                              ? "#2d2d2d"
+                              ? "#333333"
                               : "transparent",
                         }}
                         onMouseEnter={(e) => {
@@ -736,8 +652,8 @@ const SuperAdminDashboard = () => {
                             location.pathname !==
                             "/super-admin-dashboard/commissions"
                           ) {
-                            e.currentTarget.style.backgroundColor = "#2d2d2d";
-                            e.currentTarget.style.color = "#d4af37";
+                            e.currentTarget.style.backgroundColor = "#222222";
+                            e.currentTarget.style.color = "#ffffff";
                           }
                         }}
                         onMouseLeave={(e) => {
@@ -747,7 +663,7 @@ const SuperAdminDashboard = () => {
                           ) {
                             e.currentTarget.style.backgroundColor =
                               "transparent";
-                            e.currentTarget.style.color = "#ffffff";
+                            e.currentTarget.style.color = "#aaaaaa";
                           }
                         }}
                       >
@@ -768,12 +684,12 @@ const SuperAdminDashboard = () => {
                           color:
                             location.pathname ===
                             "/super-admin-dashboard/commission-rates"
-                              ? "#d4af37"
-                              : "#ffffff",
+                              ? "#ffffff"
+                              : "#aaaaaa",
                           backgroundColor:
                             location.pathname ===
                             "/super-admin-dashboard/commission-rates"
-                              ? "#2d2d2d"
+                              ? "#333333"
                               : "transparent",
                         }}
                         onMouseEnter={(e) => {
@@ -781,8 +697,8 @@ const SuperAdminDashboard = () => {
                             location.pathname !==
                             "/super-admin-dashboard/commission-rates"
                           ) {
-                            e.currentTarget.style.backgroundColor = "#2d2d2d";
-                            e.currentTarget.style.color = "#d4af37";
+                            e.currentTarget.style.backgroundColor = "#222222";
+                            e.currentTarget.style.color = "#ffffff";
                           }
                         }}
                         onMouseLeave={(e) => {
@@ -792,7 +708,7 @@ const SuperAdminDashboard = () => {
                           ) {
                             e.currentTarget.style.backgroundColor =
                               "transparent";
-                            e.currentTarget.style.color = "#ffffff";
+                            e.currentTarget.style.color = "#aaaaaa";
                           }
                         }}
                       >
@@ -807,23 +723,23 @@ const SuperAdminDashboard = () => {
             <div className="px-6 py-2">
               <h3
                 className="text-xs font-semibold uppercase tracking-wider"
-                style={{ color: "#d4af37" }}
+                style={{ color: "#ffffff" }}
               >
-                Settings
+                SETTINGS
               </h3>
               <ul className="mt-2 space-y-1">
                 <li>
                   <a
                     href="#"
                     className="flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200"
-                    style={{ color: "#ffffff" }}
+                    style={{ color: "#aaaaaa" }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = "#2d2d2d";
-                      e.currentTarget.style.color = "#d4af37";
+                      e.currentTarget.style.backgroundColor = "#222222";
+                      e.currentTarget.style.color = "#ffffff";
                     }}
                     onMouseLeave={(e) => {
                       e.currentTarget.style.backgroundColor = "transparent";
-                      e.currentTarget.style.color = "#ffffff";
+                      e.currentTarget.style.color = "#aaaaaa";
                     }}
                   >
                     <FaStore className="mr-3 h-5 w-5" />
@@ -834,14 +750,14 @@ const SuperAdminDashboard = () => {
                   <a
                     href="#"
                     className="flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200"
-                    style={{ color: "#ffffff" }}
+                    style={{ color: "#aaaaaa" }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = "#2d2d2d";
-                      e.currentTarget.style.color = "#d4af37";
+                      e.currentTarget.style.backgroundColor = "#222222";
+                      e.currentTarget.style.color = "#ffffff";
                     }}
                     onMouseLeave={(e) => {
                       e.currentTarget.style.backgroundColor = "transparent";
-                      e.currentTarget.style.color = "#ffffff";
+                      e.currentTarget.style.color = "#aaaaaa";
                     }}
                   >
                     <FaCog className="mr-3 h-5 w-5" />
@@ -862,12 +778,12 @@ const SuperAdminDashboard = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                   <div
                     className="shadow rounded-lg p-6"
-                    style={{ backgroundColor: "#1d1d1d" }}
+                    style={{ backgroundColor: "#1a1a1a" }}
                   >
                     <div className="flex items-center">
                       <FaShoppingCart
                         className="h-8 w-8"
-                        style={{ color: "#d4af37" }}
+                        style={{ color: "#ffffff" }}
                       />
                       <div className="ml-4">
                         <p
@@ -887,12 +803,12 @@ const SuperAdminDashboard = () => {
                   </div>
                   <div
                     className="shadow rounded-lg p-6"
-                    style={{ backgroundColor: "#1d1d1d" }}
+                    style={{ backgroundColor: "#1a1a1a" }}
                   >
                     <div className="flex items-center">
                       <FaMoneyBillWave
                         className="h-8 w-8"
-                        style={{ color: "#ef4444" }}
+                        style={{ color: "#ffffff" }}
                       />
                       <div className="ml-4">
                         <p
@@ -1070,9 +986,9 @@ const SuperAdminDashboard = () => {
                     <div className="mb-8">
                       <h2
                         className="text-2xl font-bold mb-6"
-                        style={{ color: "#d4af37" }}
+                        style={{ color: "#ffffff" }}
                       >
-                        Commission Analytics
+                        COMMISSION ANALYTICS
                       </h2>
                       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         <div
@@ -1164,7 +1080,7 @@ const SuperAdminDashboard = () => {
                                     <div className="text-right">
                                       <p
                                         className="font-bold"
-                                        style={{ color: "#d4af37" }}
+                                        style={{ color: "#ffffff" }}
                                       >
                                         PKR{" "}
                                         {item.commission_earned.toLocaleString()}
@@ -1205,17 +1121,17 @@ const SuperAdminDashboard = () => {
                       <button
                         className="px-3 py-1 rounded-md text-sm transition-colors duration-200"
                         style={{
-                          backgroundColor: "#d4af37",
+                          backgroundColor: "#ffffff",
                           color: "#000000",
                         }}
                         onMouseEnter={(e) => {
-                          e.currentTarget.style.backgroundColor = "#b8860b";
+                          e.currentTarget.style.backgroundColor = "#cccccc";
                         }}
                         onMouseLeave={(e) => {
-                          e.currentTarget.style.backgroundColor = "#d4af37";
+                          e.currentTarget.style.backgroundColor = "#ffffff";
                         }}
                       >
-                        View All
+                        VIEW ALL
                       </button>
                     </div>
                   </div>
@@ -1242,7 +1158,7 @@ const SuperAdminDashboard = () => {
                               <div className="flex items-center">
                                 <p
                                   className="text-sm font-medium truncate mr-2 transition-colors duration-200"
-                                  style={{ color: "#d4af37" }}
+                                  style={{ color: "#ffffff" }}
                                 >
                                   Order #{order.id}
                                 </p>
@@ -1273,11 +1189,11 @@ const SuperAdminDashboard = () => {
                                 </p>
                               </div>
                               <div className="ml-2 flex-shrink-0 flex">
-                                <p
+<p
                                   className="text-sm font-medium"
                                   style={{ color: "#ffffff" }}
                                 >
-                                  PKR {order.total_amount}
+                                  {order.total_amount.toLocaleString()}
                                 </p>
                               </div>
                             </div>
@@ -1298,7 +1214,7 @@ const SuperAdminDashboard = () => {
                                   <span className="ml-1 flex items-center">
                                     <FaCalendarAlt
                                       className="mr-1"
-                                      style={{ color: "#d4af37" }}
+                                      style={{ color: "#888888" }}
                                     />
                                     {new Date(
                                       order.created_at

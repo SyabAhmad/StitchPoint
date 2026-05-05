@@ -131,20 +131,20 @@ const Orders = () => {
       style={{ backgroundColor: "#000000", minHeight: "100vh" }}
     >
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-3xl font-bold mb-6" style={{ color: "#d4af37" }}>
-          🌍 All Orders Management
+        <h1 className="text-3xl font-bold mb-6 tracking-widest uppercase" style={{ color: "#ffffff" }}>
+          ALL ORDERS
         </h1>
 
         <div
-          className="shadow overflow-hidden sm:rounded-md"
-          style={{ backgroundColor: "#1d1d1d" }}
+          className="border border-white/10"
+          style={{ backgroundColor: "#111111" }}
         >
           <div
-            className="px-4 py-5 sm:px-6 border-b"
-            style={{ borderColor: "#2d2d2d" }}
+            className="px-6 py-4 border-b"
+            style={{ borderColor: "#333333" }}
           >
             <h3
-              className="text-lg leading-6 font-medium"
+              className="text-lg font-bold tracking-widest uppercase"
               style={{ color: "#ffffff" }}
             >
               System-wide Orders
@@ -181,7 +181,7 @@ const Orders = () => {
                       <div className="flex items-center flex-wrap gap-3">
                         <p
                           className="text-sm font-medium"
-                          style={{ color: "#d4af37" }}
+                          style={{ color: "#ffffff" }}
                         >
                           Order #{order.id}
                         </p>
@@ -211,7 +211,7 @@ const Orders = () => {
                         >
                           PKR {order.total_amount}
                         </p>
-                        <FaEye style={{ color: "#d4af37" }} />
+                        <FaEye style={{ color: "#ffffff" }} />
                       </div>
                     </div>
                     <div className="mt-2 sm:flex sm:justify-between">
@@ -262,7 +262,7 @@ const Orders = () => {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-2xl font-bold" style={{ color: "#d4af37" }}>
+              <h3 className="text-2xl font-bold" style={{ color: "#ffffff" }}>
                 Order #{selectedOrder.id}
               </h3>
               <button
@@ -279,7 +279,7 @@ const Orders = () => {
               style={{ borderBottom: "1px solid #2d2d2d" }}
             >
               <p style={{ color: "#cccccc" }} className="mb-2">
-                <span style={{ color: "#d4af37" }} className="font-semibold">
+                <span style={{ color: "#ffffff" }} className="font-semibold">
                   🏪 Store:
                 </span>{" "}
                 {selectedOrder.store_name}
@@ -292,19 +292,19 @@ const Orders = () => {
               style={{ borderBottom: "1px solid #2d2d2d" }}
             >
               <p style={{ color: "#cccccc" }} className="mb-2">
-                <span style={{ color: "#d4af37" }} className="font-semibold">
+                <span style={{ color: "#ffffff" }} className="font-semibold">
                   Customer:
                 </span>{" "}
                 {selectedOrder.customer_name}
               </p>
               <p style={{ color: "#cccccc" }} className="mb-2">
-                <span style={{ color: "#d4af37" }} className="font-semibold">
+                <span style={{ color: "#ffffff" }} className="font-semibold">
                   Email:
                 </span>{" "}
                 {selectedOrder.customer_email}
               </p>
               <p style={{ color: "#cccccc" }}>
-                <span style={{ color: "#d4af37" }} className="font-semibold">
+                <span style={{ color: "#ffffff" }} className="font-semibold">
                   Order Date:
                 </span>{" "}
                 {new Date(selectedOrder.created_at).toLocaleDateString()}
@@ -316,7 +316,7 @@ const Orders = () => {
               className="mb-6 pb-4"
               style={{ borderBottom: "1px solid #2d2d2d" }}
             >
-              <h4 style={{ color: "#d4af37" }} className="font-bold mb-3">
+              <h4 style={{ color: "#ffffff" }} className="font-bold mb-3">
                 📦 Items ({selectedOrder.items_count}):
               </h4>
               <div>
@@ -345,7 +345,7 @@ const Orders = () => {
               className="mb-6 pb-4"
               style={{ borderBottom: "1px solid #2d2d2d" }}
             >
-              <h4 style={{ color: "#d4af37" }} className="font-bold mb-2">
+              <h4 style={{ color: "#ffffff" }} className="font-bold mb-2">
                 📍 Shipping Address:
               </h4>
               <p style={{ color: "#cccccc" }}>
@@ -358,7 +358,7 @@ const Orders = () => {
               className="mb-6 pb-4"
               style={{ borderBottom: "1px solid #2d2d2d" }}
             >
-              <h4 style={{ color: "#d4af37" }} className="font-bold mb-3">
+              <h4 style={{ color: "#ffffff" }} className="font-bold mb-3">
                 🔄 Update Status:
               </h4>
               <select
@@ -401,7 +401,7 @@ const Orders = () => {
               <p style={{ color: "#ffffff" }} className="text-sm mb-1">
                 Total Amount
               </p>
-              <p className="text-2xl font-bold" style={{ color: "#d4af37" }}>
+              <p className="text-2xl font-bold" style={{ color: "#ffffff" }}>
                 PKR {selectedOrder.total_amount}
               </p>
             </div>
