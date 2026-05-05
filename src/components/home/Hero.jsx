@@ -28,22 +28,29 @@ export default function Hero() {
   }, []);
 
   return (
-    <section className="relative w-full h-[85vh] overflow-hidden">
+    <section className="relative w-full h-screen min-h-[700px] max-h-[900px] overflow-hidden flex items-center">
+      {/* Background Image */}
       <div
         className="absolute inset-0 bg-cover bg-center"
-        style={{ backgroundImage: `url(${heroImage})` }}
+        style={{ 
+          backgroundImage: `url(${heroImage})`,
+        }}
       ></div>
 
-      <div className="absolute inset-0 bg-black/80"></div>
+      {/* Strong Dark Overlay for text readability */}
+      <div className="absolute inset-0 bg-black/85"></div>
 
-      <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/50 to-transparent"></div>
+      {/* Gradient for depth */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/30"></div>
 
+      {/* Content */}
       <div className="relative z-10 flex items-center w-full h-full">
         <div
           ref={heroRef}
           className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 fade-in"
         >
-          <div className="max-w-2xl">
+          <div className="max-w-3xl">
+            {/* Badge */}
             <div className="inline-flex items-center gap-3 px-4 py-2 mb-6 border border-white/30">
               <span className="w-2 h-2 bg-white"></span>
               <span className="text-xs font-bold tracking-[0.3em] text-white uppercase">
@@ -51,63 +58,61 @@ export default function Hero() {
               </span>
             </div>
 
+            {/* Main Heading */}
             <h1
-              className="text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight text-white"
+              className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 leading-tight text-white tracking-wider uppercase"
               style={{ fontFamily: '"Playfair Display", serif' }}
             >
-              WHERE
-              <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-400">
-                TRADITION
+              Where{" "}
+              <span className="italic font-normal">
+                Tradition
               </span>
               <br />
-              MEETS ART
+              Meets{" "}
+              <span className="italic font-normal">
+                Art
+              </span>
             </h1>
 
-            <p className="text-base md:text-lg mb-8 leading-relaxed max-w-lg text-gray-300" style={{ fontFamily: '"Cormorant Garamond", serif' }}>
-              Discover bespoke fashion crafted with precision, passion, and the finest
-              materials. Your vision, our craftsmanship.
+            {/* Description */}
+            <p className="text-base md:text-lg mb-6 leading-relaxed max-w-xl text-gray-200" style={{ fontFamily: '"Cormorant Garamond", serif' }}>
+              Discover bespoke fashion crafted with precision, passion, and the finest materials. Your vision, our craftsmanship.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-4">
+            {/* Buttons */}
+            <div className="flex flex-col sm:flex-row gap-3">
               <Link
                 to="/shop"
-                className="inline-flex items-center justify-center px-8 py-4 bg-white text-black font-bold tracking-widest uppercase hover:bg-gray-200 transition-all duration-300"
+                className="inline-flex items-center justify-center px-6 py-3 bg-white text-black font-bold tracking-widest uppercase hover:bg-gray-200 transition-all duration-300"
               >
                 Shop Now
               </Link>
               <Link
-                to="/about"
-                className="inline-flex items-center justify-center px-8 py-4 border border-white/50 text-white font-bold tracking-widest uppercase hover:bg-white/10 transition-all duration-300"
+                to="/collections"
+                className="inline-flex items-center justify-center px-6 py-3 border border-white text-white font-bold tracking-widest uppercase hover:bg-white hover:text-black transition-all duration-300"
               >
-                Our Story
+                View Collections
               </Link>
             </div>
 
-            <div className="flex flex-wrap gap-10 mt-12 pt-10 border-t border-white/20">
+            {/* Stats */}
+            <div className="flex flex-wrap gap-8 mt-8 pt-8 border-t border-white/20">
               {[
                 { number: "15+", label: "YEARS" },
                 { number: "5000+", label: "CLIENTS" },
                 { number: "100%", label: "HANDCRAFTED" },
               ].map((stat, index) => (
                 <div key={index}>
-                  <div className="text-2xl md:text-3xl font-bold text-white">
+                  <div className="text-xl md:text-2xl font-bold text-white">
                     {stat.number}
                   </div>
-                  <div className="text-xs tracking-widest text-gray-500 mt-1">
+                  <div className="text-xs tracking-widest text-gray-400 mt-1">
                     {stat.label}
                   </div>
                 </div>
               ))}
             </div>
           </div>
-        </div>
-      </div>
-
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-white/30">
-        <span className="text-xs tracking-[0.2em] uppercase">Scroll</span>
-        <div className="w-6 h-10 border border-white/20 rounded-full flex justify-center">
-          <div className="w-1 h-2 bg-white/40 rounded-full mt-2 animate-bounce"></div>
         </div>
       </div>
     </section>
