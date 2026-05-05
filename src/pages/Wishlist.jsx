@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { FaHeart, FaTrash, FaShoppingCart } from "react-icons/fa";
+import { Link } from "react-router-dom";
+import { FaHeart, FaTrash, FaShoppingCart, FaArrowLeft } from "react-icons/fa";
 import { getWishlist, removeFromWishlist } from "../utils/wishlistUtils";
 import { addToCart } from "../utils/cartUtils";
 
@@ -30,7 +31,6 @@ const Wishlist = () => {
       await loadWishlist();
     } catch (error) {
       console.error("Error removing from wishlist:", error);
-      // Could show error toast here
     }
   };
 
@@ -46,92 +46,110 @@ const Wishlist = () => {
 
   if (loading) {
     return (
-      <div className="container mx-auto p-4">
-        <h1 className="text-2xl font-bold mb-4">My Wishlist</h1>
-        <div className="text-center py-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="text-gray-500 mt-4">Loading wishlist...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (wishlistItems.length === 0) {
-    return (
-      <div className="container mx-auto p-4">
-        <h1 className="text-2xl font-bold mb-4">My Wishlist</h1>
-        <div className="text-center py-12">
-          <div className="text-gray-400 text-4xl mb-4">
-            <FaHeart />
-          </div>
-          <h2 className="text-xl font-semibold text-gray-600 mb-2">
-            Your wishlist is empty
-          </h2>
-          <p className="text-gray-500">Save items you love for later!</p>
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black mx-auto"></div>
+          <p className="text-gray-600 mt-4">Loading...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto p-4">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">My Wishlist</h1>
-        <span className="text-gray-600">{wishlistItems.length} items</span>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {wishlistItems.map((item) => (
-          <div
-            key={item.id}
-            className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow"
-          >
-            <div className="relative">
-              <img
-                src={
-                  item.image_url
-                    ? `http://127.0.0.1:5000${item.image_url}`
-                    : "/placeholder-image.jpg"
-                }
-                alt={item.name}
-                className="w-full h-48 object-cover"
-                onError={(e) => {
-                  e.target.src = "/placeholder-image.jpg";
-                }}
-              />
-              <button
-                onClick={() => handleRemoveFromWishlist(item.id)}
-                className="absolute top-2 right-2 bg-white rounded-full p-2 shadow-md hover:bg-red-50 transition-colors"
-              >
-                <FaTrash className="text-red-500" size={16} />
-              </button>
-            </div>
-
-            <div className="p-4">
-              <h3 className="text-base font-semibold text-gray-900 mb-2 line-clamp-2">
-                {item.name}
-              </h3>
-
-              {item.store && (
-                <p className="text-sm text-gray-600 mb-2">
-                  From {item.store.name}
-                </p>
-              )}
-
-              <p className="text-lg font-bold text-gray-900 mb-4">
-                PKR {item.price}
-              </p>
-
-              <button
-                onClick={() => handleAddToCart(item)}
-                className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center space-x-2"
-              >
-                <FaShoppingCart size={16} />
-                <span>Add to Cart</span>
-              </button>
-            </div>
+    <div className="min-h-screen bg-white">
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-8 border-b border-gray-200 pb-4">
+          <div className="flex items-center space-x-4">
+            <Link to="/" className="text-gray-600 hover:text-black transition-colors">
+              <FaArrowLeft size={20} />
+            </Link>
+            <h1 className="text-3xl font-bold tracking-widest uppercase">
+              My Wishlist
+            </h1>
           </div>
-        ))}
+          <span className="text-gray-600 font-medium tracking-widest uppercase">
+            {wishlistItems.length} items
+          </span>
+        </div>
+
+        {wishlistItems.length === 0 ? (
+          <div className="text-center py-20">
+            <div className="text-gray-300 text-6xl mb-6">
+              <FaHeart />
+            </div>
+            <h2 className="text-xl font-bold tracking-widest uppercase text-gray-800 mb-3">
+              Your wishlist is empty
+            </h2>
+            <p className="text-gray-500 mb-8">Save items you love for later!</p>
+            <Link
+              to="/shop"
+              className="inline-block px-8 py-3 border-2 border-black text-black font-bold tracking-widest uppercase hover:bg-black hover:text-white transition-colors"
+            >
+              Continue Shopping
+            </Link>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {wishlistItems.map((item) => (
+              <div
+                key={item.id}
+                className="border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow"
+              >
+                <Link to={`/product/${item.id}`} className="block">
+                  <div className="aspect-square bg-gray-100 overflow-hidden">
+                    <img
+                      src={
+                        item.image_url
+                          ? `http://127.0.0.1:5000${item.image_url}`
+                          : "/placeholder-image.jpg"
+                      }
+                      alt={item.name}
+                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+                      onError={(e) => {
+                        e.target.src = "/placeholder-image.jpg";
+                      }}
+                    />
+                  </div>
+                </Link>
+
+                <div className="p-4">
+                  <Link to={`/product/${item.id}`}>
+                    <h3 className="text-sm font-semibold text-gray-800 mb-2 line-clamp-2 uppercase tracking-wide">
+                      {item.name}
+                    </h3>
+                  </Link>
+
+                  {item.store && (
+                    <p className="text-xs text-gray-500 mb-3 uppercase tracking-wider">
+                      {item.store.name}
+                    </p>
+                  )}
+
+                  <p className="text-lg font-bold text-gray-900 mb-4">
+                    PKR {item.price}
+                  </p>
+
+                  <div className="flex space-x-2">
+                    <button
+                      onClick={() => handleAddToCart(item)}
+                      className="flex-1 py-3 border-2 border-black text-black font-bold tracking-widest uppercase text-xs hover:bg-black hover:text-white transition-colors flex items-center justify-center space-x-2"
+                    >
+                      <FaShoppingCart size={14} />
+                      <span>Add to Cart</span>
+                    </button>
+                    <button
+                      onClick={() => handleRemoveFromWishlist(item.id)}
+                      className="px-3 py-3 border-2 border-gray-300 text-gray-500 hover:bg-red-500 hover:text-white hover:border-red-500 transition-colors"
+                    >
+                      <FaTrash size={14} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

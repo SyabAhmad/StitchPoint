@@ -127,7 +127,7 @@ const ManagerCategories = () => {
         style={{ backgroundColor: "#000000", color: "#ffffff" }}
       >
         <div className="flex flex-col items-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-yellow-500 mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-white mb-4"></div>
           <span>Loading categories...</span>
         </div>
       </div>
@@ -137,7 +137,7 @@ const ManagerCategories = () => {
   return (
     <div className="max-w-7xl mx-auto">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold" style={{ color: "#d4af37" }}>
+        <h2 className="text-2xl font-bold" style={{ color: "#ffffff" }}>
           Categories Management
         </h2>
         <button
@@ -148,15 +148,15 @@ const ManagerCategories = () => {
           }}
           className="flex items-center px-4 py-2 rounded-md transition-all duration-200"
           style={{
-            backgroundColor: "#d4af37",
+            backgroundColor: "#ffffff",
             color: "#000000",
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = "#b8860b";
+            e.currentTarget.style.backgroundColor = "#cccccc";
             e.currentTarget.style.transform = "translateY(-1px)";
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = "#d4af37";
+            e.currentTarget.style.backgroundColor = "#ffffff";
             e.currentTarget.style.transform = "translateY(0)";
           }}
         >
@@ -170,7 +170,7 @@ const ManagerCategories = () => {
           className="mb-6 p-6 rounded-lg"
           style={{ backgroundColor: "#1d1d1d" }}
         >
-          <h3 className="text-lg font-medium mb-4" style={{ color: "#d4af37" }}>
+          <h3 className="text-lg font-medium mb-4" style={{ color: "#ffffff" }}>
             {editingCategory ? "Edit Category" : "Add New Category"}
           </h3>
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -193,7 +193,7 @@ const ManagerCategories = () => {
                   border: "1px solid #3d3d3d",
                 }}
                 onFocus={(e) => {
-                  e.currentTarget.style.borderColor = "#d4af37";
+                  e.currentTarget.style.borderColor = "#ffffff";
                 }}
                 onBlur={(e) => {
                   e.currentTarget.style.borderColor = "#3d3d3d";
@@ -220,7 +220,7 @@ const ManagerCategories = () => {
                   border: "1px solid #3d3d3d",
                 }}
                 onFocus={(e) => {
-                  e.currentTarget.style.borderColor = "#d4af37";
+                  e.currentTarget.style.borderColor = "#ffffff";
                 }}
                 onBlur={(e) => {
                   e.currentTarget.style.borderColor = "#3d3d3d";
@@ -245,7 +245,7 @@ const ManagerCategories = () => {
                   border: "1px solid #3d3d3d",
                 }}
                 onFocus={(e) => {
-                  e.currentTarget.style.borderColor = "#d4af37";
+                  e.currentTarget.style.borderColor = "#ffffff";
                 }}
                 onBlur={(e) => {
                   e.currentTarget.style.borderColor = "#3d3d3d";
@@ -279,15 +279,15 @@ const ManagerCategories = () => {
                 type="submit"
                 className="px-4 py-2 rounded transition-all duration-200"
                 style={{
-                  backgroundColor: "#d4af37",
+                  backgroundColor: "#ffffff",
                   color: "#000000",
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = "#b8860b";
+                  e.currentTarget.style.backgroundColor = "#cccccc";
                   e.currentTarget.style.transform = "translateY(-1px)";
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = "#d4af37";
+                  e.currentTarget.style.backgroundColor = "#ffffff";
                   e.currentTarget.style.transform = "translateY(0)";
                 }}
               >
@@ -341,7 +341,7 @@ const ManagerCategories = () => {
                     border: "1px solid #3d3d3d",
                   }}
                   onFocus={(e) => {
-                    e.currentTarget.style.borderColor = "#d4af37";
+                    e.currentTarget.style.borderColor = "#ffffff";
                   }}
                   onBlur={(e) => {
                     e.currentTarget.style.borderColor = "#3d3d3d";
@@ -357,19 +357,19 @@ const ManagerCategories = () => {
               <tr>
                 <th
                   className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
-                  style={{ color: "#d4af37" }}
+                  style={{ color: "#ffffff" }}
                 >
                   Name
                 </th>
                 <th
                   className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
-                  style={{ color: "#d4af37" }}
+                  style={{ color: "#ffffff" }}
                 >
                   Description
                 </th>
                 <th
                   className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
-                  style={{ color: "#d4af37" }}
+                  style={{ color: "#ffffff" }}
                 >
                   Actions
                 </th>
@@ -408,12 +408,12 @@ const ManagerCategories = () => {
                     <button
                       onClick={() => handleEdit(category)}
                       className="mr-4 transition-colors duration-200"
-                      style={{ color: "#d4af37" }}
+                      style={{ color: "#ffffff" }}
                       onMouseEnter={(e) => {
-                        e.currentTarget.style.color = "#b8860b";
+                        e.currentTarget.style.color = "#cccccc";
                       }}
                       onMouseLeave={(e) => {
-                        e.currentTarget.style.color = "#d4af37";
+                        e.currentTarget.style.color = "#ffffff";
                       }}
                     >
                       <FaEdit className="inline mr-1" />

@@ -93,7 +93,7 @@ const Reviews = () => {
           <FaStar
             key={star}
             className={`w-4 h-4 ${
-              star <= rating ? "text-yellow-400" : "text-gray-300"
+              star <= rating ? "text-white" : "text-gray-300"
             }`}
           />
         ))}
@@ -136,7 +136,7 @@ const Reviews = () => {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-yellow-500 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
           <p className="text-gray-600">Loading reviews...</p>
         </div>
       </div>
@@ -158,11 +158,11 @@ const Reviews = () => {
               </p>
             </div>
             <div className="flex items-center space-x-4">
-              <div className="bg-yellow-50 px-4 py-2 rounded-lg">
-                <span className="text-yellow-700 font-semibold">
+              <div className="bg-black px-4 py-2 rounded-lg border border-white">
+                <span className="text-white font-semibold">
                   {reviews.length}
                 </span>
-                <span className="text-yellow-600 ml-1">Total Reviews</span>
+                <span className="text-white ml-1">TOTAL REVIEWS</span>
               </div>
             </div>
           </div>
@@ -176,14 +176,14 @@ const Reviews = () => {
                 placeholder="Search reviews..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-white focus:border-transparent"
               />
             </div>
 
             <select
               value={selectedProduct}
               onChange={(e) => setSelectedProduct(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-white focus:border-transparent"
             >
               <option value="">All Products</option>
               {products.map((product) => (
@@ -196,7 +196,7 @@ const Reviews = () => {
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-white focus:border-transparent"
             >
               <option value="newest">Newest First</option>
               <option value="oldest">Oldest First</option>
@@ -242,7 +242,7 @@ const Reviews = () => {
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <div className="flex items-center space-x-3 mb-2">
-                        <div className="w-10 h-10 bg-yellow-500 rounded-full flex items-center justify-center">
+                        <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center">
                           <span className="text-white font-semibold text-sm">
                             {(review.user_name || "A")[0].toUpperCase()}
                           </span>
@@ -284,7 +284,7 @@ const Reviews = () => {
                         onClick={() => {
                           navigate(`/product/${review.product_id}`);
                         }}
-                        className="p-2 text-gray-400 hover:text-yellow-600 transition-colors duration-200"
+                        className="p-2 text-gray-400 hover:text-white transition-colors duration-200"
                         title="View Product"
                       >
                         <FaEye />

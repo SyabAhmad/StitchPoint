@@ -343,7 +343,7 @@ const ManagerProducts = () => {
         style={{ backgroundColor: "#000000", color: "#ffffff" }}
       >
         <div className="flex flex-col items-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-yellow-500 mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-white mb-4"></div>
           <span>Loading products...</span>
         </div>
       </div>
@@ -354,7 +354,7 @@ const ManagerProducts = () => {
     <div className="flex gap-6">
       <div className="flex-1 max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold" style={{ color: "#d4af37" }}>
+          <h2 className="text-2xl font-bold tracking-widest uppercase" style={{ color: "#ffffff" }}>
             Products Management
           </h2>
           <button
@@ -386,15 +386,15 @@ const ManagerProducts = () => {
             }}
             className="flex items-center px-4 py-2 rounded-md transition-all duration-200"
             style={{
-              backgroundColor: "#d4af37",
+              backgroundColor: "#ffffff",
               color: "#000000",
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = "#b8860b";
+              e.currentTarget.style.backgroundColor = "#cccccc";
               e.currentTarget.style.transform = "translateY(-1px)";
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = "#d4af37";
+              e.currentTarget.style.backgroundColor = "#ffffff";
               e.currentTarget.style.transform = "translateY(0)";
             }}
           >
@@ -409,7 +409,7 @@ const ManagerProducts = () => {
             style={{ backgroundColor: "#1d1d1d" }}
           >
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-medium" style={{ color: "#d4af37" }}>
+              <h3 className="text-lg font-medium" style={{ color: "#ffffff" }}>
                 {editingProduct ? "Edit Product" : "Add New Product"}
               </h3>
               <button
@@ -443,7 +443,7 @@ const ManagerProducts = () => {
                       border: "1px solid #3d3d3d",
                     }}
                     onFocus={(e) => {
-                      e.currentTarget.style.borderColor = "#d4af37";
+                      e.currentTarget.style.borderColor = "#ffffff";
                     }}
                     onBlur={(e) => {
                       e.currentTarget.style.borderColor = "#3d3d3d";
@@ -471,7 +471,7 @@ const ManagerProducts = () => {
                       border: "1px solid #3d3d3d",
                     }}
                     onFocus={(e) => {
-                      e.currentTarget.style.borderColor = "#d4af37";
+                      e.currentTarget.style.borderColor = "#ffffff";
                     }}
                     onBlur={(e) => {
                       e.currentTarget.style.borderColor = "#3d3d3d";
@@ -499,7 +499,7 @@ const ManagerProducts = () => {
                     border: "1px solid #3d3d3d",
                   }}
                   onFocus={(e) => {
-                    e.currentTarget.style.borderColor = "#d4af37";
+                    e.currentTarget.style.borderColor = "#ffffff";
                   }}
                   onBlur={(e) => {
                     e.currentTarget.style.borderColor = "#3d3d3d";
@@ -535,7 +535,7 @@ const ManagerProducts = () => {
                       border: "1px solid #3d3d3d",
                     }}
                     onFocus={(e) => {
-                      e.currentTarget.style.borderColor = "#d4af37";
+                      e.currentTarget.style.borderColor = "#ffffff";
                     }}
                     onBlur={(e) => {
                       e.currentTarget.style.borderColor = "#3d3d3d";
@@ -561,7 +561,7 @@ const ManagerProducts = () => {
                       border: "1px solid #3d3d3d",
                     }}
                     onFocus={(e) => {
-                      e.currentTarget.style.borderColor = "#d4af37";
+                      e.currentTarget.style.borderColor = "#ffffff";
                     }}
                     onBlur={(e) => {
                       e.currentTarget.style.borderColor = "#3d3d3d";
@@ -629,7 +629,7 @@ const ManagerProducts = () => {
                     border: "1px solid #3d3d3d",
                   }}
                   onFocus={(e) => {
-                    e.currentTarget.style.borderColor = "#d4af37";
+                    e.currentTarget.style.borderColor = "#ffffff";
                   }}
                   onBlur={(e) => {
                     e.currentTarget.style.borderColor = "#3d3d3d";
@@ -663,7 +663,7 @@ const ManagerProducts = () => {
                       border: "1px solid #3d3d3d",
                     }}
                     onFocus={(e) => {
-                      e.currentTarget.style.borderColor = "#d4af37";
+                      e.currentTarget.style.borderColor = "#ffffff";
                     }}
                     onBlur={(e) => {
                       e.currentTarget.style.borderColor = "#3d3d3d";
@@ -689,7 +689,7 @@ const ManagerProducts = () => {
                       border: "1px solid #3d3d3d",
                     }}
                     onFocus={(e) => {
-                      e.currentTarget.style.borderColor = "#d4af37";
+                      e.currentTarget.style.borderColor = "#ffffff";
                     }}
                     onBlur={(e) => {
                       e.currentTarget.style.borderColor = "#3d3d3d";
@@ -717,7 +717,7 @@ const ManagerProducts = () => {
                     border: "1px solid #3d3d3d",
                   }}
                   onFocus={(e) => {
-                    e.currentTarget.style.borderColor = "#d4af37";
+                    e.currentTarget.style.borderColor = "#ffffff";
                   }}
                   onBlur={(e) => {
                     e.currentTarget.style.borderColor = "#3d3d3d";
@@ -745,7 +745,7 @@ const ManagerProducts = () => {
                       border: "1px solid #3d3d3d",
                     }}
                     onFocus={(e) => {
-                      e.currentTarget.style.borderColor = "#d4af37";
+                      e.currentTarget.style.borderColor = "#ffffff";
                     }}
                     onBlur={(e) => {
                       e.currentTarget.style.borderColor = "#3d3d3d";
@@ -771,7 +771,7 @@ const ManagerProducts = () => {
                       border: "1px solid #3d3d3d",
                     }}
                     onFocus={(e) => {
-                      e.currentTarget.style.borderColor = "#d4af37";
+                      e.currentTarget.style.borderColor = "#ffffff";
                     }}
                     onBlur={(e) => {
                       e.currentTarget.style.borderColor = "#3d3d3d";
@@ -801,7 +801,7 @@ const ManagerProducts = () => {
                       border: "1px solid #3d3d3d",
                     }}
                     onFocus={(e) => {
-                      e.currentTarget.style.borderColor = "#d4af37";
+                      e.currentTarget.style.borderColor = "#ffffff";
                     }}
                     onBlur={(e) => {
                       e.currentTarget.style.borderColor = "#3d3d3d";
@@ -828,7 +828,7 @@ const ManagerProducts = () => {
                       border: "1px solid #3d3d3d",
                     }}
                     onFocus={(e) => {
-                      e.currentTarget.style.borderColor = "#d4af37";
+                      e.currentTarget.style.borderColor = "#ffffff";
                     }}
                     onBlur={(e) => {
                       e.currentTarget.style.borderColor = "#3d3d3d";
@@ -855,7 +855,7 @@ const ManagerProducts = () => {
                       border: "1px solid #3d3d3d",
                     }}
                     onFocus={(e) => {
-                      e.currentTarget.style.borderColor = "#d4af37";
+                      e.currentTarget.style.borderColor = "#ffffff";
                     }}
                     onBlur={(e) => {
                       e.currentTarget.style.borderColor = "#3d3d3d";
@@ -873,7 +873,7 @@ const ManagerProducts = () => {
                   className="w-4 h-4 rounded transition-colors duration-200"
                   style={{
                     backgroundColor: formData.is_featured
-                      ? "#d4af37"
+                      ? "#ffffff"
                       : "#2d2d2d",
                     border: "1px solid #3d3d3d",
                   }}
@@ -896,7 +896,7 @@ const ManagerProducts = () => {
               >
                 <h4
                   className="text-md font-medium mb-4"
-                  style={{ color: "#d4af37" }}
+                  style={{ color: "#ffffff" }}
                 >
                   Special Sale Information (Optional)
                 </h4>
@@ -919,7 +919,7 @@ const ManagerProducts = () => {
                         border: "1px solid #3d3d3d",
                       }}
                       onFocus={(e) => {
-                        e.currentTarget.style.borderColor = "#d4af37";
+                        e.currentTarget.style.borderColor = "#ffffff";
                       }}
                       onBlur={(e) => {
                         e.currentTarget.style.borderColor = "#3d3d3d";
@@ -960,7 +960,7 @@ const ManagerProducts = () => {
                         border: "1px solid #3d3d3d",
                       }}
                       onFocus={(e) => {
-                        e.currentTarget.style.borderColor = "#d4af37";
+                        e.currentTarget.style.borderColor = "#ffffff";
                       }}
                       onBlur={(e) => {
                         e.currentTarget.style.borderColor = "#3d3d3d";
@@ -988,7 +988,7 @@ const ManagerProducts = () => {
                         border: "1px solid #3d3d3d",
                       }}
                       onFocus={(e) => {
-                        e.currentTarget.style.borderColor = "#d4af37";
+                        e.currentTarget.style.borderColor = "#ffffff";
                       }}
                       onBlur={(e) => {
                         e.currentTarget.style.borderColor = "#3d3d3d";
@@ -1014,7 +1014,7 @@ const ManagerProducts = () => {
                         border: "1px solid #3d3d3d",
                       }}
                       onFocus={(e) => {
-                        e.currentTarget.style.borderColor = "#d4af37";
+                        e.currentTarget.style.borderColor = "#ffffff";
                       }}
                       onBlur={(e) => {
                         e.currentTarget.style.borderColor = "#3d3d3d";
@@ -1043,15 +1043,15 @@ const ManagerProducts = () => {
                   type="submit"
                   className="px-4 py-2 rounded transition-all duration-200"
                   style={{
-                    backgroundColor: "#d4af37",
+                    backgroundColor: "#ffffff",
                     color: "#000000",
                   }}
                   onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = "#b8860b";
+                    e.currentTarget.style.backgroundColor = "#cccccc";
                     e.currentTarget.style.transform = "translateY(-1px)";
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = "#d4af37";
+                    e.currentTarget.style.backgroundColor = "#ffffff";
                     e.currentTarget.style.transform = "translateY(0)";
                   }}
                 >
@@ -1067,7 +1067,7 @@ const ManagerProducts = () => {
           className="mb-6 p-6 rounded-lg"
           style={{ backgroundColor: "#1d1d1d" }}
         >
-          <h3 className="text-lg font-medium mb-4" style={{ color: "#d4af37" }}>
+          <h3 className="text-lg font-medium mb-4" style={{ color: "#ffffff" }}>
             Filters
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
@@ -1090,7 +1090,7 @@ const ManagerProducts = () => {
                   border: "1px solid #3d3d3d",
                 }}
                 onFocus={(e) => {
-                  e.currentTarget.style.borderColor = "#d4af37";
+                  e.currentTarget.style.borderColor = "#ffffff";
                 }}
                 onBlur={(e) => {
                   e.currentTarget.style.borderColor = "#3d3d3d";
@@ -1114,7 +1114,7 @@ const ManagerProducts = () => {
                   border: "1px solid #3d3d3d",
                 }}
                 onFocus={(e) => {
-                  e.currentTarget.style.borderColor = "#d4af37";
+                  e.currentTarget.style.borderColor = "#ffffff";
                 }}
                 onBlur={(e) => {
                   e.currentTarget.style.borderColor = "#3d3d3d";
@@ -1145,7 +1145,7 @@ const ManagerProducts = () => {
                   border: "1px solid #3d3d3d",
                 }}
                 onFocus={(e) => {
-                  e.currentTarget.style.borderColor = "#d4af37";
+                  e.currentTarget.style.borderColor = "#ffffff";
                 }}
                 onBlur={(e) => {
                   e.currentTarget.style.borderColor = "#3d3d3d";
@@ -1177,7 +1177,7 @@ const ManagerProducts = () => {
                   border: "1px solid #3d3d3d",
                 }}
                 onFocus={(e) => {
-                  e.currentTarget.style.borderColor = "#d4af37";
+                  e.currentTarget.style.borderColor = "#ffffff";
                 }}
                 onBlur={(e) => {
                   e.currentTarget.style.borderColor = "#3d3d3d";
@@ -1204,7 +1204,7 @@ const ManagerProducts = () => {
                   border: "1px solid #3d3d3d",
                 }}
                 onFocus={(e) => {
-                  e.currentTarget.style.borderColor = "#d4af37";
+                  e.currentTarget.style.borderColor = "#ffffff";
                 }}
                 onBlur={(e) => {
                   e.currentTarget.style.borderColor = "#3d3d3d";
@@ -1263,31 +1263,31 @@ const ManagerProducts = () => {
                 <tr>
                   <th
                     className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
-                    style={{ color: "#d4af37" }}
+                    style={{ color: "#ffffff" }}
                   >
                     Name
                   </th>
                   <th
                     className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
-                    style={{ color: "#d4af37" }}
+                    style={{ color: "#ffffff" }}
                   >
                     Price
                   </th>
                   <th
                     className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
-                    style={{ color: "#d4af37" }}
+                    style={{ color: "#ffffff" }}
                   >
                     Category
                   </th>
                   <th
                     className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
-                    style={{ color: "#d4af37" }}
+                    style={{ color: "#ffffff" }}
                   >
                     Stock
                   </th>
                   <th
                     className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
-                    style={{ color: "#d4af37" }}
+                    style={{ color: "#ffffff" }}
                   >
                     Actions
                   </th>
@@ -1340,12 +1340,12 @@ const ManagerProducts = () => {
                       <button
                         onClick={() => handleEdit(product)}
                         className="mr-4 transition-colors duration-200"
-                        style={{ color: "#d4af37" }}
+                        style={{ color: "#ffffff" }}
                         onMouseEnter={(e) => {
-                          e.currentTarget.style.color = "#b8860b";
+                          e.currentTarget.style.color = "#cccccc";
                         }}
                         onMouseLeave={(e) => {
-                          e.currentTarget.style.color = "#d4af37";
+                          e.currentTarget.style.color = "#ffffff";
                         }}
                       >
                         <FaEdit className="inline mr-1" />
@@ -1386,18 +1386,18 @@ const ManagerProducts = () => {
               disabled={currentPage === 1}
               className="px-4 py-2 rounded transition-colors duration-200"
               style={{
-                backgroundColor: currentPage === 1 ? "#555555" : "#d4af37",
+                backgroundColor: currentPage === 1 ? "#555555" : "#ffffff",
                 color: currentPage === 1 ? "#999999" : "#000000",
                 cursor: currentPage === 1 ? "not-allowed" : "pointer",
               }}
               onMouseEnter={(e) => {
                 if (currentPage !== 1) {
-                  e.currentTarget.style.backgroundColor = "#b8860b";
+                  e.currentTarget.style.backgroundColor = "#cccccc";
                 }
               }}
               onMouseLeave={(e) => {
                 if (currentPage !== 1) {
-                  e.currentTarget.style.backgroundColor = "#d4af37";
+                  e.currentTarget.style.backgroundColor = "#ffffff";
                 }
               }}
             >
@@ -1410,7 +1410,7 @@ const ManagerProducts = () => {
                 className="px-4 py-2 rounded transition-colors duration-200"
                 style={{
                   backgroundColor:
-                    currentPage === i + 1 ? "#d4af37" : "#2d2d2d",
+                    currentPage === i + 1 ? "#ffffff" : "#2d2d2d",
                   color: currentPage === i + 1 ? "#000000" : "#ffffff",
                   border: "1px solid #3d3d3d",
                 }}
@@ -1434,18 +1434,18 @@ const ManagerProducts = () => {
               className="px-4 py-2 rounded transition-colors duration-200"
               style={{
                 backgroundColor:
-                  currentPage === totalPages ? "#555555" : "#d4af37",
+                  currentPage === totalPages ? "#555555" : "#ffffff",
                 color: currentPage === totalPages ? "#999999" : "#000000",
                 cursor: currentPage === totalPages ? "not-allowed" : "pointer",
               }}
               onMouseEnter={(e) => {
                 if (currentPage !== totalPages) {
-                  e.currentTarget.style.backgroundColor = "#b8860b";
+                  e.currentTarget.style.backgroundColor = "#cccccc";
                 }
               }}
               onMouseLeave={(e) => {
                 if (currentPage !== totalPages) {
-                  e.currentTarget.style.backgroundColor = "#d4af37";
+                  e.currentTarget.style.backgroundColor = "#ffffff";
                 }
               }}
             >

@@ -102,9 +102,9 @@ const StoreDetails = () => {
 
     for (let i = 0; i < 5; i++) {
       if (i < fullStars) {
-        stars.push(<FaStar key={i} className="text-yellow-400" />);
+        stars.push(<FaStar key={i} className="text-white" />);
       } else if (i === fullStars && hasHalfStar) {
-        stars.push(<FaStar key={i} className="text-yellow-400 opacity-50" />);
+        stars.push(<FaStar key={i} className="text-white opacity-50" />);
       } else {
         stars.push(<FaStar key={i} className="text-gray-300" />);
       }
@@ -120,9 +120,9 @@ const StoreDetails = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-white">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-yellow-500 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black mx-auto mb-4"></div>
           <p className="text-gray-600">Loading store details...</p>
         </div>
       </div>
@@ -131,7 +131,7 @@ const StoreDetails = () => {
 
   if (error || !store) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-white">
         <div className="text-center">
           <p className="text-red-600 mb-4">
             Error: {error || "Store not found"}
@@ -140,14 +140,14 @@ const StoreDetails = () => {
             onClick={() => navigate("/collections")}
             className="px-6 py-2 rounded-lg transition-all duration-200"
             style={{
-              backgroundColor: "#d4af37",
+              backgroundColor: "#ffffff",
               color: "#000000",
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = "#b8860b";
+              e.currentTarget.style.backgroundColor = "#cccccc";
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = "#d4af37";
+              e.currentTarget.style.backgroundColor = "#ffffff";
             }}
           >
             Back to Collections
@@ -158,7 +158,7 @@ const StoreDetails = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+    <div className="min-h-screen bg-white">
       {/* Header */}
       <div className="bg-white shadow-lg border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 py-4">
@@ -179,11 +179,11 @@ const StoreDetails = () => {
         <div className="relative bg-gradient-to-r from-gray-900 via-gray-800 to-black rounded-3xl p-8 shadow-2xl mb-8 overflow-hidden">
           {/* Background Pattern */}
           <div className="absolute inset-0 opacity-5">
-            <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/10 to-transparent"></div>
+            <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent"></div>
           </div>
 
           <div className="relative z-10 flex flex-col lg:flex-row items-center lg:items-start space-y-6 lg:space-y-0 lg:space-x-8">
-            <div className="w-40 h-40 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full flex items-center justify-center flex-shrink-0 shadow-2xl border-4 border-white">
+            <div className="w-40 h-40 bg-gradient-to-br from-gray-300 to-gray-600 rounded-full flex items-center justify-center flex-shrink-0 shadow-2xl border-4 border-white">
               {store.logo_url ? (
                 <img
                   src={`${API_BASE_URL}${store.logo_url}`}
@@ -195,7 +195,7 @@ const StoreDetails = () => {
               )}
             </div>
             <div className="text-center lg:text-left text-white">
-              <h1 className="text-5xl font-bold mb-4 text-white">
+              <h1 className="text-5xl font-bold tracking-widest uppercase mb-4 text-white">
                 {store.name}
               </h1>
               <div className="flex items-center justify-center lg:justify-start space-x-4 mb-6">
@@ -205,7 +205,7 @@ const StoreDetails = () => {
                       key={i}
                       className={
                         i < Math.floor(store.average_rating || 0)
-                          ? "text-yellow-400"
+                          ? "text-white"
                           : "text-white/50"
                       }
                       size={20}
@@ -221,11 +221,11 @@ const StoreDetails = () => {
               </div>
               <div className="space-y-3 text-gray-300">
                 <div className="flex items-center justify-center lg:justify-start">
-                  <FaMapMarkerAlt className="mr-3 text-yellow-400" />
+                  <FaMapMarkerAlt className="mr-3 text-white" />
                   <span className="text-lg">{store.address}</span>
                 </div>
                 <div className="flex items-center justify-center lg:justify-start">
-                  <FaPhone className="mr-3 text-yellow-400" />
+                  <FaPhone className="mr-3 text-white" />
                   <span className="text-lg">{store.contact_number}</span>
                 </div>
               </div>
@@ -240,8 +240,8 @@ const StoreDetails = () => {
 
         {/* Products Section */}
         <div>
-          <h2 className="text-3xl font-bold text-gray-900 mb-6">
-            Products from {store.name}
+          <h2 className="text-3xl font-bold tracking-widest uppercase text-gray-900 mb-6">
+            PRODUCTS
           </h2>
           {store.products.length === 0 ? (
             <div className="bg-white rounded-xl p-8 text-center shadow-sm">
@@ -250,11 +250,11 @@ const StoreDetails = () => {
               </p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {store.products.map((product) => (
                 <div
                   key={product.id}
-                  className="bg-white rounded-xl shadow-sm border overflow-hidden hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 cursor-pointer"
+                  className="border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer"
                   onClick={() => handleProductClick(product)}
                 >
                   <div className="aspect-square bg-gray-100 relative">
@@ -275,17 +275,17 @@ const StoreDetails = () => {
                         e.stopPropagation();
                         handleAddToWishlist(product);
                       }}
-                      className={`absolute top-3 right-3 p-2 rounded-full transition-all duration-300 ${
+                      className={`absolute top-3 right-3 p-2 rounded-full transition-all duration-300 border ${
                         wishlistStatus[product.id]
-                          ? "bg-red-500 text-white"
-                          : "bg-white text-gray-600 hover:bg-gray-50"
+                          ? "bg-black text-white border-black"
+                          : "bg-white text-gray-600 border-gray-200 hover:border-black"
                       }`}
                     >
                       <FaHeart size={16} />
                     </button>
                   </div>
                   <div className="p-4">
-                    <h3 className="font-semibold text-gray-900 mb-2 text-sm">
+                    <h3 className="font-semibold text-gray-900 mb-2 text-sm uppercase tracking-wide">
                       {product.name}
                     </h3>
                     {renderStars(
@@ -298,7 +298,7 @@ const StoreDetails = () => {
                     <div className="flex items-center justify-between mb-3">
                       <span
                         className="font-bold text-base"
-                        style={{ color: "#d4af37" }}
+                        style={{ color: "#ffffff" }}
                       >
                         PKR {product.price}
                       </span>
@@ -315,17 +315,17 @@ const StoreDetails = () => {
                       className="w-full px-4 py-2 rounded-lg font-semibold transition-all duration-300 flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
                       style={{
                         backgroundColor:
-                          product.stock_quantity > 0 ? "#d4af37" : "#9ca3af",
+                          product.stock_quantity > 0 ? "#ffffff" : "#9ca3af",
                         color: "#000000",
                       }}
                       onMouseEnter={(e) => {
                         if (product.stock_quantity > 0) {
-                          e.currentTarget.style.backgroundColor = "#b8860b";
+                          e.currentTarget.style.backgroundColor = "#cccccc";
                         }
                       }}
                       onMouseLeave={(e) => {
                         if (product.stock_quantity > 0) {
-                          e.currentTarget.style.backgroundColor = "#d4af37";
+                          e.currentTarget.style.backgroundColor = "#ffffff";
                         }
                       }}
                     >

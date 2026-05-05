@@ -86,7 +86,7 @@ const ManagerDashboard = () => {
         style={{ backgroundColor: "#000000", color: "#ffffff" }}
       >
         <div className="flex flex-col items-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-yellow-500 mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-white mb-4"></div>
           <span>Loading...</span>
         </div>
       </div>
@@ -113,7 +113,7 @@ const ManagerDashboard = () => {
               className="p-2 rounded-lg transition-colors"
               style={{ backgroundColor: "#2d2d2d", color: "#ffffff" }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = "#d4af37";
+                e.currentTarget.style.backgroundColor = "#ffffff";
                 e.currentTarget.style.color = "#000000";
               }}
               onMouseLeave={(e) => {
@@ -132,10 +132,10 @@ const ManagerDashboard = () => {
               className="px-4 py-2 rounded-lg transition-all"
               style={{ backgroundColor: "white", color: "#000000" }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = "#b8860b";
+                e.currentTarget.style.backgroundColor = "#cccccc";
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = "#d4af37";
+                e.currentTarget.style.backgroundColor = "#ffffff";
               }}
             >
               Home
@@ -145,10 +145,10 @@ const ManagerDashboard = () => {
               className="px-4 py-2 rounded-lg transition-all"
               style={{ backgroundColor: "white", color: "#000000" }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = "#b8860b";
+                e.currentTarget.style.backgroundColor = "#cccccc";
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = "#d4af37";
+                e.currentTarget.style.backgroundColor = "#ffffff";
               }}
             >
               Shop
@@ -156,12 +156,12 @@ const ManagerDashboard = () => {
             <Link
               to="/manager-dashboard/profile"
               className="px-4 py-2 rounded-lg transition-all"
-              style={{ backgroundColor: "#d4af37", color: "#000000" }}
+              style={{ backgroundColor: "#ffffff", color: "#000000" }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = "#b8860b";
+                e.currentTarget.style.backgroundColor = "#cccccc";
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = "#d4af37";
+                e.currentTarget.style.backgroundColor = "#ffffff";
               }}
             >
               Profile
@@ -221,7 +221,7 @@ const ManagerDashboard = () => {
             <div className="flex items-center space-x-3">
               <div
                 className="w-12 h-12 rounded-full flex items-center justify-center"
-                style={{ backgroundColor: "#d4af37" }}
+                style={{ backgroundColor: "#ffffff" }}
               >
                 <span className="text-black font-bold text-lg">
                   {userData?.name?.charAt(0)?.toUpperCase() || "M"}
@@ -242,7 +242,7 @@ const ManagerDashboard = () => {
             <div className="px-6">
               <h3
                 className="text-xs font-semibold uppercase tracking-wider mb-3"
-                style={{ color: "#d4af37" }}
+                style={{ color: "#ffffff" }}
               >
                 Management
               </h3>
@@ -258,7 +258,7 @@ const ManagerDashboard = () => {
                     style={{
                       color:
                         location.pathname === "/manager-dashboard"
-                          ? "#d4af37"
+                          ? "#ffffff"
                           : "#ffffff",
                       backgroundColor:
                         location.pathname === "/manager-dashboard"
@@ -268,7 +268,7 @@ const ManagerDashboard = () => {
                     onMouseEnter={(e) => {
                       if (location.pathname !== "/manager-dashboard") {
                         e.currentTarget.style.backgroundColor = "#2d2d2d";
-                        e.currentTarget.style.color = "#d4af37";
+                        e.currentTarget.style.color = "#ffffff";
                       }
                     }}
                     onMouseLeave={(e) => {
@@ -293,7 +293,7 @@ const ManagerDashboard = () => {
                     style={{
                       color:
                         location.pathname === "/manager-dashboard/products"
-                          ? "#d4af37"
+                          ? "#ffffff"
                           : "#ffffff",
                       backgroundColor:
                         location.pathname === "/manager-dashboard/products"
@@ -303,7 +303,7 @@ const ManagerDashboard = () => {
                     onMouseEnter={(e) => {
                       if (location.pathname !== "/manager-dashboard/products") {
                         e.currentTarget.style.backgroundColor = "#2d2d2d";
-                        e.currentTarget.style.color = "#d4af37";
+                        e.currentTarget.style.color = "#ffffff";
                       }
                     }}
                     onMouseLeave={(e) => {
@@ -328,7 +328,7 @@ const ManagerDashboard = () => {
                     style={{
                       color:
                         location.pathname === "/manager-dashboard/orders"
-                          ? "#d4af37"
+                          ? "#ffffff"
                           : "#ffffff",
                       backgroundColor:
                         location.pathname === "/manager-dashboard/orders"
@@ -338,7 +338,7 @@ const ManagerDashboard = () => {
                     onMouseEnter={(e) => {
                       if (location.pathname !== "/manager-dashboard/orders") {
                         e.currentTarget.style.backgroundColor = "#2d2d2d";
-                        e.currentTarget.style.color = "#d4af37";
+                        e.currentTarget.style.color = "#ffffff";
                       }
                     }}
                     onMouseLeave={(e) => {
@@ -363,7 +363,7 @@ const ManagerDashboard = () => {
                     style={{
                       color:
                         location.pathname === "/manager-dashboard/categories"
-                          ? "#d4af37"
+                          ? "#ffffff"
                           : "#ffffff",
                       backgroundColor:
                         location.pathname === "/manager-dashboard/categories"
@@ -375,7 +375,7 @@ const ManagerDashboard = () => {
                         location.pathname !== "/manager-dashboard/categories"
                       ) {
                         e.currentTarget.style.backgroundColor = "#2d2d2d";
-                        e.currentTarget.style.color = "#d4af37";
+                        e.currentTarget.style.color = "#ffffff";
                       }
                     }}
                     onMouseLeave={(e) => {
@@ -402,7 +402,7 @@ const ManagerDashboard = () => {
                     style={{
                       color:
                         location.pathname === "/manager-dashboard/analytics"
-                          ? "#d4af37"
+                          ? "#ffffff"
                           : "#ffffff",
                       backgroundColor:
                         location.pathname === "/manager-dashboard/analytics"
@@ -414,7 +414,7 @@ const ManagerDashboard = () => {
                         location.pathname !== "/manager-dashboard/analytics"
                       ) {
                         e.currentTarget.style.backgroundColor = "#2d2d2d";
-                        e.currentTarget.style.color = "#d4af37";
+                        e.currentTarget.style.color = "#ffffff";
                       }
                     }}
                     onMouseLeave={(e) => {
@@ -441,7 +441,7 @@ const ManagerDashboard = () => {
                     style={{
                       color:
                         location.pathname === "/manager-dashboard/comments"
-                          ? "#d4af37"
+                          ? "#ffffff"
                           : "#ffffff",
                       backgroundColor:
                         location.pathname === "/manager-dashboard/comments"
@@ -451,7 +451,7 @@ const ManagerDashboard = () => {
                     onMouseEnter={(e) => {
                       if (location.pathname !== "/manager-dashboard/comments") {
                         e.currentTarget.style.backgroundColor = "#2d2d2d";
-                        e.currentTarget.style.color = "#d4af37";
+                        e.currentTarget.style.color = "#ffffff";
                       }
                     }}
                     onMouseLeave={(e) => {
@@ -476,7 +476,7 @@ const ManagerDashboard = () => {
                     style={{
                       color:
                         location.pathname === "/manager-dashboard/reviews"
-                          ? "#d4af37"
+                          ? "#ffffff"
                           : "#ffffff",
                       backgroundColor:
                         location.pathname === "/manager-dashboard/reviews"
@@ -486,7 +486,7 @@ const ManagerDashboard = () => {
                     onMouseEnter={(e) => {
                       if (location.pathname !== "/manager-dashboard/reviews") {
                         e.currentTarget.style.backgroundColor = "#2d2d2d";
-                        e.currentTarget.style.color = "#d4af37";
+                        e.currentTarget.style.color = "#ffffff";
                       }
                     }}
                     onMouseLeave={(e) => {
@@ -511,7 +511,7 @@ const ManagerDashboard = () => {
                     style={{
                       color:
                         location.pathname === "/manager-dashboard/profile"
-                          ? "#d4af37"
+                          ? "#ffffff"
                           : "#ffffff",
                       backgroundColor:
                         location.pathname === "/manager-dashboard/profile"
@@ -521,7 +521,7 @@ const ManagerDashboard = () => {
                     onMouseEnter={(e) => {
                       if (location.pathname !== "/manager-dashboard/profile") {
                         e.currentTarget.style.backgroundColor = "#2d2d2d";
-                        e.currentTarget.style.color = "#d4af37";
+                        e.currentTarget.style.color = "#ffffff";
                       }
                     }}
                     onMouseLeave={(e) => {
@@ -547,7 +547,7 @@ const ManagerDashboard = () => {
               <>
                 <h1
                   className="text-3xl font-bold mb-6"
-                  style={{ color: "#d4af37" }}
+                  style={{ color: "#ffffff" }}
                 >
                   Manager Dashboard
                 </h1>
@@ -562,7 +562,7 @@ const ManagerDashboard = () => {
                         <div
                           className="w-8 h-8 rounded-md flex items-center justify-center"
                           style={{
-                            backgroundColor: "#d4af37",
+                            backgroundColor: "#ffffff",
                             color: "#000000",
                           }}
                         >
@@ -597,7 +597,7 @@ const ManagerDashboard = () => {
                         <div
                           className="w-8 h-8 rounded-md flex items-center justify-center"
                           style={{
-                            backgroundColor: "#d4af37",
+                            backgroundColor: "#ffffff",
                             color: "#000000",
                           }}
                         >
@@ -632,7 +632,7 @@ const ManagerDashboard = () => {
                         <div
                           className="w-8 h-8 rounded-md flex items-center justify-center"
                           style={{
-                            backgroundColor: "#d4af37",
+                            backgroundColor: "#ffffff",
                             color: "#000000",
                           }}
                         >
@@ -667,7 +667,7 @@ const ManagerDashboard = () => {
                         <div
                           className="w-8 h-8 rounded-md flex items-center justify-center"
                           style={{
-                            backgroundColor: "#d4af37",
+                            backgroundColor: "#ffffff",
                             color: "#000000",
                           }}
                         >
@@ -705,7 +705,7 @@ const ManagerDashboard = () => {
                         <div
                           className="w-8 h-8 rounded-md flex items-center justify-center"
                           style={{
-                            backgroundColor: "#d4af37",
+                            backgroundColor: "#ffffff",
                             color: "#000000",
                           }}
                         >
@@ -740,7 +740,7 @@ const ManagerDashboard = () => {
                         <div
                           className="w-8 h-8 rounded-md flex items-center justify-center"
                           style={{
-                            backgroundColor: "#d4af37",
+                            backgroundColor: "#ffffff",
                             color: "#000000",
                           }}
                         >
@@ -778,7 +778,7 @@ const ManagerDashboard = () => {
                         <div
                           className="w-8 h-8 rounded-md flex items-center justify-center"
                           style={{
-                            backgroundColor: "#d4af37",
+                            backgroundColor: "#ffffff",
                             color: "#000000",
                           }}
                         >
@@ -841,7 +841,7 @@ const ManagerDashboard = () => {
                                 <span
                                   className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold mr-3"
                                   style={{
-                                    backgroundColor: "#d4af37",
+                                    backgroundColor: "#ffffff",
                                     color: "#000000",
                                   }}
                                 >
@@ -859,7 +859,7 @@ const ManagerDashboard = () => {
                                   className="px-2 py-1 rounded-full text-xs font-semibold"
                                   style={{
                                     backgroundColor: "#2d2d2d",
-                                    color: "#d4af37",
+                                    color: "#ffffff",
                                   }}
                                 >
                                   {product.avg_rating} ⭐
@@ -915,7 +915,7 @@ const ManagerDashboard = () => {
                               <div className="flex items-center">
                                 <p
                                   className="text-sm font-medium truncate"
-                                  style={{ color: "#d4af37" }}
+                                  style={{ color: "#ffffff" }}
                                 >
                                   Order #{order.id}
                                 </p>
@@ -927,7 +927,7 @@ const ManagerDashboard = () => {
                                         : order.status === "shipped"
                                         ? "bg-blue-900 text-blue-200"
                                         : order.status === "processing"
-                                        ? "bg-yellow-900 text-yellow-200"
+                                        ? "bg-gray-900 text-gray-200"
                                         : "bg-gray-900 text-gray-200"
                                     }`}
                                   >

@@ -134,6 +134,8 @@ def create_product():
     price = request.form.get('price')
     stock_quantity = request.form.get('stock_quantity', 0)
     category_id = request.form.get('category_id')
+    district = request.form.get('district', '')
+    is_featured = request.form.get('is_featured', 'false').lower() == 'true'
 
     # Handle file upload: save image_1 to uploads/ and build image_url
     image_url = None

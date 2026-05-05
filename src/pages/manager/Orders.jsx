@@ -80,7 +80,7 @@ const ManagerOrders = () => {
         style={{ backgroundColor: "#000000", color: "#ffffff" }}
       >
         <div className="flex flex-col items-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-yellow-500 mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-white mb-4"></div>
           <span>Loading orders...</span>
         </div>
       </div>
@@ -127,7 +127,7 @@ const ManagerOrders = () => {
 
   return (
     <div className="max-w-7xl mx-auto p-4">
-      <h2 className="text-2xl font-bold mb-6" style={{ color: "#d4af37" }}>
+      <h2 className="text-2xl font-bold mb-6" style={{ color: "#ffffff" }}>
         📦 Orders Management
       </h2>
 
@@ -177,7 +177,7 @@ const ManagerOrders = () => {
                     <div className="flex items-center">
                       <p
                         className="text-sm font-medium truncate mr-2 transition-colors duration-200"
-                        style={{ color: "#d4af37" }}
+                        style={{ color: "#ffffff" }}
                       >
                         Order #{order.id}
                       </p>
@@ -198,7 +198,7 @@ const ManagerOrders = () => {
                       >
                         PKR {order.total_amount}
                       </p>
-                      <FaEye style={{ color: "#d4af37" }} />
+                      <FaEye style={{ color: "#ffffff" }} />
                     </div>
                   </div>
                   <div className="mt-2 sm:flex sm:justify-between">
@@ -248,7 +248,7 @@ const ManagerOrders = () => {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-2xl font-bold" style={{ color: "#d4af37" }}>
+              <h3 className="text-2xl font-bold" style={{ color: "#ffffff" }}>
                 Order #{selectedOrder.id}
               </h3>
               <button
@@ -265,19 +265,19 @@ const ManagerOrders = () => {
               style={{ borderBottom: "1px solid #2d2d2d" }}
             >
               <p style={{ color: "#cccccc" }} className="mb-2">
-                <span style={{ color: "#d4af37" }} className="font-semibold">
+                <span style={{ color: "#ffffff" }} className="font-semibold">
                   Customer:
                 </span>{" "}
                 {selectedOrder.customer_name}
               </p>
               <p style={{ color: "#cccccc" }} className="mb-2">
-                <span style={{ color: "#d4af37" }} className="font-semibold">
+                <span style={{ color: "#ffffff" }} className="font-semibold">
                   Email:
                 </span>{" "}
                 {selectedOrder.customer_email}
               </p>
               <p style={{ color: "#cccccc" }}>
-                <span style={{ color: "#d4af37" }} className="font-semibold">
+                <span style={{ color: "#ffffff" }} className="font-semibold">
                   Order Date:
                 </span>{" "}
                 {new Date(selectedOrder.created_at).toLocaleDateString()}
@@ -289,7 +289,7 @@ const ManagerOrders = () => {
               className="mb-6 pb-4"
               style={{ borderBottom: "1px solid #2d2d2d" }}
             >
-              <h4 style={{ color: "#d4af37" }} className="font-bold mb-3">
+              <h4 style={{ color: "#ffffff" }} className="font-bold mb-3">
                 📦 Items:
               </h4>
               <div>
@@ -318,7 +318,7 @@ const ManagerOrders = () => {
               className="mb-6 pb-4"
               style={{ borderBottom: "1px solid #2d2d2d" }}
             >
-              <h4 style={{ color: "#d4af37" }} className="font-bold mb-2">
+              <h4 style={{ color: "#ffffff" }} className="font-bold mb-2">
                 📍 Shipping Address:
               </h4>
               <p style={{ color: "#cccccc" }}>
@@ -331,7 +331,7 @@ const ManagerOrders = () => {
               className="mb-6 pb-4"
               style={{ borderBottom: "1px solid #2d2d2d" }}
             >
-              <h4 style={{ color: "#d4af37" }} className="font-bold mb-3">
+              <h4 style={{ color: "#ffffff" }} className="font-bold mb-3">
                 🔄 Update Status:
               </h4>
               <select
@@ -355,7 +355,7 @@ const ManagerOrders = () => {
                 disabled={updating || newStatus === selectedOrder.status}
                 className="w-full px-4 py-2 rounded font-semibold transition"
                 style={{
-                  backgroundColor: updating ? "#666666" : "#d4af37",
+                  backgroundColor: updating ? "#666666" : "#ffffff",
                   color: "#000000",
                   opacity:
                     updating || newStatus === selectedOrder.status ? 0.6 : 1,
@@ -370,11 +370,11 @@ const ManagerOrders = () => {
             </div>
 
             {/* Total */}
-            <div className="text-right bg-gradient-to-r from-yellow-600 to-yellow-800 p-3 rounded">
+            <div className="text-right bg-gradient-to-r from-white to-gray p-3 rounded">
               <p style={{ color: "#ffffff" }} className="text-sm mb-1">
                 Total Amount
               </p>
-              <p className="text-2xl font-bold" style={{ color: "#d4af37" }}>
+              <p className="text-2xl font-bold" style={{ color: "#ffffff" }}>
                 PKR {selectedOrder.total_amount}
               </p>
             </div>

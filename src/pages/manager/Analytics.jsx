@@ -134,7 +134,7 @@ const ManagerAnalytics = () => {
         style={{ backgroundColor: "#000000", color: "#ffffff" }}
       >
         <div className="flex flex-col items-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-yellow-500 mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-white mb-4"></div>
           <span>Loading analytics...</span>
         </div>
       </div>
@@ -146,7 +146,7 @@ const ManagerAnalytics = () => {
       className="p-8"
       style={{ backgroundColor: "#000000", color: "#ffffff" }}
     >
-      <h1 className="text-3xl font-bold mb-6" style={{ color: "#d4af37" }}>
+      <h1 className="text-3xl font-bold mb-6" style={{ color: "#ffffff" }}>
         Analytics Dashboard
       </h1>
 
@@ -178,10 +178,10 @@ const ManagerAnalytics = () => {
             key={tab}
             onClick={() => setActiveTab(tab)}
             className={`px-4 py-2 text-sm font-medium rounded ${
-              activeTab === tab ? "bg-yellow-600" : "bg-gray-600"
+              activeTab === tab ? "bg-white" : "bg-gray-600"
             }`}
             style={{
-              backgroundColor: activeTab === tab ? "#d4af37" : "#555555",
+              backgroundColor: activeTab === tab ? "#ffffff" : "#555555",
               color: activeTab === tab ? "#000000" : "#ffffff",
             }}
           >

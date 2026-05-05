@@ -707,6 +707,77 @@ def update_user_role(user_id):
 
     return jsonify({'message': 'Role updated successfully'}), 200
 
+@dashboard_bp.route('/store', methods=['POST'])
+@jwt_required()
+def create_store():
+    try:
+        user_id = int(get_jwt_identity())
+    except (TypeError, ValueError):
+        return jsonify({'message': 'Invalid token identity'}), 422
+    user = User.query.get(user_id)
+
+    if not user or user.role != 'manager':
+        return jsonify({'message': 'Unauthorized'}), 403
+
+    # If user already has a store, return 400
+    if user.store:
+        return jsonify({'message': 'Store already exists. Use PUT to update.'}), 400
+
+    # Handle FormData for file uploads
+    if request.content_type and 'multipart/form-data' in request.content_type:
+        name = request.form.get('name')
+        address = request.form.get('address')
+        contact_number = request.form.get('contact_number')
+        description = request.form.get('description')
+
+        logo_url = None
+        logo_file = request.files.get('logo')
+        if logo_file and logo_file.filename:
+            server_dir = os.path.dirname(os.path.abspath(__file__))
+            project_root = os.path.dirname(os.path.dirname(server_dir))
+            uploads_dir = os.path.join(project_root, 'uploads')
+            os.makedirs(uploads_dir, exist_ok=True)
+
+            timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+            filename = secure_filename(f"{timestamp}_{logo_file.filename}")
+            filepath = os.path.join(uploads_dir, filename)
+            logo_file.save(filepath)
+            logo_url = f"/uploads/{filename}"
+    else:
+        data = request.get_json() or {}
+        name = data.get('name')
+        address = data.get('address')
+        contact_number = data.get('contact_number')
+        description = data.get('description')
+        logo_url = data.get('logo_url')
+
+    if not name:
+        return jsonify({'message': 'Store name is required'}), 400
+
+    new_store = Store(
+        name=name,
+        address=address or "",
+        contact_number=contact_number or "",
+        description=description or "",
+        logo_url=logo_url,
+        manager_id=user_id
+    )
+    db.session.add(new_store)
+    db.session.commit()
+
+    return jsonify({
+        'message': 'Store created successfully',
+        'store': {
+            'id': new_store.id,
+            'name': new_store.name,
+            'address': new_store.address,
+            'logo_url': new_store.logo_url,
+            'contact_number': new_store.contact_number,
+            'description': new_store.description,
+        }
+    }), 201
+
+
 @dashboard_bp.route('/store', methods=['GET'])
 @jwt_required()
 def get_store():
@@ -748,8 +819,32 @@ def update_store():
     if not user or user.role != 'manager':
         return jsonify({'message': 'Unauthorized'}), 403
 
+    # If no store exists, create one now
     if not user.store:
-        return jsonify({'message': 'Store not found'}), 404
+        name = request.form.get('name') if request.content_type and 'multipart/form-data' in request.content_type else (request.get_json() or {}).get('name')
+        if not name:
+            return jsonify({'message': 'Store name is required to create store'}), 400
+        
+        new_store = Store(
+            name=name,
+            address=request.form.get('address') if request.content_type and 'multipart/form-data' in request.content_type else (request.get_json() or {}).get('address', ''),
+            contact_number=request.form.get('contact_number') if request.content_type and 'multipart/form-data' in request.content_type else (request.get_json() or {}).get('contact_number', ''),
+            description=request.form.get('description') if request.content_type and 'multipart/form-data' in request.content_type else (request.get_json() or {}).get('description', ''),
+            manager_id=user_id
+        )
+        db.session.add(new_store)
+        db.session.commit()
+        return jsonify({
+            'message': 'Store created successfully',
+            'store': {
+                'id': new_store.id,
+                'name': new_store.name,
+                'address': new_store.address,
+                'logo_url': new_store.logo_url,
+                'contact_number': new_store.contact_number,
+                'description': new_store.description,
+            }
+        }), 201
 
     store = user.store
 

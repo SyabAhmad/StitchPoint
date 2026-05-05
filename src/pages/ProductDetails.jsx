@@ -102,7 +102,8 @@ const ProductDetails = ({
       }
       const data = await response.json();
       setProduct(data.product);
-      setInWishlist(isInWishlist(data.product.id));
+      const inList = await isInWishlist(data.product.id);
+      setInWishlist(inList);
 
       // Build images array from product.image_url (and potential future image fields)
       const imgs = [];
@@ -126,18 +127,19 @@ const ProductDetails = ({
   useEffect(() => {
     if (propProduct) {
       setProduct(propProduct);
-      setInWishlist(isInWishlist(propProduct.id));
+      const checkWishlist = async () => {
+        const inList = await isInWishlist(propProduct.id);
+        setInWishlist(inList);
+        setLoading(false);
+      };
+      checkWishlist();
       // Build images array if propProduct provided
       const imgs = [];
       if (propProduct.image_url) imgs.push(propProduct.image_url);
       setImages(imgs);
-      // Fetch recommendations for propProduct
       fetchRecommendations(propProduct.id);
-      // Load reviews for propProduct
       fetchReviews(propProduct.id);
-      // Load comments for propProduct
       fetchComments(propProduct.id);
-      setLoading(false);
     } else if (id) {
       fetchProduct();
     }
@@ -320,9 +322,9 @@ const ProductDetails = ({
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-white">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-yellow-500 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black mx-auto mb-4"></div>
           <p className="text-gray-600">Loading product details...</p>
         </div>
       </div>
@@ -331,7 +333,7 @@ const ProductDetails = ({
 
   if (error || !product) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-white">
         <div className="text-center">
           <p className="text-red-600 mb-4">
             Error: {error || "Product not found"}
@@ -340,14 +342,14 @@ const ProductDetails = ({
             onClick={() => navigate("/collections")}
             className="px-6 py-2 rounded-lg transition-all duration-200"
             style={{
-              backgroundColor: "#d4af37",
+              backgroundColor: "#ffffff",
               color: "#000000",
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.backgroundColor = "#b8860b";
+              e.currentTarget.style.backgroundColor = "#cccccc";
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.backgroundColor = "#d4af37";
+              e.currentTarget.style.backgroundColor = "#ffffff";
             }}
           >
             Back to Collections
@@ -358,11 +360,11 @@ const ProductDetails = ({
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+    <div className="min-h-screen bg-white">
       {/* Breadcrumb Navigation */}
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 py-3">
-          <nav className="flex items-center space-x-2 text-sm text-gray-600">
+          <nav className="flex items-center space-x-2 text-sm text-gray-700">
             <Link
               to="/"
               className="flex items-center hover:text-gray-900 transition-colors"
@@ -370,15 +372,15 @@ const ProductDetails = ({
               <FaHome className="mr-1" />
               Home
             </Link>
-            <FaChevronRight className="text-gray-400" />
+            <FaChevronRight className="text-gray-600" />
             <Link
               to="/collections"
               className="hover:text-gray-900 transition-colors"
             >
               Collections
             </Link>
-            <FaChevronRight className="text-gray-400" />
-            <span className="text-gray-900 font-medium truncate">
+            <FaChevronRight className="text-gray-600" />
+            <span className="text-gray-800 font-medium truncate">
               {product.name}
             </span>
           </nav>
@@ -391,13 +393,13 @@ const ProductDetails = ({
           <div className="flex items-center justify-between">
             <button
               onClick={() => navigate("/collections")}
-              className="flex items-center text-gray-700 hover:text-gray-900 transition-all duration-300 text-sm font-medium hover:bg-gray-50 px-3 py-2 rounded-lg"
+              className="flex items-center text-gray-700 hover:text-gray-900 transition-all duration-300 text-sm font-medium hover:bg-gray-100 px-3 py-2 rounded-lg"
             >
               <FaArrowLeft className="mr-2" />
               Back to Collections
             </button>
             <div className="flex items-center space-x-3">
-              <button className="text-gray-600 hover:text-gray-900 transition-all duration-300 p-2 rounded-full hover:bg-gray-50">
+              <button className="text-gray-700 hover:text-gray-900 transition-all duration-300 p-2 rounded-full hover:bg-gray-100">
                 <FaShare size={18} />
               </button>
               <button
@@ -405,7 +407,7 @@ const ProductDetails = ({
                 className={`p-2 rounded-full transition-all duration-300 ${
                   inWishlist
                     ? "bg-red-50 text-red-600 hover:bg-red-100"
-                    : "text-gray-600 hover:bg-gray-50"
+                    : "text-gray-700 hover:bg-gray-100"
                 }`}
               >
                 <FaHeart size={18} />
@@ -424,33 +426,33 @@ const ProductDetails = ({
             <div className="mb-6">
               <div className="flex flex-col lg:flex-row lg:space-x-10 gap-8 items-center justify-center">
                 <div>
-                  <h1 className="text-3xl font-bold text-gray-900 mb-4 leading-tight">
+                  <h1 className="text-3xl font-bold tracking-widest uppercase text-gray-800 mb-4 leading-tight">
                     {product.name}
                   </h1>
 
                   {/* Enhanced Rating */}
                   <div className="flex items-center space-x-4 mb-6">
-                    <div className="flex items-center bg-yellow-50 px-3 py-2 rounded-full">
+                    <div className="flex items-center bg-white px-3 py-2 rounded-full">
                       {[...Array(5)].map((_, i) => (
                         <FaStar
                           key={i}
                           className={
                             i < Math.floor(product.average_rating || 0)
-                              ? "text-yellow-500"
-                              : "text-gray-300"
+                              ? "text-gray-800"
+                              : "text-gray-700"
                           }
                           size={18}
                         />
                       ))}
                     </div>
-                    <span className="text-sm text-gray-600 font-semibold">
+                    <span className="text-sm text-gray-700 font-semibold">
                       {product.average_rating
                         ? `${product.average_rating}`
                         : "No rating"}{" "}
                       ({product.reviews?.length ?? reviews.length} reviews)
                     </span>
-                    <span className="text-sm text-gray-400">•</span>
-                    <span className="text-sm text-gray-600">
+                    <span className="text-sm text-gray-600">•</span>
+                    <span className="text-sm text-gray-700">
                       {!product.average_rating
                         ? "New product"
                         : product.average_rating >= 4
@@ -471,12 +473,12 @@ const ProductDetails = ({
                           </span>
                         </div>
                         <div className="flex items-center gap-3">
-                          <div className="text-4xl font-bold text-red-500 line-through">
+                          <div className="text-4xl font-bold text-gray-400 line-through">
                             PKR {product.price}
                           </div>
                           <div
                             className="text-4xl font-bold"
-                            style={{ color: "#d4af37" }}
+                            style={{ color: "#000000" }}
                           >
                             PKR{" "}
                             {(
@@ -492,7 +494,7 @@ const ProductDetails = ({
                     ) : (
                       <div
                         className="text-4xl font-bold mb-2"
-                        style={{ color: "#d4af37" }}
+                        style={{ color: "#000000" }}
                       >
                         PKR {product.price}
                       </div>
@@ -518,7 +520,7 @@ const ProductDetails = ({
                       {product.stock_quantity > 0 ? "In Stock" : "Out of Stock"}
                     </span>
                     {product.stock_quantity > 0 && (
-                      <span className="text-gray-600 text-sm font-medium">
+                      <span className="text-gray-700 text-sm font-medium">
                         {product.stock_quantity} available
                       </span>
                     )}
@@ -532,7 +534,7 @@ const ProductDetails = ({
                     <div className="flex items-center border-2 border-gray-200 rounded-xl overflow-hidden">
                       <button
                         onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                        className="px-4 py-3 text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors duration-200"
+                        className="px-4 py-3 text-gray-700 hover:text-gray-900 hover:bg-gray-100 transition-colors duration-200"
                         disabled={quantity <= 1}
                       >
                         <FaMinus size={14} />
@@ -542,7 +544,7 @@ const ProductDetails = ({
                       </span>
                       <button
                         onClick={() => setQuantity(quantity + 1)}
-                        className="px-4 py-3 text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-colors duration-200"
+                        className="px-4 py-3 text-gray-700 hover:text-gray-900 hover:bg-gray-100 transition-colors duration-200"
                         disabled={quantity >= product.stock_quantity}
                       >
                         <FaPlus size={14} />
@@ -555,20 +557,21 @@ const ProductDetails = ({
                     <button
                       onClick={handleAddToCart}
                       disabled={product.stock_quantity === 0}
-                      className="flex-1 px-8 py-4 rounded-xl font-bold transition-all duration-300 flex items-center justify-center space-x-3 shadow-lg hover:shadow-xl transform hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="flex-1 px-8 py-4 rounded-none font-bold tracking-widest uppercase transition-all duration-300 flex items-center justify-center space-x-3 border-2 border-black hover:bg-black hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
                       style={{
-                        backgroundColor:
-                          product.stock_quantity > 0 ? "#d4af37" : "#9ca3af",
+                        backgroundColor: "transparent",
                         color: "#000000",
                       }}
                       onMouseEnter={(e) => {
                         if (product.stock_quantity > 0) {
-                          e.currentTarget.style.backgroundColor = "#b8860b";
+                          e.currentTarget.style.backgroundColor = "#000000";
+                          e.currentTarget.style.color = "#ffffff";
                         }
                       }}
                       onMouseLeave={(e) => {
                         if (product.stock_quantity > 0) {
-                          e.currentTarget.style.backgroundColor = "#d4af37";
+                          e.currentTarget.style.backgroundColor = "transparent";
+                          e.currentTarget.style.color = "#000000";
                         }
                       }}
                     >
@@ -578,11 +581,11 @@ const ProductDetails = ({
 
                     <button
                       onClick={handleAddToWishlist}
-                      className={`px-8 py-4 rounded-xl font-bold transition-all duration-300 flex items-center justify-center space-x-3 shadow-lg hover:shadow-xl transform hover:-translate-y-1 ${
-                        inWishlist
-                          ? "bg-red-500 text-white hover:bg-red-600"
-                          : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                      }`}
+                      className="flex-1 px-8 py-4 rounded-none font-bold tracking-widest uppercase transition-all duration-300 flex items-center justify-center space-x-3 border-2 border-black hover:bg-white hover:text-white"
+                      style={{
+                        backgroundColor: inWishlist ? "#000000" : "transparent",
+                        color: inWishlist ? "#ffffff" : "#000000",
+                      }}
                     >
                       <FaHeart size={20} />
                       <span className="text-lg">
@@ -593,7 +596,8 @@ const ProductDetails = ({
                 </div>
                 <div>
                   <div className="space-y-6">
-                    <div className="relative aspect-square bg-white rounded-3xl shadow-2xl overflow-hidden group">
+                    {/* Main Image - Large Display */}
+                    <div className="relative aspect-square bg-gray-100 rounded-2xl overflow-hidden shadow-lg">
                       <img
                         src={
                           images[selectedImage]
@@ -603,23 +607,23 @@ const ProductDetails = ({
                               : "/placeholder-image.jpg"
                         }
                         alt={product.name}
-                        className="w-100 h-100 object-cover transition-transform duration-500 group-hover:scale-105"
+                        className="w-full h-full object-cover transition-transform duration-500"
                         onError={(e) => {
                           e.target.src = "/placeholder-image.jpg";
                         }}
                       />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                     </div>
 
+                    {/* Thumbnail Gallery - Horizontal Scroll */}
                     {images.length > 1 && (
-                      <div className="flex gap-3 overflow-x-auto pb-2">
+                      <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
                         {images.map((img, i) => (
-                          <div
+                          <button
                             key={i}
-                            className={`flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden cursor-pointer transition-all duration-300 border-2 ${
+                            className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden cursor-pointer transition-all duration-300 border-2 ${
                               selectedImage === i
-                                ? "border-yellow-500 ring-4 ring-yellow-500/20 scale-110"
-                                : "border-gray-200 hover:border-gray-300"
+                                ? "border-black ring-2 ring-black/20"
+                                : "border-gray-200 hover:border-gray-400"
                             }`}
                             onClick={() => setSelectedImage(i)}
                           >
@@ -628,16 +632,15 @@ const ProductDetails = ({
                               alt={`img-${i}`}
                               className="w-full h-full object-cover"
                             />
-                          </div>
+                          </button>
                         ))}
                       </div>
                     )}
 
-                    {/* Zoom indicator */}
+                    {/* Image Counter */}
                     <div className="text-center">
-                      <span className="text-sm text-gray-500 bg-white px-3 py-1 rounded-full shadow-sm">
-                        Click images to zoom • {images.length} image
-                        {images.length !== 1 ? "s" : ""}
+                      <span className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
+                        {selectedImage + 1} / {images.length} images
                       </span>
                     </div>
                   </div>
@@ -648,7 +651,7 @@ const ProductDetails = ({
               {product.store_name && (
                 <div className="bg-white p-6 rounded-xl shadow-sm border mb-8">
                   <div className="flex items-center space-x-4 mb-4">
-                    <div className="w-12 h-12 bg-yellow-500 rounded-full flex items-center justify-center overflow-hidden">
+                    <div className="w-12 h-12 bg-white0 rounded-full flex items-center justify-center overflow-hidden">
                       {product.store_logo_url ? (
                         <img
                           src={`${API_BASE}${product.store_logo_url}`}
@@ -656,11 +659,11 @@ const ProductDetails = ({
                           className="w-full h-full object-cover"
                         />
                       ) : (
-                        <FaUser className="text-white" size={20} />
+                        <FaUser className="text-gray-800" size={20} />
                       )}
                     </div>
                     <div>
-                      <h3 className="font-semibold text-gray-900 text-lg">
+                      <h3 className="font-semibold text-gray-800 text-lg">
                         {product.store_name}
                       </h3>
                       <div className="flex items-center space-x-2">
@@ -670,14 +673,14 @@ const ProductDetails = ({
                               key={i}
                               className={
                                 i < Math.floor(product.store_rating || 0)
-                                  ? "text-yellow-500"
-                                  : "text-gray-300"
+                                  ? "text-gray-800"
+                                  : "text-gray-700"
                               }
                               size={12}
                             />
                           ))}
                         </div>
-                        <span className="text-sm text-gray-600">
+                        <span className="text-sm text-gray-700">
                           {product.store_rating
                             ? `${product.store_rating}`
                             : "N/A"}{" "}
@@ -692,7 +695,7 @@ const ProductDetails = ({
                           reviews)
                         </span>
                       </div>
-                      <p className="text-sm text-gray-600">
+                      <p className="text-sm text-gray-700">
                         {product.store_products_sold
                           ? product.store_products_sold >= 1000
                             ? `${(product.store_products_sold / 1000).toFixed(
@@ -705,12 +708,12 @@ const ProductDetails = ({
                     </div>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600">
+                    <span className="text-sm text-gray-700">
                       <strong>Category:</strong> {product.category || "General"}
                     </span>
                     <button
                       onClick={() => navigate(`/store/${product.store_id}`)}
-                      className="text-yellow-600 hover:text-yellow-700 font-medium text-sm"
+                      className="text-gray-600 hover:text-gray-700 font-medium text-sm"
                     >
                       Visit Store
                     </button>
@@ -721,36 +724,36 @@ const ProductDetails = ({
               {/* Product Features */}
               <div className="grid grid-cols-3 gap-3 mb-6">
                 <div className="text-center p-3 bg-white rounded-lg shadow-sm">
-                  <FaTruck className="mx-auto mb-1 text-yellow-500" size={20} />
-                  <p className="text-xs text-gray-600">Free Shipping</p>
+                  <FaTruck className="mx-auto mb-1 text-gray-800" size={20} />
+                  <p className="text-xs text-gray-700">Free Shipping</p>
                 </div>
                 <div className="text-center p-3 bg-white rounded-lg shadow-sm">
                   <FaShieldAlt
-                    className="mx-auto mb-1 text-yellow-500"
+                    className="mx-auto mb-1 text-gray-800"
                     size={20}
                   />
-                  <p className="text-xs text-gray-600">2 Year Warranty</p>
+                  <p className="text-xs text-gray-700">2 Year Warranty</p>
                 </div>
                 <div className="text-center p-3 bg-white rounded-lg shadow-sm">
-                  <FaUndo className="mx-auto mb-1 text-yellow-500" size={20} />
-                  <p className="text-xs text-gray-600">30 Day Returns</p>
+                  <FaUndo className="mx-auto mb-1 text-gray-800" size={20} />
+                  <p className="text-xs text-gray-700">30 Day Returns</p>
                 </div>
               </div>
 
               {/* Enhanced Tabs: Description / Specifications */}
               <div className="mt-8">
-                <div className="flex space-x-1 border-b border-gray-200 mb-6">
+                <div className="flex space-x-1 border-b border-gray-800 mb-6">
                   {[
-                    { key: "description", label: "Description" },
-                    { key: "specifications", label: "Specifications" },
+                    { key: "description", label: "DESCRIPTION" },
+                    { key: "specifications", label: "SPECIFICATIONS" },
                   ].map((t) => (
                     <button
                       key={t.key}
                       onClick={() => setActiveTab(t.key)}
-                      className={`px-5 py-3 font-medium text-sm rounded-t-lg transition-all duration-300 ${
+                      className={`px-5 py-3 font-medium text-sm tracking-widest uppercase rounded-t-lg transition-all duration-300 ${
                         activeTab === t.key
-                          ? "bg-yellow-500 text-white shadow-md"
-                          : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                          ? "bg-white text-gray-800"
+                          : "text-gray-600 hover:text-gray-900 hover:bg-gray-800"
                       }`}
                     >
                       {t.label}
@@ -759,7 +762,7 @@ const ProductDetails = ({
                 </div>
 
                 {/* Tab content */}
-                <div className="bg-gray-50 rounded-2xl p-6 min-h-[200px]">
+                <div className="bg-white rounded-2xl p-6">
                   {activeTab === "description" && (
                     <div className="prose text-gray-700 max-w-none">
                       <p className="text-lg leading-relaxed">
@@ -772,46 +775,46 @@ const ProductDetails = ({
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {product.artisan_name && (
                         <div className="bg-white p-4 rounded-xl shadow-sm">
-                          <dt className="font-semibold text-gray-900 mb-1">
+                          <dt className="font-semibold text-gray-800 mb-1">
                             Artisan
                           </dt>
-                          <dd className="text-gray-600">
+                          <dd className="text-gray-700">
                             {product.artisan_name}
                           </dd>
                         </div>
                       )}
                       {product.materials && (
                         <div className="bg-white p-4 rounded-xl shadow-sm">
-                          <dt className="font-semibold text-gray-900 mb-1">
+                          <dt className="font-semibold text-gray-800 mb-1">
                             Materials
                           </dt>
-                          <dd className="text-gray-600">{product.materials}</dd>
+                          <dd className="text-gray-700">{product.materials}</dd>
                         </div>
                       )}
                       {product.dimensions && (
                         <div className="bg-white p-4 rounded-xl shadow-sm">
-                          <dt className="font-semibold text-gray-900 mb-1">
+                          <dt className="font-semibold text-gray-800 mb-1">
                             Dimensions
                           </dt>
-                          <dd className="text-gray-600">
+                          <dd className="text-gray-700">
                             {product.dimensions}
                           </dd>
                         </div>
                       )}
                       {product.weight && (
                         <div className="bg-white p-4 rounded-xl shadow-sm">
-                          <dt className="font-semibold text-gray-900 mb-1">
+                          <dt className="font-semibold text-gray-800 mb-1">
                             Weight
                           </dt>
-                          <dd className="text-gray-600">{product.weight}</dd>
+                          <dd className="text-gray-700">{product.weight}</dd>
                         </div>
                       )}
                       {product.care_instructions && (
                         <div className="bg-white p-4 rounded-xl shadow-sm md:col-span-2">
-                          <dt className="font-semibold text-gray-900 mb-1">
+                          <dt className="font-semibold text-gray-800 mb-1">
                             Care Instructions
                           </dt>
-                          <dd className="text-gray-600">
+                          <dd className="text-gray-700">
                             {product.care_instructions}
                           </dd>
                         </div>
@@ -821,7 +824,7 @@ const ProductDetails = ({
                         !product.dimensions &&
                         !product.weight &&
                         !product.care_instructions && (
-                          <p className="text-gray-600 col-span-full text-center py-4">
+                          <p className="text-gray-700 col-span-full text-center py-4">
                             No specifications available for this product.
                           </p>
                         )}
@@ -832,10 +835,10 @@ const ProductDetails = ({
 
               {/* Reviews Section */}
               <div className="mt-8">
-                <h3 className="text-xl font-bold text-gray-900 mb-6">
-                  Customer Reviews
+                <h3 className="text-xl font-bold tracking-widest uppercase text-gray-800 mb-6">
+                  CUSTOMER REVIEWS
                 </h3>
-                <div className="bg-gray-50 rounded-2xl p-6">
+                <div className="bg-white rounded-2xl p-6">
                   <form onSubmit={submitReview}>
                     <div className="mb-4">
                       <div className="flex items-center space-x-4 mb-3">
@@ -890,24 +893,24 @@ const ProductDetails = ({
                           disabled={submittingReview}
                           className="px-4 py-2 rounded-lg disabled:opacity-60 transition-all duration-200"
                           style={{
-                            backgroundColor: "#d4af37",
+                            backgroundColor: "#ffffff",
                             color: "#000000",
                           }}
                           onMouseEnter={(e) => {
-                            e.currentTarget.style.backgroundColor = "#b8860b";
+                            e.currentTarget.style.backgroundColor = "#cccccc";
                           }}
                           onMouseLeave={(e) => {
-                            e.currentTarget.style.backgroundColor = "#d4af37";
+                            e.currentTarget.style.backgroundColor = "#ffffff";
                           }}
                         >
-                          {submittingReview ? "Submitting..." : "Submit Review"}
+                          {submittingReview ? "Submitting..." : "SUBMIT REVIEW"}
                         </button>
                       </div>
                     </div>
                   </form>
 
                   {reviews.length === 0 ? (
-                    <p className="text-gray-600">
+                    <p className="text-gray-700">
                       No reviews yet. Be the first to review this product.
                     </p>
                   ) : (
@@ -919,14 +922,14 @@ const ProductDetails = ({
                         >
                           <div className="flex items-center justify-between mb-4">
                             <div className="flex items-center space-x-3">
-                              <div className="w-10 h-10 bg-yellow-500 rounded-full flex items-center justify-center">
-                                <FaUser className="text-white" size={16} />
+                              <div className="w-10 h-10 bg-white0 rounded-full flex items-center justify-center">
+                                <FaUser className="text-gray-800" size={16} />
                               </div>
                               <div>
-                                <p className="font-semibold text-gray-900">
+                                <p className="font-semibold text-gray-800">
                                   {review.user_name || "Anonymous"}
                                 </p>
-                                <p className="text-sm text-gray-500">
+                                <p className="text-sm text-gray-600">
                                   {review.created_at
                                     ? new Date(
                                         review.created_at,
@@ -939,7 +942,7 @@ const ProductDetails = ({
                               {[...Array(review.rating)].map((_, i) => (
                                 <FaStar
                                   key={i}
-                                  className="text-yellow-500"
+                                  className="text-gray-800"
                                   size={14}
                                 />
                               ))}
@@ -955,10 +958,10 @@ const ProductDetails = ({
 
               {/* Comments Section */}
               <div className="mt-8">
-                <h3 className="text-xl font-bold text-gray-900 mb-6">
+                <h3 className="text-xl font-bold tracking-widest uppercase text-gray-800 mb-6">
                   Comments
                 </h3>
-                <div className="bg-gray-50 rounded-2xl p-6">
+                <div className="bg-white rounded-2xl p-6">
                   <form onSubmit={submitComment}>
                     <div className="mb-4">
                       {!localStorage.getItem("token") && (
@@ -992,14 +995,14 @@ const ProductDetails = ({
                           disabled={submittingComment}
                           className="px-4 py-2 rounded-lg disabled:opacity-60 transition-all duration-200"
                           style={{
-                            backgroundColor: "#d4af37",
+                            backgroundColor: "#ffffff",
                             color: "#000000",
                           }}
                           onMouseEnter={(e) => {
-                            e.currentTarget.style.backgroundColor = "#b8860b";
+                            e.currentTarget.style.backgroundColor = "#cccccc";
                           }}
                           onMouseLeave={(e) => {
-                            e.currentTarget.style.backgroundColor = "#d4af37";
+                            e.currentTarget.style.backgroundColor = "#ffffff";
                           }}
                         >
                           {submittingComment ? "Submitting..." : "Post Comment"}
@@ -1010,7 +1013,7 @@ const ProductDetails = ({
 
                   {/* Display comments */}
                   {comments.length === 0 ? (
-                    <p className="text-gray-600">
+                    <p className="text-gray-700">
                       No comments yet. Be the first to share your thoughts!
                     </p>
                   ) : (
@@ -1018,18 +1021,18 @@ const ProductDetails = ({
                       {comments.map((comment) => (
                         <div
                           key={comment.id}
-                          className="bg-gray-50 p-4 rounded-lg border border-gray-200"
+                          className="bg-white p-4 rounded-lg border border-gray-200"
                         >
                           <div className="flex items-center justify-between mb-2">
                             <div className="flex items-center space-x-3">
-                              <div className="w-8 h-8 bg-yellow-500 rounded-full flex items-center justify-center">
-                                <FaUser className="text-white" size={14} />
+                              <div className="w-8 h-8 bg-white0 rounded-full flex items-center justify-center">
+                                <FaUser className="text-gray-800" size={14} />
                               </div>
                               <div>
-                                <p className="font-semibold text-gray-900 text-sm">
+                                <p className="font-semibold text-gray-800 text-sm">
                                   {comment.user_name || "Anonymous"}
                                 </p>
-                                <p className="text-xs text-gray-500">
+                                <p className="text-xs text-gray-600">
                                   {comment.created_at
                                     ? new Date(
                                         comment.created_at,
@@ -1052,7 +1055,7 @@ const ProductDetails = ({
 
         {/* Recommendations Section */}
         <div className="mt-12">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">
+          <h2 className="text-2xl font-bold tracking-widest uppercase text-gray-800 mb-6">
             You Might Also Like
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -1077,12 +1080,12 @@ const ProductDetails = ({
                   />
                 </div>
                 <div className="p-4">
-                  <h3 className="font-semibold text-gray-900 mb-1 text-sm">
+                  <h3 className="font-semibold text-gray-800 mb-1 text-sm">
                     {rec.name}
                   </h3>
                   <div className="flex items-center gap-2 mb-1">
                     {rec.sale_type && rec.sale_discount_percentage && (
-                      <span className="bg-red-500 text-white text-xs px-2 py-1 rounded-full font-semibold">
+                      <span className="bg-red-500 text-gray-800 text-xs px-2 py-1 rounded-full font-semibold">
                         {rec.sale_type} SALE
                       </span>
                     )}
@@ -1094,7 +1097,7 @@ const ProductDetails = ({
                       </p>
                       <p
                         className="font-bold text-base"
-                        style={{ color: "#d4af37" }}
+                        style={{ color: "#ffffff" }}
                       >
                         PKR{" "}
                         {(
@@ -1109,7 +1112,7 @@ const ProductDetails = ({
                   ) : (
                     <p
                       className="font-bold text-base"
-                      style={{ color: "#d4af37" }}
+                      style={{ color: "#ffffff" }}
                     >
                       PKR {rec.price}
                     </p>

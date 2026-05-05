@@ -83,18 +83,18 @@ const AnalyticsAside = ({ userRole }) => {
     }
   };
 
-  const COLORS = ["#d4af37", "#b8860b", "#daa520", "#f4e4bc", "#8b7355"];
+  const COLORS = ["#ffffff", "#cccccc", "#999999", "#666666", "#333333"];
 
   const pieData = [
     {
       name: "Views",
       value: analyticsData.overview.total_views,
-      color: "#d4af37",
+      color: "#ffffff",
     },
     {
       name: "Clicks",
       value: analyticsData.overview.total_clicks,
-      color: "#b8860b",
+      color: "#cccccc",
     },
     {
       name: "Cart Adds",
@@ -110,7 +110,7 @@ const AnalyticsAside = ({ userRole }) => {
         style={{ backgroundColor: "#1d1d1d", color: "#ffffff" }}
       >
         <div className="flex justify-center items-center h-32">
-          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-yellow-500"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-white"></div>
         </div>
       </div>
     );
@@ -121,8 +121,8 @@ const AnalyticsAside = ({ userRole }) => {
       className="w-80 p-4"
       style={{ backgroundColor: "#1d1d1d", color: "#ffffff" }}
     >
-      <h3 className="text-lg font-semibold mb-4" style={{ color: "#d4af37" }}>
-        Product Analytics
+      <h3 className="text-lg font-semibold tracking-widest uppercase mb-4" style={{ color: "#ffffff" }}>
+        PRODUCT ANALYTICS
       </h3>
 
       {/* Filter */}
@@ -153,10 +153,10 @@ const AnalyticsAside = ({ userRole }) => {
             key={tab}
             onClick={() => setActiveTab(tab)}
             className={`px-3 py-1 text-sm rounded ${
-              activeTab === tab ? "bg-yellow-600" : "bg-gray-600"
+              activeTab === tab ? "bg-white" : "bg-gray-700"
             }`}
             style={{
-              backgroundColor: activeTab === tab ? "#d4af37" : "#555555",
+              backgroundColor: activeTab === tab ? "#ffffff" : "#555555",
               color: activeTab === tab ? "#000000" : "#ffffff",
             }}
           >
@@ -177,12 +177,12 @@ const AnalyticsAside = ({ userRole }) => {
               >
                 <div
                   className="text-2xl font-bold"
-                  style={{ color: "#d4af37" }}
+                  style={{ color: "#ffffff" }}
                 >
                   {analyticsData.overview.total_views}
                 </div>
                 <div className="text-xs" style={{ color: "#cccccc" }}>
-                  Total Views
+                  TOTAL VIEWS
                 </div>
               </div>
               <div
@@ -191,12 +191,12 @@ const AnalyticsAside = ({ userRole }) => {
               >
                 <div
                   className="text-2xl font-bold"
-                  style={{ color: "#b8860b" }}
+                  style={{ color: "#cccccc" }}
                 >
                   {analyticsData.overview.total_clicks}
                 </div>
                 <div className="text-xs" style={{ color: "#cccccc" }}>
-                  Total Clicks
+                  TOTAL CLICKS
                 </div>
               </div>
               <div
@@ -205,12 +205,12 @@ const AnalyticsAside = ({ userRole }) => {
               >
                 <div
                   className="text-2xl font-bold"
-                  style={{ color: "#daa520" }}
+                  style={{ color: "#999999" }}
                 >
                   {analyticsData.overview.total_cart_adds}
                 </div>
                 <div className="text-xs" style={{ color: "#cccccc" }}>
-                  Cart Adds
+                  CART ADDS
                 </div>
               </div>
               <div
@@ -219,12 +219,12 @@ const AnalyticsAside = ({ userRole }) => {
               >
                 <div
                   className="text-2xl font-bold"
-                  style={{ color: "#f4e4bc" }}
+                  style={{ color: "#666666" }}
                 >
                   {analyticsData.overview.avg_time_spent}s
                 </div>
                 <div className="text-xs" style={{ color: "#cccccc" }}>
-                  Avg Time
+                  AVG TIME
                 </div>
               </div>
             </div>
@@ -256,7 +256,7 @@ const AnalyticsAside = ({ userRole }) => {
             <div>
               <h4
                 className="text-sm font-medium mb-2"
-                style={{ color: "#d4af37" }}
+                style={{ color: "#ffffff" }}
               >
                 Top Products by Views
               </h4>
@@ -269,7 +269,7 @@ const AnalyticsAside = ({ userRole }) => {
                       className="flex justify-between text-sm"
                     >
                       <span style={{ color: "#cccccc" }}>{product.name}</span>
-                      <span style={{ color: "#d4af37" }}>{product.views}</span>
+                      <span style={{ color: "#ffffff" }}>{product.views}</span>
                     </div>
                   ))}
               </div>
@@ -298,7 +298,7 @@ const AnalyticsAside = ({ userRole }) => {
                     color: "#ffffff",
                   }}
                 />
-                <Bar dataKey="views" fill="#d4af37" />
+                <Bar dataKey="views" fill="#ffffff" />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -325,7 +325,7 @@ const AnalyticsAside = ({ userRole }) => {
                     color: "#ffffff",
                   }}
                 />
-                <Bar dataKey="clicks" fill="#b8860b" />
+                <Bar dataKey="clicks" fill="#cccccc" />
               </BarChart>
             </ResponsiveContainer>
           </div>
