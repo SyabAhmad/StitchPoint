@@ -267,14 +267,23 @@ const SuperAdminDashboard = () => {
           </div>
           <div className="p-6 border-b" style={{ borderColor: "#333333" }}>
             <div className="flex items-center space-x-3">
-              <div
-                className="w-12 h-12 rounded-full flex items-center justify-center"
-                style={{ backgroundColor: "#ffffff" }}
-              >
-                <span className="text-black font-bold text-lg">
-                  {userData?.name?.charAt(0)?.toUpperCase() || "S"}
-                </span>
-              </div>
+              {userData?.profile_picture ? (
+                <img
+                  src={userData.profile_picture}
+                  alt="Profile"
+                  className="w-12 h-12 rounded-full object-cover"
+                  style={{ border: "2px solid #d4af37" }}
+                />
+              ) : (
+                <div
+                  className="w-12 h-12 rounded-full flex items-center justify-center"
+                  style={{ backgroundColor: "#d4af37" }}
+                >
+                  <span className="text-black font-bold text-lg">
+                    {userData?.name?.charAt(0)?.toUpperCase() || "S"}
+                  </span>
+                </div>
+              )}
               <div>
                 <p className="font-semibold" style={{ color: "#ffffff" }}>
                   {userData?.name || "Super Admin"}
@@ -747,22 +756,44 @@ const SuperAdminDashboard = () => {
                   </a>
                 </li>
                 <li>
-                  <a
-                    href="#"
+                  <Link
+                    to="/super-admin-dashboard/settings"
                     className="flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200"
-                    style={{ color: "#aaaaaa" }}
+                    style={{
+                      color:
+                        location.pathname ===
+                        "/super-admin-dashboard/settings"
+                          ? "#ffffff"
+                          : "#aaaaaa",
+                      backgroundColor:
+                        location.pathname ===
+                        "/super-admin-dashboard/settings"
+                          ? "#333333"
+                          : "transparent",
+                    }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = "#222222";
-                      e.currentTarget.style.color = "#ffffff";
+                      if (
+                        location.pathname !==
+                        "/super-admin-dashboard/settings"
+                      ) {
+                        e.currentTarget.style.backgroundColor = "#222222";
+                        e.currentTarget.style.color = "#ffffff";
+                      }
                     }}
                     onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = "transparent";
-                      e.currentTarget.style.color = "#aaaaaa";
+                      if (
+                        location.pathname !==
+                        "/super-admin-dashboard/settings"
+                      ) {
+                        e.currentTarget.style.backgroundColor =
+                          "transparent";
+                        e.currentTarget.style.color = "#aaaaaa";
+                      }
                     }}
                   >
                     <FaCog className="mr-3 h-5 w-5" />
-                    System Config
-                  </a>
+                    Account Settings
+                  </Link>
                 </li>
               </ul>
             </div>

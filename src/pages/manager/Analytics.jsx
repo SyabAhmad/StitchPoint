@@ -7,6 +7,9 @@ import ProductClicksChart from "../../components/analytics/ProductClicksChart";
 import RevenueChart from "../../components/analytics/RevenueChart";
 import ReviewTrendsChart from "../../components/analytics/ReviewTrendsChart";
 import CommentTrendsChart from "../../components/analytics/CommentTrendsChart";
+import CostChart from "../../components/analytics/CostChart";
+import ProfitChart from "../../components/analytics/ProfitChart";
+import CommissionChart from "../../components/analytics/CommissionChart";
 
 const ManagerAnalytics = () => {
   const [analyticsData, setAnalyticsData] = useState({
@@ -172,8 +175,8 @@ const ManagerAnalytics = () => {
       </div>
 
       {/* Tabs */}
-      <div className="flex mb-6 space-x-2">
-        {["overview", "performance", "trends"].map((tab) => (
+      <div className="flex mb-6 space-x-2 flex-wrap">
+        {["overview", "performance", "trends", "financial"].map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
@@ -195,9 +198,26 @@ const ManagerAnalytics = () => {
         {activeTab === "overview" && (
           <>
             <OverviewStats data={analyticsData.overview} />
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <AnalyticsPieChart data={analyticsData.overview} />
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="lg:col-span-2">
+                <AnalyticsPieChart data={analyticsData.overview} />
+              </div>
               <TopProductsList products={analyticsData.overview.top_products} />
+            </div>
+            {/* Reviews & Comments Summary */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="p-4 rounded-lg border border-white/20" style={{ backgroundColor: "#1a1a1a" }}>
+                <h3 className="text-sm font-bold uppercase tracking-widest mb-2" style={{ color: "#ffffff" }}>Total Reviews</h3>
+                <p className="text-3xl font-bold" style={{ color: "#ffffff" }}>{analyticsData.overview.total_reviews || 0}</p>
+              </div>
+              <div className="p-4 rounded-lg border border-white/20" style={{ backgroundColor: "#1a1a1a" }}>
+                <h3 className="text-sm font-bold uppercase tracking-widest mb-2" style={{ color: "#ffffff" }}>Avg Rating</h3>
+                <p className="text-3xl font-bold" style={{ color: "#ffffff" }}>{analyticsData.overview.avg_rating?.toFixed(1) || "0.0"}</p>
+              </div>
+              <div className="p-4 rounded-lg border border-white/20" style={{ backgroundColor: "#1a1a1a" }}>
+                <h3 className="text-sm font-bold uppercase tracking-widest mb-2" style={{ color: "#ffffff" }}>Total Comments</h3>
+                <p className="text-3xl font-bold" style={{ color: "#ffffff" }}>{analyticsData.overview.total_comments || 0}</p>
+              </div>
             </div>
           </>
         )}
@@ -214,6 +234,15 @@ const ManagerAnalytics = () => {
             <RevenueChart />
             <ReviewTrendsChart data={analyticsData.reviewsTrends} />
             <CommentTrendsChart data={analyticsData.commentsTrends} />
+          </div>
+        )}
+
+        {activeTab === "financial" && (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <RevenueChart />
+            <CostChart />
+            <ProfitChart />
+            <CommissionChart />
           </div>
         )}
       </div>

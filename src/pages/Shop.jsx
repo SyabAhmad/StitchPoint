@@ -9,6 +9,8 @@ import {
 import toast from "react-hot-toast";
 import { FaStar } from "react-icons/fa";
 
+const API_BASE = import.meta.env.VITE_API_BASE || "http://127.0.0.1:5000";
+
 const quickFilters = {
   az: {
     label: "A-Z",
@@ -268,6 +270,16 @@ export default function Collections() {
 
   const handleProductClick = (product) => {
     if (product && product.id) {
+      try {
+        fetch(`${API_BASE}/api/analytics/log`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            product_id: product.id,
+            action: "click",
+          }),
+        });
+      } catch (e) { /* ignore analytics errors */ }
       navigate(`/product/${product.id}`);
     }
   };
@@ -275,6 +287,16 @@ export default function Collections() {
   const handleAddToCart = async (product) => {
     try {
       addToCart(product);
+      try {
+        await fetch(`${API_BASE}/api/analytics/log`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            product_id: product.id,
+            action: "add_to_cart",
+          }),
+        });
+      } catch (e) { /* ignore analytics errors */ }
       toast.success(`${product.name} added to cart!`);
     } catch {
       toast.error("Failed to add to cart");

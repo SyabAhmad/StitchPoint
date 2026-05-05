@@ -618,7 +618,6 @@ def create_user():
 @dashboard_bp.route('/users/<int:user_id>', methods=['PUT'])
 @jwt_required()
 def update_user(user_id):
-    # Only super_admin can update arbitrary users via dashboard
     try:
         current_user_id = int(get_jwt_identity())
     except (TypeError, ValueError):
@@ -636,6 +635,7 @@ def update_user(user_id):
     name = data.get('name')
     email = data.get('email')
     password = data.get('password')
+    profile_picture = data.get('profile_picture')
 
     if email and email != user.email:
         if User.query.filter_by(email=email).first():
@@ -648,8 +648,66 @@ def update_user(user_id):
     if password:
         user.password_hash = generate_password_hash(password)
 
+    if profile_picture is not None:
+        user.profile_picture = profile_picture
+
     db.session.commit()
-    return jsonify({'message': 'User updated successfully', 'user': {'id': user.id, 'email': user.email, 'name': user.name, 'role': user.role}}), 200
+    return jsonify({'message': 'User updated successfully', 'user': {'id': user.id, 'email': user.email, 'name': user.name, 'role': user.role, 'profile_picture': user.profile_picture}}), 200
+
+
+@dashboard_bp.route('/profile', methods=['GET', 'PUT'])
+@jwt_required()
+def get_update_profile():
+    try:
+        user_id = int(get_jwt_identity())
+    except (TypeError, ValueError):
+        return jsonify({'message': 'Invalid token identity'}), 422
+
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({'message': 'User not found'}), 404
+
+    if request.method == 'GET':
+        return jsonify({
+            'id': user.id,
+            'email': user.email,
+            'name': user.name,
+            'role': user.role,
+            'profile_picture': user.profile_picture,
+            'created_at': user.created_at.isoformat() if user.created_at else None
+        }), 200
+
+    data = request.get_json() or {}
+    name = data.get('name')
+    email = data.get('email')
+    password = data.get('password')
+    profile_picture = data.get('profile_picture')
+
+    if email and email != user.email:
+        if User.query.filter_by(email=email).first():
+            return jsonify({'message': 'Email already in use'}), 400
+        user.email = email
+
+    if name is not None:
+        user.name = name
+
+    if password:
+        user.password_hash = generate_password_hash(password)
+
+    if profile_picture is not None:
+        user.profile_picture = profile_picture
+
+    db.session.commit()
+    return jsonify({
+        'message': 'Profile updated successfully',
+        'user': {
+            'id': user.id,
+            'email': user.email,
+            'name': user.name,
+            'role': user.role,
+            'profile_picture': user.profile_picture
+        }
+    }), 200
 
 
 @dashboard_bp.route('/users/<int:user_id>', methods=['DELETE'])

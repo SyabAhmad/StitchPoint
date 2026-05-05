@@ -571,9 +571,8 @@ def get_stores_analytics():
      .outerjoin(Review, Product.id == Review.product_id)\
      .outerjoin(Comment, Product.id == Comment.product_id)\
      .outerjoin(OrderItem, Product.id == OrderItem.product_id)\
-     .outerjoin(Order, OrderItem.order_id == Order.id)\
-     .filter(ProductAnalytics.timestamp >= start_date if ProductAnalytics.timestamp else True)\
-     .filter(Order.status == 'delivered')  # Only count delivered orders for revenue
+     .outerjoin(Order, db.and_(OrderItem.order_id == Order.id, Order.status == 'delivered'))\
+     .filter(db.or_(ProductAnalytics.timestamp >= start_date, ProductAnalytics.timestamp == None))
 
     if store_filter:
         query = query.filter(Store.id == store_filter)
@@ -623,54 +622,62 @@ def get_store_analytics(store_id):
     days = request.args.get('days', 30, type=int)
     start_date = datetime.utcnow() - timedelta(days=days)
 
-    # Query single store analytics
-    row = db.session.query(
-        Store.id,
-        Store.name,
-        func.count(func.distinct(Product.id)).label('total_products'),
-        func.count(ProductAnalytics.id).label('total_views'),
-        func.sum(case((ProductAnalytics.action == 'click', 1), else_=0)).label('total_clicks'),
-        func.sum(case((ProductAnalytics.action == 'add_to_cart', 1), else_=0)).label('total_cart_adds'),
-        func.avg(case((ProductAnalytics.action == 'view', ProductAnalytics.time_spent), else_=None)).label('avg_time_spent'),
-        func.count(func.distinct(Review.id)).label('total_reviews'),
-        func.avg(Review.rating).label('avg_rating'),
-        func.count(func.distinct(Comment.id)).label('total_comments'),
-        # Financial calculations
-        func.sum(Order.total_amount).label('total_revenue'),
-        func.sum(OrderItem.quantity).label('total_units_sold'),
-        func.sum(func.coalesce(Product.cost_price, Product.price) * OrderItem.quantity).label('total_costs'),
-        (func.sum(Order.total_amount) - func.sum(func.coalesce(Product.cost_price, Product.price) * OrderItem.quantity)).label('total_profit')
-    ) \
-    .outerjoin(Product, Store.id == Product.store_id) \
-    .outerjoin(ProductAnalytics, Product.id == ProductAnalytics.product_id) \
-    .outerjoin(Review, Product.id == Review.product_id) \
-    .outerjoin(Comment, Product.id == Comment.product_id) \
-    .outerjoin(OrderItem, Product.id == OrderItem.product_id) \
-    .outerjoin(Order, OrderItem.order_id == Order.id) \
-    .filter(Store.id == store_id) \
-    .filter(ProductAnalytics.timestamp >= start_date if ProductAnalytics.timestamp else True) \
-    .filter(Order.status == 'delivered') \
-    .group_by(Store.id, Store.name) \
-    .first()
-
-    if not row:
+    store = Store.query.get(store_id)
+    if not store:
         return jsonify({'message': 'Store not found'}), 404
 
+    products = Product.query.filter_by(store_id=store_id).all()
+    product_ids = [p.id for p in products]
+
+    total_products = len(products)
+
+    analytics_q = ProductAnalytics.query.filter(
+        ProductAnalytics.product_id.in_(product_ids) if product_ids else False,
+        ProductAnalytics.timestamp >= start_date
+    ).all()
+
+    total_views = sum(1 for a in analytics_q if a.action == 'view')
+    total_clicks = sum(1 for a in analytics_q if a.action == 'click')
+    total_cart_adds = sum(1 for a in analytics_q if a.action == 'add_to_cart')
+
+    time_spent_values = [a.time_spent for a in analytics_q if a.action == 'view' and a.time_spent]
+    avg_time_spent = sum(time_spent_values) / len(time_spent_values) if time_spent_values else 0
+
+    total_reviews = Review.query.filter(Review.product_id.in_(product_ids)).count() if product_ids else 0
+    avg_rating = db.session.query(func.avg(Review.rating)).filter(Review.product_id.in_(product_ids)).scalar() if product_ids else 0
+
+    total_comments = Comment.query.filter(Comment.product_id.in_(product_ids)).count() if product_ids else 0
+
+    revenue_q = db.session.query(
+        func.sum(OrderItem.quantity * Product.price).label('revenue'),
+        func.sum(OrderItem.quantity * func.coalesce(Product.cost_price, Product.price)).label('costs')
+    ).join(Product, Product.id == OrderItem.product_id)\
+     .join(Order, Order.id == OrderItem.order_id)\
+     .filter(Product.store_id == store_id)\
+     .filter(Order.status == 'delivered').first()
+
+    total_revenue = revenue_q.revenue or 0
+    total_units_sold = db.session.query(func.sum(OrderItem.quantity)).join(Product).join(Order).filter(
+        Product.store_id == store_id, Order.status == 'delivered'
+    ).scalar() or 0
+    total_costs = revenue_q.costs or 0
+    total_profit = total_revenue - total_costs
+
     store_data = {
-        'store_id': row.id,
-        'store_name': row.name,
-        'total_products': row.total_products or 0,
-        'total_views': row.total_views or 0,
-        'total_clicks': row.total_clicks or 0,
-        'total_cart_adds': row.total_cart_adds or 0,
-        'avg_time_spent': round(row.avg_time_spent or 0, 2),
-        'total_reviews': row.total_reviews or 0,
-        'avg_rating': round(row.avg_rating or 0, 2),
-        'total_comments': row.total_comments or 0,
-        'total_revenue': round(row.total_revenue or 0, 2),
-        'total_units_sold': row.total_units_sold or 0,
-        'total_costs': round(row.total_costs or 0, 2),
-        'total_profit': round(row.total_profit or 0, 2)
+        'store_id': store.id,
+        'store_name': store.name,
+        'total_products': total_products,
+        'total_views': total_views,
+        'total_clicks': total_clicks,
+        'total_cart_adds': total_cart_adds,
+        'avg_time_spent': round(avg_time_spent, 2),
+        'total_reviews': total_reviews,
+        'avg_rating': round(avg_rating or 0, 2),
+        'total_comments': total_comments,
+        'total_revenue': round(total_revenue or 0, 2),
+        'total_units_sold': total_units_sold or 0,
+        'total_costs': round(total_costs or 0, 2),
+        'total_profit': round(total_profit or 0, 2)
     }
 
     return jsonify({'store': store_data}), 200
@@ -692,62 +699,64 @@ def get_products_by_store():
     start_date = datetime.utcnow() - timedelta(days=days)
 
     store_id = request.args.get('store_id', type=int)
-    # For managers, default to their store
-    if user.role == 'manager' and user.store:
-        store_id = user.store.id
-
     if not store_id:
         return jsonify({'message': 'store_id is required'}), 400
 
-    # Query products for the given store
-    query = db.session.query(
-        Product.id,
-        Product.name,
-        Product.store_id,
-        func.count(ProductAnalytics.id).label('total_views'),
-        func.sum(case((ProductAnalytics.action == 'click', 1), else_=0)).label('total_clicks'),
-        func.sum(case((ProductAnalytics.action == 'add_to_cart', 1), else_=0)).label('total_cart_adds'),
-        func.avg(case((ProductAnalytics.action == 'view', ProductAnalytics.time_spent), else_=None)).label('avg_time_spent'),
-        func.count(func.distinct(Review.id)).label('total_reviews'),
-        func.avg(Review.rating).label('avg_rating'),
-        func.count(func.distinct(Comment.id)).label('total_comments'),
-        # Financial data
-        func.sum(Order.total_amount).label('total_revenue'),
-        func.sum(OrderItem.quantity).label('total_units_sold'),
-        func.sum(func.coalesce(Product.cost_price, Product.price) * OrderItem.quantity).label('total_costs'),
-        (func.sum(Order.total_amount) - func.sum(func.coalesce(Product.cost_price, Product.price) * OrderItem.quantity)).label('total_profit')
-    ) \
-    .outerjoin(ProductAnalytics, Product.id == ProductAnalytics.product_id) \
-    .outerjoin(Review, Product.id == Review.product_id) \
-    .outerjoin(Comment, Product.id == Comment.product_id) \
-    .outerjoin(OrderItem, Product.id == OrderItem.product_id) \
-    .outerjoin(Order, OrderItem.order_id == Order.id) \
-    .filter(Product.store_id == store_id) \
-    .filter(ProductAnalytics.timestamp >= start_date if ProductAnalytics.timestamp else True) \
-    .filter(Order.status == 'delivered') \
-    .group_by(Product.id, Product.name, Product.store_id) \
-    .order_by(desc('total_views'))
-
-    results = query.all()
+    products = Product.query.filter_by(store_id=store_id).all()
 
     data = []
-    for row in results:
+    for product in products:
+        product_id = product.id
+
+        analytics_q = ProductAnalytics.query.filter(
+            ProductAnalytics.product_id == product_id,
+            ProductAnalytics.timestamp >= start_date
+        ).all()
+
+        total_views = sum(1 for a in analytics_q if a.action == 'view')
+        total_clicks = sum(1 for a in analytics_q if a.action == 'click')
+        total_cart_adds = sum(1 for a in analytics_q if a.action == 'add_to_cart')
+
+        time_spent_vals = [a.time_spent for a in analytics_q if a.action == 'view' and a.time_spent]
+        avg_time_spent = sum(time_spent_vals) / len(time_spent_vals) if time_spent_vals else 0
+
+        total_reviews = Review.query.filter_by(product_id=product_id).count()
+        avg_rating = db.session.query(func.avg(Review.rating)).filter_by(product_id=product_id).scalar() or 0
+
+        total_comments = Comment.query.filter_by(product_id=product_id).count()
+
+        revenue_q = db.session.query(
+            func.sum(OrderItem.quantity * product.price).label('revenue'),
+            func.sum(OrderItem.quantity * func.coalesce(product.cost_price, product.price)).label('costs')
+        ).join(Order, db.and_(Order.id == OrderItem.order_id, Order.status == 'delivered'))\
+         .filter(OrderItem.product_id == product_id).first()
+
+        total_revenue = revenue_q.revenue or 0 if revenue_q else 0
+        total_units_sold = db.session.query(func.sum(OrderItem.quantity)).join(
+            Order, db.and_(Order.id == OrderItem.order_id, Order.status == 'delivered')
+        ).filter(OrderItem.product_id == product_id).scalar() or 0
+
+        total_costs = revenue_q.costs or 0 if revenue_q else 0
+        total_profit = total_revenue - total_costs
+
         data.append({
-            'product_id': row.id,
-            'product_name': row.name,
-            'store_id': row.store_id,
-            'total_views': row.total_views or 0,
-            'total_clicks': row.total_clicks or 0,
-            'total_cart_adds': row.total_cart_adds or 0,
-            'avg_time_spent': round(row.avg_time_spent or 0, 2),
-            'total_reviews': row.total_reviews or 0,
-            'avg_rating': round(row.avg_rating or 0, 2),
-            'total_comments': row.total_comments or 0,
-            'total_revenue': round(row.total_revenue or 0, 2),
-            'total_units_sold': row.total_units_sold or 0,
-            'total_costs': round(row.total_costs or 0, 2),
-            'total_profit': round(row.total_profit or 0, 2)
+            'product_id': product_id,
+            'product_name': product.name,
+            'store_id': product.store_id,
+            'total_views': total_views,
+            'total_clicks': total_clicks,
+            'total_cart_adds': total_cart_adds,
+            'avg_time_spent': round(avg_time_spent, 2),
+            'total_reviews': total_reviews,
+            'avg_rating': round(avg_rating, 2),
+            'total_comments': total_comments,
+            'total_revenue': round(total_revenue, 2),
+            'total_units_sold': total_units_sold,
+            'total_costs': round(total_costs, 2),
+            'total_profit': round(total_profit, 2)
         })
+
+    data.sort(key=lambda x: x['total_views'], reverse=True)
 
     return jsonify({'products': data}), 200
 

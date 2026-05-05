@@ -10,7 +10,7 @@ class User(db.Model):
     password_hash = db.Column(db.String(256), nullable=False)
     name = db.Column(db.String(100), nullable=True)
     role = db.Column(db.String(20), default='customer')
-    profile_picture = db.Column(db.String(500), nullable=True)
+    profile_picture = db.Column(db.Text, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     # Relationships

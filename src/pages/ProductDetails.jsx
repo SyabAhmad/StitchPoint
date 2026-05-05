@@ -158,6 +158,7 @@ const ProductDetails = ({
     } else {
       try {
         await addToCart(product, quantity);
+        logAnalytics(product.id, "add_to_cart");
         toast.success(`${product.name} added to cart!`);
       } catch {
         toast.error("Failed to add to cart");

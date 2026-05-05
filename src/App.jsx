@@ -43,6 +43,7 @@ import Reviews from "./pages/super_admin/Reviews.jsx";
 import ReviewDetails from "./pages/super_admin/ReviewDetails.jsx";
 import CommissionRates from "./pages/super_admin/CommissionRates.jsx";
 import Commissions from "./pages/super_admin/Commissions.jsx";
+import SuperAdminSettings from "./pages/super_admin/Settings.jsx";
 
 function App() {
   return (
@@ -110,6 +111,7 @@ function App() {
           <Route path="reviews/:review_id" element={<ReviewDetails />} />
           <Route path="commission-rates" element={<CommissionRates />} />
           <Route path="commissions" element={<Commissions />} />
+          <Route path="settings" element={<SuperAdminSettings />} />
         </Route>
       </Routes>
     </Router>

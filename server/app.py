@@ -35,7 +35,7 @@ app.config.from_object(Config)
 db.init_app(app)
 migrate = Migrate(app, db)
 jwt = JWTManager(app)
-CORS(app)
+CORS(app, resources={r"/api/*": {"origins": "http://localhost:5173"}}, supports_credentials=True)
 
 # Set up logger
 logger = setup_logger()
