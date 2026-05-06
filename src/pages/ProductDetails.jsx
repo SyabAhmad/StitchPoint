@@ -923,7 +923,7 @@ const ProductDetails = ({
                         >
                           <div className="flex items-center justify-between mb-4">
                             <div className="flex items-center space-x-3">
-                              <div className="w-10 h-10 bg-white0 rounded-full flex items-center justify-center">
+                              <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
                                 <FaUser className="text-gray-800" size={16} />
                               </div>
                               <div>
@@ -950,6 +950,20 @@ const ProductDetails = ({
                             </div>
                           </div>
                           <p className="text-gray-700">{review.comment}</p>
+                          {/* Show Reply if exists */}
+                          {review.reply && (
+                            <div className="mt-2 p-3 rounded-lg" style={{ backgroundColor: "#e8f5e9", borderLeft: "3px solid #4caf50" }}>
+                              <div className="flex items-center gap-2 mb-1">
+                                <span className="text-xs font-semibold" style={{ color: "#4caf50" }}>Manager Reply</span>
+                                {review.replied_at && (
+                                  <span className="text-xs" style={{ color: "#888" }}>
+                                    ({new Date(review.replied_at).toLocaleDateString()})
+                                  </span>
+                                )}
+                              </div>
+                              <p className="text-gray-700 text-sm">{review.reply}</p>
+                            </div>
+                          )}
                         </div>
                       ))}
                     </div>
@@ -1026,7 +1040,7 @@ const ProductDetails = ({
                         >
                           <div className="flex items-center justify-between mb-2">
                             <div className="flex items-center space-x-3">
-                              <div className="w-8 h-8 bg-white0 rounded-full flex items-center justify-center">
+                              <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
                                 <FaUser className="text-gray-800" size={14} />
                               </div>
                               <div>
@@ -1044,6 +1058,20 @@ const ProductDetails = ({
                             </div>
                           </div>
                           <p className="text-gray-700">{comment.comment}</p>
+                          {/* Show Reply if exists */}
+                          {comment.reply && (
+                            <div className="mt-2 p-3 rounded-lg" style={{ backgroundColor: "#e8f5e9", borderLeft: "3px solid #4caf50" }}>
+                              <div className="flex items-center gap-2 mb-1">
+                                <span className="text-xs font-semibold" style={{ color: "#4caf50" }}>Manager Reply</span>
+                                {comment.replied_at && (
+                                  <span className="text-xs" style={{ color: "#888" }}>
+                                    ({new Date(comment.replied_at).toLocaleDateString()})
+                                  </span>
+                                )}
+                              </div>
+                              <p className="text-gray-700 text-sm">{comment.reply}</p>
+                            </div>
+                          )}
                         </div>
                       ))}
                     </div>

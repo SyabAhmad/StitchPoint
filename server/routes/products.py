@@ -620,9 +620,11 @@ def get_reviews(product_id):
         reviews_list.append({
             'id': r.id,
             'user_id': r.user_id,
-            'user_name': reviewer_name,
+            'user_name': reviewer_name or "Anonymous",
             'rating': r.rating,
             'comment': r.comment,
+            'reply': r.reply,
+            'replied_at': r.replied_at.isoformat() if r.replied_at else None,
             'created_at': r.created_at.isoformat()
         })
 
@@ -706,8 +708,10 @@ def get_comments(product_id):
         comments_list.append({
             'id': c.id,
             'user_id': c.user_id,
-            'user_name': commenter_name,
+            'user_name': commenter_name or "Anonymous",
             'comment': c.comment,
+            'reply': c.reply,
+            'replied_at': c.replied_at.isoformat() if c.replied_at else None,
             'created_at': c.created_at.isoformat()
         })
 
@@ -845,14 +849,21 @@ def get_all_comments():
     comments_list = []
     for comment, product_name, store_id in comments_query:
         store = Store.query.get(store_id) if store_id else None
+        # Get the actual user name from user ID if user_name is not set
+        commenter_name = comment.user_name
+        if not commenter_name and comment.user_id:
+            u = User.query.get(comment.user_id)
+            commenter_name = u.name if u and u.name else (u.email if u else None)
         comments_list.append({
             'id': comment.id,
             'product_id': comment.product_id,
             'product_name': product_name,
             'store_name': store.name if store else 'Unknown Store',
             'user_id': comment.user_id,
-            'user_name': comment.user_name,
+            'user_name': commenter_name or "Anonymous",
             'comment': comment.comment,
+            'reply': comment.reply,
+            'replied_at': comment.replied_at.isoformat() if comment.replied_at else None,
             'created_at': comment.created_at.isoformat()
         })
 

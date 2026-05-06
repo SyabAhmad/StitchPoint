@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { FaSearch, FaFilter, FaTrash, FaEye, FaComment } from "react-icons/fa";
+import { FaSearch, FaFilter, FaTrash, FaEye, FaComment, FaReply } from "react-icons/fa";
 import toast from "react-hot-toast";
 
 const Comments = () => {
@@ -11,6 +11,8 @@ const Comments = () => {
   const [selectedProduct, setSelectedProduct] = useState("");
   const [sortBy, setSortBy] = useState("newest");
   const [products, setProducts] = useState([]);
+  const [replyingTo, setReplyingTo] = useState(null);
+  const [replyText, setReplyText] = useState("");
 
   useEffect(() => {
     fetchComments();
@@ -80,6 +82,41 @@ const Comments = () => {
     } catch (error) {
       console.error("Error deleting comment:", error);
       toast.error("Error deleting comment");
+    }
+  };
+
+  const submitReply = async (commentId) => {
+    if (!replyText.trim()) {
+      toast.error("Please enter a reply");
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        `http://127.0.0.1:5000/api/dashboard/comments/${commentId}/reply`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ reply: replyText }),
+        }
+      );
+
+      if (response.ok) {
+        toast.success("Reply added successfully");
+        setReplyingTo(null);
+        setReplyText("");
+        fetchComments();
+      } else {
+        const data = await response.json();
+        toast.error(data.message || "Failed to add reply");
+      }
+    } catch (error) {
+      console.error("Error adding reply:", error);
+      toast.error("Error adding reply");
     }
   };
 
@@ -240,17 +277,71 @@ const Comments = () => {
                         </p>
                       </div>
 
+                      {/* Reply Display */}
+                      {comment.reply && (
+                        <div className="mb-3 p-3 rounded-lg" style={{ backgroundColor: "#e8f5e9", borderLeft: "3px solid #4caf50" }}>
+                          <div className="flex items-center gap-2 mb-1">
+                            <FaReply className="text-sm" style={{ color: "#4caf50" }} />
+                            <span className="text-xs font-semibold" style={{ color: "#4caf50" }}>Manager Reply</span>
+                            {comment.replied_at && (
+                              <span className="text-xs" style={{ color: "#888" }}>
+                                ({new Date(comment.replied_at).toLocaleDateString()})
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-gray-700 text-sm">{comment.reply}</p>
+                        </div>
+                      )}
+
+                      {/* Reply Form */}
+                      {replyingTo === comment.id ? (
+                        <div className="mb-3 p-3 rounded-lg" style={{ backgroundColor: "#f5f5f5" }}>
+                          <textarea
+                            value={replyText}
+                            onChange={(e) => setReplyText(e.target.value)}
+                            placeholder="Write your reply to this comment..."
+                            className="w-full p-2 border rounded-lg text-sm"
+                            rows={2}
+                          />
+                          <div className="flex gap-2 mt-2">
+                            <button
+                              onClick={() => submitReply(comment.id)}
+                              className="px-3 py-1 bg-black text-white text-sm rounded hover:bg-gray-800"
+                            >
+                              Submit Reply
+                            </button>
+                            <button
+                              onClick={() => { setReplyingTo(null); setReplyText(""); }}
+                              className="px-3 py-1 bg-gray-300 text-gray-700 text-sm rounded hover:bg-gray-400"
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        </div>
+                      ) : null}
+
                       <div className="flex items-center space-x-4 text-sm text-gray-600">
-                        <span className="font-medium">Product:</span>
-                        <span>{comment.product_name || "Unknown Product"}</span>
+                        <button
+                          onClick={() => navigate(`/product/${comment.product_id}`)}
+                          className="font-medium hover:underline flex items-center gap-1"
+                        >
+                          <FaEye className="text-xs" /> Product: {comment.product_name || "Unknown Product"}
+                        </button>
                         <span className="text-gray-400">•</span>
-                        <span>
-                          Store: {comment.store_name || "Unknown Store"}
-                        </span>
+                        <span>Store: {comment.store_name || "Unknown Store"}</span>
                       </div>
                     </div>
 
                     <div className="flex items-center space-x-2 ml-4">
+                      {!comment.reply && (
+                        <button
+                          onClick={() => { setReplyingTo(comment.id); setReplyText(""); }}
+                          className="p-2 text-gray-400 hover:text-green-600 transition-colors duration-200"
+                          title="Reply to Comment"
+                        >
+                          <FaReply />
+                        </button>
+                      )}
                       <button
                         onClick={() => {
                           navigate(`/product/${comment.product_id}`);

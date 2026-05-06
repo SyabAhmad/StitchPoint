@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation, Outlet } from "react-router-dom";
-import { FaBars, FaTimes } from "react-icons/fa";
+import { FaBars, FaTimes, FaShoppingBag, FaHeart, FaBox, FaUser, FaArrowRight, FaStar, FaMapMarkerAlt, FaCreditCard } from "react-icons/fa";
 import { fetchWithAuth } from "../../utils/fetchWithAuth.js";
-import SmartFooter from "../../components/footer/SmartFooter.jsx";
 
 const CustomerDashboard = () => {
   const navigate = useNavigate();
@@ -15,32 +14,29 @@ const CustomerDashboard = () => {
   const [totalOrders, setTotalOrders] = useState(0);
   const [recommendedProducts, setRecommendedProducts] = useState([]);
   const [profilePicture, setProfilePicture] = useState(null);
+  const [localUser, setLocalUser] = useState({});
   const [loading, setLoading] = useState(true);
 
-  // Toggle sidebar function
-  const toggleSidebar = () => {
-    console.log("Toggling sidebar. Current state:", sidebarOpen);
-    setSidebarOpen(!sidebarOpen);
-    console.log("New sidebar state will be:", !sidebarOpen);
+  const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
+
+  const getProfileImageUrl = (path) => {
+    if (!path) return "";
+    if (path.startsWith('http')) return path;
+    return `http://localhost:5000${path}`;
   };
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    const userData = JSON.parse(localStorage.getItem("user"));
+    const userData = JSON.parse(localStorage.getItem("user") || "{}");
+    setLocalUser(userData);
 
     if (!token || !userData || userData.role !== "customer") {
       window.location.href = "/login";
       return;
     }
 
-    // Fetch dashboard data
     fetchWithAuth("http://localhost:5000/api/dashboard/customer")
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return response.json();
-      })
+      .then((response) => response.json())
       .then((data) => {
         setOrders(data.orders || []);
         setCartItems(data.cart_items || []);
@@ -48,440 +44,132 @@ const CustomerDashboard = () => {
         setTotalSpent(data.total_spent || 0);
         setTotalOrders(data.total_orders || 0);
         setRecommendedProducts(data.recommended_products || []);
-        // Update profile picture from dashboard data
-        if (data.user?.profile_picture) {
-          setProfilePicture(data.user.profile_picture);
+        if (data.user) {
+          setProfilePicture(data.user.profile_picture || null);
+          if (data.user.profile_picture) {
+            const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
+            storedUser.profile_picture = data.user.profile_picture;
+            localStorage.setItem("user", JSON.stringify(storedUser));
+          }
         }
         setLoading(false);
       })
-      .catch((error) => {
-        console.error("Error fetching dashboard data:", error);
-        setOrders([]);
-        setCartItems([]);
-        setWishlistItems([]);
-        setTotalSpent(0);
-        setTotalOrders(0);
-        setRecommendedProducts([]);
-        setLoading(false);
-      });
+      .catch(() => setLoading(false));
   }, []);
 
   if (loading) {
     return (
-      <div
-        className="flex justify-center items-center h-screen"
-        style={{ backgroundColor: "#000000", color: "#ffffff" }}
-      >
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: "#000000" }}>
         <div className="flex flex-col items-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-yellow-500 mb-4"></div>
-          <span>Loading...</span>
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2" style={{ borderColor: "#d4af37" }}></div>
+          <p className="mt-4" style={{ color: "#aaa" }}>Loading...</p>
         </div>
       </div>
     );
   }
 
-  const userData = JSON.parse(localStorage.getItem("user"));
+  const userData = localUser;
 
   return (
-    <div
-      className="h-screen flex flex-col"
-      style={{ backgroundColor: "#000000" }}
-    >
-      {/* Fixed Header */}
-      <header
-        className="shadow-lg px-6 py-4 flex-shrink-0 relative z-60"
-        style={{
-          backgroundColor: "#1d1d1d",
-          borderBottom: "1px solid #2d2d2d",
-        }}
-      >
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <button
-              onClick={toggleSidebar}
-              className="p-2 rounded-lg transition-colors"
-              style={{ backgroundColor: "#2d2d2d", color: "#ffffff" }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = "#d4af37";
-                e.currentTarget.style.color = "#000000";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = "#2d2d2d";
-                e.currentTarget.style.color = "#ffffff";
-              }}
-            >
-              {sidebarOpen ? <FaTimes /> : <FaBars />}
-            </button>
-            <h1 className="text-white text-2xl font-bold">Naqsh Studio</h1>
-            <span style={{ color: "#cccccc" }}>Customer Dashboard</span>
-          </div>
-          <div className="flex items-center space-x-4">
-            <Link
-              to="/"
-              className="px-4 py-2 rounded-lg transition-all"
-              style={{ backgroundColor: "white", color: "#000000" }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = "#b8860b";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = "#d4af37";
-              }}
-            >
-              Home
-            </Link>
-            <Link
-              to="/shop"
-              className="px-4 py-2 rounded-lg transition-all"
-              style={{ backgroundColor: "white", color: "#000000" }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = "#b8860b";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = "#d4af37";
-              }}
-            >
-              Shop
-            </Link>
-            <Link
-              to="/customer-dashboard/profile"
-              className="px-4 py-2 rounded-lg transition-all"
-              style={{
-                backgroundColor:
-                  location.pathname === "/customer-dashboard/profile"
-                    ? "#b8860b"
-                    : "#d4af37",
-                color: "#000000",
-              }}
-              onMouseEnter={(e) => {
-                if (location.pathname !== "/customer-dashboard/profile") {
-                  e.currentTarget.style.backgroundColor = "#b8860b";
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (location.pathname !== "/customer-dashboard/profile") {
-                  e.currentTarget.style.backgroundColor = "#d4af37";
-                }
-              }}
-            >
-              Profile
-            </Link>
-            <button
-              onClick={() => {
-                localStorage.clear();
-                window.location.href = "/login";
-              }}
-              className="px-4 py-2 rounded-lg transition-all hover:cursor-pointer"
-              style={{ backgroundColor: "#dc3545", color: "#ffffff" }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = "#c82333";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = "#dc3545";
-              }}
-            >
-              Logout
-            </button>
+    <div className="min-h-screen flex flex-col" style={{ backgroundColor: "#000000" }}>
+      {/* Header */}
+      <header className="sticky top-0 z-50 shadow-lg" style={{ backgroundColor: "#0a0a0a", borderBottom: "1px solid #1a1a1a" }}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center gap-4">
+              <button onClick={toggleSidebar} className="p-2 rounded-lg lg:hidden" style={{ backgroundColor: "#141414" }}>
+                {sidebarOpen ? <FaTimes style={{ color: "#d4af37" }} /> : <FaBars style={{ color: "#d4af37" }} />}
+              </button>
+              <Link to="/" className="text-xl font-bold tracking-[0.2em]" style={{ fontFamily: '"Playfair Display", serif', color: "#d4af37" }}>
+                NAQSH
+              </Link>
+            </div>
+            <nav className="hidden md:flex items-center gap-1">
+              {[{ to: "/", label: "HOME" }, { to: "/shop", label: "SHOP" }, { to: "/customer-dashboard/profile", label: "PROFILE", highlight: true }].map((item) => (
+                <Link key={item.to} to={item.to} className="px-4 py-2 rounded-lg text-sm font-bold tracking-widest transition-colors" 
+                  style={{ color: item.highlight ? "#d4af37" : "#888" }}>
+                  {item.label}
+                </Link>
+              ))}
+              <button onClick={() => { localStorage.clear(); window.location.href = "/login"; }} className="px-4 py-2 rounded-lg text-sm font-bold tracking-widest" style={{ color: "#dc3545" }}>LOGOUT</button>
+            </nav>
           </div>
         </div>
       </header>
 
-      <div className="flex-1 flex overflow-hidden relative">
-        {/* Mobile Overlay */}
-        {sidebarOpen && (
-          <div
-            className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
-            onClick={() => setSidebarOpen(false)}
-          ></div>
-        )}
+      <div className="flex-1 flex">
+        {sidebarOpen && <div className="fixed inset-0 bg-black/80 z-40 lg:hidden" onClick={() => setSidebarOpen(false)}></div>}
 
-        {/* Fixed Aside */}
-        <aside
-          className={`fixed inset-y-0 left-0 z-50 w-64 shadow-lg transform transition-transform duration-300 ease-in-out ${
-            sidebarOpen ? "translate-x-0" : "-translate-x-full"
-          }`}
-          style={{ backgroundColor: "#1d1d1d" }}
-        >
-          <div
-            className="flex items-center justify-between p-6 border-b lg:hidden"
-            style={{ borderColor: "#2d2d2d" }}
-          >
-            <h2 className="text-lg font-semibold" style={{ color: "#ffffff" }}>
-              Menu
-            </h2>
-            <button
-              onClick={() => setSidebarOpen(false)}
-              className="p-2 rounded-lg transition-colors"
-              style={{ backgroundColor: "#2d2d2d", color: "#ffffff" }}
-            >
-              <FaTimes />
-            </button>
-          </div>
-          <div className="p-6 border-b" style={{ borderColor: "#2d2d2d" }}>
-            <div className="flex items-center space-x-3">
-              <img
-                className="h-12 w-12 rounded-full object-cover border-2"
-                style={{ borderColor: "#d4af37" }}
-                src={
-                  profilePicture ||
-                  userData?.profile_picture ||
-                  "/placeholder-avatar.svg"
-                }
-                alt="Profile"
-                onError={(e) => {
-                  e.target.src = "/placeholder-avatar.svg";
-                }}
-              />
+        {/* Sidebar */}
+        <aside className={`fixed inset-y-0 left-0 z-50 w-64 shadow-2xl lg:static lg:shadow-none lg:translate-x-0 transform transition-transform duration-300 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}`} style={{ backgroundColor: "#0a0a0a" }}>
+          <div className="p-6 border-b" style={{ borderColor: "#1a1a1a" }}>
+            <div className="flex items-center gap-3">
+              <div className="w-14 h-14 rounded-full overflow-hidden flex items-center justify-center" style={{ backgroundColor: "#141414", border: "2px solid #d4af37" }}>
+              {profilePicture || localUser?.profile_picture || userData?.profile_picture ? (
+                <img 
+                  src={getProfileImageUrl(profilePicture || localUser?.profile_picture || userData?.profile_picture)} 
+                  alt="Profile" 
+                  className="w-full h-full object-cover"
+                  onError={(e) => { console.error("Image load error:", e.target.src); e.target.style.display='none'; }}
+                />
+              ) : (
+                <FaUser className="text-xl" style={{ color: "#d4af37" }} />
+              )}
+              </div>
               <div>
-                <p className="font-semibold" style={{ color: "#ffffff" }}>
-                  {userData?.name || "Customer"}
-                </p>
-                <p className="text-sm" style={{ color: "#cccccc" }}>
-                  {userData?.email}
-                </p>
+                <p className="font-bold tracking-wider" style={{ color: "#fff" }}>{userData?.name || "Guest"}</p>
+                <p className="text-xs" style={{ color: "#555" }}>{userData?.email}</p>
               </div>
             </div>
           </div>
 
-          <nav className="mt-6">
-            <div className="px-6">
-              <h3
-                className="text-xs font-semibold uppercase tracking-wider mb-3"
-                style={{ color: "#d4af37" }}
-              >
-                Dashboard
-              </h3>
-              <ul className="space-y-2">
-                <li>
-                  <Link
-                    to="/customer-dashboard"
-                    className={`flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all ${
-                      location.pathname === "/customer-dashboard"
-                        ? "active-menu-item"
-                        : ""
-                    }`}
-                    style={{
-                      color:
-                        location.pathname === "/customer-dashboard"
-                          ? "#d4af37"
-                          : "#ffffff",
-                      backgroundColor:
-                        location.pathname === "/customer-dashboard"
-                          ? "#2d2d2d"
-                          : "transparent",
+          <nav className="p-3">
+            <ul className="space-y-1">
+              {[
+                { path: "/customer-dashboard", label: "DASHBOARD", icon: "✦" },
+                { path: "/customer-dashboard/cart", label: "CART", icon: <FaShoppingBag />, badge: cartItems.length },
+                { path: "/customer-dashboard/wishlist", label: "WISHLIST", icon: <FaHeart />, badge: wishlistItems.length },
+                { path: "/customer-dashboard/orders", label: "ORDERS", icon: <FaBox />, badge: totalOrders }
+              ].map((item) => (
+                <li key={item.path}>
+                  <Link to={item.path} onClick={() => setSidebarOpen(false)}
+                    className="flex items-center px-4 py-3 rounded-lg transition-all"
+                    style={{ 
+                      color: location.pathname === item.path ? "#d4af37" : "#888",
+                      backgroundColor: location.pathname === item.path ? "#141414" : "transparent"
                     }}
-                    onMouseEnter={(e) => {
-                      if (location.pathname !== "/customer-dashboard") {
-                        e.currentTarget.style.backgroundColor = "#2d2d2d";
-                        e.currentTarget.style.color = "#d4af37";
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (location.pathname !== "/customer-dashboard") {
-                        e.currentTarget.style.backgroundColor = "transparent";
-                        e.currentTarget.style.color = "#ffffff";
-                      }
-                    }}
-                    onClick={() => setSidebarOpen(false)}
                   >
-                    📊 Overview
+                    <span className="mr-3" style={{ color: location.pathname === item.path ? "#d4af37" : "#444" }}>{item.icon}</span>
+                    <span className="flex-1 text-sm font-bold tracking-widest">{item.label}</span>
+                    {item.badge > 0 && (
+                      <span className="px-2 py-0.5 text-xs font-bold rounded-full" style={{ backgroundColor: "#d4af37", color: "#000" }}>{item.badge}</span>
+                    )}
                   </Link>
                 </li>
-                <li>
-                  <Link
-                    to="/customer-dashboard/cart"
-                    className={`flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all ${
-                      location.pathname === "/customer-dashboard/cart"
-                        ? "active-menu-item"
-                        : ""
-                    }`}
-                    style={{
-                      color:
-                        location.pathname === "/customer-dashboard/cart"
-                          ? "#d4af37"
-                          : "#ffffff",
-                      backgroundColor:
-                        location.pathname === "/customer-dashboard/cart"
-                          ? "#2d2d2d"
-                          : "transparent",
-                    }}
-                    onMouseEnter={(e) => {
-                      if (location.pathname !== "/customer-dashboard/cart") {
-                        e.currentTarget.style.backgroundColor = "#2d2d2d";
-                        e.currentTarget.style.color = "#d4af37";
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (location.pathname !== "/customer-dashboard/cart") {
-                        e.currentTarget.style.backgroundColor = "transparent";
-                        e.currentTarget.style.color = "#ffffff";
-                      }
-                    }}
-                    onClick={() => setSidebarOpen(false)}
-                  >
-                    🛒 Cart ({cartItems.length})
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/customer-dashboard/wishlist"
-                    className={`flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all ${
-                      location.pathname === "/customer-dashboard/wishlist"
-                        ? "active-menu-item"
-                        : ""
-                    }`}
-                    style={{
-                      color:
-                        location.pathname === "/customer-dashboard/wishlist"
-                          ? "#d4af37"
-                          : "#ffffff",
-                      backgroundColor:
-                        location.pathname === "/customer-dashboard/wishlist"
-                          ? "#2d2d2d"
-                          : "transparent",
-                    }}
-                    onMouseEnter={(e) => {
-                      if (
-                        location.pathname !== "/customer-dashboard/wishlist"
-                      ) {
-                        e.currentTarget.style.backgroundColor = "#2d2d2d";
-                        e.currentTarget.style.color = "#d4af37";
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (
-                        location.pathname !== "/customer-dashboard/wishlist"
-                      ) {
-                        e.currentTarget.style.backgroundColor = "transparent";
-                        e.currentTarget.style.color = "#ffffff";
-                      }
-                    }}
-                    onClick={() => setSidebarOpen(false)}
-                  >
-                    ❤️ Wishlist ({wishlistItems.length})
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/customer-dashboard/orders"
-                    className={`flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all ${
-                      location.pathname.startsWith("/customer-dashboard/orders")
-                        ? "active-menu-item"
-                        : ""
-                    }`}
-                    style={{
-                      color: location.pathname.startsWith(
-                        "/customer-dashboard/orders"
-                      )
-                        ? "#d4af37"
-                        : "#ffffff",
-                      backgroundColor: location.pathname.startsWith(
-                        "/customer-dashboard/orders"
-                      )
-                        ? "#2d2d2d"
-                        : "transparent",
-                    }}
-                    onMouseEnter={(e) => {
-                      if (
-                        !location.pathname.startsWith(
-                          "/customer-dashboard/orders"
-                        )
-                      ) {
-                        e.currentTarget.style.backgroundColor = "#2d2d2d";
-                        e.currentTarget.style.color = "#d4af37";
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (
-                        !location.pathname.startsWith(
-                          "/customer-dashboard/orders"
-                        )
-                      ) {
-                        e.currentTarget.style.backgroundColor = "transparent";
-                        e.currentTarget.style.color = "#ffffff";
-                      }
-                    }}
-                    onClick={() => setSidebarOpen(false)}
-                  >
-                    📦 Orders ({totalOrders})
-                  </Link>
-                </li>
-              </ul>
+              ))}
+            </ul>
 
-              <h3
-                className="text-xs font-semibold uppercase tracking-wider mt-8 mb-3"
-                style={{ color: "#d4af37" }}
-              >
-                Account
-              </h3>
-              <ul className="space-y-2">
+            <div className="mt-6 pt-4 border-t" style={{ borderColor: "#1a1a1a" }}>
+              <p className="px-4 text-xs font-bold tracking-widest mb-2" style={{ color: "#d4af37" }}>ACCOUNT</p>
+              <ul className="space-y-1">
                 <li>
-                  <Link
-                    to="/customer-dashboard/profile"
-                    className={`flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all ${
-                      location.pathname === "/customer-dashboard/profile"
-                        ? "active-menu-item"
-                        : ""
-                    }`}
-                    style={{
-                      color:
-                        location.pathname === "/customer-dashboard/profile"
-                          ? "#d4af37"
-                          : "#ffffff",
-                      backgroundColor:
-                        location.pathname === "/customer-dashboard/profile"
-                          ? "#2d2d2d"
-                          : "transparent",
+                  <Link to="/customer-dashboard/profile" onClick={() => setSidebarOpen(false)}
+                    className="flex items-center px-4 py-3 rounded-lg transition-all"
+                    style={{ 
+                      color: location.pathname.includes("profile") ? "#d4af37" : "#888",
+                      backgroundColor: location.pathname.includes("profile") ? "#141414" : "transparent"
                     }}
-                    onMouseEnter={(e) => {
-                      if (location.pathname !== "/customer-dashboard/profile") {
-                        e.currentTarget.style.backgroundColor = "#2d2d2d";
-                        e.currentTarget.style.color = "#d4af37";
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (location.pathname !== "/customer-dashboard/profile") {
-                        e.currentTarget.style.backgroundColor = "transparent";
-                        e.currentTarget.style.color = "#ffffff";
-                      }
-                    }}
-                    onClick={() => setSidebarOpen(false)}
                   >
-                    ⚙️ Profile Settings
+                    <FaUser className="mr-3" style={{ color: location.pathname.includes("profile") ? "#d4af37" : "#444" }} />
+                    <span className="text-sm font-bold tracking-widest">PROFILE</span>
                   </Link>
                 </li>
                 <li>
-                  <Link
-                    to="/collections"
-                    className={`flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all ${
-                      location.pathname === "/collections"
-                        ? "active-menu-item"
-                        : ""
-                    }`}
-                    style={{
-                      color:
-                        location.pathname === "/collections"
-                          ? "#d4af37"
-                          : "#ffffff",
-                      backgroundColor:
-                        location.pathname === "/collections"
-                          ? "#2d2d2d"
-                          : "transparent",
-                    }}
-                    onMouseEnter={(e) => {
-                      if (location.pathname !== "/collections") {
-                        e.currentTarget.style.backgroundColor = "#2d2d2d";
-                        e.currentTarget.style.color = "#d4af37";
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (location.pathname !== "/collections") {
-                        e.currentTarget.style.backgroundColor = "transparent";
-                        e.currentTarget.style.color = "#ffffff";
-                      }
-                    }}
-                    onClick={() => setSidebarOpen(false)}
+                  <Link to="/collections" onClick={() => setSidebarOpen(false)}
+                    className="flex items-center px-4 py-3 rounded-lg transition-all" style={{ color: "#888" }}
                   >
-                    🛍️ Browse Collections
+                    <span className="mr-3" style={{ color: "#444" }}>✦</span>
+                    <span className="text-sm font-bold tracking-widest">COLLECTIONS</span>
                   </Link>
                 </li>
               </ul>
@@ -489,315 +177,167 @@ const CustomerDashboard = () => {
           </nav>
         </aside>
 
-        {/* Main content area */}
-        <main className="flex-1 overflow-y-auto bg-gray-50 p-6">
+        {/* Main Content */}
+        <main className="flex-1 p-4 md:p-6 lg:p-8 overflow-y-auto">
           <div className="max-w-7xl mx-auto">
-            {/* Customer Dashboard Overview - Only show on main dashboard route */}
             {location.pathname === "/customer-dashboard" && (
               <>
-                {/* User Header */}
-                <div
-                  className="shadow-lg rounded-2xl mb-8 p-8"
-                  style={{ backgroundColor: "#1d1d1d" }}
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center">
-                      <div className="flex-shrink-0">
-                        <img
-                          className="h-20 w-20 rounded-full object-cover border-4 shadow-lg"
-                          style={{ borderColor: "#d4af37" }}
-                          src={
-                            profilePicture ||
-                            userData?.profile_picture ||
-                            "/placeholder-avatar.svg"
-                          }
-                          alt="Profile"
-                          onError={(e) => {
-                            e.target.src = "/placeholder-avatar.svg";
-                          }}
+                {/* Welcome Hero */}
+                <div className="rounded-2xl p-6 md:p-10 mb-8 relative overflow-hidden" style={{ backgroundColor: "#0a0a0a", backgroundImage: "radial-gradient(circle at 80% 50%, rgba(212,175,55,0.05) 0%, transparent 50%)" }}>
+                  <div className="absolute top-0 right-0 w-64 h-64 opacity-5" style={{ background: "radial-gradient(circle, #d4af37 0%, transparent 70%)" }}></div>
+                  <div className="relative flex flex-col md:flex-row items-center justify-between gap-8">
+                    <div className="flex items-center gap-6">
+                      <div className="w-24 h-24 md:w-28 md:h-28 rounded-full overflow-hidden flex items-center justify-center" style={{ backgroundColor: "#141414", border: "3px solid #d4af37", boxShadow: "0 0 30px rgba(212, 175, 55, 0.3)" }}>
+                      {profilePicture || localUser?.profile_picture || userData?.profile_picture ? (
+                        <img 
+                          src={getProfileImageUrl(profilePicture || localUser?.profile_picture || userData?.profile_picture)} 
+                          alt="Profile" 
+                          className="w-full h-full object-cover"
+                          onError={(e) => { console.error("Image load error:", e.target.src); e.target.style.display='none'; }}
                         />
+                      ) : (
+                        <FaUser className="text-4xl" style={{ color: "#d4af37" }} />
+                      )}
                       </div>
-                      <div className="ml-6 flex-1">
-                        <h2
-                          className="text-3xl font-extrabold"
-                          style={{ color: "#d4af37" }}
-                        >
-                          Welcome back, {userData?.name || "Customer"}! 👋
+                      <div>
+                        <p className="text-sm font-bold tracking-widest" style={{ color: "#555" }}>WELCOME BACK</p>
+                        <h2 className="text-3xl md:text-4xl font-bold tracking-widest" style={{ fontFamily: '"Playfair Display", serif', color: "#fff" }}>
+                          {userData?.name || "Guest"}
                         </h2>
-                        <p className="mt-2" style={{ color: "#cccccc" }}>
-                          {userData?.email}
-                        </p>
+                        <div className="flex items-center gap-4 mt-2">
+                          <p className="text-sm" style={{ color: "#555" }}>{userData?.email}</p>
+                          <span className="w-1 h-1 rounded-full" style={{ backgroundColor: "#333" }}></span>
+                          <p className="text-sm font-bold tracking-widest" style={{ color: "#d4af37" }}>VIP CUSTOMER</p>
+                        </div>
                       </div>
                     </div>
-                    <Link
-                      to="/customer-dashboard/profile"
-                      className="px-6 py-3 rounded-lg font-semibold transition-all transform hover:scale-105"
-                      style={{ backgroundColor: "#d4af37", color: "#000000" }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = "#b8860b";
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = "#d4af37";
-                      }}
+                    <Link to="/customer-dashboard/profile"
+                      className="px-8 py-4 rounded-xl font-bold tracking-widest uppercase text-sm transition-all hover:scale-105 hover:shadow-xl hover:shadow-[#d4af37]/30"
+                      style={{ backgroundColor: "#d4af37", color: "#000000", boxShadow: "0 4px 20px rgba(212, 175, 55, 0.4)" }}
                     >
-                      ⚙️ Manage Profile
+                      Edit Profile
                     </Link>
                   </div>
                 </div>
 
-                <h1
-                  className="text-2xl font-extrabold mb-8"
-                  style={{ color: "#d4af37" }}
-                >
-                  📊 Dashboard
-                </h1>
-
-                {/* Stats Grid - Clickable Cards */}
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
-                  {/* Cart Items */}
-                  <div
-                    onClick={() => navigate("/customer-dashboard/cart")}
-                    className="bg-white border-2 rounded-2xl p-6 shadow-md hover:shadow-xl transition-all transform hover:scale-102 cursor-pointer"
-                  >
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm font-semibold text-gray-600">
-                          🛒 Cart Items
-                        </p>
-                        <p className="text-2xl font-extrabold mt-2 text-gray-900">
-                          {cartItems.length}
-                        </p>
+                {/* Stats Cards */}
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-10">
+                  {[
+                    { label: "CART ITEMS", value: cartItems.length, icon: <FaShoppingBag />, color: "#d4af37", path: "/customer-dashboard/cart" },
+                    { label: "WISHLIST", value: wishlistItems.length, icon: <FaHeart />, color: "#ec4899", path: "/customer-dashboard/wishlist" },
+                    { label: "TOTAL ORDERS", value: totalOrders, icon: <FaBox />, color: "#3b82f6", path: "/customer-dashboard/orders" },
+                    { label: "TOTAL SPENT", value: `PKR ${totalSpent.toLocaleString()}`, icon: "✦", color: "#10b981", path: null }
+                  ].map((stat, idx) => (
+                    <div key={idx} onClick={() => stat.path && navigate(stat.path)}
+                      className="rounded-xl p-5 md:p-6 transition-all hover:scale-[1.02] hover:border-[#d4af37]/50 hover:shadow-lg hover:shadow-[#d4af37]/10 cursor-pointer group"
+                      style={{ backgroundColor: "#0a0a0a", border: "1px solid #1a1a1a" }}
+                    >
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 rounded-xl flex items-center justify-center transition-colors group-hover:bg-[#d4af37]/10" style={{ backgroundColor: "#141414", color: stat.color }}>
+                          {stat.icon}
+                        </div>
+                        <div>
+                          <p className="text-xs font-bold tracking-widest uppercase" style={{ color: "#444" }}>{stat.label}</p>
+                          <p className="text-xl md:text-2xl font-bold" style={{ color: "#fff" }}>{stat.value}</p>
+                        </div>
                       </div>
-                      <div className="text-2xl">🛍️</div>
                     </div>
-                    <p className="text-xs mt-4 text-gray-500">
-                      Click to view cart
-                    </p>
-                  </div>
-
-                  {/* Wishlist Items */}
-                  <div
-                    onClick={() => navigate("/customer-dashboard/wishlist")}
-                    className="bg-white border-2 rounded-2xl p-6 shadow-md hover:shadow-xl transition-all transform hover:scale-102 cursor-pointer"
-                  >
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm font-semibold text-gray-600">
-                          ❤️ Wishlist
-                        </p>
-                        <p className="text-2xl font-extrabold mt-2 text-gray-900">
-                          {wishlistItems.length}
-                        </p>
-                      </div>
-                      <div className="text-2xl">💝</div>
-                    </div>
-                    <p className="text-xs mt-4 text-gray-500">
-                      Click to view wishlist
-                    </p>
-                  </div>
-
-                  {/* Total Orders */}
-                  <div
-                    onClick={() => navigate("/customer-dashboard/orders")}
-                    className="bg-white border-2 rounded-2xl p-6 shadow-md hover:shadow-xl transition-all transform hover:scale-102 cursor-pointer"
-                  >
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm font-semibold text-gray-600">
-                          📦 Total Orders
-                        </p>
-                        <p className="text-2xl font-extrabold mt-2 text-gray-900">
-                          {totalOrders}
-                        </p>
-                      </div>
-                      <div className="text-2xl">📋</div>
-                    </div>
-                    <p className="text-xs mt-4 text-gray-500">
-                      Click to view all orders
-                    </p>
-                  </div>
-
-                  {/* Total Spent */}
-                  <div
-                    className="bg-white border-2 rounded-2xl p-6 shadow-md"
-                  >
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm font-semibold text-gray-600">
-                          💰 Total Spent
-                        </p>
-                        <p className="text-2xl font-extrabold mt-2 text-gray-900">
-                          PKR {totalSpent.toFixed(2)}
-                        </p>
-                      </div>
-                      <div className="text-2xl">💳</div>
-                    </div>
-                    <p className="text-xs mt-4 text-gray-500">
-                      Lifetime spending
-                    </p>
-                  </div>
+                  ))}
                 </div>
 
+                {/* Recommended Products */}
                 {recommendedProducts.length > 0 && (
-                  <div
-                    className="shadow-lg border mb-12 rounded-2xl"
-                    style={{
-                      backgroundColor: "#1d1d1d",
-                      borderColor: "#2d2d2d",
-                    }}
-                  >
-                    <div className="px-8 py-6 sm:px-8">
-                      <h3
-                        className="text-2xl font-bold"
-                        style={{ color: "#d4af37" }}
-                      >
-                        ✨ You Might Also Like
-                      </h3>
-                      <p className="mt-2" style={{ color: "#cccccc" }}>
-                        Recommended products based on your preferences
-                      </p>
-                    </div>
-                    <div className="px-8 py-6 sm:px-8">
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                        {recommendedProducts.map((product) => (
-                          <div
-                            key={product.id}
-                            onClick={() => navigate(`/product/${product.id}`)}
-                            className="hover:shadow-xl transition-all transform hover:scale-105 cursor-pointer p-4 rounded-xl"
-                            style={{ backgroundColor: "#2d2d2d" }}
-                          >
-                            <div className="mb-4 overflow-hidden rounded-lg">
-                              <img
-                                src={
-                                  product.image_url ||
-                                  "/placeholder-product.jpg"
-                                }
-                                alt={product.name}
-                                className="w-full h-40 object-cover hover:scale-110 transition-transform"
-                              />
-                            </div>
-                            <h4
-                              className="text-sm font-bold truncate"
-                              style={{ color: "#ffffff" }}
-                            >
-                              {product.name}
-                            </h4>
-                            <p
-                              className="text-xs truncate mt-1"
-                              style={{ color: "#cccccc" }}
-                            >
-                              {product.store_name}
-                            </p>
-                            <p
-                              className="text-lg font-bold mt-3"
-                              style={{ color: "#d4af37" }}
-                            >
-                              PKR {product.price}
-                            </p>
-                            <button
-                              className="mt-3 w-full py-2 px-4 rounded-lg text-sm font-bold transition-all transform hover:scale-105"
-                              style={{
-                                backgroundColor: "#d4af37",
-                                color: "#000000",
-                              }}
-                            >
-                              👁️ View Product
-                            </button>
-                          </div>
-                        ))}
+                  <div className="mb-10">
+                    <div className="flex items-center justify-between mb-6">
+                      <div>
+                        <h3 className="text-2xl font-bold tracking-widest uppercase" style={{ fontFamily: '"Playfair Display", serif', color: "#fff" }}>
+                          You Might Also Like
+                        </h3>
+                        <p className="text-sm mt-1" style={{ color: "#555" }}>Based on your shopping history</p>
                       </div>
+                      <Link to="/shop" className="flex items-center gap-2 text-sm font-bold tracking-widest uppercase px-4 py-2 rounded-lg transition-colors" style={{ color: "#d4af37", border: "1px solid #1a1a1a" }}
+                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "#141414"} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "transparent"}>
+                        View All <FaArrowRight />
+                      </Link>
+                    </div>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+                      {recommendedProducts.slice(0, 4).map((product) => (
+                        <div key={product.id} onClick={() => navigate(`/product/${product.id}`)}
+                          className="rounded-xl overflow-hidden transition-all hover:scale-[1.02] hover:shadow-2xl hover:border-[#d4af37]/50 cursor-pointer group"
+                          style={{ backgroundColor: "#0a0a0a", border: "1px solid #1a1a1a" }}
+                        >
+                          <div className="aspect-square overflow-hidden relative">
+                            <img src={product.image_url || "/placeholder-product.jpg"} alt={product.name}
+                              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                            <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                              <span className="px-4 py-2 rounded-lg font-bold tracking-widest uppercase text-sm" style={{ backgroundColor: "#d4af37", color: "#000" }}>View</span>
+                            </div>
+                          </div>
+                          <div className="p-4">
+                            <h4 className="font-bold text-sm truncate" style={{ color: "#fff" }}>{product.name}</h4>
+                            <p className="text-xs truncate mt-1" style={{ color: "#555" }}>{product.store_name}</p>
+                            <p className="text-xl font-bold mt-3" style={{ color: "#d4af37" }}>PKR {product.price}</p>
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   </div>
                 )}
 
-                {/* Recent Orders Section */}
-                <div className="bg-white border-2 rounded-2xl shadow-lg">
-                  <div className="px-8 py-6 sm:px-8">
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <h3 className="text-xl font-bold text-gray-900">
-                          📦 Recent Orders
-                        </h3>
-                        <p className="mt-2 text-gray-600">
-                          Your latest order history
-                        </p>
-                      </div>
-                      <button
-                        onClick={() => navigate("/customer-dashboard/orders")}
-                        className="px-6 py-2 rounded-lg font-bold transition-all transform hover:scale-105 bg-gray-900 hover:bg-gray-800 text-white"
-                      >
-                        View All →
-                      </button>
+                {/* Recent Orders */}
+                <div className="rounded-xl overflow-hidden" style={{ backgroundColor: "#0a0a0a", border: "1px solid #1a1a1a" }}>
+                  <div className="p-5 md:p-6 border-b flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4" style={{ borderColor: "#1a1a1a" }}>
+                    <div>
+                      <h3 className="text-xl font-bold tracking-widest uppercase" style={{ fontFamily: '"Playfair Display", serif', color: "#fff" }}>Recent Orders</h3>
+                      <p className="text-sm mt-1" style={{ color: "#555" }}>Your latest order history</p>
                     </div>
+                    <button onClick={() => navigate("/customer-dashboard/orders")}
+                      className="px-5 py-3 rounded-lg text-sm font-bold tracking-widest uppercase transition-colors"
+                      style={{ backgroundColor: "#141414", color: "#fff", border: "1px solid #2a2a2a" }}
+                    >
+                      View All
+                    </button>
                   </div>
-                  <div className="divide-y divide-gray-200">
-                    {orders.length > 0 ? (
-                      orders.slice(0, 5).map((order) => (
-                        <div
-                          key={order.id}
-                          onClick={() =>
-                            navigate(`/customer-dashboard/orders/${order.id}`)
-                          }
-                          className="px-8 py-6 hover:bg-gray-50 transition-all cursor-pointer border-l-4 border-l-transparent hover:border-l-gray-900"
-                        >
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-6">
-                              <div>
-                                <p className="text-base font-bold text-gray-900">
-                                  Order #{order.id}
-                                </p>
-                                <p className="text-sm mt-1 text-gray-600">
-                                  📅{" "}
-                                  {new Date(
-                                    order.created_at
-                                  ).toLocaleDateString("en-US", {
-                                    year: "numeric",
-                                    month: "short",
-                                    day: "numeric",
-                                  })}
-                                </p>
-                              </div>
+                  <div>
+                    {orders.length > 0 ? orders.slice(0, 5).map((order) => (
+                      <div key={order.id} onClick={() => navigate(`/customer-dashboard/orders/${order.id}`)}
+                        className="p-4 md:p-5 border-b transition-colors cursor-pointer hover:bg-[#141414] hover:border-l-2 hover:border-l-[#d4af37]"
+                        style={{ borderColor: "#1a1a1a" }}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-4">
+                            <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: "#141414" }}>
+                              <FaBox style={{ color: "#d4af37" }} />
                             </div>
-                            <div className="text-right">
-                              <p className="text-xl font-bold text-gray-900">
-                                PKR {order.total_amount}
+                            <div>
+                              <p className="font-bold tracking-widest uppercase" style={{ color: "#fff" }}>Order #{order.id}</p>
+                              <p className="text-sm" style={{ color: "#555" }}>
+                                {new Date(order.created_at).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })}
                               </p>
-                              <span
-                                className={`inline-block mt-2 px-4 py-1 text-sm font-bold rounded-full ${
-                                  order.status === "delivered"
-                                    ? "bg-green-100 text-green-800"
-                                    : order.status === "shipped"
-                                    ? "bg-blue-100 text-blue-800"
-                                    : order.status === "processing"
-                                    ? "bg-yellow-100 text-yellow-800"
-                                    : order.status === "cancelled"
-                                    ? "bg-red-100 text-red-800"
-                                    : "bg-gray-100 text-gray-800"
-                                }`}
-                              >
-                                {order.status.charAt(0).toUpperCase() +
-                                  order.status.slice(1)}
-                              </span>
                             </div>
                           </div>
+                          <div className="text-right">
+                            <p className="font-bold" style={{ color: "#fff" }}>PKR {order.total_amount}</p>
+<span className="inline-block mt-2 px-3 py-1 text-xs font-bold tracking-widest uppercase rounded-full"
+  style={{ 
+    backgroundColor: order.status === "delivered" ? "#064e3b" : order.status === "shipped" ? "#1e3a5f" : order.status === "processing" ? "#451a03" : order.status === "cancelled" ? "#450a0a" : "#1a1a1a",
+    color: order.status === "delivered" ? "#34d399" : order.status === "shipped" ? "#60a5fa" : order.status === "processing" ? "#fbbf24" : order.status === "cancelled" ? "#f87171" : "#666",
+    border: `1px solid ${order.status === "delivered" ? "#34d399" : order.status === "shipped" ? "#60a5fa" : order.status === "processing" ? "#fbbf24" : order.status === "cancelled" ? "#f87171" : "#333"}`
+  }}>
+                              {order.status}
+                            </span>
+                          </div>
                         </div>
-                      ))
-                    ) : (
-                      <div className="px-8 py-12 text-center">
-                        <p className="text-2xl" style={{ color: "#999999" }}>
-                          🛒
-                        </p>
-                        <p className="mt-3" style={{ color: "#cccccc" }}>
-                          No orders yet
-                        </p>
-                        <Link
-                          to="/collections"
-                          className="inline-block mt-4 px-6 py-2 rounded-lg font-bold transition-all"
-                          style={{
-                            backgroundColor: "#d4af37",
-                            color: "#000000",
-                          }}
-                        >
+                      </div>
+                    )) : (
+                      <div className="p-10 md:p-14 text-center">
+                        <div className="w-20 h-20 mx-auto mb-5 rounded-full flex items-center justify-center" style={{ backgroundColor: "#141414" }}>
+                          <span className="text-3xl" style={{ color: "#d4af37" }}>✦</span>
+                        </div>
+                        <p className="text-xl font-bold tracking-widest uppercase mb-3" style={{ color: "#fff" }}>No orders yet</p>
+                        <p className="mb-6" style={{ color: "#555" }}>Start shopping to see your orders here</p>
+                        <Link to="/collections" className="inline-block px-8 py-4 rounded-xl font-bold tracking-widest uppercase transition-all hover:scale-105 hover:shadow-xl hover:shadow-[#d4af37]/30"
+                          style={{ backgroundColor: "#d4af37", color: "#000" }}>
                           Start Shopping
                         </Link>
                       </div>
@@ -806,14 +346,10 @@ const CustomerDashboard = () => {
                 </div>
               </>
             )}
-
-            {/* Render nested routes for other customer dashboard pages */}
             <Outlet />
           </div>
         </main>
       </div>
-
-      <SmartFooter variant="simple" />
     </div>
   );
 };

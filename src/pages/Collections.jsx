@@ -17,7 +17,6 @@ export default function Collections() {
         const data = await response.json();
         const prods = data.products || [];
 
-        // Group products by category
         const grouped = prods.reduce((acc, product) => {
           const category = product.category || "Uncategorized";
           if (!acc[category]) {
@@ -38,7 +37,6 @@ export default function Collections() {
   }, []);
 
   const handleCategoryClick = (category) => {
-    // Navigate to shop with category filter
     navigate(`/shop?category=${encodeURIComponent(category)}`);
   };
 
@@ -50,12 +48,15 @@ export default function Collections() {
 
   if (loading) {
     return (
-      <div className="min-h-screen">
-        <div className="bg-gradient-to-br from-gold-500/5 via-white to-gold-500/5 py-12 px-4 text-center">
-          <h1 className="text-3xl md:text-4xl font-bold font-serif text-gold-500 mb-4">
-            Our Collections
-          </h1>
-          <p className="text-lg text-black/70">Loading collections...</p>
+      <div className="min-h-screen bg-white">
+        <div className="py-32 px-4 text-center">
+          <div className="inline-block px-6 py-2 border border-black/20 text-black text-sm font-bold tracking-widest uppercase mb-6">
+            COLLECTIONS
+          </div>
+          <h2 className="text-4xl md:text-5xl font-bold text-black mb-4" style={{ fontFamily: '"Playfair Display", serif' }}>
+            OUR <span className="italic">COLLECTIONS</span>
+          </h2>
+          <p className="text-lg text-gray-400" style={{ fontFamily: '"Cormorant Garamond", serif' }}>Loading collections...</p>
         </div>
       </div>
     );
@@ -63,60 +64,70 @@ export default function Collections() {
 
   if (error) {
     return (
-      <div className="min-h-screen">
-        <div className="py-12 px-4 text-center bg-gradient-to-br from-gold-500/2 to-white/98">
-          <h1 className="text-3xl md:text-4xl font-bold font-serif text-gold-500 mb-4">
-            Collections
-          </h1>
-          <p className="text-base md:text-lg text-black/70">
-            Error loading collections: {error}
-          </p>
+      <div className="min-h-screen bg-white">
+        <div className="py-32 px-4 text-center">
+          <h2 className="text-4xl md:text-5xl font-bold text-black mb-4" style={{ fontFamily: '"Playfair Display", serif' }}>
+            OUR <span className="italic">COLLECTIONS</span>
+          </h2>
+          <p className="text-lg text-gray-500">Error: {error}</p>
         </div>
       </div>
     );
   }
 
+  const categories = Object.keys(groupedProducts);
+
   return (
-    <div className="min-h-screen">
-      {/* Header Section */}
-      <div className="bg-gradient-to-br from-gold-500/5 via-white to-gold-500/5 py-12 px-4 text-center relative overflow-hidden">
+    <div className="min-h-screen bg-white">
+      {/* Hero Header */}
+      <div className="py-24 px-4 text-center relative overflow-hidden">
         <div
-          className="absolute inset-0 opacity-30"
+          className="absolute inset-0 opacity-[0.03]"
           style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23f59e0b' fill-opacity='0.03'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zM36 0v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zM36 68v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zM36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zM36 68v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zM2 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zM2 0v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zM2 68v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zM2 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zM2 68v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4z'%3E%3C/path%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
           }}
         ></div>
-        <div className="relative z-10 max-w-3xl mx-auto">
-          <h1 className="text-3xl md:text-4xl font-bold font-serif text-gold-500 mb-3 tracking-tight">
-            Our Collections
+        <div className="relative z-10 max-w-4xl mx-auto">
+          <div className="inline-block px-6 py-2 border border-black/20 text-black text-sm font-bold tracking-[0.3em] uppercase mb-6">
+            DISCOVER
+          </div>
+          <h1 className="text-5xl md:text-7xl font-bold text-black mb-6 tracking-wider" style={{ fontFamily: '"Playfair Display", serif' }}>
+            OUR <span className="italic">COLLECTIONS</span>
           </h1>
-          <p className="text-sm md:text-base text-black/70 max-w-xl mx-auto leading-relaxed font-light">
-            Explore our curated collections, each showcasing the finest
-            craftsmanship and traditional designs.
+          <p className="text-lg md:text-xl text-gray-500 max-w-2xl mx-auto leading-relaxed" style={{ fontFamily: '"Cormorant Garamond", serif' }}>
+            Explore our curated collections, each showcasing the finest craftsmanship and traditional designs that tell a story of heritage and elegance.
           </p>
         </div>
       </div>
 
       {/* Collections Grid */}
-      <div className="max-w-7xl mx-auto px-4 py-12">
-        {Object.keys(groupedProducts).length > 0 ? (
+      <div className="max-w-7xl mx-auto px-4 pb-24">
+        {categories.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {Object.entries(groupedProducts).map(
-              ([category, categoryProducts]) => (
+            {categories.map((category) => {
+              const categoryProducts = groupedProducts[category];
+              return (
                 <div
                   key={category}
-                  className="bg-white rounded-2xl shadow-lg border border-gold-500/20 overflow-hidden group hover:shadow-xl transition-all duration-300 cursor-pointer"
+                  className="group bg-white border border-black/10 hover:border-black/30 transition-all duration-500 cursor-pointer"
                   onClick={() => handleCategoryClick(category)}
                 >
-                  {/* Category Header */}
-                  <div className="bg-gradient-to-r from-gold-500 to-gold-600 p-6 text-white">
-                    <h2 className="text-xl font-bold font-serif mb-2">
-                      {category}
-                    </h2>
-                    <p className="text-gold-100 text-sm">
-                      {categoryProducts.length}{" "}
-                      {categoryProducts.length === 1 ? "item" : "items"}
-                    </p>
+                  {/* Collection Banner */}
+                  <div className="relative h-40 bg-black text-white p-6 flex flex-col justify-end overflow-hidden">
+                    <div
+                      className="absolute inset-0 opacity-20"
+                      style={{
+                        backgroundImage: `url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23ffffff' fill-opacity='0.4' fill-rule='evenodd'%3E%3C/path%3E%3C/svg%3E")`,
+                      }}
+                    ></div>
+                    <div className="relative z-10">
+                      <h2 className="text-2xl font-bold tracking-wide" style={{ fontFamily: '"Playfair Display", serif' }}>
+                        {category.toUpperCase()}
+                      </h2>
+                      <p className="text-white/70 text-sm tracking-wider mt-1">
+                        {categoryProducts.length} {categoryProducts.length === 1 ? "ITEM" : "ITEMS"}
+                      </p>
+                    </div>
                   </div>
 
                   {/* Products Preview */}
@@ -125,7 +136,7 @@ export default function Collections() {
                       {categoryProducts.slice(0, 4).map((product) => (
                         <div
                           key={product.id}
-                          className="aspect-square rounded-lg overflow-hidden bg-gray-100 relative group/product"
+                          className="aspect-square bg-black/5 border border-black/10 overflow-hidden relative group/product cursor-pointer"
                           onClick={(e) => {
                             e.stopPropagation();
                             handleProductClick(product);
@@ -135,7 +146,7 @@ export default function Collections() {
                             <img
                               src={`http://127.0.0.1:5000${product.image_url}`}
                               alt={product.name}
-                              className="w-full h-full object-cover group-hover/product:scale-110 transition-transform duration-300"
+                              className="w-full h-full object-cover grayscale group-hover/product:grayscale-0 transition-all duration-500"
                               onError={(e) => {
                                 e.target.style.display = "none";
                                 e.target.nextSibling.style.display = "flex";
@@ -145,17 +156,14 @@ export default function Collections() {
                           <div
                             className={`absolute inset-0 flex items-center justify-center ${
                               product.image_url ? "hidden" : "flex"
-                            } bg-gradient-to-br from-gold-100 to-gold-200`}
+                            } bg-black/5`}
                           >
-                            <span className="text-xs font-bold text-center px-1">
-                              {product.name && product.name.charAt
-                                ? product.name.charAt(0).toUpperCase()
-                                : "?"}
+                            <span className="text-2xl font-bold text-black">
+                              {product.name?.charAt(0)?.toUpperCase() || "?"}
                             </span>
                           </div>
-                          {/* Overlay on hover */}
-                          <div className="absolute inset-0 bg-black/20 opacity-0 group-hover/product:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                            <span className="text-white text-xs font-bold bg-black/50 px-2 py-1 rounded-full">
+                          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/product:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                            <span className="text-white text-xs font-bold bg-black/70 px-3 py-1.5 uppercase tracking-wider">
                               View
                             </span>
                           </div>
@@ -165,29 +173,27 @@ export default function Collections() {
 
                     {/* View All Button */}
                     <button
-                      className="w-full bg-gradient-to-r from-gold-500 to-gold-600 text-white py-2 px-4 rounded-lg font-bold hover:from-gold-600 hover:to-gold-700 transition-all duration-300 text-sm"
+                      className="w-full py-3 bg-black text-white font-bold tracking-[0.2em] uppercase text-xs hover:bg-gray-800 transition-all duration-300"
                       onClick={(e) => {
                         e.stopPropagation();
                         handleCategoryClick(category);
                       }}
                     >
-                      View All {category}
+                      View Collection
                     </button>
                   </div>
                 </div>
-              )
-            )}
+              );
+            })}
           </div>
         ) : (
-          <div className="text-center py-20 text-black/60 bg-white rounded-3xl shadow-xl border border-gold-500/10">
-            <p className="text-2xl font-semibold mb-4 text-gold-500">
-              No collections found!
+          <div className="text-center py-24 border border-black/10">
+            <div className="text-6xl mb-6">✦</div>
+            <p className="text-2xl font-bold text-black mb-4" style={{ fontFamily: '"Playfair Display", serif' }}>
+              No Collections Yet
             </p>
-            <p className="text-lg mb-3">
-              It seems there are no products available at the moment.
-            </p>
-            <p className="text-md">
-              Please check back later for our latest collections.
+            <p className="text-lg text-gray-500">
+              Check back soon for our curated collections.
             </p>
           </div>
         )}

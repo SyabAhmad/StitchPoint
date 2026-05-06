@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from werkzeug.security import generate_password_hash
 from werkzeug.utils import secure_filename
-from models import db, User, Order, Product, PageView, ButtonClick, Review, Store, OrderItem, Address, PaymentMethod, Cart, CartItem, WishlistItem, Commission, CommissionRate
+from models import db, User, Order, Product, PageView, ButtonClick, Review, Comment, Store, OrderItem, Address, PaymentMethod, Cart, CartItem, WishlistItem, Commission, CommissionRate
 from sqlalchemy import func
 import os
 from datetime import datetime, timedelta
@@ -655,61 +655,6 @@ def update_user(user_id):
     return jsonify({'message': 'User updated successfully', 'user': {'id': user.id, 'email': user.email, 'name': user.name, 'role': user.role, 'profile_picture': user.profile_picture}}), 200
 
 
-@dashboard_bp.route('/profile', methods=['GET', 'PUT'])
-@jwt_required()
-def get_update_profile():
-    try:
-        user_id = int(get_jwt_identity())
-    except (TypeError, ValueError):
-        return jsonify({'message': 'Invalid token identity'}), 422
-
-    user = User.query.get(user_id)
-    if not user:
-        return jsonify({'message': 'User not found'}), 404
-
-    if request.method == 'GET':
-        return jsonify({
-            'id': user.id,
-            'email': user.email,
-            'name': user.name,
-            'role': user.role,
-            'profile_picture': user.profile_picture,
-            'created_at': user.created_at.isoformat() if user.created_at else None
-        }), 200
-
-    data = request.get_json() or {}
-    name = data.get('name')
-    email = data.get('email')
-    password = data.get('password')
-    profile_picture = data.get('profile_picture')
-
-    if email and email != user.email:
-        if User.query.filter_by(email=email).first():
-            return jsonify({'message': 'Email already in use'}), 400
-        user.email = email
-
-    if name is not None:
-        user.name = name
-
-    if password:
-        user.password_hash = generate_password_hash(password)
-
-    if profile_picture is not None:
-        user.profile_picture = profile_picture
-
-    db.session.commit()
-    return jsonify({
-        'message': 'Profile updated successfully',
-        'user': {
-            'id': user.id,
-            'email': user.email,
-            'name': user.name,
-            'role': user.role,
-            'profile_picture': user.profile_picture
-        }
-    }), 200
-
-
 @dashboard_bp.route('/users/<int:user_id>', methods=['DELETE'])
 @jwt_required()
 def delete_user(user_id):
@@ -1020,6 +965,80 @@ def delete_review(review_id):
     db.session.commit()
 
     return jsonify({'message': 'Review deleted successfully'}), 200
+
+@dashboard_bp.route('/reviews/<int:review_id>/reply', methods=['POST'])
+@jwt_required()
+def reply_review(review_id):
+    try:
+        user_id = int(get_jwt_identity())
+    except (TypeError, ValueError):
+        return jsonify({'message': 'Invalid token identity'}), 422
+    user = User.query.get(user_id)
+
+    if not user or user.role not in ['manager', 'super_admin']:
+        return jsonify({'message': 'Unauthorized'}), 403
+
+    review = Review.query.get(review_id)
+    if not review:
+        return jsonify({'message': 'Review not found'}), 404
+
+    if user.role == 'manager':
+        product = Product.query.get(review.product_id)
+        if not product or product.store_id != user.store.id:
+            return jsonify({'message': 'Unauthorized to reply to this review'}), 403
+
+    data = request.get_json() or {}
+    reply_text = data.get('reply', '').strip()
+
+    if not reply_text:
+        return jsonify({'message': 'Reply text is required'}), 400
+
+    review.reply = reply_text
+    review.replied_at = datetime.utcnow()
+    db.session.commit()
+
+    return jsonify({'message': 'Reply added successfully', 'review': {
+        'id': review.id,
+        'reply': review.reply,
+        'replied_at': review.replied_at.isoformat()
+    }}), 200
+
+@dashboard_bp.route('/comments/<int:comment_id>/reply', methods=['POST'])
+@jwt_required()
+def reply_comment(comment_id):
+    try:
+        user_id = int(get_jwt_identity())
+    except (TypeError, ValueError):
+        return jsonify({'message': 'Invalid token identity'}), 422
+    user = User.query.get(user_id)
+
+    if not user or user.role not in ['manager', 'super_admin']:
+        return jsonify({'message': 'Unauthorized'}), 403
+
+    comment = Comment.query.get(comment_id)
+    if not comment:
+        return jsonify({'message': 'Comment not found'}), 404
+
+    if user.role == 'manager':
+        product = Product.query.get(comment.product_id)
+        if not product or product.store_id != user.store.id:
+            return jsonify({'message': 'Unauthorized to reply to this comment'}), 403
+
+    data = request.get_json() or {}
+    reply_text = data.get('reply', '').strip()
+
+    if not reply_text:
+        return jsonify({'message': 'Reply text is required'}), 400
+
+    comment.reply = reply_text
+    comment.replied_at = datetime.utcnow()
+    db.session.commit()
+
+    return jsonify({'message': 'Reply added successfully', 'comment': {
+        'id': comment.id,
+        'reply': comment.reply,
+        'replied_at': comment.replied_at.isoformat()
+    }}), 200
 
 # Profile routes
 @dashboard_bp.route('/profile', methods=['GET'])

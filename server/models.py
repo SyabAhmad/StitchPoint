@@ -215,6 +215,8 @@ class Review(db.Model):
     user_name = db.Column(db.String(120), nullable=True)
     rating = db.Column(db.Integer, nullable=False, default=5)
     comment = db.Column(db.Text, nullable=True)
+    reply = db.Column(db.Text, nullable=True)
+    replied_at = db.Column(db.DateTime, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     def __repr__(self):
@@ -226,6 +228,8 @@ class Comment(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
     user_name = db.Column(db.String(120), nullable=True)
     comment = db.Column(db.Text, nullable=False)
+    reply = db.Column(db.Text, nullable=True)
+    replied_at = db.Column(db.DateTime, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     def __repr__(self):
