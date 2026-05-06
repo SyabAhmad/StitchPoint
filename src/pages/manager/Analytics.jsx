@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import OverviewStats from "../../components/analytics/OverviewStats";
 import AnalyticsPieChart from "../../components/analytics/AnalyticsPieChart";
 import TopProductsList from "../../components/analytics/TopProductsList";
@@ -30,15 +31,33 @@ const ManagerAnalytics = () => {
     commentsTrends: [],
     viewsSummary: { total: 0, today: 0, this_week: 0, this_month: 0, daily: [] },
     clicksSummary: { total: 0, today: 0, this_week: 0, this_month: 0, daily: [] },
+    financial: {
+      total_revenue: 0,
+      revenue_today: 0,
+      total_units_sold: 0,
+      total_costs: 0,
+      total_profit: 0,
+      total_balance: 0,
+    },
   });
   const [loading, setLoading] = useState(true);
   const [filterDays, setFilterDays] = useState(30);
   const [activeTab, setActiveTab] = useState("overview");
 
+  const toNum = (val) => {
+    if (typeof val === 'number') return val;
+    return parseFloat(val) || 0;
+  };
+
   useEffect(() => {
     const fetchAnalytics = async () => {
       try {
         const token = localStorage.getItem("token");
+        if (!token) {
+          setLoading(false);
+          return;
+        }
+
         const [
           overviewRes,
           viewsRes,
@@ -48,55 +67,35 @@ const ManagerAnalytics = () => {
           commentsTrendsRes,
           viewsSummaryRes,
           clicksSummaryRes,
+          financialSummaryRes,
         ] = await Promise.all([
-          fetch(
-            `http://localhost:5000/api/analytics/overview?days=${filterDays}`,
-            {
-              headers: { Authorization: `Bearer ${token}` },
-            }
-          ),
-          fetch(
-            `http://localhost:5000/api/analytics/product-views?days=${filterDays}`,
-            {
-              headers: { Authorization: `Bearer ${token}` },
-            }
-          ),
-          fetch(
-            `http://localhost:5000/api/analytics/product-clicks?days=${filterDays}`,
-            {
-              headers: { Authorization: `Bearer ${token}` },
-            }
-          ),
-          fetch(
-            `http://localhost:5000/api/analytics/reviews-overview?days=${filterDays}`,
-            {
-              headers: { Authorization: `Bearer ${token}` },
-            }
-          ),
-          fetch(
-            `http://localhost:5000/api/analytics/reviews-trends?days=${filterDays}`,
-            {
-              headers: { Authorization: `Bearer ${token}` },
-            }
-          ),
-          fetch(
-            `http://localhost:5000/api/analytics/comments-trends?days=${filterDays}`,
-            {
-              headers: { Authorization: `Bearer ${token}` },
-            }
-          ),
-          fetch(
-            "http://localhost:5000/api/analytics/views-summary",
-            {
-              headers: { Authorization: `Bearer ${token}` },
-            }
-          ),
-          fetch(
-            "http://localhost:5000/api/analytics/clicks-summary",
-            {
-              headers: { Authorization: `Bearer ${token}` },
-            }
-          ),
+          fetch(`http://localhost:5000/api/analytics/overview?days=${filterDays}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          fetch(`http://localhost:5000/api/analytics/product-views?days=${filterDays}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          fetch(`http://localhost:5000/api/analytics/product-clicks?days=${filterDays}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          fetch(`http://localhost:5000/api/analytics/reviews-overview?days=${filterDays}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          fetch(`http://localhost:5000/api/analytics/reviews-trends?days=${filterDays}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          fetch(`http://localhost:5000/api/analytics/comments-trends?days=${filterDays}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          fetch("http://localhost:5000/api/analytics/views-summary", {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          fetch("http://localhost:5000/api/analytics/clicks-summary", {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          fetch("http://localhost:5000/api/analytics/financial-summary", {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
         ]);
 
         const [
@@ -108,6 +107,7 @@ const ManagerAnalytics = () => {
           commentsTrendsData,
           viewsSummaryData,
           clicksSummaryResData,
+          financialSummaryData,
         ] = await Promise.all([
           overviewRes.json(),
           viewsRes.json(),
@@ -117,6 +117,7 @@ const ManagerAnalytics = () => {
           commentsTrendsRes.json(),
           viewsSummaryRes.json(),
           clicksSummaryRes.json(),
+          financialSummaryRes.json(),
         ]);
 
         setAnalyticsData({
@@ -141,6 +142,14 @@ const ManagerAnalytics = () => {
           commentsTrends: commentsTrendsData.comments_trends || [],
           viewsSummary: viewsSummaryData || { total: 0, today: 0, this_week: 0, this_month: 0, daily: [] },
           clicksSummary: clicksSummaryResData || { total: 0, today: 0, this_week: 0, this_month: 0, daily: [] },
+          financial: financialSummaryData || {
+            total_revenue: 0,
+            revenue_today: 0,
+            total_units_sold: 0,
+            total_costs: 0,
+            total_profit: 0,
+            total_balance: 0,
+          },
         });
       } catch (error) {
         console.error("Error fetching analytics:", error);
@@ -154,12 +163,9 @@ const ManagerAnalytics = () => {
 
   if (loading) {
     return (
-      <div
-        className="flex justify-center items-center h-screen"
-        style={{ backgroundColor: "#000000", color: "#ffffff" }}
-      >
+      <div className="flex justify-center items-center h-screen" style={{ backgroundColor: "#000000", color: "#ffffff" }}>
         <div className="flex flex-col items-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-white mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-yellow-500 mb-4"></div>
           <span>Loading analytics...</span>
         </div>
       </div>
@@ -167,10 +173,7 @@ const ManagerAnalytics = () => {
   }
 
   return (
-    <div
-      className="p-8"
-      style={{ backgroundColor: "#000000", color: "#ffffff" }}
-    >
+    <div className="p-8" style={{ backgroundColor: "#000000", color: "#ffffff" }}>
       <h1 className="text-3xl font-bold mb-6" style={{ color: "#ffffff" }}>
         Analytics Dashboard
       </h1>
@@ -242,39 +245,6 @@ const ManagerAnalytics = () => {
                   <p className="text-2xl font-bold" style={{ color: "#ffffff" }}>{analyticsData.viewsSummary.total || 0}</p>
                 </div>
               </div>
-              {/* Simple bar chart for daily views */}
-              <div className="mt-4">
-                <h4 className="text-sm font-bold mb-2" style={{ color: "#ccc" }}>Daily Views - Last 30 Days</h4>
-                <div className="relative h-32 w-full">
-                  {(analyticsData.viewsSummary.daily && analyticsData.viewsSummary.daily.length > 0) ? (
-                    <div className="flex items-end h-full gap-px w-full">
-                      {analyticsData.viewsSummary.daily.map((day, idx) => {
-                        const dailyArr = analyticsData.viewsSummary.daily || [];
-                        const maxV = Math.max(...dailyArr.map(d => d.views || 0), 1);
-                        const barHeight = day.views > 0 ? Math.max((day.views / maxV) * 100, 10) : 4;
-                        return (
-                          <div 
-                            key={idx} 
-                            className="flex-1 bg-yellow-500 hover:bg-yellow-400 rounded-t transition-all"
-                            style={{ height: `${barHeight}%`, minWidth: '3px' }}
-                            title={`${day.date}: ${day.views} views`}
-                          />
-                        );
-                      })}
-                    </div>
-                  ) : (
-                    <div className="flex items-center justify-center h-full text-gray-500">
-                      No view data available
-                    </div>
-                  )}
-                </div>
-                {analyticsData.viewsSummary.daily && analyticsData.viewsSummary.daily.length > 0 && (
-                  <div className="flex justify-between text-xs mt-1" style={{ color: "#888" }}>
-                    <span>{analyticsData.viewsSummary.daily[0]?.date?.slice(5) || '-'}</span>
-                    <span>{analyticsData.viewsSummary.daily[analyticsData.viewsSummary.daily.length - 1]?.date?.slice(5) || '-'}</span>
-                  </div>
-                )}
-              </div>
             </div>
 
             {/* Clicks Summary */}
@@ -298,39 +268,6 @@ const ManagerAnalytics = () => {
                   <p className="text-2xl font-bold" style={{ color: "#ffffff" }}>{analyticsData.clicksSummary.total || 0}</p>
                 </div>
               </div>
-              {/* Simple bar chart for daily clicks */}
-              <div className="mt-4">
-                <h4 className="text-sm font-bold mb-2" style={{ color: "#ccc" }}>Daily Clicks - Last 30 Days</h4>
-                <div className="relative h-32 w-full">
-                  {(analyticsData.clicksSummary.daily && analyticsData.clicksSummary.daily.length > 0) ? (
-                    <div className="flex items-end h-full gap-px w-full">
-                      {analyticsData.clicksSummary.daily.map((day, idx) => {
-                        const dailyArr = analyticsData.clicksSummary.daily || [];
-                        const maxC = Math.max(...dailyArr.map(d => d.clicks || 0), 1);
-                        const barHeight = day.clicks > 0 ? Math.max((day.clicks / maxC) * 100, 10) : 4;
-                        return (
-                          <div 
-                            key={idx} 
-                            className="flex-1 bg-blue-500 hover:bg-blue-400 rounded-t transition-all"
-                            style={{ height: `${barHeight}%`, minWidth: '3px' }}
-                            title={`${day.date}: ${day.clicks} clicks`}
-                          />
-                        );
-                      })}
-                    </div>
-                  ) : (
-                    <div className="flex items-center justify-center h-full text-gray-500">
-                      No click data available
-                    </div>
-                  )}
-                </div>
-                {analyticsData.clicksSummary.daily && analyticsData.clicksSummary.daily.length > 0 && (
-                  <div className="flex justify-between text-xs mt-1" style={{ color: "#888" }}>
-                    <span>{analyticsData.clicksSummary.daily[0]?.date?.slice(5) || '-'}</span>
-                    <span>{analyticsData.clicksSummary.daily[analyticsData.clicksSummary.daily.length - 1]?.date?.slice(5) || '-'}</span>
-                  </div>
-                )}
-              </div>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -339,6 +276,38 @@ const ManagerAnalytics = () => {
               </div>
               <TopProductsList products={analyticsData.overview.top_products} />
             </div>
+
+            {/* Financial Summary */}
+            <div className="p-6 rounded-lg" style={{ backgroundColor: "#1a1a1a" }}>
+              <h3 className="text-xl font-bold mb-4" style={{ color: "#ffffff" }}>Financial Summary</h3>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                <div className="p-4 rounded-lg" style={{ backgroundColor: "#2d2d2d" }}>
+                  <span className="text-xs font-bold uppercase" style={{ color: "#888" }}>Revenue</span>
+                  <p className="text-xl font-bold" style={{ color: "#10b981" }}>PKR {(analyticsData.financial.total_revenue || 0).toLocaleString()}</p>
+                </div>
+                <div className="p-4 rounded-lg" style={{ backgroundColor: "#2d2d2d" }}>
+                  <span className="text-xs font-bold uppercase" style={{ color: "#888" }}>Today</span>
+                  <p className="text-xl font-bold" style={{ color: "#10b981" }}>PKR {(analyticsData.financial.revenue_today || 0).toLocaleString()}</p>
+                </div>
+                <div className="p-4 rounded-lg" style={{ backgroundColor: "#2d2d2d" }}>
+                  <span className="text-xs font-bold uppercase" style={{ color: "#888" }}>Units Sold</span>
+                  <p className="text-xl font-bold" style={{ color: "#ffffff" }}>{analyticsData.financial.total_units_sold || 0}</p>
+                </div>
+                <div className="p-4 rounded-lg" style={{ backgroundColor: "#2d2d2d" }}>
+                  <span className="text-xs font-bold uppercase" style={{ color: "#888" }}>Costs</span>
+                  <p className="text-xl font-bold" style={{ color: "#ef4444" }}>PKR {(analyticsData.financial.total_costs || 0).toLocaleString()}</p>
+                </div>
+                <div className="p-4 rounded-lg" style={{ backgroundColor: "#2d2d2d" }}>
+                  <span className="text-xs font-bold uppercase" style={{ color: "#888" }}>Profit</span>
+                  <p className="text-xl font-bold" style={{ color: analyticsData.financial.total_profit >= 0 ? "#10b981" : "#ef4444" }}>PKR {(analyticsData.financial.total_profit || 0).toLocaleString()}</p>
+                </div>
+                <div className="p-4 rounded-lg" style={{ backgroundColor: "#2d2d2d" }}>
+                  <span className="text-xs font-bold uppercase" style={{ color: "#888" }}>Balance</span>
+                  <p className="text-xl font-bold" style={{ color: "#d4af37" }}>PKR {(analyticsData.financial.total_balance || 0).toLocaleString()}</p>
+                </div>
+              </div>
+            </div>
+
             {/* Reviews & Comments Summary */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="p-4 rounded-lg border border-white/20" style={{ backgroundColor: "#1a1a1a" }}>
@@ -347,7 +316,7 @@ const ManagerAnalytics = () => {
               </div>
               <div className="p-4 rounded-lg border border-white/20" style={{ backgroundColor: "#1a1a1a" }}>
                 <h3 className="text-sm font-bold uppercase tracking-widest mb-2" style={{ color: "#ffffff" }}>Avg Rating</h3>
-                <p className="text-3xl font-bold" style={{ color: "#ffffff" }}>{analyticsData.overview.avg_rating?.toFixed(1) || "0.0"}</p>
+                <p className="text-3xl font-bold" style={{ color: "#ffffff" }}>{toNum(analyticsData.overview.avg_rating).toFixed(1)}</p>
               </div>
               <div className="p-4 rounded-lg border border-white/20" style={{ backgroundColor: "#1a1a1a" }}>
                 <h3 className="text-sm font-bold uppercase tracking-widest mb-2" style={{ color: "#ffffff" }}>Total Comments</h3>

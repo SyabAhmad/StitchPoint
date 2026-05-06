@@ -36,7 +36,7 @@ const CommissionChart = ({ data }) => {
             {new Date(label).toLocaleDateString()}
           </p>
           <p style={{ color: "#4ecdc4" }}>
-            Commission Earned: PKR {payload[0].value.toFixed(2)}
+            Commission Earned: PKR {(payload[0]?.value || 0).toFixed(2)}
           </p>
         </div>
       );

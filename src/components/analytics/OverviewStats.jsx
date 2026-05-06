@@ -2,23 +2,29 @@ import React from "react";
 import { FaEye, FaMousePointer, FaShoppingCart, FaClock, FaStar, FaCommentAlt, FaMoneyBillWave } from "react-icons/fa";
 
 const OverviewStats = ({ data }) => {
+  const normalizeNumber = (val) => {
+    if (typeof val === 'number') return val;
+    if (typeof val === 'string') return parseFloat(val) || 0;
+    return 0;
+  };
+
   const stats = [
-    { label: "Total Views", value: data.total_views || 0, icon: <FaEye />, color: "#d4af37" },
-    { label: "Total Clicks", value: data.total_clicks || 0, icon: <FaMousePointer />, color: "#4ecdc4" },
-    { label: "Cart Adds", value: data.total_cart_adds || 0, icon: <FaShoppingCart />, color: "#ff6b6b" },
-    { label: "Avg Time", value: `${data.avg_time_spent || 0}s`, icon: <FaClock />, color: "#a78bfa" },
-    { label: "Reviews", value: data.total_reviews || 0, icon: <FaStar />, color: "#fbbf24" },
-    { label: "Avg Rating", value: data.avg_rating ? data.avg_rating.toFixed(1) : "0.0", icon: <FaStar />, color: "#34d399" },
-    { label: "Comments", value: data.total_comments || 0, icon: <FaCommentAlt />, color: "#60a5fa" },
-    { label: "Avg/Product", value: data.avg_comments_per_product?.toFixed(1) || "0.0", icon: <FaCommentAlt />, color: "#f472b6" },
+    { label: "Total Views", value: normalizeNumber(data.total_views), icon: <FaEye />, color: "#d4af37" },
+    { label: "Total Clicks", value: normalizeNumber(data.total_clicks), icon: <FaMousePointer />, color: "#4ecdc4" },
+    { label: "Cart Adds", value: normalizeNumber(data.total_cart_adds), icon: <FaShoppingCart />, color: "#ff6b6b" },
+    { label: "Avg Time", value: `${normalizeNumber(data.avg_time_spent)}s`, icon: <FaClock />, color: "#a78bfa" },
+    { label: "Reviews", value: normalizeNumber(data.total_reviews), icon: <FaStar />, color: "#fbbf24" },
+    { label: "Avg Rating", value: normalizeNumber(data.avg_rating).toFixed(1), icon: <FaStar />, color: "#34d399" },
+    { label: "Comments", value: normalizeNumber(data.total_comments), icon: <FaCommentAlt />, color: "#60a5fa" },
+    { label: "Avg/Product", value: normalizeNumber(data.avg_comments_per_product).toFixed(1), icon: <FaCommentAlt />, color: "#f472b6" },
   ];
 
   if (data.total_revenue !== undefined) {
     stats.push(
-      { label: "Revenue", value: `PKR ${(data.total_revenue || 0).toLocaleString()}`, icon: <FaMoneyBillWave />, color: "#22c55e" },
-      { label: "Profit", value: `PKR ${(data.total_profit || 0).toLocaleString()}`, icon: <FaMoneyBillWave />, color: "#d4af37" },
-      { label: "Units Sold", value: data.total_units_sold || 0, icon: <FaShoppingCart />, color: "#ec4899" },
-      { label: "Costs", value: `PKR ${(data.total_costs || 0).toLocaleString()}`, icon: <FaMoneyBillWave />, color: "#6b7280" }
+      { label: "Revenue", value: `PKR ${normalizeNumber(data.total_revenue).toLocaleString()}`, icon: <FaMoneyBillWave />, color: "#22c55e" },
+      { label: "Profit", value: `PKR ${normalizeNumber(data.total_profit).toLocaleString()}`, icon: <FaMoneyBillWave />, color: "#d4af37" },
+      { label: "Units Sold", value: normalizeNumber(data.total_units_sold), icon: <FaShoppingCart />, color: "#ec4899" },
+      { label: "Costs", value: `PKR ${normalizeNumber(data.total_costs).toLocaleString()}`, icon: <FaMoneyBillWave />, color: "#6b7280" }
     );
   }
 

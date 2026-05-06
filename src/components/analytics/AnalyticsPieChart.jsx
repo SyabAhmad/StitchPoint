@@ -13,11 +13,12 @@ const AnalyticsPieChart = ({ data }) => {
   const CustomTooltip = ({ active, payload }) => {
     if (active && payload && payload.length) {
       const item = payload[0].payload;
-      const pct = total > 0 ? ((item.value / total) * 100).toFixed(1) : 0;
+      const val = item?.value || 0;
+      const pct = total > 0 ? ((val / total) * 100).toFixed(1) : 0;
       return (
         <div className="p-3 rounded-lg shadow-lg" style={{ backgroundColor: "#1d1d1d", border: `1px solid ${item.color}` }}>
           <p className="text-sm font-bold" style={{ color: item.color }}>{item.name}</p>
-          <p className="text-lg font-bold text-white">{item.value.toLocaleString()}</p>
+          <p className="text-lg font-bold text-white">{val.toLocaleString()}</p>
           <p className="text-xs" style={{ color: "#666" }}>{pct}% of total</p>
         </div>
       );

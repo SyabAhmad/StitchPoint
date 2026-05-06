@@ -550,6 +550,9 @@ def get_stores_analytics():
         store_filter = user.store.id
 
     # Query stores with analytics including financial data
+    # Use explicit subqueries to properly filter delivered orders
+    delivered_orders_subq = db.session.query(Order.id).filter(Order.status == 'delivered').subquery()
+    
     query = db.session.query(
         Store.id,
         Store.name,
@@ -560,18 +563,11 @@ def get_stores_analytics():
         func.avg(case((ProductAnalytics.action == 'view', ProductAnalytics.time_spent), else_=None)).label('avg_time_spent'),
         func.count(func.distinct(Review.id)).label('total_reviews'),
         func.avg(Review.rating).label('avg_rating'),
-        func.count(func.distinct(Comment.id)).label('total_comments'),
-        # Financial calculations
-        func.sum(Order.total_amount).label('total_revenue'),
-        func.sum(OrderItem.quantity).label('total_units_sold'),
-        func.sum(func.coalesce(Product.cost_price, Product.price) * OrderItem.quantity).label('total_costs'),
-        (func.sum(Order.total_amount) - func.sum(func.coalesce(Product.cost_price, Product.price) * OrderItem.quantity)).label('total_profit')
+        func.count(func.distinct(Comment.id)).label('total_comments')
     ).outerjoin(Product, Store.id == Product.store_id)\
      .outerjoin(ProductAnalytics, Product.id == ProductAnalytics.product_id)\
      .outerjoin(Review, Product.id == Review.product_id)\
      .outerjoin(Comment, Product.id == Comment.product_id)\
-     .outerjoin(OrderItem, Product.id == OrderItem.product_id)\
-     .outerjoin(Order, db.and_(OrderItem.order_id == Order.id, Order.status == 'delivered'))\
      .filter(db.or_(ProductAnalytics.timestamp >= start_date, ProductAnalytics.timestamp == None))
 
     if store_filter:
@@ -581,8 +577,25 @@ def get_stores_analytics():
 
     results = query.all()
 
+    # Now get financial data separately with proper filtering
     data = []
     for row in results:
+        store_id = row.id
+        
+        # Revenue, units sold, costs, profit - ONLY from delivered orders
+        fin_q = db.session.query(
+            func.sum(OrderItem.quantity * Product.price).label('revenue'),
+            func.sum(OrderItem.quantity).label('units_sold'),
+            func.sum(func.coalesce(Product.cost_price, 0) * OrderItem.quantity).label('costs')
+        ).join(Product, Product.id == OrderItem.product_id)\
+         .join(Order, db.and_(Order.id == OrderItem.order_id, Order.status == 'delivered'))\
+         .filter(Product.store_id == store_id).first()
+        
+        total_revenue = float(fin_q.revenue or 0)
+        total_units_sold = int(fin_q.units_sold or 0)
+        total_costs = float(fin_q.costs or 0)
+        total_profit = total_revenue - total_costs
+        
         data.append({
             'store_id': row.id,
             'store_name': row.name,
@@ -594,10 +607,10 @@ def get_stores_analytics():
             'total_reviews': row.total_reviews or 0,
             'avg_rating': round(row.avg_rating or 0, 2),
             'total_comments': row.total_comments or 0,
-            'total_revenue': round(row.total_revenue or 0, 2),
-            'total_units_sold': row.total_units_sold or 0,
-            'total_costs': round(row.total_costs or 0, 2),
-            'total_profit': round(row.total_profit or 0, 2)
+            'total_revenue': round(total_revenue, 2),
+            'total_units_sold': total_units_sold,
+            'total_costs': round(total_costs, 2),
+            'total_profit': round(total_profit, 2)
         })
 
     return jsonify({'stores_analytics': data}), 200
@@ -1220,6 +1233,81 @@ def get_clicks_summary():
         'this_week': clicks_week,
         'this_month': clicks_month,
         'daily': daily_data
+    }), 200
+
+@analytics_bp.route('/financial-summary', methods=['GET'])
+@jwt_required()
+def get_financial_summary():
+    """Get financial summary: revenue, costs, profit, units sold, balance"""
+    try:
+        user_id = int(get_jwt_identity())
+    except (TypeError, ValueError):
+        return jsonify({'message': 'Invalid token identity'}), 422
+    user = User.query.get(user_id)
+
+    if not user or user.role not in ['manager', 'super_admin']:
+        return jsonify({'message': 'Unauthorized'}), 403
+
+    # Store filter
+    store_filter = None
+    if user.role == 'manager' and user.store:
+        store_filter = user.store.id
+
+    # Total revenue (from delivered orders)
+    revenue_q = db.session.query(func.sum(Order.total_amount)).filter(
+        Order.status == 'delivered'
+    )
+    if store_filter:
+        revenue_q = revenue_q.filter(Order.store_id == store_filter)
+    total_revenue = revenue_q.scalar() or 0
+    total_revenue = float(total_revenue) if total_revenue else 0.0
+
+    # Revenue today
+    today_start = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
+    revenue_today_q = db.session.query(func.sum(Order.total_amount)).filter(
+        Order.status == 'delivered',
+        Order.created_at >= today_start
+    )
+    if store_filter:
+        revenue_today_q = revenue_today_q.filter(Order.store_id == store_filter)
+    revenue_today = revenue_today_q.scalar() or 0
+    revenue_today = float(revenue_today) if revenue_today else 0.0
+
+    # Total units sold
+    units_q = db.session.query(func.sum(OrderItem.quantity)).join(
+        Order, OrderItem.order_id == Order.id
+    ).filter(Order.status == 'delivered')
+    if store_filter:
+        units_q = units_q.join(Product, OrderItem.product_id == Product.id).filter(
+            Product.store_id == store_filter
+        )
+    total_units_sold = units_q.scalar() or 0
+    total_units_sold = int(total_units_sold) if total_units_sold else 0
+
+    # Total costs (cost_price * quantity)
+    costs_q = db.session.query(
+        func.sum(func.coalesce(Product.cost_price, 0) * OrderItem.quantity)
+    ).join(Order, OrderItem.order_id == Order.id).join(
+        Product, OrderItem.product_id == Product.id
+    ).filter(Order.status == 'delivered')
+    if store_filter:
+        costs_q = costs_q.filter(Product.store_id == store_filter)
+    total_costs = costs_q.scalar() or 0
+    total_costs = float(total_costs) if total_costs else 0.0
+
+    # Total profit (revenue - costs)
+    total_profit = total_revenue - total_costs
+
+    # Total balance (could be revenue - costs, or profit + costs)
+    total_balance = total_revenue
+
+    return jsonify({
+        'total_revenue': round(total_revenue, 2),
+        'revenue_today': round(revenue_today, 2),
+        'total_units_sold': total_units_sold,
+        'total_costs': round(total_costs, 2),
+        'total_profit': round(total_profit, 2),
+        'total_balance': round(total_balance, 2)
     }), 200
 
 @analytics_bp.route('/welcome', methods=['GET'])

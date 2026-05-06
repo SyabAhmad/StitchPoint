@@ -31,7 +31,7 @@ const CostChart = ({ data }) => {
           />
           <Tooltip
             labelFormatter={(value) => new Date(value).toLocaleDateString()}
-            formatter={(value) => [`PKR ${value.toFixed(2)}`, "Costs"]}
+            formatter={(value) => [`PKR ${(value || 0).toFixed(2)}`, "Costs"]}
             contentStyle={{
               backgroundColor: "#1d1d1d",
               border: "1px solid #3d3d3d",
