@@ -127,10 +127,13 @@ const Profile = () => {
   const handleAddressSave = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch("http://localhost:5000/api/dashboard/profile/addresses", {
+      const url = editingAddress 
+        ? `http://localhost:5000/api/dashboard/profile/addresses/${editingAddress}`
+        : "http://localhost:5000/api/dashboard/profile/addresses";
+      const response = await fetch(url, {
         method: editingAddress ? "PUT" : "POST",
         headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-        body: JSON.stringify(editingAddress ? { ...addressForm, id: editingAddress } : addressForm),
+        body: JSON.stringify(addressForm),
       });
       if (response.ok) {
         toast.success(editingAddress ? "Address updated" : "Address added");

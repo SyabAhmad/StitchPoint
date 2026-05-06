@@ -9,8 +9,9 @@ import {
   FaComment,
   FaStar,
   FaMoneyBillWave,
+  FaUser,
 } from "react-icons/fa";
-import { Link, Outlet, useLocation } from "react-router-dom";
+import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { fetchWithAuth } from "../../utils/fetchWithAuth.js";
 import CostChart from "../../components/analytics/CostChart.jsx";
 import SalesChart from "../../components/analytics/SalesChart.jsx";
@@ -19,11 +20,13 @@ import SmartFooter from "../../components/footer/SmartFooter.jsx";
 
 const ManagerDashboard = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [analytics, setAnalytics] = useState({});
   const [recentOrders, setRecentOrders] = useState([]);
   const [financialTrends, setFinancialTrends] = useState([]);
   const [userData, setUserData] = useState(null);
+  const [profilePicture, setProfilePicture] = useState(null);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -35,6 +38,26 @@ const ManagerDashboard = () => {
     }
 
     setUserData(storedUserData);
+    
+    // Fetch store to get store logo
+    const fetchStore = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const res = await fetch("http://localhost:5000/api/dashboard/store", {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.store?.logo_url) {
+            setProfilePicture(data.store.logo_url);
+          }
+        }
+      } catch (err) {
+        console.error("Error fetching store:", err);
+      }
+    };
+    
+    fetchStore();
 
     // Fetch dashboard data only if on the main dashboard route
     if (location.pathname === "/manager-dashboard") {
@@ -178,12 +201,19 @@ const ManagerDashboard = () => {
           <div className="p-6 border-b" style={{ borderColor: "#2d2d2d" }}>
             <div className="flex items-center space-x-3">
               <div
-                className="w-12 h-12 rounded-full flex items-center justify-center"
-                style={{ backgroundColor: "#ffffff" }}
+                className="w-12 h-12 rounded-full overflow-hidden flex items-center justify-center"
+                style={{ backgroundColor: "#2d2d2d", border: "2px solid #d4af37" }}
               >
-                <span className="text-black font-bold text-lg">
-                  {userData?.name?.charAt(0)?.toUpperCase() || "M"}
-                </span>
+                {profilePicture ? (
+                  <img 
+                    src={profilePicture.startsWith('http') ? profilePicture : `http://localhost:5000${profilePicture}`}
+                    alt="Profile"
+                    className="w-full h-full object-cover"
+                    onError={(e) => { e.target.style.display = 'none'; }}
+                  />
+                ) : (
+                  <FaUser className="text-xl" style={{ color: "#d4af37" }} />
+                )}
               </div>
               <div>
                 <p className="font-semibold" style={{ color: "#ffffff" }}>
@@ -875,7 +905,11 @@ const ManagerDashboard = () => {
                   <ul className="divide-y divide-gray-200">
                     {recentOrders.length > 0 ? (
                       recentOrders.map((order) => (
-                        <li key={order.id}>
+                        <li 
+                          key={order.id} 
+                          onClick={() => navigate(`/manager-dashboard/orders?order=${order.id}`)}
+                          className="cursor-pointer hover:bg-gray-800 transition-colors"
+                        >
                           <div className="px-4 py-4 sm:px-6">
                             <div className="flex items-center justify-between">
                               <div className="flex items-center">

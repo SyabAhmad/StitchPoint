@@ -209,7 +209,7 @@ const Checkout = () => {
 
             <div className="flex gap-4 justify-center flex-wrap">
               <button
-                onClick={() => navigate("/customer/orders")}
+                onClick={() => navigate("/customer-dashboard/orders")}
                 className="bg-gray-900 hover:bg-gray-800 text-white font-bold py-3 px-8 rounded-lg transition-all transform hover:scale-105"
               >
                 � View My Orders

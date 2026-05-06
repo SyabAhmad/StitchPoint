@@ -28,6 +28,8 @@ const ManagerAnalytics = () => {
     productClicks: [],
     reviewsTrends: [],
     commentsTrends: [],
+    viewsSummary: { total: 0, today: 0, this_week: 0, this_month: 0, daily: [] },
+    clicksSummary: { total: 0, today: 0, this_week: 0, this_month: 0, daily: [] },
   });
   const [loading, setLoading] = useState(true);
   const [filterDays, setFilterDays] = useState(30);
@@ -44,6 +46,8 @@ const ManagerAnalytics = () => {
           reviewsOverviewRes,
           reviewsTrendsRes,
           commentsTrendsRes,
+          viewsSummaryRes,
+          clicksSummaryRes,
         ] = await Promise.all([
           fetch(
             `http://localhost:5000/api/analytics/overview?days=${filterDays}`,
@@ -81,6 +85,18 @@ const ManagerAnalytics = () => {
               headers: { Authorization: `Bearer ${token}` },
             }
           ),
+          fetch(
+            "http://localhost:5000/api/analytics/views-summary",
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          ),
+          fetch(
+            "http://localhost:5000/api/analytics/clicks-summary",
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          ),
         ]);
 
         const [
@@ -90,6 +106,8 @@ const ManagerAnalytics = () => {
           reviewsOverviewData,
           reviewsTrendsData,
           commentsTrendsData,
+          viewsSummaryData,
+          clicksSummaryResData,
         ] = await Promise.all([
           overviewRes.json(),
           viewsRes.json(),
@@ -97,6 +115,8 @@ const ManagerAnalytics = () => {
           reviewsOverviewRes.json(),
           reviewsTrendsRes.json(),
           commentsTrendsRes.json(),
+          viewsSummaryRes.json(),
+          clicksSummaryRes.json(),
         ]);
 
         setAnalyticsData({
@@ -119,6 +139,8 @@ const ManagerAnalytics = () => {
           productClicks: clicksData.analytics || [],
           reviewsTrends: reviewsTrendsData.reviews_trends || [],
           commentsTrends: commentsTrendsData.comments_trends || [],
+          viewsSummary: viewsSummaryData || { total: 0, today: 0, this_week: 0, this_month: 0, daily: [] },
+          clicksSummary: clicksSummaryResData || { total: 0, today: 0, this_week: 0, this_month: 0, daily: [] },
         });
       } catch (error) {
         console.error("Error fetching analytics:", error);
@@ -198,6 +220,119 @@ const ManagerAnalytics = () => {
         {activeTab === "overview" && (
           <>
             <OverviewStats data={analyticsData.overview} />
+            
+            {/* Views Summary */}
+            <div className="p-6 rounded-lg" style={{ backgroundColor: "#1a1a1a" }}>
+              <h3 className="text-xl font-bold mb-4" style={{ color: "#ffffff" }}>Views Analytics</h3>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                <div className="p-4 rounded-lg" style={{ backgroundColor: "#2d2d2d" }}>
+                  <span className="text-xs font-bold uppercase" style={{ color: "#888" }}>Today</span>
+                  <p className="text-2xl font-bold" style={{ color: "#ffffff" }}>{analyticsData.viewsSummary.today || 0}</p>
+                </div>
+                <div className="p-4 rounded-lg" style={{ backgroundColor: "#2d2d2d" }}>
+                  <span className="text-xs font-bold uppercase" style={{ color: "#888" }}>This Week</span>
+                  <p className="text-2xl font-bold" style={{ color: "#ffffff" }}>{analyticsData.viewsSummary.this_week || 0}</p>
+                </div>
+                <div className="p-4 rounded-lg" style={{ backgroundColor: "#2d2d2d" }}>
+                  <span className="text-xs font-bold uppercase" style={{ color: "#888" }}>This Month</span>
+                  <p className="text-2xl font-bold" style={{ color: "#ffffff" }}>{analyticsData.viewsSummary.this_month || 0}</p>
+                </div>
+                <div className="p-4 rounded-lg" style={{ backgroundColor: "#2d2d2d" }}>
+                  <span className="text-xs font-bold uppercase" style={{ color: "#888" }}>Total</span>
+                  <p className="text-2xl font-bold" style={{ color: "#ffffff" }}>{analyticsData.viewsSummary.total || 0}</p>
+                </div>
+              </div>
+              {/* Simple bar chart for daily views */}
+              <div className="mt-4">
+                <h4 className="text-sm font-bold mb-2" style={{ color: "#ccc" }}>Daily Views - Last 30 Days</h4>
+                <div className="relative h-32 w-full">
+                  {(analyticsData.viewsSummary.daily && analyticsData.viewsSummary.daily.length > 0) ? (
+                    <div className="flex items-end h-full gap-px w-full">
+                      {analyticsData.viewsSummary.daily.map((day, idx) => {
+                        const dailyArr = analyticsData.viewsSummary.daily || [];
+                        const maxV = Math.max(...dailyArr.map(d => d.views || 0), 1);
+                        const barHeight = day.views > 0 ? Math.max((day.views / maxV) * 100, 10) : 4;
+                        return (
+                          <div 
+                            key={idx} 
+                            className="flex-1 bg-yellow-500 hover:bg-yellow-400 rounded-t transition-all"
+                            style={{ height: `${barHeight}%`, minWidth: '3px' }}
+                            title={`${day.date}: ${day.views} views`}
+                          />
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-center h-full text-gray-500">
+                      No view data available
+                    </div>
+                  )}
+                </div>
+                {analyticsData.viewsSummary.daily && analyticsData.viewsSummary.daily.length > 0 && (
+                  <div className="flex justify-between text-xs mt-1" style={{ color: "#888" }}>
+                    <span>{analyticsData.viewsSummary.daily[0]?.date?.slice(5) || '-'}</span>
+                    <span>{analyticsData.viewsSummary.daily[analyticsData.viewsSummary.daily.length - 1]?.date?.slice(5) || '-'}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Clicks Summary */}
+            <div className="p-6 rounded-lg" style={{ backgroundColor: "#1a1a1a" }}>
+              <h3 className="text-xl font-bold mb-4" style={{ color: "#ffffff" }}>Clicks Analytics</h3>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                <div className="p-4 rounded-lg" style={{ backgroundColor: "#2d2d2d" }}>
+                  <span className="text-xs font-bold uppercase" style={{ color: "#888" }}>Today</span>
+                  <p className="text-2xl font-bold" style={{ color: "#ffffff" }}>{analyticsData.clicksSummary.today || 0}</p>
+                </div>
+                <div className="p-4 rounded-lg" style={{ backgroundColor: "#2d2d2d" }}>
+                  <span className="text-xs font-bold uppercase" style={{ color: "#888" }}>This Week</span>
+                  <p className="text-2xl font-bold" style={{ color: "#ffffff" }}>{analyticsData.clicksSummary.this_week || 0}</p>
+                </div>
+                <div className="p-4 rounded-lg" style={{ backgroundColor: "#2d2d2d" }}>
+                  <span className="text-xs font-bold uppercase" style={{ color: "#888" }}>This Month</span>
+                  <p className="text-2xl font-bold" style={{ color: "#ffffff" }}>{analyticsData.clicksSummary.this_month || 0}</p>
+                </div>
+                <div className="p-4 rounded-lg" style={{ backgroundColor: "#2d2d2d" }}>
+                  <span className="text-xs font-bold uppercase" style={{ color: "#888" }}>Total</span>
+                  <p className="text-2xl font-bold" style={{ color: "#ffffff" }}>{analyticsData.clicksSummary.total || 0}</p>
+                </div>
+              </div>
+              {/* Simple bar chart for daily clicks */}
+              <div className="mt-4">
+                <h4 className="text-sm font-bold mb-2" style={{ color: "#ccc" }}>Daily Clicks - Last 30 Days</h4>
+                <div className="relative h-32 w-full">
+                  {(analyticsData.clicksSummary.daily && analyticsData.clicksSummary.daily.length > 0) ? (
+                    <div className="flex items-end h-full gap-px w-full">
+                      {analyticsData.clicksSummary.daily.map((day, idx) => {
+                        const dailyArr = analyticsData.clicksSummary.daily || [];
+                        const maxC = Math.max(...dailyArr.map(d => d.clicks || 0), 1);
+                        const barHeight = day.clicks > 0 ? Math.max((day.clicks / maxC) * 100, 10) : 4;
+                        return (
+                          <div 
+                            key={idx} 
+                            className="flex-1 bg-blue-500 hover:bg-blue-400 rounded-t transition-all"
+                            style={{ height: `${barHeight}%`, minWidth: '3px' }}
+                            title={`${day.date}: ${day.clicks} clicks`}
+                          />
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-center h-full text-gray-500">
+                      No click data available
+                    </div>
+                  )}
+                </div>
+                {analyticsData.clicksSummary.daily && analyticsData.clicksSummary.daily.length > 0 && (
+                  <div className="flex justify-between text-xs mt-1" style={{ color: "#888" }}>
+                    <span>{analyticsData.clicksSummary.daily[0]?.date?.slice(5) || '-'}</span>
+                    <span>{analyticsData.clicksSummary.daily[analyticsData.clicksSummary.daily.length - 1]?.date?.slice(5) || '-'}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <div className="lg:col-span-2">
                 <AnalyticsPieChart data={analyticsData.overview} />

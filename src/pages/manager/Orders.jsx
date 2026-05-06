@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import {
   FaEye,
   FaTruck,
@@ -10,6 +11,7 @@ import {
 import toast from "react-hot-toast";
 
 const ManagerOrders = () => {
+  const [searchParams] = useSearchParams();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState(null);
@@ -39,6 +41,18 @@ const ManagerOrders = () => {
   useEffect(() => {
     fetchOrders();
   }, []);
+
+  useEffect(() => {
+    if (!loading && orders.length > 0) {
+      const orderId = searchParams.get("order");
+      if (orderId) {
+        const order = orders.find(o => o.id === parseInt(orderId));
+        if (order) {
+          setSelectedOrder(order);
+        }
+      }
+    }
+  }, [loading, orders, searchParams]);
 
   const handleStatusChange = async (orderId, status) => {
     setUpdating(true);

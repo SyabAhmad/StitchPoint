@@ -1052,6 +1052,176 @@ def get_financial_trends():
 
     return jsonify({'financial_trends': data}), 200
 
+@analytics_bp.route('/views-summary', methods=['GET'])
+@jwt_required()
+def get_views_summary():
+    """Get views summary by day, week, month with totals"""
+    try:
+        user_id = int(get_jwt_identity())
+    except (TypeError, ValueError):
+        return jsonify({'message': 'Invalid token identity'}), 422
+    user = User.query.get(user_id)
+
+    if not user or user.role not in ['manager', 'super_admin']:
+        return jsonify({'message': 'Unauthorized'}), 403
+
+    # Get date ranges
+    now = datetime.utcnow()
+    today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
+    week_start = today_start - timedelta(days=today_start.weekday())
+    month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+
+    # Store filter
+    store_filter = None
+    if user.role == 'manager' and user.store:
+        store_filter = user.store.id
+
+    # Total views query
+    total_views_q = db.session.query(func.count(ProductAnalytics.id)).filter(
+        ProductAnalytics.action == 'view'
+    )
+    if store_filter:
+        total_views_q = total_views_q.join(Product).filter(Product.store_id == store_filter)
+    total_views = total_views_q.scalar() or 0
+
+    # Views today
+    views_today_q = db.session.query(func.count(ProductAnalytics.id)).filter(
+        ProductAnalytics.action == 'view',
+        ProductAnalytics.timestamp >= today_start
+    )
+    if store_filter:
+        views_today_q = views_today_q.join(Product).filter(Product.store_id == store_filter)
+    views_today = views_today_q.scalar() or 0
+
+    # Views this week
+    views_week_q = db.session.query(func.count(ProductAnalytics.id)).filter(
+        ProductAnalytics.action == 'view',
+        ProductAnalytics.timestamp >= week_start
+    )
+    if store_filter:
+        views_week_q = views_week_q.join(Product).filter(Product.store_id == store_filter)
+    views_week = views_week_q.scalar() or 0
+
+    # Views this month
+    views_month_q = db.session.query(func.count(ProductAnalytics.id)).filter(
+        ProductAnalytics.action == 'view',
+        ProductAnalytics.timestamp >= month_start
+    )
+    if store_filter:
+        views_month_q = views_month_q.join(Product).filter(Product.store_id == store_filter)
+    views_month = views_month_q.scalar() or 0
+
+    # Get daily views for last 30 days
+    daily_data = []
+    for i in range(30):
+        day = today_start - timedelta(days=29-i)
+        day_end = day + timedelta(days=1)
+        day_views_q = db.session.query(func.count(ProductAnalytics.id)).filter(
+            ProductAnalytics.action == 'view',
+            ProductAnalytics.timestamp >= day,
+            ProductAnalytics.timestamp < day_end
+        )
+        if store_filter:
+            day_views_q = day_views_q.join(Product).filter(Product.store_id == store_filter)
+        day_views = day_views_q.scalar() or 0
+        daily_data.append({
+            'date': day.strftime('%Y-%m-%d'),
+            'views': day_views
+        })
+
+    return jsonify({
+        'total': total_views,
+        'today': views_today,
+        'this_week': views_week,
+        'this_month': views_month,
+        'daily': daily_data
+    }), 200
+
+@analytics_bp.route('/clicks-summary', methods=['GET'])
+@jwt_required()
+def get_clicks_summary():
+    """Get clicks summary by day, week, month with totals"""
+    try:
+        user_id = int(get_jwt_identity())
+    except (TypeError, ValueError):
+        return jsonify({'message': 'Invalid token identity'}), 422
+    user = User.query.get(user_id)
+
+    if not user or user.role not in ['manager', 'super_admin']:
+        return jsonify({'message': 'Unauthorized'}), 403
+
+    # Get date ranges
+    now = datetime.utcnow()
+    today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
+    week_start = today_start - timedelta(days=today_start.weekday())
+    month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+
+    # Store filter
+    store_filter = None
+    if user.role == 'manager' and user.store:
+        store_filter = user.store.id
+
+    # Total clicks query
+    total_clicks_q = db.session.query(func.count(ProductAnalytics.id)).filter(
+        ProductAnalytics.action == 'click'
+    )
+    if store_filter:
+        total_clicks_q = total_clicks_q.join(Product).filter(Product.store_id == store_filter)
+    total_clicks = total_clicks_q.scalar() or 0
+
+    # Clicks today
+    clicks_today_q = db.session.query(func.count(ProductAnalytics.id)).filter(
+        ProductAnalytics.action == 'click',
+        ProductAnalytics.timestamp >= today_start
+    )
+    if store_filter:
+        clicks_today_q = clicks_today_q.join(Product).filter(Product.store_id == store_filter)
+    clicks_today = clicks_today_q.scalar() or 0
+
+    # Clicks this week
+    clicks_week_q = db.session.query(func.count(ProductAnalytics.id)).filter(
+        ProductAnalytics.action == 'click',
+        ProductAnalytics.timestamp >= week_start
+    )
+    if store_filter:
+        clicks_week_q = clicks_week_q.join(Product).filter(Product.store_id == store_filter)
+    clicks_week = clicks_week_q.scalar() or 0
+
+    # Clicks this month
+    clicks_month_q = db.session.query(func.count(ProductAnalytics.id)).filter(
+        ProductAnalytics.action == 'click',
+        ProductAnalytics.timestamp >= month_start
+    )
+    if store_filter:
+        clicks_month_q = clicks_month_q.join(Product).filter(Product.store_id == store_filter)
+    clicks_month = clicks_month_q.scalar() or 0
+
+    # Get daily clicks for last 30 days
+    daily_data = []
+    for i in range(30):
+        day = today_start - timedelta(days=29-i)
+        day_end = day + timedelta(days=1)
+        day_clicks_q = db.session.query(func.count(ProductAnalytics.id)).filter(
+            ProductAnalytics.action == 'click',
+            ProductAnalytics.timestamp >= day,
+            ProductAnalytics.timestamp < day_end
+        )
+        if store_filter:
+            day_clicks_q = day_clicks_q.join(Product).filter(Product.store_id == store_filter)
+        day_clicks = day_clicks_q.scalar() or 0
+        daily_data.append({
+            'date': day.strftime('%Y-%m-%d'),
+            'clicks': day_clicks
+        })
+
+    return jsonify({
+        'total': total_clicks,
+        'today': clicks_today,
+        'this_week': clicks_week,
+        'this_month': clicks_month,
+        'daily': daily_data
+    }), 200
+
 @analytics_bp.route('/welcome', methods=['GET'])
 def welcome():
     """
