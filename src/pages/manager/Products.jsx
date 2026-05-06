@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { FaEdit, FaTrash, FaPlus, FaTimes } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import AnalyticsAside from "../../components/AnalyticsAside";
 import { makeAuthenticatedRequest } from "../../utils/auth";
 
 const ManagerProducts = () => {
@@ -1454,7 +1453,6 @@ const ManagerProducts = () => {
           </div>
         )}
       </div>
-      <AnalyticsAside userRole="manager" />
     </div>
   );
 };

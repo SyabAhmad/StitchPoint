@@ -3,17 +3,12 @@ import {
   FaUsers,
   FaBox,
   FaShoppingCart,
-  FaEye,
-  FaMousePointer,
   FaChartLine,
-  FaCog,
   FaStore,
   FaUserCog,
   FaComment,
   FaStar,
   FaMoneyBillWave,
-  FaBars,
-  FaTimes,
 } from "react-icons/fa";
 import { Link, Outlet, useLocation } from "react-router-dom";
 import { fetchWithAuth } from "../../utils/fetchWithAuth.js";
@@ -24,7 +19,6 @@ import SmartFooter from "../../components/footer/SmartFooter.jsx";
 
 const ManagerDashboard = () => {
   const location = useLocation();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [analytics, setAnalytics] = useState({});
   const [recentOrders, setRecentOrders] = useState([]);
@@ -79,6 +73,10 @@ const ManagerDashboard = () => {
     }
   }, [location.pathname]);
 
+  const handleMenuItemClick = () => {
+    // No-op - kept for potential future mobile menu
+  };
+
   if (loading) {
     return (
       <div
@@ -98,9 +96,9 @@ const ManagerDashboard = () => {
       className="h-screen flex flex-col"
       style={{ backgroundColor: "#000000" }}
     >
-      {/* Fixed Header */}
+      {/* Fixed Header - with left margin */}
       <header
-        className="shadow-lg px-6 py-4 flex-shrink-0 relative z-60"
+        className="shadow-lg px-6 py-4 flex-shrink-0 ml-64"
         style={{
           backgroundColor: "#1d1d1d",
           borderBottom: "1px solid #2d2d2d",
@@ -108,21 +106,6 @@ const ManagerDashboard = () => {
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
-            <button
-              onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="p-2 rounded-lg transition-colors"
-              style={{ backgroundColor: "#2d2d2d", color: "#ffffff" }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = "#ffffff";
-                e.currentTarget.style.color = "#000000";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = "#2d2d2d";
-                e.currentTarget.style.color = "#ffffff";
-              }}
-            >
-              {sidebarOpen ? <FaTimes /> : <FaBars />}
-            </button>
             <h1 className="text-white text-2xl font-bold">Naqsh Studio</h1>
             <span style={{ color: "#cccccc" }}>Manager Dashboard</span>
           </div>
@@ -186,37 +169,12 @@ const ManagerDashboard = () => {
         </div>
       </header>
 
-      <div className="flex-1 flex overflow-hidden relative">
-        {/* Mobile Overlay */}
-        {sidebarOpen && (
-          <div
-            className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
-            onClick={() => setSidebarOpen(false)}
-          ></div>
-        )}
-
-        {/* Fixed Aside */}
+      <div className="flex-1 flex overflow-hidden">
+        {/* Fixed Sidebar - Always visible */}
         <aside
-          className={`fixed inset-y-0 left-0 z-50 w-64 shadow-lg transform transition-transform duration-300 ease-in-out ${
-            sidebarOpen ? "translate-x-0" : "-translate-x-full"
-          }`}
+          className="fixed inset-y-0 left-0 z-50 w-64 shadow-lg"
           style={{ backgroundColor: "#1d1d1d" }}
         >
-          <div
-            className="flex items-center justify-between p-6 border-b lg:hidden"
-            style={{ borderColor: "#2d2d2d" }}
-          >
-            <h2 className="text-lg font-semibold" style={{ color: "#ffffff" }}>
-              Menu
-            </h2>
-            <button
-              onClick={() => setSidebarOpen(false)}
-              className="p-2 rounded-lg transition-colors"
-              style={{ backgroundColor: "#2d2d2d", color: "#ffffff" }}
-            >
-              <FaTimes />
-            </button>
-          </div>
           <div className="p-6 border-b" style={{ borderColor: "#2d2d2d" }}>
             <div className="flex items-center space-x-3">
               <div
@@ -250,6 +208,7 @@ const ManagerDashboard = () => {
                 <li>
                   <Link
                     to="/manager-dashboard"
+                    onClick={handleMenuItemClick}
                     className={`flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
                       location.pathname === "/manager-dashboard"
                         ? "active-menu-item"
@@ -285,6 +244,7 @@ const ManagerDashboard = () => {
                 <li>
                   <Link
                     to="/manager-dashboard/products"
+                    onClick={handleMenuItemClick}
                     className={`flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
                       location.pathname === "/manager-dashboard/products"
                         ? "active-menu-item"
@@ -320,6 +280,7 @@ const ManagerDashboard = () => {
                 <li>
                   <Link
                     to="/manager-dashboard/orders"
+                    onClick={handleMenuItemClick}
                     className={`flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
                       location.pathname === "/manager-dashboard/orders"
                         ? "active-menu-item"
@@ -355,6 +316,7 @@ const ManagerDashboard = () => {
                 <li>
                   <Link
                     to="/manager-dashboard/categories"
+                    onClick={handleMenuItemClick}
                     className={`flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
                       location.pathname === "/manager-dashboard/categories"
                         ? "active-menu-item"
@@ -394,6 +356,7 @@ const ManagerDashboard = () => {
                 <li>
                   <Link
                     to="/manager-dashboard/analytics"
+                    onClick={handleMenuItemClick}
                     className={`flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
                       location.pathname === "/manager-dashboard/analytics"
                         ? "active-menu-item"
@@ -433,6 +396,7 @@ const ManagerDashboard = () => {
                 <li>
                   <Link
                     to="/manager-dashboard/comments"
+                    onClick={handleMenuItemClick}
                     className={`flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
                       location.pathname === "/manager-dashboard/comments"
                         ? "active-menu-item"
@@ -468,6 +432,7 @@ const ManagerDashboard = () => {
                 <li>
                   <Link
                     to="/manager-dashboard/reviews"
+                    onClick={handleMenuItemClick}
                     className={`flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
                       location.pathname === "/manager-dashboard/reviews"
                         ? "active-menu-item"
@@ -503,6 +468,7 @@ const ManagerDashboard = () => {
                 <li>
                   <Link
                     to="/manager-dashboard/profile"
+                    onClick={handleMenuItemClick}
                     className={`flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
                       location.pathname === "/manager-dashboard/profile"
                         ? "active-menu-item"
@@ -540,8 +506,8 @@ const ManagerDashboard = () => {
           </nav>
         </aside>
 
-        {/* Scrollable Main Content */}
-        <main className="flex-1 p-8 overflow-y-auto">
+        {/* Main Content - starts after sidebar */}
+        <main className="flex-1 p-8 overflow-y-auto ml-64">
           <div className="max-w-7xl mx-auto">
             {location.pathname === "/manager-dashboard" && (
               <>
