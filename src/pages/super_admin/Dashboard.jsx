@@ -43,7 +43,7 @@ const SuperAdminDashboard = () => {
     if (
       !token ||
       !userData ||
-      !["manager", "super_admin"].includes(userData.role)
+      userData.role !== "super_admin"
     ) {
       window.location.href = "/login";
       return;
@@ -177,74 +177,116 @@ const SuperAdminDashboard = () => {
       className="h-screen flex flex-col"
       style={{ backgroundColor: "#000000" }}
     >
-      {/* Fixed Header */}
+      {/* Elegant Header */}
       <header
-        className="shadow-lg px-6 py-4 flex-shrink-0 relative z-60"
+        className="shadow-lg px-8 py-4 flex-shrink-0 relative z-60"
         style={{
-          backgroundColor: "#111111",
-          borderBottom: "1px solid #333333",
+          backgroundColor: "#0a0a0a",
+          borderBottom: "2px solid #d4af37",
         }}
       >
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <h1 className="text-white text-2xl font-bold">NAQSH STUDIO</h1>
-            <span style={{ color: "#888888" }}>SUPER ADMIN PANEL</span>
-          </div>
-          <div className="flex items-center space-x-4">
-            <Link
-              to="/"
-              className="px-4 py-2 rounded-lg transition-all"
-              style={{ backgroundColor: "#ffffff", color: "#000000" }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = "#cccccc";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = "#ffffff";
+          <div className="flex items-center space-x-6">
+            <h1 
+              className="text-2xl font-bold tracking-[0.3em]" 
+              style={{ 
+                fontFamily: '"Playfair Display", serif',
+                color: "#d4af37",
+                textShadow: "0 0 20px rgba(212, 175, 55, 0.3)"
               }}
             >
-              HOME
+              NAQSH
+            </h1>
+            <div 
+              className="h-6 w-px" 
+              style={{ backgroundColor: "#333333" }}
+            />
+            <span 
+              className="text-sm font-medium uppercase tracking-widest" 
+              style={{ color: "#666666", letterSpacing: "0.2em" }}
+            >
+              Super Admin
+            </span>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Link
+              to="/"
+              className="px-5 py-2 rounded-md transition-all text-sm font-medium tracking-wide"
+              style={{ 
+                color: "#888888",
+                border: "1px solid #333333",
+                backgroundColor: "transparent"
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = "#d4af37";
+                e.currentTarget.style.color = "#d4af37";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = "#333333";
+                e.currentTarget.style.color = "#888888";
+              }}
+            >
+              Home
             </Link>
             <Link
               to="/shop"
-              className="px-4 py-2 rounded-lg transition-all"
-              style={{ backgroundColor: "#ffffff", color: "#000000" }}
+              className="px-5 py-2 rounded-md transition-all text-sm font-medium tracking-wide"
+              style={{ 
+                color: "#888888",
+                border: "1px solid #333333",
+                backgroundColor: "transparent"
+              }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = "#cccccc";
+                e.currentTarget.style.borderColor = "#d4af37";
+                e.currentTarget.style.color = "#d4af37";
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = "#ffffff";
+                e.currentTarget.style.borderColor = "#333333";
+                e.currentTarget.style.color = "#888888";
               }}
             >
-              SHOP
+              Shop
             </Link>
             <Link
               to="/super-admin-dashboard/user-management"
-              className="px-4 py-2 rounded-lg transition-all"
-              style={{ backgroundColor: "#ffffff", color: "#000000" }}
+              className="px-5 py-2 rounded-md transition-all text-sm font-medium tracking-wide"
+              style={{ 
+                color: "#888888",
+                border: "1px solid #333333",
+                backgroundColor: "transparent"
+              }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = "#cccccc";
+                e.currentTarget.style.borderColor = "#d4af37";
+                e.currentTarget.style.color = "#d4af37";
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = "#ffffff";
+                e.currentTarget.style.borderColor = "#333333";
+                e.currentTarget.style.color = "#888888";
               }}
             >
-              SETTINGS
+              Settings
             </Link>
             <button
               onClick={() => {
                 localStorage.clear();
                 window.location.href = "/login";
               }}
-              className="px-4 py-2 rounded-lg transition-all hover:cursor-pointer"
-              style={{ backgroundColor: "#333333", color: "#ffffff" }}
+              className="px-5 py-2 rounded-md transition-all text-sm font-medium tracking-wide hover:cursor-pointer"
+              style={{ 
+                color: "#ffffff",
+                backgroundColor: "#d4af37",
+                border: "1px solid #d4af37"
+              }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = "#dc3545";
+                e.currentTarget.style.backgroundColor = "#b8962f";
+                e.currentTarget.style.borderColor = "#b8962f";
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = "#333333";
+                e.currentTarget.style.backgroundColor = "#d4af37";
+                e.currentTarget.style.borderColor = "#d4af37";
               }}
             >
-              LOGOUT
+              Logout
             </button>
           </div>
         </div>

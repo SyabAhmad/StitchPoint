@@ -119,55 +119,91 @@ const ManagerDashboard = () => {
       className="h-screen flex flex-col"
       style={{ backgroundColor: "#000000" }}
     >
-      {/* Fixed Header - with left margin */}
+      {/* Elegant Header */}
       <header
-        className="shadow-lg px-6 py-4 flex-shrink-0 ml-64"
+        className="shadow-lg px-8 py-4 flex-shrink-0 ml-64 relative z-60"
         style={{
-          backgroundColor: "#1d1d1d",
-          borderBottom: "1px solid #2d2d2d",
+          backgroundColor: "#0a0a0a",
+          borderBottom: "2px solid #d4af37",
         }}
       >
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <h1 className="text-white text-2xl font-bold">Naqsh Studio</h1>
-            <span style={{ color: "#cccccc" }}>Manager Dashboard</span>
+          <div className="flex items-center space-x-6">
+            <h1 
+              className="text-2xl font-bold tracking-[0.3em]" 
+              style={{ 
+                fontFamily: '"Playfair Display", serif',
+                color: "#d4af37",
+                textShadow: "0 0 20px rgba(212, 175, 55, 0.3)"
+              }}
+            >
+              NAQSH
+            </h1>
+            <div 
+              className="h-6 w-px" 
+              style={{ backgroundColor: "#333333" }}
+            />
+            <span 
+              className="text-sm font-medium uppercase tracking-widest" 
+              style={{ color: "#666666", letterSpacing: "0.2em" }}
+            >
+              Manager
+            </span>
           </div>
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2">
             <Link
               to="/"
-              className="px-4 py-2 rounded-lg transition-all"
-              style={{ backgroundColor: "white", color: "#000000" }}
+              className="px-5 py-2 rounded-md transition-all text-sm font-medium tracking-wide"
+              style={{ 
+                color: "#888888",
+                border: "1px solid #333333",
+                backgroundColor: "transparent"
+              }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = "#cccccc";
+                e.currentTarget.style.borderColor = "#d4af37";
+                e.currentTarget.style.color = "#d4af37";
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = "#ffffff";
+                e.currentTarget.style.borderColor = "#333333";
+                e.currentTarget.style.color = "#888888";
               }}
             >
               Home
             </Link>
             <Link
               to="/shop"
-              className="px-4 py-2 rounded-lg transition-all"
-              style={{ backgroundColor: "white", color: "#000000" }}
+              className="px-5 py-2 rounded-md transition-all text-sm font-medium tracking-wide"
+              style={{ 
+                color: "#888888",
+                border: "1px solid #333333",
+                backgroundColor: "transparent"
+              }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = "#cccccc";
+                e.currentTarget.style.borderColor = "#d4af37";
+                e.currentTarget.style.color = "#d4af37";
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = "#ffffff";
+                e.currentTarget.style.borderColor = "#333333";
+                e.currentTarget.style.color = "#888888";
               }}
             >
               Shop
             </Link>
             <Link
               to="/manager-dashboard/profile"
-              className="px-4 py-2 rounded-lg transition-all"
-              style={{ backgroundColor: "#ffffff", color: "#000000" }}
+              className="px-5 py-2 rounded-md transition-all text-sm font-medium tracking-wide"
+              style={{ 
+                color: "#888888",
+                border: "1px solid #333333",
+                backgroundColor: "transparent"
+              }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = "#cccccc";
+                e.currentTarget.style.borderColor = "#d4af37";
+                e.currentTarget.style.color = "#d4af37";
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = "#ffffff";
+                e.currentTarget.style.borderColor = "#333333";
+                e.currentTarget.style.color = "#888888";
               }}
             >
               Profile
@@ -177,13 +213,19 @@ const ManagerDashboard = () => {
                 localStorage.clear();
                 window.location.href = "/login";
               }}
-              className="px-4 py-2 rounded-lg transition-all hover:cursor-pointer"
-              style={{ backgroundColor: "#dc3545", color: "#ffffff" }}
+              className="px-5 py-2 rounded-md transition-all text-sm font-medium tracking-wide hover:cursor-pointer"
+              style={{ 
+                color: "#ffffff",
+                backgroundColor: "#d4af37",
+                border: "1px solid #d4af37"
+              }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = "#c82333";
+                e.currentTarget.style.backgroundColor = "#b8962f";
+                e.currentTarget.style.borderColor = "#b8962f";
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = "#dc3545";
+                e.currentTarget.style.backgroundColor = "#d4af37";
+                e.currentTarget.style.borderColor = "#d4af37";
               }}
             >
               Logout

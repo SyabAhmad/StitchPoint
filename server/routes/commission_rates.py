@@ -134,7 +134,7 @@ def update_commission_rate(rate_id):
             rate.max_price = data['max_price']
         if 'commission_percentage' in data:
             percentage = data['commission_percentage']
-            if percentage < 0 or percentage > 100:
+            if percentage is None or percentage < 0 or percentage > 100:
                 return jsonify({'message': 'Commission percentage must be between 0 and 100'}), 400
             rate.commission_percentage = percentage
         if 'is_active' in data:
@@ -144,16 +144,18 @@ def update_commission_rate(rate_id):
         if 'min_price' in data or 'max_price' in data:
             existing_rates = CommissionRate.query.filter(CommissionRate.id != rate_id, CommissionRate.is_active == True).all()
             for existing_rate in existing_rates:
-                min_price = rate.min_price
-                max_price = rate.max_price
-                if not max_price:  # Unlimited max price
-                    if min_price >= existing_rate.min_price:
-                        return jsonify({'message': f'Price range overlaps with existing rate: {existing_rate.name}'}), 400
-                else:
-                    if (min_price >= existing_rate.min_price and min_price < existing_rate.max_price) or \
-                       (max_price and max_price > existing_rate.min_price and max_price <= existing_rate.max_price) or \
-                       (min_price <= existing_rate.min_price and (not max_price or max_price >= existing_rate.max_price)):
-                        return jsonify({'message': f'Price range overlaps with existing rate: {existing_rate.name}'}), 400
+                min_price = rate.min_price if rate.min_price is not None else 0
+                max_price = rate.max_price if rate.max_price is not None else float('inf')
+                existing_min = existing_rate.min_price if existing_rate.min_price is not None else 0
+                existing_max = existing_rate.max_price if existing_rate.max_price is not None else float('inf')
+                
+                # Skip comparison if either rate has null min_price
+                if rate.min_price is None or existing_rate.min_price is None:
+                    continue
+                    
+                # Check overlap: ranges overlap if one starts before the other ends
+                if min_price < existing_max and max_price > existing_min:
+                    return jsonify({'message': f'Price range overlaps with existing rate: {existing_rate.name}'}), 400
         
         rate.updated_at = datetime.utcnow()
         db.session.commit()

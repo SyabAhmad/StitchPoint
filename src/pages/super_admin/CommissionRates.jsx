@@ -56,8 +56,9 @@ const CommissionRates = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...formData,
-          max_price:
-            formData.max_price === "" ? null : parseFloat(formData.max_price),
+          min_price: formData.min_price ? parseFloat(formData.min_price) : 0,
+          max_price: formData.max_price === "" ? null : (formData.max_price ? parseFloat(formData.max_price) : null),
+          commission_percentage: parseFloat(formData.commission_percentage) || 0,
         }),
       });
 
