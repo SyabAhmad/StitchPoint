@@ -1,42 +1,26 @@
-# Logs
-logs
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
+# dependencies
+node_modules/
 
-node_modules
-dist
-dist-ssr
-*.local
-
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
-.DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
-\
-
+# env
 .env
-.venv
-venv
-env/
-ENV/
-env.bak/
-venv.bak/
+.env.*
+.env.production
+.env.development
 
+# python
 __pycache__/
 *.pyc
-*.pyo
-*.pyd
-*.sqlite3
+server/__pycache__/
+server/.venv/
 
+# build
+dist/
+build/
 
-TODO.md
+# uploads (if not needed in git)
+uploads/
+
+# misc
+.github/
+.qodo/
+memory-bank/
