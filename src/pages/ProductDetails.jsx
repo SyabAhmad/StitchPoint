@@ -20,9 +20,11 @@ import { addToCart } from "../utils/cartUtils";
 import { addToWishlist, isInWishlist } from "../utils/wishlistUtils";
 import toast from "react-hot-toast";
 
+const API_BASE = import.meta.env.VITE_API_BASE || "http://127.0.0.1:5000";
+
 const logAnalytics = async (productId, action, timeSpent = null) => {
   try {
-    await fetch("http://127.0.0.1:5000/api/analytics/log", {
+    await fetch(`${API_BASE}/api/analytics/log`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -69,7 +71,7 @@ const ProductDetails = ({
   const fetchRecommendations = useCallback(async (prodId) => {
     try {
       const res = await fetch(
-        `http://127.0.0.1:5000/api/products/${prodId}/recommendations`
+        `${API_BASE}/api/products/${prodId}/recommendations`,
       );
       if (!res.ok) return;
       const d = await res.json();
@@ -81,9 +83,7 @@ const ProductDetails = ({
 
   const fetchReviews = useCallback(async (prodId) => {
     try {
-      const res = await fetch(
-        `http://127.0.0.1:5000/api/products/${prodId}/reviews`
-      );
+      const res = await fetch(`${API_BASE}/api/products/${prodId}/reviews`);
       if (!res.ok) return;
       const d = await res.json();
       setReviews(d.reviews || []);
@@ -96,7 +96,7 @@ const ProductDetails = ({
   const fetchProduct = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await fetch(`http://127.0.0.1:5000/api/products/${id}`);
+      const response = await fetch(`${API_BASE}/api/products/${id}`);
       if (!response.ok) {
         throw new Error("Failed to fetch product");
       }
@@ -211,7 +211,7 @@ const ProductDetails = ({
 
     setSubmittingComment(true); // New loading state
     try {
-      const url = `http://127.0.0.1:5000/api/products/${product.id}/comments`;
+      const url = `${API_BASE}/api/products/${product.id}/comments`;
       const body = { comment };
       if (!token) body.user_name = user_name;
 
@@ -243,9 +243,7 @@ const ProductDetails = ({
 
   const fetchComments = async (productId) => {
     try {
-      const res = await fetch(
-        `http://127.0.0.1:5000/api/products/${productId}/comments`
-      );
+      const res = await fetch(`${API_BASE}/api/products/${productId}/comments`);
       if (res.ok) {
         const data = await res.json();
         setComments(data.comments || []);
@@ -288,7 +286,7 @@ const ProductDetails = ({
 
     setSubmittingReview(true);
     try {
-      const url = `http://127.0.0.1:5000/api/products/${product.id}/reviews`;
+      const url = `${API_BASE}/api/products/${product.id}/reviews`;
       const body = { rating, comment };
       if (!token) body.user_name = user_name;
 
@@ -309,8 +307,9 @@ const ProductDetails = ({
       toast.success("Review submitted");
       // Clear form
       setReviewForm({ rating: 5, comment: "", user_name: "" });
-      // Refresh reviews
+      // Refresh reviews and product data
       fetchReviews(product.id);
+      fetchProduct();
     } catch (err) {
       console.error("Submit review error", err);
       toast.error("Failed to submit review");
@@ -433,23 +432,33 @@ const ProductDetails = ({
                   <div className="flex items-center space-x-4 mb-6">
                     <div className="flex items-center bg-yellow-50 px-3 py-2 rounded-full">
                       {[...Array(5)].map((_, i) => (
-                        <FaStar key={i} className="text-yellow-500" size={18} />
+                        <FaStar
+                          key={i}
+                          className={
+                            i < Math.floor(product.average_rating || 0)
+                              ? "text-yellow-500"
+                              : "text-gray-300"
+                          }
+                          size={18}
+                        />
                       ))}
                     </div>
                     <span className="text-sm text-gray-600 font-semibold">
-                      {product.store_rating ? `${product.store_rating}` : "N/A"}{" "}
-                      (
-                      {product.store_total_reviews
-                        ? product.store_total_reviews >= 1000
-                          ? `${(product.store_total_reviews / 1000).toFixed(
-                              1
-                            )}k`
-                          : product.store_total_reviews
-                        : 0}{" "}
-                      reviews)
+                      {product.average_rating
+                        ? `${product.average_rating}`
+                        : "No rating"}{" "}
+                      ({product.reviews?.length ?? reviews.length} reviews)
                     </span>
                     <span className="text-sm text-gray-400">•</span>
-                    <span className="text-sm text-gray-600">Highly rated</span>
+                    <span className="text-sm text-gray-600">
+                      {!product.average_rating
+                        ? "New product"
+                        : product.average_rating >= 4
+                          ? "Highly rated"
+                          : product.average_rating >= 3
+                            ? "Good rating"
+                            : "Low rating"}
+                    </span>
                   </div>
 
                   {/* Enhanced Price */}
@@ -590,8 +599,8 @@ const ProductDetails = ({
                           images[selectedImage]
                             ? `http://127.0.0.1:5000${images[selectedImage]}`
                             : product.image_url
-                            ? `http://127.0.0.1:5000${product.image_url}`
-                            : "/placeholder-image.jpg"
+                              ? `${API_BASE}${product.image_url}`
+                              : "/placeholder-image.jpg"
                         }
                         alt={product.name}
                         className="w-100 h-100 object-cover transition-transform duration-500 group-hover:scale-105"
@@ -615,7 +624,7 @@ const ProductDetails = ({
                             onClick={() => setSelectedImage(i)}
                           >
                             <img
-                              src={`http://127.0.0.1:5000${img}`}
+                              src={`${API_BASE}${img}`}
                               alt={`img-${i}`}
                               className="w-full h-full object-cover"
                             />
@@ -639,8 +648,16 @@ const ProductDetails = ({
               {product.store_name && (
                 <div className="bg-white p-6 rounded-xl shadow-sm border mb-8">
                   <div className="flex items-center space-x-4 mb-4">
-                    <div className="w-12 h-12 bg-yellow-500 rounded-full flex items-center justify-center">
-                      <FaUser className="text-white" size={20} />
+                    <div className="w-12 h-12 bg-yellow-500 rounded-full flex items-center justify-center overflow-hidden">
+                      {product.store_logo_url ? (
+                        <img
+                          src={`${API_BASE}${product.store_logo_url}`}
+                          alt={product.store_name}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <FaUser className="text-white" size={20} />
+                      )}
                     </div>
                     <div>
                       <h3 className="font-semibold text-gray-900 text-lg">
@@ -651,7 +668,11 @@ const ProductDetails = ({
                           {[...Array(5)].map((_, i) => (
                             <FaStar
                               key={i}
-                              className="text-yellow-500"
+                              className={
+                                i < Math.floor(product.store_rating || 0)
+                                  ? "text-yellow-500"
+                                  : "text-gray-300"
+                              }
                               size={12}
                             />
                           ))}
@@ -664,7 +685,7 @@ const ProductDetails = ({
                           {product.store_total_reviews
                             ? product.store_total_reviews >= 1000
                               ? `${(product.store_total_reviews / 1000).toFixed(
-                                  1
+                                  1,
                                 )}k`
                               : product.store_total_reviews
                             : 0}{" "}
@@ -675,7 +696,7 @@ const ProductDetails = ({
                         {product.store_products_sold
                           ? product.store_products_sold >= 1000
                             ? `${(product.store_products_sold / 1000).toFixed(
-                                1
+                                1,
                               )}k`
                             : product.store_products_sold
                           : 0}{" "}
@@ -908,7 +929,7 @@ const ProductDetails = ({
                                 <p className="text-sm text-gray-500">
                                   {review.created_at
                                     ? new Date(
-                                        review.created_at
+                                        review.created_at,
                                       ).toLocaleDateString()
                                     : ""}
                                 </p>
@@ -1011,7 +1032,7 @@ const ProductDetails = ({
                                 <p className="text-xs text-gray-500">
                                   {comment.created_at
                                     ? new Date(
-                                        comment.created_at
+                                        comment.created_at,
                                       ).toLocaleDateString()
                                     : ""}
                                 </p>
@@ -1045,7 +1066,7 @@ const ProductDetails = ({
                   <img
                     src={
                       rec.image_url
-                        ? `http://127.0.0.1:5000${rec.image_url}`
+                        ? `${API_BASE}${rec.image_url}`
                         : "/placeholder-image.jpg"
                     }
                     alt={rec.name}

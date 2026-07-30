@@ -4,8 +4,36 @@ import os
 import time
 from flask_jwt_extended import jwt_required, get_jwt_identity, verify_jwt_in_request
 from models import db, Product, User, Category, Store, Review, Comment, OrderItem, Commission, CommissionRate
+from sqlalchemy import func
 
 products_bp = Blueprint('products', __name__)
+
+def get_review_stats_for_products(product_ids):
+    """Get review stats for multiple products in a single query.
+    
+    Returns a dict {product_id: (avg_rating, review_count)}
+    """
+    if not product_ids:
+        return {}
+    
+    stats = db.session.query(
+        Review.product_id,
+        func.avg(Review.rating).label('avg_rating'),
+        func.count(Review.id).label('review_count')
+    ).filter(Review.product_id.in_(product_ids)).group_by(Review.product_id).all()
+    
+    stats_map = {}
+    for stat in stats:
+        avg_rating = round(float(stat.avg_rating), 1) if stat.avg_rating else 0
+        review_count = stat.review_count
+        stats_map[stat.product_id] = (avg_rating, review_count)
+    
+    # For products with no reviews, set to (0, 0)
+    for pid in product_ids:
+        if pid not in stats_map:
+            stats_map[pid] = (0, 0)
+    
+    return stats_map
 
 @products_bp.route('/products', methods=['GET'])
 def get_products():
@@ -50,9 +78,16 @@ def get_products():
     # Apply pagination
     products = query.offset((page - 1) * per_page).limit(per_page).all()
 
+    # Get review stats for all products in one query
+    product_ids = [p.id for p in products]
+    stats_map = get_review_stats_for_products(product_ids)
+
     product_list = []
     for product in products:
         category_obj = Category.query.filter_by(name=product.category).first() if product.category else None
+        
+        avg_rating, review_count = stats_map.get(product.id, (0, 0))
+        
         product_list.append({
             'id': product.id,
             'name': product.name,
@@ -70,7 +105,9 @@ def get_products():
             'sale_type': product.sale_type,
             'sale_start_date': product.sale_start_date.isoformat() if product.sale_start_date else None,
             'sale_end_date': product.sale_end_date.isoformat() if product.sale_end_date else None,
-            'sale_discount_percentage': product.sale_discount_percentage
+            'sale_discount_percentage': product.sale_discount_percentage,
+            'average_rating': avg_rating,
+            'review_count': review_count
         })
     return jsonify({'products': product_list, 'total': total, 'page': page, 'per_page': per_page}), 200
 
@@ -434,9 +471,11 @@ def get_product(product_id):
         except Exception:
             pass
 
-    avg_rating = None
+    avg_rating = 0
     if len(reviews_list) > 0:
-        avg_rating = round(total_rating / len(reviews_list), 2)
+        avg_rating = round(total_rating / len(reviews_list), 1)
+
+    review_count = len(reviews_list)
 
     # Calculate store stats
     store = product.store
@@ -472,6 +511,7 @@ def get_product(product_id):
         'category_id': category_obj.id if category_obj else None,
         'store_name': product.store.name if product.store else 'Unknown Store',
         'store_id': product.store_id if product.store else None,
+        'store_logo_url': product.store.logo_url if product.store else None,
         'store_rating': store_rating,
         'store_total_reviews': store_total_reviews,
         'store_products_sold': store_products_sold,
@@ -479,6 +519,7 @@ def get_product(product_id):
         'updated_at': product.updated_at.isoformat(),
         'reviews': reviews_list,
         'average_rating': avg_rating,
+        'review_count': review_count,
         'sale_type': product.sale_type,
         'sale_start_date': product.sale_start_date.isoformat() if product.sale_start_date else None,
         'sale_end_date': product.sale_end_date.isoformat() if product.sale_end_date else None,
@@ -534,8 +575,14 @@ def get_recommendations(product_id):
     scored.sort(key=lambda x: x[0], reverse=True)
     top = [p for (_s, p) in scored[:8]]
 
+    # Get review stats for all products in one query
+    product_ids = [p.id for p in top]
+    stats_map = get_review_stats_for_products(product_ids)
+
     rec_list = []
     for p in top:
+        avg_rating, review_count = stats_map.get(p.id, (0, 0))
+        
         rec_list.append({
             'id': p.id,
             'name': p.name,
@@ -547,7 +594,9 @@ def get_recommendations(product_id):
             'sale_type': p.sale_type,
             'sale_start_date': p.sale_start_date.isoformat() if p.sale_start_date else None,
             'sale_end_date': p.sale_end_date.isoformat() if p.sale_end_date else None,
-            'sale_discount_percentage': p.sale_discount_percentage
+            'sale_discount_percentage': p.sale_discount_percentage,
+            'average_rating': avg_rating,
+            'review_count': review_count
         })
 
     return jsonify({'recommendations': rec_list}), 200
@@ -843,9 +892,17 @@ def get_store(store_id):
 
     # Get all products for this store
     products = Product.query.filter_by(store_id=store_id).all()
+
+    # Get review stats for all products in one query
+    product_ids = [p.id for p in products]
+    stats_map = get_review_stats_for_products(product_ids)
+
     product_list = []
     for product in products:
         category_obj = Category.query.filter_by(name=product.category).first() if product.category else None
+        
+        avg_rating, review_count = stats_map.get(product.id, (0, 0))
+        
         product_list.append({
             'id': product.id,
             'name': product.name,
@@ -863,8 +920,22 @@ def get_store(store_id):
             'sale_type': product.sale_type,
             'sale_start_date': product.sale_start_date.isoformat() if product.sale_start_date else None,
             'sale_end_date': product.sale_end_date.isoformat() if product.sale_end_date else None,
-            'sale_discount_percentage': product.sale_discount_percentage
+            'sale_discount_percentage': product.sale_discount_percentage,
+            'average_rating': avg_rating,
+            'review_count': review_count
         })
+
+    # Calculate store-level rating statistics
+    # Get all reviews for store products
+    store_reviews = Review.query.filter(Review.product_id.in_(product_ids)).all() if product_ids else []
+    store_total_reviews = len(store_reviews)
+    
+    # Calculate average rating
+    if store_reviews:
+        total_store_rating = sum(r.rating for r in store_reviews if r.rating)
+        store_avg_rating = round(total_store_rating / len([r for r in store_reviews if r.rating]), 1) if total_store_rating else 0
+    else:
+        store_avg_rating = 0
 
     store_data = {
         'id': store.id,
@@ -876,7 +947,9 @@ def get_store(store_id):
         'manager_id': store.manager_id,
         'created_at': store.created_at.isoformat(),
         'updated_at': store.updated_at.isoformat(),
-        'products': product_list
+        'products': product_list,
+        'average_rating': store_avg_rating,
+        'total_reviews': store_total_reviews
     }
 
     return jsonify({'store': store_data}), 200
@@ -890,9 +963,16 @@ def get_featured_products():
             Product.featured_order, Product.created_at.desc()
         ).limit(6).all()
 
+        # Get review stats for all products in one query
+        product_ids = [p.id for p in featured_products]
+        stats_map = get_review_stats_for_products(product_ids)
+
         featured_list = []
         for product in featured_products:
             category_obj = Category.query.filter_by(name=product.category).first() if product.category else None
+            
+            avg_rating, review_count = stats_map.get(product.id, (0, 0))
+            
             featured_list.append({
                 'id': product.id,
                 'name': product.name,
@@ -913,7 +993,9 @@ def get_featured_products():
                 'is_featured': product.is_featured,
                 'is_new_arrival': product.is_new_arrival,
                 'featured_order': product.featured_order,
-                'new_arrival_order': product.new_arrival_order
+                'new_arrival_order': product.new_arrival_order,
+                'average_rating': avg_rating,
+                'review_count': review_count
             })
 
         return jsonify({'products': featured_list}), 200
@@ -938,9 +1020,16 @@ def get_new_arrivals():
             )
         ).order_by(Product.created_at.desc()).limit(8).all()
 
+        # Get review stats for all products in one query
+        product_ids = [p.id for p in new_arrival_products]
+        stats_map = get_review_stats_for_products(product_ids)
+
         new_arrival_list = []
         for product in new_arrival_products:
             category_obj = Category.query.filter_by(name=product.category).first() if product.category else None
+            
+            avg_rating, review_count = stats_map.get(product.id, (0, 0))
+            
             new_arrival_list.append({
                 'id': product.id,
                 'name': product.name,
@@ -961,7 +1050,9 @@ def get_new_arrivals():
                 'is_featured': product.is_featured,
                 'is_new_arrival': product.is_new_arrival,
                 'featured_order': product.featured_order,
-                'new_arrival_order': product.new_arrival_order
+                'new_arrival_order': product.new_arrival_order,
+                'average_rating': avg_rating,
+                'review_count': review_count
             })
 
         return jsonify({'products': new_arrival_list}), 200
@@ -990,9 +1081,16 @@ def get_top_sale_products():
             Product.created_at.desc()  # Then by newest
         ).limit(6).all()
 
+        # Get review stats for all products in one query
+        product_ids = [p.id for p in top_sale_products]
+        stats_map = get_review_stats_for_products(product_ids)
+
         top_sale_list = []
         for product in top_sale_products:
             category_obj = Category.query.filter_by(name=product.category).first() if product.category else None
+            
+            avg_rating, review_count = stats_map.get(product.id, (0, 0))
+            
             top_sale_list.append({
                 'id': product.id,
                 'name': product.name,
@@ -1013,7 +1111,9 @@ def get_top_sale_products():
                 'is_featured': product.is_featured,
                 'is_new_arrival': product.is_new_arrival,
                 'featured_order': product.featured_order,
-                'new_arrival_order': product.new_arrival_order
+                'new_arrival_order': product.new_arrival_order,
+                'average_rating': avg_rating,
+                'review_count': review_count
             })
 
         return jsonify({'products': top_sale_list}), 200

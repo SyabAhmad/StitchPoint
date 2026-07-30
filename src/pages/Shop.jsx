@@ -7,6 +7,7 @@ import {
   removeFromWishlist,
 } from "../utils/wishlistUtils";
 import toast from "react-hot-toast";
+import { FaStar } from "react-icons/fa";
 
 // Quick filter definitions (moved outside component to avoid useEffect dependency issues)
 const quickFilters = {
@@ -325,6 +326,37 @@ export default function Collections() {
     } catch {
       toast.error("Failed to update wishlist");
     }
+  };
+
+  const renderStars = (rating, reviewCount) => {
+    if (!rating || rating === 0) {
+      return (
+        <div className="flex items-center gap-1">
+          <span className="text-gray-400 text-xs">No reviews</span>
+        </div>
+      );
+    }
+    
+    const stars = [];
+    const fullStars = Math.floor(rating);
+    const hasHalfStar = rating % 1 !== 0;
+    
+    for (let i = 0; i < 5; i++) {
+      if (i < fullStars) {
+        stars.push(<FaStar key={i} className="text-yellow-400" size={12} />);
+      } else if (i === fullStars && hasHalfStar) {
+        stars.push(<FaStar key={i} className="text-yellow-400 opacity-50" size={12} />);
+      } else {
+        stars.push(<FaStar key={i} className="text-gray-300" size={12} />);
+      }
+    }
+    
+    return (
+      <div className="flex items-center gap-1">
+        <div className="flex">{stars}</div>
+        <span className="text-xs font-semibold text-black/70">({reviewCount})</span>
+      </div>
+    );
   };
 
   if (loading) {
@@ -1054,12 +1086,7 @@ export default function Collections() {
                           <h4 className="text-sm font-bold text-black leading-tight font-serif line-clamp-1">
                             {product.name}
                           </h4>
-                          <div className="flex items-center gap-1">
-                            <span className="text-yellow-400 text-xs">⭐</span>
-                            <span className="text-xs font-semibold text-black/70">
-                              4.8
-                            </span>
-                          </div>
+                          {renderStars(product.average_rating || 0, product.review_count || 0)}
                         </div>
 
                         <p className="text-black/80 mb-2 leading-relaxed text-xs line-clamp-1">
@@ -1163,14 +1190,7 @@ export default function Collections() {
                             <h4 className="text-lg font-bold text-gray-900 leading-tight font-serif">
                               {product.name}
                             </h4>
-                            <div className="flex items-center gap-1">
-                              <span className="text-yellow-400 text-sm">
-                                ⭐
-                              </span>
-                              <span className="text-sm font-semibold text-gray-700">
-                                4.8
-                              </span>
-                            </div>
+                            {renderStars(product.average_rating || 0, product.review_count || 0)}
                           </div>
 
                           <p className="text-gray-700 mb-4 leading-relaxed line-clamp-2">

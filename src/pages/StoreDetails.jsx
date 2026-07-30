@@ -10,8 +10,14 @@ import {
   FaHeart,
 } from "react-icons/fa";
 import { addToCart } from "../utils/cartUtils";
-import { addToWishlist, isInWishlist } from "../utils/wishlistUtils";
+import {
+  addToWishlist,
+  removeFromWishlist,
+  isInWishlist,
+} from "../utils/wishlistUtils";
 import toast from "react-hot-toast";
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE || "http://127.0.0.1:5000";
 
 const StoreDetails = () => {
   const { store_id } = useParams();
@@ -19,19 +25,31 @@ const StoreDetails = () => {
   const [store, setStore] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [wishlistStatus, setWishlistStatus] = useState({});
 
   useEffect(() => {
     const fetchStore = async () => {
       try {
         setLoading(true);
-        const response = await fetch(
-          `http://127.0.0.1:5000/api/stores/${store_id}`
-        );
+        const response = await fetch(`${API_BASE_URL}/api/stores/${store_id}`);
         if (!response.ok) {
           throw new Error("Failed to fetch store");
         }
         const data = await response.json();
         setStore(data.store);
+
+        // Check wishlist status for all products in parallel
+        if (data.store && data.store.products) {
+          const products = data.store.products;
+          const wishlistResults = await Promise.all(
+            products.map((product) => isInWishlist(product.id)),
+          );
+          const status = {};
+          products.forEach((product, index) => {
+            status[product.id] = wishlistResults[index];
+          });
+          setWishlistStatus(status);
+        }
       } catch (e) {
         console.error(e);
         setError(e.message || "Failed to load store");
@@ -54,18 +72,50 @@ const StoreDetails = () => {
     }
   };
 
-  const handleAddToWishlist = (product) => {
+  const handleAddToWishlist = async (product) => {
     try {
-      if (isInWishlist(product.id)) {
-        // Remove from wishlist logic
-        toast.success("Removed from wishlist");
+      const isInWishlist = wishlistStatus[product.id];
+      if (isInWishlist) {
+        await removeFromWishlist(product);
+        setWishlistStatus((prev) => ({ ...prev, [product.id]: false }));
+        toast.success(`${product.name} removed from wishlist!`);
       } else {
-        addToWishlist(product);
+        await addToWishlist(product);
+        setWishlistStatus((prev) => ({ ...prev, [product.id]: true }));
         toast.success(`${product.name} added to wishlist!`);
       }
     } catch {
       toast.error("Failed to update wishlist");
     }
+  };
+
+  const handleProductClick = (product) => {
+    if (product && product.id) {
+      navigate(`/product/${product.id}`);
+    }
+  };
+
+  const renderStars = (rating, reviewCount) => {
+    const stars = [];
+    const fullStars = Math.floor(rating);
+    const hasHalfStar = rating % 1 !== 0;
+
+    for (let i = 0; i < 5; i++) {
+      if (i < fullStars) {
+        stars.push(<FaStar key={i} className="text-yellow-400" />);
+      } else if (i === fullStars && hasHalfStar) {
+        stars.push(<FaStar key={i} className="text-yellow-400 opacity-50" />);
+      } else {
+        stars.push(<FaStar key={i} className="text-gray-300" />);
+      }
+    }
+
+    return (
+      <div className="flex items-center gap-1 mb-2">
+        <div className="flex">{stars}</div>
+        <span className="text-gray-600 text-sm">({reviewCount})</span>
+      </div>
+    );
   };
 
   if (loading) {
@@ -126,47 +176,65 @@ const StoreDetails = () => {
 
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Store Header */}
-        <div className="bg-white rounded-3xl p-8 shadow-xl mb-8">
-          <div className="flex flex-col lg:flex-row items-center lg:items-start space-y-6 lg:space-y-0 lg:space-x-8">
-            <div className="w-32 h-32 bg-yellow-500 rounded-full flex items-center justify-center flex-shrink-0">
+        <div className="relative bg-gradient-to-r from-gray-900 via-gray-800 to-black rounded-3xl p-8 shadow-2xl mb-8 overflow-hidden">
+          {/* Background Pattern */}
+          <div className="absolute inset-0 opacity-5">
+            <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/10 to-transparent"></div>
+          </div>
+
+          <div className="relative z-10 flex flex-col lg:flex-row items-center lg:items-start space-y-6 lg:space-y-0 lg:space-x-8">
+            <div className="w-40 h-40 bg-gradient-to-br from-yellow-400 to-yellow-600 rounded-full flex items-center justify-center flex-shrink-0 shadow-2xl border-4 border-white">
               {store.logo_url ? (
                 <img
-                  src={`http://127.0.0.1:5000${store.logo_url}`}
+                  src={`${API_BASE_URL}${store.logo_url}`}
                   alt={store.name}
                   className="w-full h-full object-cover rounded-full"
                 />
               ) : (
-                <FaShoppingCart size={40} className="text-white" />
+                <FaShoppingCart size={50} className="text-white" />
               )}
             </div>
-            <div className="text-center lg:text-left">
-              <h1 className="text-4xl font-bold text-gray-900 mb-4">
+            <div className="text-center lg:text-left text-white">
+              <h1 className="text-5xl font-bold mb-4 text-white">
                 {store.name}
               </h1>
-              <div className="flex items-center justify-center lg:justify-start space-x-4 mb-4">
-                <div className="flex items-center bg-yellow-50 px-3 py-2 rounded-full">
+              <div className="flex items-center justify-center lg:justify-start space-x-4 mb-6">
+                <div className="flex items-center bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full border border-white/30">
                   {[...Array(5)].map((_, i) => (
-                    <FaStar key={i} className="text-yellow-500" size={18} />
+                    <FaStar
+                      key={i}
+                      className={
+                        i < Math.floor(store.average_rating || 0)
+                          ? "text-yellow-400"
+                          : "text-white/50"
+                      }
+                      size={20}
+                    />
                   ))}
                 </div>
-                <span className="text-sm text-gray-600 font-semibold">
-                  4.5 (24 reviews)
+                <span className="text-white font-semibold">
+                  {store.average_rating
+                    ? `${store.average_rating}`
+                    : "No rating"}{" "}
+                  ({store.total_reviews || 0} reviews)
                 </span>
               </div>
-              <div className="space-y-2 text-gray-600">
+              <div className="space-y-3 text-gray-300">
                 <div className="flex items-center justify-center lg:justify-start">
-                  <FaMapMarkerAlt className="mr-2 text-gray-400" />
-                  <span>{store.address}</span>
+                  <FaMapMarkerAlt className="mr-3 text-yellow-400" />
+                  <span className="text-lg">{store.address}</span>
                 </div>
                 <div className="flex items-center justify-center lg:justify-start">
-                  <FaPhone className="mr-2 text-gray-400" />
-                  <span>{store.contact_number}</span>
+                  <FaPhone className="mr-3 text-yellow-400" />
+                  <span className="text-lg">{store.contact_number}</span>
                 </div>
               </div>
             </div>
           </div>
-          <div className="mt-6">
-            <p className="text-gray-700 text-lg">{store.description}</p>
+          <div className="relative z-10 mt-8">
+            <p className="text-gray-300 text-xl leading-relaxed max-w-3xl">
+              {store.description}
+            </p>
           </div>
         </div>
 
@@ -186,13 +254,14 @@ const StoreDetails = () => {
               {store.products.map((product) => (
                 <div
                   key={product.id}
-                  className="bg-white rounded-xl shadow-sm border overflow-hidden hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1"
+                  className="bg-white rounded-xl shadow-sm border overflow-hidden hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 cursor-pointer"
+                  onClick={() => handleProductClick(product)}
                 >
                   <div className="aspect-square bg-gray-100 relative">
                     <img
                       src={
                         product.image_url
-                          ? `http://127.0.0.1:5000${product.image_url}`
+                          ? `${API_BASE_URL}${product.image_url}`
                           : "/placeholder-image.jpg"
                       }
                       alt={product.name}
@@ -202,9 +271,12 @@ const StoreDetails = () => {
                       }}
                     />
                     <button
-                      onClick={() => handleAddToWishlist(product)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleAddToWishlist(product);
+                      }}
                       className={`absolute top-3 right-3 p-2 rounded-full transition-all duration-300 ${
-                        isInWishlist(product.id)
+                        wishlistStatus[product.id]
                           ? "bg-red-500 text-white"
                           : "bg-white text-gray-600 hover:bg-gray-50"
                       }`}
@@ -216,6 +288,10 @@ const StoreDetails = () => {
                     <h3 className="font-semibold text-gray-900 mb-2 text-sm">
                       {product.name}
                     </h3>
+                    {renderStars(
+                      product.average_rating || 0,
+                      product.review_count || 0,
+                    )}
                     <p className="text-gray-600 text-sm mb-2 line-clamp-2">
                       {product.description}
                     </p>
@@ -231,7 +307,10 @@ const StoreDetails = () => {
                       </span>
                     </div>
                     <button
-                      onClick={() => handleAddToCart(product)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleAddToCart(product);
+                      }}
                       disabled={product.stock_quantity === 0}
                       className="w-full px-4 py-2 rounded-lg font-semibold transition-all duration-300 flex items-center justify-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
                       style={{
