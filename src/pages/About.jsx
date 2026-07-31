@@ -6,9 +6,9 @@ import fabric from "../assets/embroidery.jpg";
 
 export default function About() {
   return (
-    <div className="bg-white min-h-screen pt-14">
+    <div className="bg-white min-h-screen">
       {/* Hero */}
-      <section className="relative h-[45vh] min-h-[300px] flex items-center overflow-hidden">
+      <section className="relative h-[calc(100vh-3.5rem)] min-h-[400px] flex items-center overflow-hidden">
         <div className="absolute inset-0 bg-cover bg-center bg-no-repeat" style={{ backgroundImage: `url(${heroImage})` }} />
         <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent" />
         <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-12 w-full">

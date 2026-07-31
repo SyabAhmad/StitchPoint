@@ -6,8 +6,9 @@ import ScrollToTop from "./ScrollToTop.jsx";
 const Layout = () => {
   return (
     <div className="app-root">
-      {/* Top header (main) */}
+      {/* Top header (main) - fixed, so reserve its height with a spacer */}
       <NaqshCoutureNavbar />
+      <div className="h-14" aria-hidden="true" />
 
       {/* Flexible main area - grows to fill available space and push footer down */}
       <main className="app-content">

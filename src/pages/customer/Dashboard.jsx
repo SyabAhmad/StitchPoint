@@ -1,6 +1,17 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation, Outlet } from "react-router-dom";
-import { FaBars, FaTimes } from "react-icons/fa";
+import {
+  FaBars,
+  FaTimes,
+  FaTachometerAlt,
+  FaShoppingCart,
+  FaHeart,
+  FaBoxOpen,
+  FaUserCog,
+  FaStore,
+  FaHome,
+  FaSignOutAlt,
+} from "react-icons/fa";
 import { fetchWithAuth } from "../../utils/fetchWithAuth.js";
 import SmartFooter from "../../components/footer/SmartFooter.jsx";
 
@@ -17,13 +28,6 @@ const CustomerDashboard = () => {
   const [profilePicture, setProfilePicture] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Toggle sidebar function
-  const toggleSidebar = () => {
-    console.log("Toggling sidebar. Current state:", sidebarOpen);
-    setSidebarOpen(!sidebarOpen);
-    console.log("New sidebar state will be:", !sidebarOpen);
-  };
-
   useEffect(() => {
     const token = localStorage.getItem("token");
     const userData = JSON.parse(localStorage.getItem("user"));
@@ -33,12 +37,9 @@ const CustomerDashboard = () => {
       return;
     }
 
-    // Fetch dashboard data
     fetchWithAuth("http://localhost:5000/api/dashboard/customer")
       .then((response) => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         return response.json();
       })
       .then((data) => {
@@ -48,33 +49,22 @@ const CustomerDashboard = () => {
         setTotalSpent(data.total_spent || 0);
         setTotalOrders(data.total_orders || 0);
         setRecommendedProducts(data.recommended_products || []);
-        // Update profile picture from dashboard data
         if (data.user?.profile_picture) {
           setProfilePicture(data.user.profile_picture);
         }
         setLoading(false);
       })
-      .catch((error) => {
-        console.error("Error fetching dashboard data:", error);
-        setOrders([]);
-        setCartItems([]);
-        setWishlistItems([]);
-        setTotalSpent(0);
-        setTotalOrders(0);
-        setRecommendedProducts([]);
+      .catch(() => {
         setLoading(false);
       });
   }, []);
 
   if (loading) {
     return (
-      <div
-        className="flex justify-center items-center h-screen"
-        style={{ backgroundColor: "#000000", color: "#ffffff" }}
-      >
+      <div className="flex justify-center items-center h-screen bg-gray-50">
         <div className="flex flex-col items-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-yellow-500 mb-4"></div>
-          <span>Loading...</span>
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-gold-500 mb-4"></div>
+          <span className="text-gray-600">Loading...</span>
         </div>
       </div>
     );
@@ -82,721 +72,291 @@ const CustomerDashboard = () => {
 
   const userData = JSON.parse(localStorage.getItem("user"));
 
+  const navItems = [
+    { to: "/customer-dashboard", icon: <FaTachometerAlt />, label: "Overview", exact: true },
+    { to: "/customer-dashboard/cart", icon: <FaShoppingCart />, label: "Cart", badge: cartItems.length },
+    { to: "/customer-dashboard/wishlist", icon: <FaHeart />, label: "Wishlist", badge: wishlistItems.length },
+    { to: "/customer-dashboard/orders", icon: <FaBoxOpen />, label: "Orders", badge: totalOrders },
+  ];
+
+  const accountItems = [
+    { to: "/customer-dashboard/profile", icon: <FaUserCog />, label: "Profile Settings" },
+    { to: "/collections", icon: <FaStore />, label: "Browse Collections" },
+  ];
+
+  const isActive = (to, exact) =>
+    exact ? location.pathname === to : location.pathname.startsWith(to);
+
+  const sidebarContent = (
+    <>
+      <div className="p-6 border-b border-gray-200">
+        <div className="flex items-center gap-3">
+          <img
+            className="h-12 w-12 rounded-full object-cover border-2 border-gold-500"
+            src={profilePicture || userData?.profile_picture || "/placeholder-avatar.svg"}
+            alt="Profile"
+            onError={(e) => { e.target.src = "/placeholder-avatar.svg"; }}
+          />
+          <div className="min-w-0">
+            <p className="font-semibold text-gray-900 truncate">{userData?.name || "Customer"}</p>
+            <p className="text-sm text-gray-500 truncate">{userData?.email}</p>
+          </div>
+        </div>
+      </div>
+
+      <nav className="mt-6 px-4">
+        <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-3 px-2">Dashboard</h3>
+        <ul className="space-y-1">
+          {navItems.map((item) => {
+            const active = isActive(item.to, item.exact);
+            return (
+              <li key={item.to}>
+                <Link
+                  to={item.to}
+                  className={`flex items-center justify-between px-4 py-3 text-sm font-medium rounded-lg transition-all ${
+                    active
+                      ? "bg-gold-500/10 text-gold-600 border-l-2 border-gold-500"
+                      : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                  }`}
+                  onClick={() => setSidebarOpen(false)}
+                >
+                  <span className="flex items-center gap-3">
+                    {item.icon}
+                    {item.label}
+                  </span>
+                  {item.badge !== undefined && (
+                    <span className="text-xs bg-gray-200 text-gray-700 px-2 py-0.5 rounded-full">{item.badge}</span>
+                  )}
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+
+        <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-400 mt-8 mb-3 px-2">Account</h3>
+        <ul className="space-y-1">
+          {accountItems.map((item) => {
+            const active = isActive(item.to);
+            return (
+              <li key={item.to}>
+                <Link
+                  to={item.to}
+                  className={`flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg transition-all ${
+                    active
+                      ? "bg-gold-500/10 text-gold-600 border-l-2 border-gold-500"
+                      : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                  }`}
+                  onClick={() => setSidebarOpen(false)}
+                >
+                  {item.icon}
+                  {item.label}
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      </nav>
+    </>
+  );
+
   return (
-    <div
-      className="h-screen flex flex-col"
-      style={{ backgroundColor: "#000000" }}
-    >
-      {/* Fixed Header */}
-      <header
-        className="shadow-lg px-6 py-4 flex-shrink-0 relative z-60"
-        style={{
-          backgroundColor: "#1d1d1d",
-          borderBottom: "1px solid #2d2d2d",
-        }}
-      >
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <button
-              onClick={toggleSidebar}
-              className="p-2 rounded-lg transition-colors"
-              style={{ backgroundColor: "#2d2d2d", color: "#ffffff" }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = "#d4af37";
-                e.currentTarget.style.color = "#000000";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = "#2d2d2d";
-                e.currentTarget.style.color = "#ffffff";
-              }}
-            >
-              {sidebarOpen ? <FaTimes /> : <FaBars />}
-            </button>
-            <h1 className="text-white text-2xl font-bold">Naqsh Couture</h1>
-            <span style={{ color: "#cccccc" }}>Customer Dashboard</span>
-          </div>
-          <div className="flex items-center space-x-4">
-            <Link
-              to="/"
-              className="px-4 py-2 rounded-lg transition-all"
-              style={{ backgroundColor: "white", color: "#000000" }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = "#b8860b";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = "#d4af37";
-              }}
-            >
-              Home
-            </Link>
-            <Link
-              to="/shop"
-              className="px-4 py-2 rounded-lg transition-all"
-              style={{ backgroundColor: "white", color: "#000000" }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = "#b8860b";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = "#d4af37";
-              }}
-            >
-              Shop
-            </Link>
-            <Link
-              to="/customer-dashboard/profile"
-              className="px-4 py-2 rounded-lg transition-all"
-              style={{
-                backgroundColor:
-                  location.pathname === "/customer-dashboard/profile"
-                    ? "#b8860b"
-                    : "#d4af37",
-                color: "#000000",
-              }}
-              onMouseEnter={(e) => {
-                if (location.pathname !== "/customer-dashboard/profile") {
-                  e.currentTarget.style.backgroundColor = "#b8860b";
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (location.pathname !== "/customer-dashboard/profile") {
-                  e.currentTarget.style.backgroundColor = "#d4af37";
-                }
-              }}
-            >
-              Profile
-            </Link>
-            <button
-              onClick={() => {
-                localStorage.clear();
-                window.location.href = "/login";
-              }}
-              className="px-4 py-2 rounded-lg transition-all hover:cursor-pointer"
-              style={{ backgroundColor: "#dc3545", color: "#ffffff" }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = "#c82333";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = "#dc3545";
-              }}
-            >
-              Logout
-            </button>
-          </div>
+    <div className="h-screen flex flex-col bg-gray-50">
+      {/* Header */}
+      <header className="h-14 bg-white border-b border-gray-200 px-6 flex items-center justify-between flex-shrink-0 z-50">
+        <div className="flex items-center gap-4">
+          <button
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            className="p-2 rounded-lg text-gray-600 hover:bg-gray-100 lg:hidden"
+          >
+            {sidebarOpen ? <FaTimes /> : <FaBars />}
+          </button>
+          <h1 className="text-lg font-bold text-gray-900">Naqsh Couture</h1>
+          <span className="text-sm text-gray-500 hidden sm:inline">Customer Dashboard</span>
+        </div>
+        <div className="flex items-center gap-3">
+          <Link to="/" className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
+            <FaHome className="inline mr-2" />
+            Home
+          </Link>
+          <Link to="/shop" className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
+            Shop
+          </Link>
+          <button
+            onClick={() => { localStorage.clear(); window.location.href = "/login"; }}
+            className="px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+          >
+            <FaSignOutAlt className="inline mr-2" />
+            Logout
+          </button>
         </div>
       </header>
 
-      <div className="flex-1 flex overflow-hidden relative">
-        {/* Mobile Overlay */}
+      <div className="flex-1 flex overflow-hidden">
+        {/* Sidebar - mobile overlay */}
         {sidebarOpen && (
-          <div
-            className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
-            onClick={() => setSidebarOpen(false)}
-          ></div>
+          <div className="fixed inset-0 bg-black/50 z-40 lg:hidden" onClick={() => setSidebarOpen(false)} />
         )}
 
-        {/* Fixed Aside */}
-        <aside
-          className={`fixed inset-y-0 left-0 z-50 w-64 shadow-lg transform transition-transform duration-300 ease-in-out ${
-            sidebarOpen ? "translate-x-0" : "-translate-x-full"
-          }`}
-          style={{ backgroundColor: "#1d1d1d" }}
-        >
-          <div
-            className="flex items-center justify-between p-6 border-b lg:hidden"
-            style={{ borderColor: "#2d2d2d" }}
-          >
-            <h2 className="text-lg font-semibold" style={{ color: "#ffffff" }}>
-              Menu
-            </h2>
-            <button
-              onClick={() => setSidebarOpen(false)}
-              className="p-2 rounded-lg transition-colors"
-              style={{ backgroundColor: "#2d2d2d", color: "#ffffff" }}
-            >
+        {/* Sidebar */}
+        <aside className={`fixed top-14 bottom-0 left-0 z-50 w-56 bg-white border-r border-gray-200 transform transition-transform duration-300 lg:translate-x-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} lg:static lg:translate-x-0`}>
+          <div className="h-14 flex items-center justify-between px-6 border-b border-gray-200 lg:hidden">
+            <h2 className="font-semibold text-gray-900">Menu</h2>
+            <button onClick={() => setSidebarOpen(false)} className="p-2 rounded-lg text-gray-600 hover:bg-gray-100">
               <FaTimes />
             </button>
           </div>
-          <div className="p-6 border-b" style={{ borderColor: "#2d2d2d" }}>
-            <div className="flex items-center space-x-3">
-              <img
-                className="h-12 w-12 rounded-full object-cover border-2"
-                style={{ borderColor: "#d4af37" }}
-                src={
-                  profilePicture ||
-                  userData?.profile_picture ||
-                  "/placeholder-avatar.svg"
-                }
-                alt="Profile"
-                onError={(e) => {
-                  e.target.src = "/placeholder-avatar.svg";
-                }}
-              />
-              <div>
-                <p className="font-semibold" style={{ color: "#ffffff" }}>
-                  {userData?.name || "Customer"}
-                </p>
-                <p className="text-sm" style={{ color: "#cccccc" }}>
-                  {userData?.email}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <nav className="mt-6">
-            <div className="px-6">
-              <h3
-                className="text-xs font-semibold uppercase tracking-wider mb-3"
-                style={{ color: "#d4af37" }}
-              >
-                Dashboard
-              </h3>
-              <ul className="space-y-2">
-                <li>
-                  <Link
-                    to="/customer-dashboard"
-                    className={`flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all ${
-                      location.pathname === "/customer-dashboard"
-                        ? "active-menu-item"
-                        : ""
-                    }`}
-                    style={{
-                      color:
-                        location.pathname === "/customer-dashboard"
-                          ? "#d4af37"
-                          : "#ffffff",
-                      backgroundColor:
-                        location.pathname === "/customer-dashboard"
-                          ? "#2d2d2d"
-                          : "transparent",
-                    }}
-                    onMouseEnter={(e) => {
-                      if (location.pathname !== "/customer-dashboard") {
-                        e.currentTarget.style.backgroundColor = "#2d2d2d";
-                        e.currentTarget.style.color = "#d4af37";
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (location.pathname !== "/customer-dashboard") {
-                        e.currentTarget.style.backgroundColor = "transparent";
-                        e.currentTarget.style.color = "#ffffff";
-                      }
-                    }}
-                    onClick={() => setSidebarOpen(false)}
-                  >
-                    📊 Overview
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/customer-dashboard/cart"
-                    className={`flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all ${
-                      location.pathname === "/customer-dashboard/cart"
-                        ? "active-menu-item"
-                        : ""
-                    }`}
-                    style={{
-                      color:
-                        location.pathname === "/customer-dashboard/cart"
-                          ? "#d4af37"
-                          : "#ffffff",
-                      backgroundColor:
-                        location.pathname === "/customer-dashboard/cart"
-                          ? "#2d2d2d"
-                          : "transparent",
-                    }}
-                    onMouseEnter={(e) => {
-                      if (location.pathname !== "/customer-dashboard/cart") {
-                        e.currentTarget.style.backgroundColor = "#2d2d2d";
-                        e.currentTarget.style.color = "#d4af37";
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (location.pathname !== "/customer-dashboard/cart") {
-                        e.currentTarget.style.backgroundColor = "transparent";
-                        e.currentTarget.style.color = "#ffffff";
-                      }
-                    }}
-                    onClick={() => setSidebarOpen(false)}
-                  >
-                    🛒 Cart ({cartItems.length})
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/customer-dashboard/wishlist"
-                    className={`flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all ${
-                      location.pathname === "/customer-dashboard/wishlist"
-                        ? "active-menu-item"
-                        : ""
-                    }`}
-                    style={{
-                      color:
-                        location.pathname === "/customer-dashboard/wishlist"
-                          ? "#d4af37"
-                          : "#ffffff",
-                      backgroundColor:
-                        location.pathname === "/customer-dashboard/wishlist"
-                          ? "#2d2d2d"
-                          : "transparent",
-                    }}
-                    onMouseEnter={(e) => {
-                      if (
-                        location.pathname !== "/customer-dashboard/wishlist"
-                      ) {
-                        e.currentTarget.style.backgroundColor = "#2d2d2d";
-                        e.currentTarget.style.color = "#d4af37";
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (
-                        location.pathname !== "/customer-dashboard/wishlist"
-                      ) {
-                        e.currentTarget.style.backgroundColor = "transparent";
-                        e.currentTarget.style.color = "#ffffff";
-                      }
-                    }}
-                    onClick={() => setSidebarOpen(false)}
-                  >
-                    ❤️ Wishlist ({wishlistItems.length})
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/customer-dashboard/orders"
-                    className={`flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all ${
-                      location.pathname.startsWith("/customer-dashboard/orders")
-                        ? "active-menu-item"
-                        : ""
-                    }`}
-                    style={{
-                      color: location.pathname.startsWith(
-                        "/customer-dashboard/orders"
-                      )
-                        ? "#d4af37"
-                        : "#ffffff",
-                      backgroundColor: location.pathname.startsWith(
-                        "/customer-dashboard/orders"
-                      )
-                        ? "#2d2d2d"
-                        : "transparent",
-                    }}
-                    onMouseEnter={(e) => {
-                      if (
-                        !location.pathname.startsWith(
-                          "/customer-dashboard/orders"
-                        )
-                      ) {
-                        e.currentTarget.style.backgroundColor = "#2d2d2d";
-                        e.currentTarget.style.color = "#d4af37";
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (
-                        !location.pathname.startsWith(
-                          "/customer-dashboard/orders"
-                        )
-                      ) {
-                        e.currentTarget.style.backgroundColor = "transparent";
-                        e.currentTarget.style.color = "#ffffff";
-                      }
-                    }}
-                    onClick={() => setSidebarOpen(false)}
-                  >
-                    📦 Orders ({totalOrders})
-                  </Link>
-                </li>
-              </ul>
-
-              <h3
-                className="text-xs font-semibold uppercase tracking-wider mt-8 mb-3"
-                style={{ color: "#d4af37" }}
-              >
-                Account
-              </h3>
-              <ul className="space-y-2">
-                <li>
-                  <Link
-                    to="/customer-dashboard/profile"
-                    className={`flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all ${
-                      location.pathname === "/customer-dashboard/profile"
-                        ? "active-menu-item"
-                        : ""
-                    }`}
-                    style={{
-                      color:
-                        location.pathname === "/customer-dashboard/profile"
-                          ? "#d4af37"
-                          : "#ffffff",
-                      backgroundColor:
-                        location.pathname === "/customer-dashboard/profile"
-                          ? "#2d2d2d"
-                          : "transparent",
-                    }}
-                    onMouseEnter={(e) => {
-                      if (location.pathname !== "/customer-dashboard/profile") {
-                        e.currentTarget.style.backgroundColor = "#2d2d2d";
-                        e.currentTarget.style.color = "#d4af37";
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (location.pathname !== "/customer-dashboard/profile") {
-                        e.currentTarget.style.backgroundColor = "transparent";
-                        e.currentTarget.style.color = "#ffffff";
-                      }
-                    }}
-                    onClick={() => setSidebarOpen(false)}
-                  >
-                    ⚙️ Profile Settings
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/collections"
-                    className={`flex items-center px-4 py-3 text-sm font-medium rounded-lg transition-all ${
-                      location.pathname === "/collections"
-                        ? "active-menu-item"
-                        : ""
-                    }`}
-                    style={{
-                      color:
-                        location.pathname === "/collections"
-                          ? "#d4af37"
-                          : "#ffffff",
-                      backgroundColor:
-                        location.pathname === "/collections"
-                          ? "#2d2d2d"
-                          : "transparent",
-                    }}
-                    onMouseEnter={(e) => {
-                      if (location.pathname !== "/collections") {
-                        e.currentTarget.style.backgroundColor = "#2d2d2d";
-                        e.currentTarget.style.color = "#d4af37";
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (location.pathname !== "/collections") {
-                        e.currentTarget.style.backgroundColor = "transparent";
-                        e.currentTarget.style.color = "#ffffff";
-                      }
-                    }}
-                    onClick={() => setSidebarOpen(false)}
-                  >
-                    🛍️ Browse Collections
-                  </Link>
-                </li>
-              </ul>
-            </div>
-          </nav>
+          <div className="overflow-y-auto h-full pb-4">{sidebarContent}</div>
         </aside>
 
-        {/* Main content area */}
-        <main className="flex-1 overflow-y-auto bg-gray-50 p-6">
+        {/* Main content */}
+        <main className="flex-1 overflow-y-auto p-6">
           <div className="max-w-7xl mx-auto">
-            {/* Customer Dashboard Overview - Only show on main dashboard route */}
             {location.pathname === "/customer-dashboard" && (
               <>
-                {/* User Header */}
-                <div
-                  className="shadow-lg rounded-2xl mb-8 p-8"
-                  style={{ backgroundColor: "#1d1d1d" }}
-                >
+                {/* Welcome banner */}
+                <div className="bg-white rounded-lg border border-gray-200 p-8 mb-8">
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center">
-                      <div className="flex-shrink-0">
-                        <img
-                          className="h-20 w-20 rounded-full object-cover border-4 shadow-lg"
-                          style={{ borderColor: "#d4af37" }}
-                          src={
-                            profilePicture ||
-                            userData?.profile_picture ||
-                            "/placeholder-avatar.svg"
-                          }
-                          alt="Profile"
-                          onError={(e) => {
-                            e.target.src = "/placeholder-avatar.svg";
-                          }}
-                        />
-                      </div>
-                      <div className="ml-6 flex-1">
-                        <h2
-                          className="text-3xl font-extrabold"
-                          style={{ color: "#d4af37" }}
-                        >
-                          Welcome back, {userData?.name || "Customer"}! 👋
+                    <div className="flex items-center gap-6">
+                      <img
+                        className="h-20 w-20 rounded-full object-cover border-2 border-gold-500"
+                        src={profilePicture || userData?.profile_picture || "/placeholder-avatar.svg"}
+                        alt="Profile"
+                        onError={(e) => { e.target.src = "/placeholder-avatar.svg"; }}
+                      />
+                      <div>
+                        <h2 className="text-2xl font-bold text-gray-900">
+                          Welcome back, {userData?.name || "Customer"}
                         </h2>
-                        <p className="mt-2" style={{ color: "#cccccc" }}>
-                          {userData?.email}
-                        </p>
+                        <p className="text-gray-500 mt-1">{userData?.email}</p>
                       </div>
                     </div>
                     <Link
                       to="/customer-dashboard/profile"
-                      className="px-6 py-3 rounded-lg font-semibold transition-all transform hover:scale-105"
-                      style={{ backgroundColor: "#d4af37", color: "#000000" }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = "#b8860b";
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = "#d4af37";
-                      }}
+                      className="px-6 py-3 rounded-lg font-semibold text-sm bg-gold-500 text-black hover:bg-gold-600 transition-colors"
                     >
-                      ⚙️ Manage Profile
+                      Manage Profile
                     </Link>
                   </div>
                 </div>
 
-                <h1
-                  className="text-2xl font-extrabold mb-8"
-                  style={{ color: "#d4af37" }}
-                >
-                  📊 Dashboard
-                </h1>
-
-                {/* Stats Grid - Clickable Cards */}
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
-                  {/* Cart Items */}
-                  <div
+                {/* Stats */}
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                  <button
                     onClick={() => navigate("/customer-dashboard/cart")}
-                    className="bg-white border-2 rounded-2xl p-6 shadow-md hover:shadow-xl transition-all transform hover:scale-102 cursor-pointer"
+                    className="bg-white border border-gray-200 rounded-lg p-6 text-left hover:border-gold-500 transition-colors"
                   >
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm font-semibold text-gray-600">
-                          🛒 Cart Items
-                        </p>
-                        <p className="text-2xl font-extrabold mt-2 text-gray-900">
-                          {cartItems.length}
-                        </p>
-                      </div>
-                      <div className="text-2xl">🛍️</div>
-                    </div>
-                    <p className="text-xs mt-4 text-gray-500">
-                      Click to view cart
-                    </p>
-                  </div>
-
-                  {/* Wishlist Items */}
-                  <div
+                    <p className="text-sm text-gray-500">Cart Items</p>
+                    <p className="text-2xl font-bold text-gray-900 mt-1">{cartItems.length}</p>
+                  </button>
+                  <button
                     onClick={() => navigate("/customer-dashboard/wishlist")}
-                    className="bg-white border-2 rounded-2xl p-6 shadow-md hover:shadow-xl transition-all transform hover:scale-102 cursor-pointer"
+                    className="bg-white border border-gray-200 rounded-lg p-6 text-left hover:border-gold-500 transition-colors"
                   >
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm font-semibold text-gray-600">
-                          ❤️ Wishlist
-                        </p>
-                        <p className="text-2xl font-extrabold mt-2 text-gray-900">
-                          {wishlistItems.length}
-                        </p>
-                      </div>
-                      <div className="text-2xl">💝</div>
-                    </div>
-                    <p className="text-xs mt-4 text-gray-500">
-                      Click to view wishlist
-                    </p>
-                  </div>
-
-                  {/* Total Orders */}
-                  <div
+                    <p className="text-sm text-gray-500">Wishlist</p>
+                    <p className="text-2xl font-bold text-gray-900 mt-1">{wishlistItems.length}</p>
+                  </button>
+                  <button
                     onClick={() => navigate("/customer-dashboard/orders")}
-                    className="bg-white border-2 rounded-2xl p-6 shadow-md hover:shadow-xl transition-all transform hover:scale-102 cursor-pointer"
+                    className="bg-white border border-gray-200 rounded-lg p-6 text-left hover:border-gold-500 transition-colors"
                   >
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm font-semibold text-gray-600">
-                          📦 Total Orders
-                        </p>
-                        <p className="text-2xl font-extrabold mt-2 text-gray-900">
-                          {totalOrders}
-                        </p>
-                      </div>
-                      <div className="text-2xl">📋</div>
-                    </div>
-                    <p className="text-xs mt-4 text-gray-500">
-                      Click to view all orders
-                    </p>
-                  </div>
-
-                  {/* Total Spent */}
-                  <div
-                    className="bg-white border-2 rounded-2xl p-6 shadow-md"
-                  >
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm font-semibold text-gray-600">
-                          💰 Total Spent
-                        </p>
-                        <p className="text-2xl font-extrabold mt-2 text-gray-900">
-                          PKR {totalSpent.toFixed(2)}
-                        </p>
-                      </div>
-                      <div className="text-2xl">💳</div>
-                    </div>
-                    <p className="text-xs mt-4 text-gray-500">
-                      Lifetime spending
-                    </p>
+                    <p className="text-sm text-gray-500">Total Orders</p>
+                    <p className="text-2xl font-bold text-gray-900 mt-1">{totalOrders}</p>
+                  </button>
+                  <div className="bg-white border border-gray-200 rounded-lg p-6">
+                    <p className="text-sm text-gray-500">Total Spent</p>
+                    <p className="text-2xl font-bold text-gray-900 mt-1">PKR {totalSpent.toFixed(2)}</p>
                   </div>
                 </div>
 
+                {/* Recommended products */}
                 {recommendedProducts.length > 0 && (
-                  <div
-                    className="shadow-lg border mb-12 rounded-2xl"
-                    style={{
-                      backgroundColor: "#1d1d1d",
-                      borderColor: "#2d2d2d",
-                    }}
-                  >
-                    <div className="px-8 py-6 sm:px-8">
-                      <h3
-                        className="text-2xl font-bold"
-                        style={{ color: "#d4af37" }}
-                      >
-                        ✨ You Might Also Like
-                      </h3>
-                      <p className="mt-2" style={{ color: "#cccccc" }}>
-                        Recommended products based on your preferences
-                      </p>
-                    </div>
-                    <div className="px-8 py-6 sm:px-8">
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                        {recommendedProducts.map((product) => (
-                          <div
-                            key={product.id}
-                            onClick={() => navigate(`/product/${product.id}`)}
-                            className="hover:shadow-xl transition-all transform hover:scale-105 cursor-pointer p-4 rounded-xl"
-                            style={{ backgroundColor: "#2d2d2d" }}
-                          >
-                            <div className="mb-4 overflow-hidden rounded-lg">
-                              <img
-                                src={
-                                  product.image_url ||
-                                  "/placeholder-product.jpg"
-                                }
-                                alt={product.name}
-                                className="w-full h-40 object-cover hover:scale-110 transition-transform"
-                              />
-                            </div>
-                            <h4
-                              className="text-sm font-bold truncate"
-                              style={{ color: "#ffffff" }}
-                            >
-                              {product.name}
-                            </h4>
-                            <p
-                              className="text-xs truncate mt-1"
-                              style={{ color: "#cccccc" }}
-                            >
-                              {product.store_name}
-                            </p>
-                            <p
-                              className="text-lg font-bold mt-3"
-                              style={{ color: "#d4af37" }}
-                            >
-                              PKR {product.price}
-                            </p>
-                            <button
-                              className="mt-3 w-full py-2 px-4 rounded-lg text-sm font-bold transition-all transform hover:scale-105"
-                              style={{
-                                backgroundColor: "#d4af37",
-                                color: "#000000",
-                              }}
-                            >
-                              👁️ View Product
+                  <div className="bg-white border border-gray-200 rounded-lg p-8 mb-8">
+                    <h3 className="text-lg font-bold text-gray-900 mb-1">You Might Also Like</h3>
+                    <p className="text-sm text-gray-500 mb-6">Recommended products based on your preferences</p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                      {recommendedProducts.map((product) => (
+                        <div
+                          key={product.id}
+                          onClick={() => navigate(`/product/${product.id}`)}
+                          className="border border-gray-200 rounded-lg overflow-hidden hover:border-gold-500 transition-colors cursor-pointer"
+                        >
+                          <img
+                            src={product.image_url || "/placeholder-product.jpg"}
+                            alt={product.name}
+                            className="w-full h-40 object-cover"
+                          />
+                          <div className="p-4">
+                            <h4 className="text-sm font-semibold text-gray-900 truncate">{product.name}</h4>
+                            <p className="text-xs text-gray-500 truncate mt-1">{product.store_name}</p>
+                            <p className="text-lg font-bold text-gold-600 mt-2">PKR {product.price}</p>
+                            <button className="mt-3 w-full py-2 rounded-lg text-sm font-semibold bg-gold-500 text-black hover:bg-gold-600 transition-colors">
+                              View Product
                             </button>
                           </div>
-                        ))}
-                      </div>
+                        </div>
+                      ))}
                     </div>
                   </div>
                 )}
 
-                {/* Recent Orders Section */}
-                <div className="bg-white border-2 rounded-2xl shadow-lg">
-                  <div className="px-8 py-6 sm:px-8">
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <h3 className="text-xl font-bold text-gray-900">
-                          📦 Recent Orders
-                        </h3>
-                        <p className="mt-2 text-gray-600">
-                          Your latest order history
-                        </p>
-                      </div>
-                      <button
-                        onClick={() => navigate("/customer-dashboard/orders")}
-                        className="px-6 py-2 rounded-lg font-bold transition-all transform hover:scale-105 bg-gray-900 hover:bg-gray-800 text-white"
-                      >
-                        View All →
-                      </button>
+                {/* Recent Orders */}
+                <div className="bg-white border border-gray-200 rounded-lg">
+                  <div className="px-8 py-6 flex justify-between items-center border-b border-gray-200">
+                    <div>
+                      <h3 className="text-lg font-bold text-gray-900">Recent Orders</h3>
+                      <p className="text-sm text-gray-500 mt-1">Your latest order history</p>
                     </div>
+                    <button
+                      onClick={() => navigate("/customer-dashboard/orders")}
+                      className="px-4 py-2 text-sm font-semibold text-gold-600 hover:bg-gold-500/10 rounded-lg transition-colors"
+                    >
+                      View All
+                    </button>
                   </div>
                   <div className="divide-y divide-gray-200">
                     {orders.length > 0 ? (
                       orders.slice(0, 5).map((order) => (
                         <div
                           key={order.id}
-                          onClick={() =>
-                            navigate(`/customer-dashboard/orders/${order.id}`)
-                          }
-                          className="px-8 py-6 hover:bg-gray-50 transition-all cursor-pointer border-l-4 border-l-transparent hover:border-l-gray-900"
+                          onClick={() => navigate(`/customer-dashboard/orders/${order.id}`)}
+                          className="px-8 py-5 hover:bg-gray-50 transition-colors cursor-pointer flex items-center justify-between"
                         >
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-6">
-                              <div>
-                                <p className="text-base font-bold text-gray-900">
-                                  Order #{order.id}
-                                </p>
-                                <p className="text-sm mt-1 text-gray-600">
-                                  📅{" "}
-                                  {new Date(
-                                    order.created_at
-                                  ).toLocaleDateString("en-US", {
-                                    year: "numeric",
-                                    month: "short",
-                                    day: "numeric",
-                                  })}
-                                </p>
-                              </div>
-                            </div>
-                            <div className="text-right">
-                              <p className="text-xl font-bold text-gray-900">
-                                PKR {order.total_amount}
-                              </p>
-                              <span
-                                className={`inline-block mt-2 px-4 py-1 text-sm font-bold rounded-full ${
-                                  order.status === "delivered"
-                                    ? "bg-green-100 text-green-800"
-                                    : order.status === "shipped"
-                                    ? "bg-blue-100 text-blue-800"
-                                    : order.status === "processing"
-                                    ? "bg-yellow-100 text-yellow-800"
-                                    : order.status === "cancelled"
-                                    ? "bg-red-100 text-red-800"
-                                    : "bg-gray-100 text-gray-800"
-                                }`}
-                              >
-                                {order.status.charAt(0).toUpperCase() +
-                                  order.status.slice(1)}
-                              </span>
-                            </div>
+                          <div>
+                            <p className="text-sm font-semibold text-gray-900">Order #{order.id}</p>
+                            <p className="text-xs text-gray-500 mt-1">
+                              {new Date(order.created_at).toLocaleDateString("en-US", {
+                                year: "numeric",
+                                month: "short",
+                                day: "numeric",
+                              })}
+                            </p>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-sm font-bold text-gray-900">PKR {order.total_amount}</p>
+                            <span
+                              className={`inline-block mt-1 px-2 py-0.5 text-xs font-semibold rounded-full ${
+                                order.status === "delivered"
+                                  ? "bg-green-100 text-green-800"
+                                  : order.status === "shipped"
+                                  ? "bg-blue-100 text-blue-800"
+                                  : order.status === "processing"
+                                  ? "bg-yellow-100 text-yellow-800"
+                                  : order.status === "cancelled"
+                                  ? "bg-red-100 text-red-800"
+                                  : "bg-gray-100 text-gray-800"
+                              }`}
+                            >
+                              {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                            </span>
                           </div>
                         </div>
                       ))
                     ) : (
                       <div className="px-8 py-12 text-center">
-                        <p className="text-2xl" style={{ color: "#999999" }}>
-                          🛒
-                        </p>
-                        <p className="mt-3" style={{ color: "#cccccc" }}>
-                          No orders yet
-                        </p>
+                        <p className="text-gray-500">No orders yet</p>
                         <Link
                           to="/collections"
-                          className="inline-block mt-4 px-6 py-2 rounded-lg font-bold transition-all"
-                          style={{
-                            backgroundColor: "#d4af37",
-                            color: "#000000",
-                          }}
+                          className="inline-block mt-3 px-6 py-2 rounded-lg text-sm font-semibold bg-gold-500 text-black hover:bg-gold-600 transition-colors"
                         >
                           Start Shopping
                         </Link>
@@ -807,7 +367,6 @@ const CustomerDashboard = () => {
               </>
             )}
 
-            {/* Render nested routes for other customer dashboard pages */}
             <Outlet />
           </div>
         </main>

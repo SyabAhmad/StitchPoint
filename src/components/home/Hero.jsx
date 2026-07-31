@@ -5,7 +5,7 @@ import { FaChevronDown } from "react-icons/fa";
 
 export default function Hero() {
   return (
-    <section className="relative w-full h-[70vh] min-h-[450px] overflow-hidden">
+    <section className="relative w-full h-[calc(100vh-3.5rem)] overflow-hidden">
       {/* Background Image — full screen, no heavy overlay */}
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
