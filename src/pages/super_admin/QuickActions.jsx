@@ -2,15 +2,10 @@ import React from "react";
 import {
   FaUsers,
   FaBox,
-  FaEye,
-  FaList,
   FaStar,
   FaBuilding,
-  FaClipboardList,
   FaComments,
-  FaChartLine,
   FaChartBar,
-  FaPlus,
 } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
@@ -25,156 +20,34 @@ const QuickActions = () => {
 
   if (!user || user.role !== "super_admin") return null;
 
+  const actions = [
+    { icon: FaUsers, label: "Add New User", color: "text-gold-500", bg: "bg-gold-500/10", to: "/super-admin-dashboard/user-management" },
+    { icon: FaBox, label: "View Products", color: "text-gold-600", bg: "bg-gold-600/10", to: "/super-admin-dashboard/products" },
+    { icon: FaStar, label: "View Reviews", color: "text-amber-400", bg: "bg-amber-400/10", to: "/super-admin-dashboard/reviews" },
+    { icon: FaBuilding, label: "View Stores", color: "text-amber-500", bg: "bg-amber-500/10", to: "/super-admin-dashboard/store-analytics" },
+    { icon: FaComments, label: "View Comments", color: "text-orange-400", bg: "bg-orange-400/10", to: "/super-admin-dashboard/comments" },
+    { icon: FaChartBar, label: "View Analytics", color: "text-yellow-300", bg: "bg-yellow-300/10", to: "/super-admin-dashboard/analytics" },
+  ];
+
   return (
     <section className="mb-6">
-      <h2 className="text-xl font-semibold mb-4" style={{ color: "#ffffff" }}>
-        Quick Actions
-      </h2>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {/* Add User Card */}
-        <div
-          className="shadow rounded-lg p-6 cursor-pointer transition-transform hover:scale-105"
-          style={{ backgroundColor: "#1d1d1d" }}
-          onClick={() => navigate("/super-admin-dashboard/user-management")}
-        >
-          <div className="flex items-center justify-between">
-            <div>
-              <div
-                className="text-3xl font-bold mb-2"
-                style={{ color: "#d4af37" }}
-              >
-                <FaPlus />
+      <h2 className="text-sm font-semibold text-gold-500 uppercase tracking-wider mb-4">Quick Actions</h2>
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+        {actions.map((a) => {
+          const Icon = a.icon;
+          return (
+            <button
+              key={a.label}
+              onClick={() => navigate(a.to)}
+              className="bg-[#111] border border-white/5 rounded-lg p-4 text-left hover:border-gold-500/20 hover:bg-white/[0.02] transition-all duration-200 group"
+            >
+              <div className={`w-9 h-9 rounded-lg ${a.bg} flex items-center justify-center mb-3 group-hover:scale-110 transition-transform`}>
+                <Icon className={`${a.color} text-sm`} />
               </div>
-              <div className="text-sm" style={{ color: "#cccccc" }}>
-                Add New User
-              </div>
-            </div>
-            <div className="text-4xl" style={{ color: "#d4af37" }}>
-              <FaUsers />
-            </div>
-          </div>
-        </div>
-
-        {/* See Products Card */}
-        <div
-          className="shadow rounded-lg p-6 cursor-pointer transition-transform hover:scale-105"
-          style={{ backgroundColor: "#1d1d1d" }}
-          onClick={() => navigate("/super-admin-dashboard/products")}
-        >
-          <div className="flex items-center justify-between">
-            <div>
-              <div
-                className="text-3xl font-bold mb-2"
-                style={{ color: "#b8860b" }}
-              >
-                <FaEye />
-              </div>
-              <div className="text-sm" style={{ color: "#cccccc" }}>
-                View Products
-              </div>
-            </div>
-            <div className="text-4xl" style={{ color: "#b8860b" }}>
-              <FaBox />
-            </div>
-          </div>
-        </div>
-
-        {/* See Reviews Card */}
-        <div
-          className="shadow rounded-lg p-6 cursor-pointer transition-transform hover:scale-105"
-          style={{ backgroundColor: "#1d1d1d" }}
-          onClick={() => navigate("/super-admin-dashboard/reviews")}
-        >
-          <div className="flex items-center justify-between">
-            <div>
-              <div
-                className="text-3xl font-bold mb-2"
-                style={{ color: "#ffd700" }}
-              >
-                <FaList />
-              </div>
-              <div className="text-sm" style={{ color: "#cccccc" }}>
-                View Reviews
-              </div>
-            </div>
-            <div className="text-4xl" style={{ color: "#ffd700" }}>
-              <FaStar />
-            </div>
-          </div>
-        </div>
-
-        {/* See Stores Card */}
-        <div
-          className="shadow rounded-lg p-6 cursor-pointer transition-transform hover:scale-105"
-          style={{ backgroundColor: "#1d1d1d" }}
-          onClick={() => navigate("/super-admin-dashboard/store-analytics")}
-        >
-          <div className="flex items-center justify-between">
-            <div>
-              <div
-                className="text-3xl font-bold mb-2"
-                style={{ color: "#daa520" }}
-              >
-                <FaEye />
-              </div>
-              <div className="text-sm" style={{ color: "#cccccc" }}>
-                View Stores
-              </div>
-            </div>
-            <div className="text-4xl" style={{ color: "#daa520" }}>
-              <FaBuilding />
-            </div>
-          </div>
-        </div>
-
-        {/* See Comments Card */}
-        <div
-          className="shadow rounded-lg p-6 cursor-pointer transition-transform hover:scale-105"
-          style={{ backgroundColor: "#1d1d1d" }}
-          onClick={() => navigate("/super-admin-dashboard/comments")}
-        >
-          <div className="flex items-center justify-between">
-            <div>
-              <div
-                className="text-3xl font-bold mb-2"
-                style={{ color: "#ff8c00" }}
-              >
-                <FaClipboardList />
-              </div>
-              <div className="text-sm" style={{ color: "#cccccc" }}>
-                View Comments
-              </div>
-            </div>
-            <div className="text-4xl" style={{ color: "#ff8c00" }}>
-              <FaComments />
-            </div>
-          </div>
-        </div>
-
-        {/* Analytics Card */}
-        <div
-          className="shadow rounded-lg p-6 cursor-pointer transition-transform hover:scale-105"
-          style={{ backgroundColor: "#1d1d1d" }}
-          onClick={() => navigate("/super-admin-dashboard/analytics")}
-        >
-          <div className="flex items-center justify-between">
-            <div>
-              <div
-                className="text-3xl font-bold mb-2"
-                style={{ color: "#f4e4bc" }}
-              >
-                <FaChartLine />
-              </div>
-              <div className="text-sm" style={{ color: "#cccccc" }}>
-                View Analytics
-              </div>
-            </div>
-            <div className="text-4xl" style={{ color: "#f4e4bc" }}>
-              <FaChartBar />
-            </div>
-          </div>
-        </div>
+              <p className="text-[13px] font-medium text-white/70 group-hover:text-white transition-colors">{a.label}</p>
+            </button>
+          );
+        })}
       </div>
     </section>
   );

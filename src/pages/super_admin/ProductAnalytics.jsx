@@ -65,12 +65,9 @@ const ProductAnalytics = () => {
 
   if (loading) {
     return (
-      <div
-        className="flex justify-center items-center h-screen"
-        style={{ backgroundColor: "#000000", color: "#ffffff" }}
-      >
+      <div className="flex justify-center items-center h-screen bg-black text-white">
         <div className="flex flex-col items-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-yellow-500 mb-4"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-2 border-gold-500/20 border-t-gold-500 mb-4"></div>
           <span>Loading products analytics...</span>
         </div>
       </div>
@@ -133,19 +130,16 @@ const ProductAnalytics = () => {
   };
 
   return (
-    <div
-      className="p-8"
-      style={{ backgroundColor: "#000000", minHeight: "100vh" }}
-    >
+    <div className="p-8 bg-black min-h-screen">
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-3xl font-bold mb-6" style={{ color: "#d4af37" }}>
+        <h1 className="text-3xl font-bold mb-6 text-gold-500">
           Product Analytics
         </h1>
 
         {/* Filters */}
         <div className="mb-6 flex flex-wrap gap-4">
           <div>
-            <label className="block text-sm mb-2" style={{ color: "#cccccc" }}>
+            <label className="block text-sm mb-2 text-white/50">
               Time Period:
             </label>
             <select
@@ -154,12 +148,7 @@ const ProductAnalytics = () => {
                 setFilterDays(Number(e.target.value));
                 setPage(1); // Reset to first page
               }}
-              className="px-3 py-2 rounded"
-              style={{
-                backgroundColor: "#2d2d2d",
-                color: "#ffffff",
-                border: "1px solid #3d3d3d",
-              }}
+              className="px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-gold-500/40 transition-colors"
             >
               <option value={7}>Last 7 days</option>
               <option value={30}>Last 30 days</option>
@@ -167,9 +156,7 @@ const ProductAnalytics = () => {
             </select>
           </div>
           <div>
-            <label className="block text-sm mb-2" style={{ color: "#cccccc" }}>
-              Store:
-            </label>
+            <label className="block text-sm mb-2 text-white/50">Store:</label>
             <select
               value={selectedStore || ""}
               onChange={(e) => {
@@ -178,12 +165,7 @@ const ProductAnalytics = () => {
                 );
                 setPage(1); // Reset to first page
               }}
-              className="px-3 py-2 rounded"
-              style={{
-                backgroundColor: "#2d2d2d",
-                color: "#ffffff",
-                border: "1px solid #3d3d3d",
-              }}
+              className="px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-gold-500/40 transition-colors"
             >
               <option value="">All Stores</option>
               {stores.map((store) => (
@@ -199,215 +181,114 @@ const ProductAnalytics = () => {
         <OverviewStats data={overview} />
 
         {/* Products Table */}
-        <div
-          className="shadow overflow-hidden sm:rounded-md mb-8"
-          style={{ backgroundColor: "#1d1d1d" }}
-        >
-          <div
-            className="px-4 py-5 sm:px-6 border-b"
-            style={{ borderColor: "#2d2d2d" }}
-          >
-            <h3
-              className="text-lg leading-6 font-medium"
-              style={{ color: "#ffffff" }}
-            >
+        <div className="bg-[#111] border border-white/5 rounded-lg shadow overflow-hidden mb-8">
+          <div className="px-4 py-5 sm:px-6 border-b border-white/5">
+            <h3 className="text-lg leading-6 font-medium text-white">
               Products Performance
             </h3>
-            <p className="mt-1 max-w-2xl text-sm" style={{ color: "#999999" }}>
+            <p className="mt-1 max-w-2xl text-sm text-white/30">
               Detailed analytics for each product
             </p>
           </div>
           <div className="overflow-x-auto">
             <table className="min-w-full">
-              <thead style={{ backgroundColor: "#2d2d2d" }}>
+              <thead className="bg-white/5">
                 <tr>
-                  <th
-                    className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
-                    style={{ color: "#d4af37" }}
-                  >
+                  <th className="px-6 py-3 text-left text-[11px] font-medium text-white/30 uppercase tracking-wider">
                     Product
                   </th>
-                  <th
-                    className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
-                    style={{ color: "#d4af37" }}
-                  >
+                  <th className="px-6 py-3 text-left text-[11px] font-medium text-white/30 uppercase tracking-wider">
                     Store
                   </th>
-                  <th
-                    className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
-                    style={{ color: "#d4af37" }}
-                  >
+                  <th className="px-6 py-3 text-left text-[11px] font-medium text-white/30 uppercase tracking-wider">
                     Views
                   </th>
-                  <th
-                    className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
-                    style={{ color: "#d4af37" }}
-                  >
+                  <th className="px-6 py-3 text-left text-[11px] font-medium text-white/30 uppercase tracking-wider">
                     Clicks
                   </th>
-                  <th
-                    className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
-                    style={{ color: "#d4af37" }}
-                  >
+                  <th className="px-6 py-3 text-left text-[11px] font-medium text-white/30 uppercase tracking-wider">
                     Cart Adds
                   </th>
-                  <th
-                    className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
-                    style={{ color: "#d4af37" }}
-                  >
+                  <th className="px-6 py-3 text-left text-[11px] font-medium text-white/30 uppercase tracking-wider">
                     Avg Time
                   </th>
-                  <th
-                    className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
-                    style={{ color: "#d4af37" }}
-                  >
+                  <th className="px-6 py-3 text-left text-[11px] font-medium text-white/30 uppercase tracking-wider">
                     Reviews
                   </th>
-                  <th
-                    className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
-                    style={{ color: "#d4af37" }}
-                  >
+                  <th className="px-6 py-3 text-left text-[11px] font-medium text-white/30 uppercase tracking-wider">
                     Avg Rating
                   </th>
-                  <th
-                    className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
-                    style={{ color: "#d4af37" }}
-                  >
+                  <th className="px-6 py-3 text-left text-[11px] font-medium text-white/30 uppercase tracking-wider">
                     Comments
                   </th>
-                  <th
-                    className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
-                    style={{ color: "#d4af37" }}
-                  >
+                  <th className="px-6 py-3 text-left text-[11px] font-medium text-white/30 uppercase tracking-wider">
                     Revenue
                   </th>
-                  <th
-                    className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
-                    style={{ color: "#d4af37" }}
-                  >
+                  <th className="px-6 py-3 text-left text-[11px] font-medium text-white/30 uppercase tracking-wider">
                     Units Sold
                   </th>
-                  <th
-                    className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
-                    style={{ color: "#d4af37" }}
-                  >
+                  <th className="px-6 py-3 text-left text-[11px] font-medium text-white/30 uppercase tracking-wider">
                     Costs
                   </th>
-                  <th
-                    className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
-                    style={{ color: "#d4af37" }}
-                  >
+                  <th className="px-6 py-3 text-left text-[11px] font-medium text-white/30 uppercase tracking-wider">
                     Profit
                   </th>
                 </tr>
               </thead>
-              <tbody style={{ backgroundColor: "#1d1d1d" }}>
-                {productsAnalytics.map((product, index) => (
+              <tbody className="divide-y divide-white/5">
+                {productsAnalytics.map((product) => (
                   <tr
                     key={product.product_id}
-                    className="transition-colors duration-150 cursor-pointer"
-                    style={{
-                      borderBottom: "1px solid #2d2d2d",
-                      backgroundColor: index % 2 === 0 ? "#1d1d1d" : "#2d2d2d",
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = "#1f1f1f";
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor =
-                        index % 2 === 0 ? "#1d1d1d" : "#2d2d2d";
-                    }}
+                    className="transition-colors duration-150 cursor-pointer hover:bg-white/[0.02]"
                     onClick={() => navigate(`/product/${product.product_id}`)}
                   >
-                    <td
-                      className="px-6 py-4 whitespace-nowrap text-sm font-medium"
-                      style={{ color: "#ffffff" }}
-                    >
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <Link
                         to={`/product/${product.product_id}`}
-                        style={{ color: "#d4af37", textDecoration: "none" }}
-                        onMouseEnter={(e) =>
-                          (e.target.style.textDecoration = "underline")
-                        }
-                        onMouseLeave={(e) =>
-                          (e.target.style.textDecoration = "none")
-                        }
+                        className="text-gold-500 hover:underline"
                       >
                         {product.product_name}
                       </Link>
                     </td>
-                    <td
-                      className="px-6 py-4 whitespace-nowrap text-sm"
-                      style={{ color: "#cccccc" }}
-                    >
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-white/50">
                       {product.store_name}
                     </td>
-                    <td
-                      className="px-6 py-4 whitespace-nowrap text-sm"
-                      style={{ color: "#cccccc" }}
-                    >
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-white/50">
                       {product.total_views}
                     </td>
-                    <td
-                      className="px-6 py-4 whitespace-nowrap text-sm"
-                      style={{ color: "#cccccc" }}
-                    >
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-white/50">
                       {product.total_clicks}
                     </td>
-                    <td
-                      className="px-6 py-4 whitespace-nowrap text-sm"
-                      style={{ color: "#cccccc" }}
-                    >
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-white/50">
                       {product.total_cart_adds}
                     </td>
-                    <td
-                      className="px-6 py-4 whitespace-nowrap text-sm"
-                      style={{ color: "#cccccc" }}
-                    >
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-white/50">
                       {product.avg_time_spent}s
                     </td>
-                    <td
-                      className="px-6 py-4 whitespace-nowrap text-sm"
-                      style={{ color: "#cccccc" }}
-                    >
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-white/50">
                       {product.total_reviews}
                     </td>
-                    <td
-                      className="px-6 py-4 whitespace-nowrap text-sm"
-                      style={{ color: "#cccccc" }}
-                    >
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-white/50">
                       {product.avg_rating || 0}
                     </td>
-                    <td
-                      className="px-6 py-4 whitespace-nowrap text-sm"
-                      style={{ color: "#cccccc" }}
-                    >
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-white/50">
                       {product.total_comments}
                     </td>
-                    <td
-                      className="px-6 py-4 whitespace-nowrap text-sm"
-                      style={{ color: "#d4af37" }}
-                    >
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gold-500">
                       PKR {product.total_revenue || 0}
                     </td>
-                    <td
-                      className="px-6 py-4 whitespace-nowrap text-sm"
-                      style={{ color: "#cccccc" }}
-                    >
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-white/50">
                       {product.total_units_sold || 0}
                     </td>
-                    <td
-                      className="px-6 py-4 whitespace-nowrap text-sm"
-                      style={{ color: "#cccccc" }}
-                    >
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-white/50">
                       PKR {product.total_costs || 0}
                     </td>
                     <td
-                      className="px-6 py-4 whitespace-nowrap text-sm"
-                      style={{
-                        color:
-                          product.total_profit >= 0 ? "#4ecdc4" : "#ff6b6b",
-                      }}
+                      className={`px-6 py-4 whitespace-nowrap text-sm ${
+                        product.total_profit >= 0
+                          ? "text-teal-400"
+                          : "text-red-400"
+                      }`}
                     >
                       PKR {product.total_profit || 0}
                     </td>
@@ -416,7 +297,7 @@ const ProductAnalytics = () => {
               </tbody>
             </table>
             {productsAnalytics.length === 0 && (
-              <div className="text-center py-8" style={{ color: "#999999" }}>
+              <div className="text-center py-8 text-white/30">
                 No products analytics available.
               </div>
             )}
@@ -424,29 +305,12 @@ const ProductAnalytics = () => {
 
           {/* Pagination Controls */}
           {pagination.total_pages > 1 && (
-            <div
-              className="px-4 py-3 sm:px-6 flex items-center justify-between"
-              style={{
-                backgroundColor: "#1d1d1d",
-                borderTop: "1px solid #2d2d2d",
-              }}
-            >
+            <div className="px-4 py-3 sm:px-6 flex items-center justify-between border-t border-white/5">
               <div className="flex-1 flex justify-between sm:hidden">
                 <button
                   onClick={() => setPage(Math.max(1, page - 1))}
                   disabled={page === 1}
-                  className="relative inline-flex items-center px-4 py-2 text-sm font-medium rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
-                  style={{
-                    color: "#ffffff",
-                    backgroundColor: "#2d2d2d",
-                    border: "1px solid #3d3d3d",
-                  }}
-                  onMouseEnter={(e) =>
-                    (e.currentTarget.style.backgroundColor = "#1f1f1f")
-                  }
-                  onMouseLeave={(e) =>
-                    (e.currentTarget.style.backgroundColor = "#2d2d2d")
-                  }
+                  className="relative inline-flex items-center px-4 py-2 text-sm font-medium rounded-md text-white bg-white/5 border border-white/10 hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   Previous
                 </button>
@@ -455,35 +319,24 @@ const ProductAnalytics = () => {
                     setPage(Math.min(pagination.total_pages, page + 1))
                   }
                   disabled={page === pagination.total_pages}
-                  className="ml-3 relative inline-flex items-center px-4 py-2 text-sm font-medium rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
-                  style={{
-                    color: "#ffffff",
-                    backgroundColor: "#2d2d2d",
-                    border: "1px solid #3d3d3d",
-                  }}
-                  onMouseEnter={(e) =>
-                    (e.currentTarget.style.backgroundColor = "#1f1f1f")
-                  }
-                  onMouseLeave={(e) =>
-                    (e.currentTarget.style.backgroundColor = "#2d2d2d")
-                  }
+                  className="ml-3 relative inline-flex items-center px-4 py-2 text-sm font-medium rounded-md text-white bg-white/5 border border-white/10 hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   Next
                 </button>
               </div>
               <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
                 <div>
-                  <p className="text-sm" style={{ color: "#cccccc" }}>
+                  <p className="text-sm text-white/50">
                     Showing{" "}
-                    <span className="font-medium">
+                    <span className="font-medium text-white">
                       {(page - 1) * limit + 1}
                     </span>{" "}
                     to{" "}
-                    <span className="font-medium">
+                    <span className="font-medium text-white">
                       {Math.min(page * limit, pagination.total_count)}
                     </span>{" "}
                     of{" "}
-                    <span className="font-medium">
+                    <span className="font-medium text-white">
                       {pagination.total_count}
                     </span>{" "}
                     results
@@ -494,18 +347,7 @@ const ProductAnalytics = () => {
                     <button
                       onClick={() => setPage(Math.max(1, page - 1))}
                       disabled={page === 1}
-                      className="relative inline-flex items-center px-2 py-2 rounded-l-md text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-                      style={{
-                        color: "#cccccc",
-                        backgroundColor: "#2d2d2d",
-                        border: "1px solid #3d3d3d",
-                      }}
-                      onMouseEnter={(e) =>
-                        (e.currentTarget.style.backgroundColor = "#1f1f1f")
-                      }
-                      onMouseLeave={(e) =>
-                        (e.currentTarget.style.backgroundColor = "#2d2d2d")
-                      }
+                      className="relative inline-flex items-center px-2 py-2 rounded-l-md text-sm font-medium text-white/30 bg-white/5 border border-white/10 hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                     >
                       Previous
                     </button>
@@ -521,23 +363,11 @@ const ProductAnalytics = () => {
                           <button
                             key={pageNum}
                             onClick={() => setPage(pageNum)}
-                            className="relative inline-flex items-center px-4 py-2 border text-sm font-medium"
-                            style={{
-                              color: pageNum === page ? "#d4af37" : "#cccccc",
-                              backgroundColor:
-                                pageNum === page ? "#2d2d2d" : "#1d1d1d",
-                              border: "1px solid #3d3d3d",
-                            }}
-                            onMouseEnter={(e) => {
-                              if (pageNum !== page)
-                                e.currentTarget.style.backgroundColor =
-                                  "#1f1f1f";
-                            }}
-                            onMouseLeave={(e) => {
-                              if (pageNum !== page)
-                                e.currentTarget.style.backgroundColor =
-                                  "#1d1d1d";
-                            }}
+                            className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium transition-colors ${
+                              pageNum === page
+                                ? "z-10 bg-gold-500 border-gold-500 text-black"
+                                : "bg-white/5 border-white/10 text-white/30 hover:bg-white/10"
+                            }`}
                           >
                             {pageNum}
                           </button>
@@ -549,18 +379,7 @@ const ProductAnalytics = () => {
                         setPage(Math.min(pagination.total_pages, page + 1))
                       }
                       disabled={page === pagination.total_pages}
-                      className="relative inline-flex items-center px-2 py-2 rounded-r-md text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-                      style={{
-                        color: "#cccccc",
-                        backgroundColor: "#2d2d2d",
-                        border: "1px solid #3d3d3d",
-                      }}
-                      onMouseEnter={(e) =>
-                        (e.currentTarget.style.backgroundColor = "#1f1f1f")
-                      }
-                      onMouseLeave={(e) =>
-                        (e.currentTarget.style.backgroundColor = "#2d2d2d")
-                      }
+                      className="relative inline-flex items-center px-2 py-2 rounded-r-md text-sm font-medium text-white/30 bg-white/5 border border-white/10 hover:bg-white/10 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                     >
                       Next
                     </button>

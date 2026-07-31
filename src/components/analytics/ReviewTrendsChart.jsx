@@ -9,43 +9,29 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
+const CustomTooltip = ({ active, payload, label }) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="bg-[#1a1a1a] border border-white/10 rounded-lg px-4 py-3 shadow-xl">
+        <p className="font-semibold text-sm text-white mb-1">{new Date(label).toLocaleDateString()}</p>
+        <p className="text-lg font-bold text-gold-500">{payload[0].value} reviews</p>
+      </div>
+    );
+  }
+  return null;
+};
+
 const ReviewTrendsChart = ({ data }) => {
   return (
-    <div
-      className="shadow rounded-lg p-6"
-      style={{ backgroundColor: "#1d1d1d", color: "#ffffff" }}
-    >
-      <h3 className="text-lg font-semibold mb-4" style={{ color: "#d4af37" }}>
-        Review Trends
-      </h3>
-      <ResponsiveContainer width="100%" height={300}>
-        <LineChart data={data}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#444" />
-          <XAxis
-            dataKey="date"
-            stroke="#cccccc"
-            tickFormatter={(value) => new Date(value).toLocaleDateString()}
-          />
-          <YAxis stroke="#cccccc" />
-          <Tooltip
-            contentStyle={{
-              backgroundColor: "#2d2d2d",
-              border: "1px solid #444",
-              borderRadius: "8px",
-              color: "#ffffff",
-            }}
-            labelFormatter={(value) => new Date(value).toLocaleDateString()}
-          />
-          <Line
-            type="monotone"
-            dataKey="reviews"
-            stroke="#ffd700"
-            strokeWidth={2}
-            dot={{ fill: "#ffd700", strokeWidth: 2, r: 4 }}
-          />
-        </LineChart>
-      </ResponsiveContainer>
-    </div>
+    <ResponsiveContainer width="100%" height={220}>
+      <LineChart data={data} margin={{ top: 5, right: 10, left: -10, bottom: 0 }}>
+        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" vertical={false} />
+        <XAxis dataKey="date" stroke="rgba(255,255,255,0.2)" fontSize={10} tickLine={false} tickFormatter={(v) => new Date(v).toLocaleDateString()} />
+        <YAxis stroke="rgba(255,255,255,0.2)" fontSize={10} tickLine={false} />
+        <Tooltip content={<CustomTooltip />} />
+        <Line type="monotone" dataKey="reviews" stroke="#D4AF37" strokeWidth={2} dot={false} activeDot={{ r: 4, fill: "#D4AF37", strokeWidth: 0 }} />
+      </LineChart>
+    </ResponsiveContainer>
   );
 };
 

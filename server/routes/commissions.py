@@ -96,6 +96,11 @@ def create_or_update_commission():
         commission_amount = data.get('commission_amount')
         reset_to_default = data.get('reset_to_default', False)
 
+        # Check if product exists
+        product = Product.query.get(product_id)
+        if not product:
+            return jsonify({'message': 'Product not found'}), 404
+
         # Allow reset request
         if reset_to_default:
             existing_commission = Commission.query.filter_by(product_id=product_id).first()
@@ -138,11 +143,6 @@ def create_or_update_commission():
         # Validate amount is positive
         if commission_amount is not None and commission_amount < 0:
             return jsonify({'message': 'commission_amount must be positive'}), 400
-
-        # Check if product exists
-        product = Product.query.get(product_id)
-        if not product:
-            return jsonify({'message': 'Product not found'}), 404
 
         # Check if commission already exists for this product
         existing_commission = Commission.query.filter_by(product_id=product_id).first()

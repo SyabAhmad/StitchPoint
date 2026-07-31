@@ -1,90 +1,75 @@
 import React from "react";
+import { FaStar } from "react-icons/fa";
 
-const quotes = [
+const testimonials = [
   {
     id: 1,
-    name: "Aisha",
-    text: "Absolutely love my wedding dress — the detail was perfect.",
+    name: "Aisha Khan",
+    role: "Bride",
+    quote: "The wedding dress was beyond my expectations. Every stitch was perfect, and the fitting was impeccable.",
     rating: 5,
-    avatar: "👩‍💼",
-    location: "Dubai",
+    initials: "AK",
   },
   {
     id: 2,
-    name: "Omar",
-    text: "Incredible craftsmanship. Highly recommended.",
+    name: "Omar Farooq",
+    role: "Entrepreneur",
+    quote: "Exceptional craftsmanship and attention to detail. My bespoke suit received countless compliments.",
     rating: 5,
-    avatar: "👨‍💼",
-    location: "Abu Dhabi",
+    initials: "OF",
   },
   {
     id: 3,
-    name: "Mariyam",
-    text: "Fast turnaround and exquisite finishing touches.",
+    name: "Mariyam Hassan",
+    role: "Fashion Enthusiast",
+    quote: "Fast turnaround, exquisite finishing, and a team that truly understands fabric and design.",
     rating: 5,
-    avatar: "👩‍🎨",
-    location: "Sharjah",
+    initials: "MH",
   },
 ];
 
-const StarRating = ({ rating }) => {
-  return (
-    <div className="flex gap-1 mb-2">
-      {[...Array(5)].map((_, i) => (
-        <span
-          key={i}
-          className={
-            i < rating ? "text-gold-500 text-xl" : "text-gray-300 text-xl"
-          }
-        >
-          ★
-        </span>
-      ))}
-    </div>
-  );
-};
-
 export default function Testimonials() {
   return (
-    <section className="py-20 px-4 bg-gradient-to-br from-black-silk/3 to-white/98">
-      <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold font-serif text-gold-500 mb-4">
+    <section className="py-14 md:py-20 bg-black/[0.02]">
+      <div className="max-w-6xl mx-auto px-6">
+        <div className="text-center mb-10">
+          <span className="text-gold-500 text-xs font-semibold tracking-[0.2em] uppercase">
+            Testimonials
+          </span>
+          <h2 className="text-2xl md:text-3xl font-serif text-black mt-2 mb-3">
             What Our Clients Say
           </h2>
-          <p className="text-lg md:text-xl text-black/70 max-w-2xl mx-auto leading-relaxed">
-            Trusted by discerning clients across the UAE
+          <p className="text-black/45 max-w-lg mx-auto text-sm leading-relaxed">
+            Trusted by clients who value quality craftsmanship and timeless design.
           </p>
         </div>
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
-        {quotes.map((q) => (
-          <div
-            key={q.id}
-            className="bg-white p-8 rounded-2xl shadow-lg border border-gold-500/10 hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 overflow-hidden relative group"
-          >
-            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-gold-500 to-gold-600 scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
-            <div className="flex items-center gap-4 mb-6">
-              <div className="text-4xl w-16 h-16 flex items-center justify-center bg-gradient-to-br from-gold-500/10 to-gold-500/20 rounded-full border-2 border-gold-500/20">
-                {q.avatar}
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          {testimonials.map((t) => (
+            <div
+              key={t.id}
+              className="bg-white p-6 rounded-xl border border-black/5 hover:shadow-md transition-all duration-300"
+            >
+              <div className="flex gap-0.5 mb-3">
+                {[...Array(5)].map((_, i) => (
+                  <FaStar key={i} className={i < t.rating ? "text-gold-500 text-xs" : "text-black/10 text-xs"} />
+                ))}
               </div>
-              <div className="flex-1">
-                <StarRating rating={q.rating} />
-                <div className="text-sm text-black/60 font-medium">
-                  {q.location}
+              <p className="text-black/55 text-sm leading-relaxed mb-5 italic">
+                &ldquo;{t.quote}&rdquo;
+              </p>
+              <div className="flex items-center gap-3 pt-4 border-t border-black/5">
+                <div className="w-9 h-9 rounded-full bg-gold-500/10 flex items-center justify-center text-gold-600 font-semibold text-xs">
+                  {t.initials}
+                </div>
+                <div>
+                  <p className="text-xs font-semibold text-black">{t.name}</p>
+                  <p className="text-[11px] text-black/30">{t.role}</p>
                 </div>
               </div>
             </div>
-            <blockquote className="mb-6">
-              <p className="text-lg leading-relaxed text-black/80 italic mb-4">
-                "{q.text}"
-              </p>
-              <footer className="text-gold-500 font-bold text-lg">
-                {q.name}
-              </footer>
-            </blockquote>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </section>
   );

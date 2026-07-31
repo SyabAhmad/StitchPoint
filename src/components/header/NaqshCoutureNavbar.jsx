@@ -7,19 +7,29 @@ import {
   FaSignOutAlt,
   FaTachometerAlt,
   FaBars,
+  FaTimes,
 } from "react-icons/fa";
 
 const NaqshCoutureNavbar = () => {
   const location = useLocation();
   const [user, setUser] = useState(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
     const userData = localStorage.getItem("user");
-    if (userData) {
-      setUser(JSON.parse(userData));
-    }
+    if (userData) setUser(JSON.parse(userData));
   }, []);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => {
+    setIsMenuOpen(false);
+  }, [location.pathname]);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -28,209 +38,164 @@ const NaqshCoutureNavbar = () => {
     window.location.href = "/";
   };
 
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
-  };
+  const navLinks = [
+    { to: "/", label: "Home" },
+    { to: "/about", label: "About" },
+    { to: "/shop", label: "Shop" },
+    { to: "/contact", label: "Contact" },
+  ];
+
+  const isActive = (path) => location.pathname === path;
+
+  const dashboardPath = user
+    ? user.role === "customer"
+      ? "/customer-dashboard"
+      : user.role === "manager"
+      ? "/manager-dashboard"
+      : "/super-admin-dashboard"
+    : null;
+
+  const cartPath = user?.role === "customer" ? "/customer-dashboard/cart" : "/cart";
+  const wishlistPath = user?.role === "customer" ? "/customer-dashboard/wishlist" : "/wishlist";
 
   return (
-    <nav className="navbar !bg-(--black-naqsh)">
-      <div className="container mx-auto container-inline">
-        <div className="nc-logo">
-          <h1
-            className="text-2xl font-serif"
-            style={{ color: "var(--gold-500)" }}
-          >
-            Naqsh Couture
-          </h1>
-        </div>
-        {/* Hamburger Menu for Mobile */}
-        <button
-          className="md:hidden text-white hover:text-gold-500 transition-colors duration-300"
-          onClick={toggleMenu}
-          aria-label="Toggle menu"
-        >
-          <FaBars size={24} />
-        </button>
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-black">
+      <div className="max-w-7xl mx-auto px-5 h-14 flex items-center justify-between">
+        {/* Logo */}
+        <Link to="/" className="flex items-center gap-0.5 shrink-0">
+          <span className="text-gold-500 font-serif text-lg font-semibold tracking-wide">
+            Naqsh
+          </span>
+          <span className="text-white font-serif text-lg font-light">
+            Couture
+          </span>
+        </Link>
 
-        {/* Desktop Nav Items */}
-        <ul className="hidden md:flex nav-items font-sans">
-          <li>
-            <Link
-              to="/"
-              className={`nav-link ${
-                location.pathname === "/" ? "nav-link-active" : ""
-              }`}
-            >
-              Home
-            </Link>
-          </li>
-          <li>
-            <Link
-              to="/about"
-              className={`nav-link ${
-                location.pathname === "/about" ? "nav-link-active" : ""
-              }`}
-            >
-              About
-            </Link>
-          </li>
-          <li>
-            <Link
-              to="/shop"
-              className={`nav-link ${
-                location.pathname === "/shop" ? "nav-link-active" : ""
-              }`}
-            >
-              Shop
-            </Link>
-          </li>
-          <li>
-            <Link
-              to="/contact"
-              className={`nav-link ${
-                location.pathname === "/contact" ? "nav-link-active" : ""
-              }`}
-            >
-              Contact
-            </Link>
-          </li>
+        {/* Desktop Links */}
+        <ul className="hidden md:flex items-center gap-7">
+          {navLinks.map((link) => (
+            <li key={link.to}>
+              <Link
+                to={link.to}
+                className="text-[13px] font-medium tracking-wide transition-colors duration-200"
+                style={{ color: isActive(link.to) ? "#D4AF37" : "rgba(255,255,255,0.7)" }}
+                onMouseEnter={(e) => { if (!isActive(link.to)) e.target.style.color = "#fff"; }}
+                onMouseLeave={(e) => { if (!isActive(link.to)) e.target.style.color = "rgba(255,255,255,0.7)"; }}
+              >
+                {link.label}
+              </Link>
+            </li>
+          ))}
         </ul>
 
-        {/* Mobile Menu */}
-        {isMenuOpen && (
-          <ul className="md:hidden absolute top-full left-0 w-full bg-black-naqsh text-white flex flex-col items-center space-y-4 py-4 font-sans">
-            <li>
-              <Link
-                to="/"
-                className={`nav-link ${
-                  location.pathname === "/" ? "nav-link-active" : ""
-                }`}
-                onClick={toggleMenu}
-              >
-                Home
-              </Link>
-            </li>
-            <li>
-              <Link
-                to="/about"
-                className={`nav-link ${
-                  location.pathname === "/about" ? "nav-link-active" : ""
-                }`}
-                onClick={toggleMenu}
-              >
-                About
-              </Link>
-            </li>
-            <li>
-              <Link
-                to="/shop"
-                className={`nav-link ${
-                  location.pathname === "/shop" ? "nav-link-active" : ""
-                }`}
-                onClick={toggleMenu}
-              >
-                Shop
-              </Link>
-            </li>
-            <li>
-              <Link
-                to="/contact"
-                className={`nav-link ${
-                  location.pathname === "/contact" ? "nav-link-active" : ""
-                }`}
-                onClick={toggleMenu}
-              >
-                Contact
-              </Link>
-            </li>
-          </ul>
-        )}
-        <div className="flex items-center" style={{ gap: "2.95rem" }}>
+        {/* Right Actions */}
+        <div className="flex items-center gap-4">
           {user ? (
-            <div className="flex items-center space-x-4">
-              {/* Dashboard Link */}
+            <>
               <Link
-                to={
-                  user.role === "customer"
-                    ? "/customer-dashboard"
-                    : user.role === "manager"
-                    ? "/manager-dashboard"
-                    : "/super-admin-dashboard"
-                }
-                className={`flex items-center space-x-2 transition-colors duration-300 ${
-                  (user.role === "customer" &&
-                    location.pathname === "/customer-dashboard") ||
-                  (user.role === "manager" &&
-                    location.pathname.startsWith("/manager-dashboard")) ||
-                  (user.role === "super_admin" &&
-                    location.pathname.startsWith("/super-admin-dashboard"))
+                to={dashboardPath}
+                className={`hidden md:flex items-center gap-1.5 text-xs transition-colors ${
+                  location.pathname.startsWith(dashboardPath)
                     ? "text-gold-500"
-                    : "text-white hover:text-gold-500"
+                    : "text-white/50 hover:text-white"
                 }`}
-                title="Go to Dashboard"
+                title="Dashboard"
               >
-                <FaTachometerAlt />
-                <span className="hidden md:block">Dashboard</span>
+                <FaTachometerAlt className="text-[11px]" />
+                <span className="hidden lg:inline">Dashboard</span>
               </Link>
 
-              {/* Cart Icon */}
               <Link
-                to={
-                  user.role === "customer"
-                    ? "/customer-dashboard/cart"
-                    : "/cart"
-                }
-                className={`btn-icon ${
-                  (user.role === "customer" &&
-                    location.pathname === "/customer-dashboard/cart") ||
-                  (user.role !== "customer" && location.pathname === "/cart")
-                    ? "active"
-                    : ""
+                to={cartPath}
+                className={`relative transition-colors ${
+                  location.pathname === cartPath
+                    ? "text-gold-500"
+                    : "text-white/50 hover:text-white"
                 }`}
-                title="View Cart"
+                title="Cart"
               >
-                <FaShoppingCart />
+                <FaShoppingCart className="text-sm" />
               </Link>
-              {/* Wishlist Icon */}
+
               <Link
-                to={
-                  user.role === "customer"
-                    ? "/customer-dashboard/wishlist"
-                    : "/wishlist"
-                }
-                className={`btn-icon ${
-                  (user.role === "customer" &&
-                    location.pathname === "/customer-dashboard/wishlist") ||
-                  (user.role !== "customer" &&
-                    location.pathname === "/wishlist")
-                    ? "active"
-                    : ""
+                to={wishlistPath}
+                className={`relative transition-colors ${
+                  location.pathname === wishlistPath
+                    ? "text-gold-500"
+                    : "text-white/50 hover:text-white"
                 }`}
-                title="View Wishlist"
+                title="Wishlist"
               >
-                <FaHeart />
+                <FaHeart className="text-sm" />
               </Link>
-              {/* Logout Button */}
+
               <button
                 onClick={handleLogout}
-                className="btn-icon"
+                className="text-white/50 hover:text-white transition-colors"
                 title="Logout"
               >
-                <FaSignOutAlt />
+                <FaSignOutAlt className="text-sm" />
               </button>
-            </div>
+            </>
           ) : (
-            <div className="flex items-center space-x-4">
-              <Link to="/login" className="btn-gold">
+            <div className="flex items-center gap-3">
+              <Link
+                to="/login"
+                className="text-[13px] text-white/60 hover:text-white font-medium transition-colors"
+              >
                 Login
               </Link>
-              <Link to="/signup" className="btn-gold">
-                Signup
+              <Link
+                to="/signup"
+                className="text-[13px] bg-gold-500 text-black px-4 py-1.5 rounded font-semibold hover:bg-gold-600 transition-colors"
+              >
+                Sign Up
               </Link>
             </div>
           )}
+
+          {/* Mobile Toggle */}
+          <button
+            className="md:hidden text-white/70 hover:text-white transition-colors"
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            aria-label="Toggle menu"
+          >
+            {isMenuOpen ? <FaTimes className="text-base" /> : <FaBars className="text-base" />}
+          </button>
         </div>
       </div>
+
+      {/* Mobile Menu */}
+      {isMenuOpen && (
+        <div className="md:hidden bg-black border-t border-white/10">
+          <ul className="max-w-7xl mx-auto px-5 py-4 space-y-1">
+            {navLinks.map((link) => (
+              <li key={link.to}>
+                <Link
+                  to={link.to}
+                  className={`block py-2.5 text-sm font-medium transition-colors ${
+                    location.pathname === link.to
+                      ? "text-gold-500"
+                      : "text-white/60 hover:text-white"
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              </li>
+            ))}
+            {user && (
+              <li>
+                <Link
+                  to={dashboardPath}
+                  className="block py-2.5 text-sm font-medium text-white/60 hover:text-white transition-colors"
+                >
+                  Dashboard
+                </Link>
+              </li>
+            )}
+          </ul>
+        </div>
+      )}
     </nav>
   );
 };

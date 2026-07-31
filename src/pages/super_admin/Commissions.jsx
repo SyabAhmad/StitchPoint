@@ -200,15 +200,9 @@ const Commissions = () => {
 
   if (loading) {
     return (
-      <div
-        className="flex flex-col justify-center items-center min-h-[50vh] space-y-4"
-        style={{ backgroundColor: "#000000", color: "#d4af37" }}
-      >
-        <div
-          className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2"
-          style={{ borderColor: "#d4af37" }}
-        ></div>
-        <span className="text-sm tracking-wide uppercase text-gray-300">
+      <div className="flex flex-col justify-center items-center min-h-[50vh] space-y-4 bg-black text-gold-500">
+        <div className="animate-spin rounded-full h-8 w-8 border-2 border-gold-500/20 border-t-gold-500"></div>
+        <span className="text-sm tracking-wide uppercase text-white/30">
           Loading commissions...
         </span>
       </div>
@@ -218,26 +212,17 @@ const Commissions = () => {
   const groupedCommissions = groupCommissionsByStore(commissions);
 
   return (
-    <div
-      className="min-h-screen py-8 px-4 sm:px-6 lg:px-8"
-      style={{ backgroundColor: "#000000", color: "#ffffff" }}
-    >
+    <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8 bg-black text-white">
       <div className="max-w-7xl mx-auto space-y-8">
         <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
           <div>
-            <p className="uppercase tracking-[0.3em] text-xs text-gray-400 mb-2">
+            <p className="uppercase tracking-[0.3em] text-xs text-white/30 mb-2">
               Finance Suite
             </p>
-            <h1
-              className="text-3xl md:text-4xl font-bold"
-              style={{ color: "#d4af37" }}
-            >
+            <h1 className="text-3xl md:text-4xl font-bold text-gold-500">
               Commission Management
             </h1>
-            <p
-              className="mt-3 text-sm leading-relaxed"
-              style={{ color: "#cccccc" }}
-            >
+            <p className="mt-3 text-sm leading-relaxed text-white/50">
               Adjust per-product commission overrides while our tiered rules
               power default rates for every new sale.
             </p>
@@ -264,45 +249,30 @@ const Commissions = () => {
           ].map(({ label, value, icon }) => (
             <div
               key={label}
-              className="flex items-center justify-between rounded-2xl px-5 py-4"
-              style={{
-                background:
-                  "linear-gradient(135deg, rgba(33,33,33,0.8), rgba(17,17,17,0.95))",
-                border: "1px solid #2d2d2d",
-              }}
+              className="flex items-center justify-between rounded-2xl px-5 py-4 bg-[#111] border border-white/5"
             >
               <div>
-                <p className="text-xs uppercase tracking-wide text-gray-400">
+                <p className="text-xs uppercase tracking-wide text-white/30">
                   {label}
                 </p>
-                <p
-                  className="mt-2 text-2xl font-semibold"
-                  style={{ color: "#ffffff" }}
-                >
+                <p className="mt-2 text-2xl font-semibold text-white">
                   {value}
                 </p>
               </div>
-              <span style={{ color: "#d4af37" }}>{icon}</span>
+              <span className="text-gold-500">{icon}</span>
             </div>
           ))}
         </section>
 
         {/* Pagination Controls */}
-        <div
-          className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4 rounded-xl"
-          style={{
-            background:
-              "linear-gradient(135deg, rgba(33,33,33,0.8), rgba(17,17,17,0.95))",
-            border: "1px solid #2d2d2d",
-          }}
-        >
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4 rounded-xl bg-[#111] border border-white/5">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
-              <label className="text-sm text-gray-400">Items per page:</label>
+              <label className="text-sm text-white/30">Items per page:</label>
               <select
                 value={perPage}
                 onChange={(e) => handlePerPageChange(Number(e.target.value))}
-                className="px-3 py-1 rounded text-sm bg-gray-800 text-white border border-gray-600 focus:border-d4af37 focus:outline-none"
+                className="px-3 py-1 rounded text-sm bg-white/5 text-white border border-white/10 focus:border-gold-500/40 focus:outline-none"
               >
                 <option value={5}>5</option>
                 <option value={10}>10</option>
@@ -310,7 +280,7 @@ const Commissions = () => {
                 <option value={50}>50</option>
               </select>
             </div>
-            <div className="text-sm text-gray-400">
+            <div className="text-sm text-white/30">
               Showing {(currentPage - 1) * perPage + 1} to{" "}
               {Math.min(currentPage * perPage, totalItems)} of {totalItems}{" "}
               results
@@ -323,8 +293,8 @@ const Commissions = () => {
               disabled={!hasPrev}
               className={`px-3 py-2 rounded text-sm font-medium transition-all flex items-center gap-2 ${
                 hasPrev
-                  ? "bg-gray-700 text-white hover:bg-gray-600"
-                  : "bg-gray-800 text-gray-500 cursor-not-allowed"
+                  ? "bg-white/5 text-white hover:bg-white/10"
+                  : "bg-white/5 text-white/20 cursor-not-allowed"
               }`}
             >
               <FaChevronLeft /> Previous
@@ -349,8 +319,8 @@ const Commissions = () => {
                     onClick={() => handlePageChange(pageNum)}
                     className={`px-3 py-2 rounded text-sm font-medium transition-all ${
                       pageNum === currentPage
-                        ? "bg-d4af37 text-black"
-                        : "bg-gray-700 text-white hover:bg-gray-600"
+                        ? "bg-gold-500 text-black"
+                        : "bg-white/5 text-white hover:bg-white/10"
                     }`}
                   >
                     {pageNum}
@@ -364,8 +334,8 @@ const Commissions = () => {
               disabled={!hasNext}
               className={`px-3 py-2 rounded text-sm font-medium transition-all flex items-center gap-2 ${
                 hasNext
-                  ? "bg-gray-700 text-white hover:bg-gray-600"
-                  : "bg-gray-800 text-gray-500 cursor-not-allowed"
+                  ? "bg-white/5 text-white hover:bg-white/10"
+                  : "bg-white/5 text-white/20 cursor-not-allowed"
               }`}
             >
               Next <FaChevronRight />
@@ -376,26 +346,12 @@ const Commissions = () => {
         {(error || success) && (
           <div className="space-y-3">
             {error && (
-              <div
-                className="px-4 py-3 rounded-xl border"
-                style={{
-                  backgroundColor: "rgba(255, 82, 82, 0.1)",
-                  borderColor: "rgba(255, 82, 82, 0.3)",
-                  color: "#ff6b6b",
-                }}
-              >
+              <div className="px-4 py-3 rounded-xl border bg-red-500/10 border-red-500/30 text-red-400">
                 {error}
               </div>
             )}
             {success && (
-              <div
-                className="px-4 py-3 rounded-xl border"
-                style={{
-                  backgroundColor: "rgba(76, 175, 80, 0.1)",
-                  borderColor: "rgba(76, 175, 80, 0.3)",
-                  color: "#48bb78",
-                }}
-              >
+              <div className="px-4 py-3 rounded-xl border bg-green-500/10 border-green-500/30 text-green-400">
                 {success}
               </div>
             )}
@@ -407,27 +363,14 @@ const Commissions = () => {
             ([storeName, storeCommissions]) => (
               <div
                 key={storeName}
-                className="rounded-2xl overflow-hidden shadow-lg"
-                style={{
-                  backgroundColor: "#101010",
-                  border: "1px solid #1f1f1f",
-                }}
+                className="rounded-2xl overflow-hidden shadow-lg bg-[#111] border border-white/5"
               >
-                <div
-                  className="px-6 py-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
-                  style={{
-                    background:
-                      "linear-gradient(135deg, rgba(18,18,18,0.95), rgba(36,36,36,0.95))",
-                  }}
-                >
+                <div className="px-6 py-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-white/[0.02]">
                   <div>
-                    <h3
-                      className="text-xl font-semibold"
-                      style={{ color: "#ffffff" }}
-                    >
+                    <h3 className="text-xl font-semibold text-white">
                       {storeName}
                     </h3>
-                    <p className="text-sm" style={{ color: "#aaaaaa" }}>
+                    <p className="text-sm text-white/30">
                       {storeCommissions.length} product
                       {storeCommissions.length !== 1 ? "s" : ""} linked to this
                       store
@@ -435,19 +378,16 @@ const Commissions = () => {
                   </div>
                 </div>
 
-                <ul className="divide-y" style={{ borderColor: "#1f1f1f" }}>
+                <ul className="divide-y divide-white/5">
                   {storeCommissions.map((commission) => (
                     <li key={commission.product_id} className="px-6 py-5">
                       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                         <div className="flex-1 space-y-2">
                           <div>
-                            <h4
-                              className="text-lg font-medium"
-                              style={{ color: "#ffffff" }}
-                            >
+                            <h4 className="text-lg font-medium text-white">
                               {commission.product_name}
                             </h4>
-                            <p className="text-sm" style={{ color: "#b0b0b0" }}>
+                            <p className="text-sm text-white/30">
                               Price: PKR {commission.price}
                             </p>
                           </div>
@@ -455,8 +395,8 @@ const Commissions = () => {
                           {editingId === commission.product_id ? (
                             <div className="grid sm:grid-cols-2 gap-4">
                               <div className="space-y-2">
-                                <label className="text-xs uppercase tracking-wide text-gray-400 flex items-center gap-2">
-                                  <FaPercentage className="text-gray-500" />{" "}
+                                <label className="text-xs uppercase tracking-wide text-white/30 flex items-center gap-2">
+                                  <FaPercentage className="text-white/20" />{" "}
                                   Percentage Override
                                 </label>
                                 <div className="relative">
@@ -473,25 +413,20 @@ const Commissions = () => {
                                         e.target.value
                                       )
                                     }
-                                    className="w-full rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2"
-                                    style={{
-                                      backgroundColor: "#1b1b1b",
-                                      border: "1px solid #2d2d2d",
-                                      color: "#ffffff",
-                                    }}
+                                    className="w-full rounded-lg px-4 py-2 text-sm bg-white/5 border border-white/10 text-white focus:outline-none focus:border-gold-500/40 transition-colors"
                                   />
-                                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-500">
+                                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-white/20">
                                     %
                                   </span>
                                 </div>
                               </div>
                               <div className="space-y-2">
-                                <label className="text-xs uppercase tracking-wide text-gray-400 flex items-center gap-2">
-                                  <FaMoneyBillWave className="text-gray-500" />{" "}
+                                <label className="text-xs uppercase tracking-wide text-white/30 flex items-center gap-2">
+                                  <FaMoneyBillWave className="text-white/20" />{" "}
                                   Fixed Amount (PKR)
                                 </label>
                                 <div className="relative">
-                                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-gray-500">
+                                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-white/20">
                                     PKR
                                   </span>
                                   <input
@@ -506,12 +441,7 @@ const Commissions = () => {
                                         e.target.value
                                       )
                                     }
-                                    className="w-full rounded-lg px-4 py-2 text-sm pl-12 focus:outline-none focus:ring-2"
-                                    style={{
-                                      backgroundColor: "#1b1b1b",
-                                      border: "1px solid #2d2d2d",
-                                      color: "#ffffff",
-                                    }}
+                                    className="w-full rounded-lg px-4 py-2 text-sm pl-12 bg-white/5 border border-white/10 text-white focus:outline-none focus:border-gold-500/40 transition-colors"
                                   />
                                 </div>
                               </div>
@@ -522,40 +452,20 @@ const Commissions = () => {
                                 <>
                                   {commission.commission_percentage !==
                                     null && (
-                                    <span
-                                      className="inline-flex items-center px-3 py-1 rounded-full text-sm"
-                                      style={{
-                                        backgroundColor:
-                                          "rgba(78, 205, 196, 0.12)",
-                                        color: "#4ecdc4",
-                                      }}
-                                    >
+                                    <span className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-teal-500/10 text-teal-400">
                                       <FaPercentage className="mr-2" />
                                       {commission.commission_percentage}%
                                     </span>
                                   )}
                                   {commission.commission_amount !== null && (
-                                    <span
-                                      className="inline-flex items-center px-3 py-1 rounded-full text-sm"
-                                      style={{
-                                        backgroundColor:
-                                          "rgba(244, 208, 63, 0.12)",
-                                        color: "#f4d03f",
-                                      }}
-                                    >
+                                    <span className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-yellow-500/10 text-yellow-400">
                                       <FaMoneyBillWave className="mr-2" />
                                       PKR {commission.commission_amount}
                                     </span>
                                   )}
                                 </>
                               ) : (
-                                <span
-                                  className="inline-flex items-center px-3 py-1 rounded-full text-xs"
-                                  style={{
-                                    backgroundColor: "rgba(255,255,255,0.05)",
-                                    color: "#bbbbbb",
-                                  }}
-                                >
+                                <span className="inline-flex items-center px-3 py-1 rounded-full text-xs bg-white/5 text-white/30">
                                   Using tier default:{" "}
                                   {commission.tier_commission_percentage ??
                                     "--"}
@@ -573,38 +483,13 @@ const Commissions = () => {
                                 onClick={() =>
                                   handleSave(commission.product_id)
                                 }
-                                className="inline-flex items-center justify-center px-4 py-2 rounded-lg text-sm font-semibold transition-all"
-                                style={{
-                                  backgroundColor: "#d4af37",
-                                  color: "#000000",
-                                }}
-                                onMouseEnter={(e) =>
-                                  (e.currentTarget.style.backgroundColor =
-                                    "#b8860b")
-                                }
-                                onMouseLeave={(e) =>
-                                  (e.currentTarget.style.backgroundColor =
-                                    "#d4af37")
-                                }
+                                className="inline-flex items-center justify-center px-4 py-2 rounded-lg text-sm font-semibold transition-all bg-gold-500 text-black hover:bg-gold-600"
                               >
                                 <FaSave className="mr-2" /> Save
                               </button>
                               <button
                                 onClick={handleCancel}
-                                className="inline-flex items-center justify-center px-4 py-2 rounded-lg text-sm font-semibold"
-                                style={{
-                                  backgroundColor: "#1b1b1b",
-                                  color: "#cccccc",
-                                  border: "1px solid #2d2d2d",
-                                }}
-                                onMouseEnter={(e) =>
-                                  (e.currentTarget.style.backgroundColor =
-                                    "#2a2a2a")
-                                }
-                                onMouseLeave={(e) =>
-                                  (e.currentTarget.style.backgroundColor =
-                                    "#1b1b1b")
-                                }
+                                className="inline-flex items-center justify-center px-4 py-2 rounded-lg text-sm font-semibold bg-white/5 text-white/50 border border-white/10 hover:bg-white/10 transition-colors"
                               >
                                 <FaTimes className="mr-2" /> Cancel
                               </button>
@@ -613,19 +498,7 @@ const Commissions = () => {
                             <div className="flex items-center gap-3">
                               <button
                                 onClick={() => handleEdit(commission)}
-                                className="inline-flex items-center justify-center px-4 py-2 rounded-lg text-sm font-semibold transition-all"
-                                style={{
-                                  backgroundColor: "rgba(212, 175, 55, 0.15)",
-                                  color: "#d4af37",
-                                }}
-                                onMouseEnter={(e) =>
-                                  (e.currentTarget.style.backgroundColor =
-                                    "rgba(212, 175, 55, 0.25)")
-                                }
-                                onMouseLeave={(e) =>
-                                  (e.currentTarget.style.backgroundColor =
-                                    "rgba(212, 175, 55, 0.15)")
-                                }
+                                className="inline-flex items-center justify-center px-4 py-2 rounded-lg text-sm font-semibold transition-all bg-gold-500/15 text-gold-500 hover:bg-gold-500/25"
                               >
                                 <FaEdit className="mr-2" /> Edit Override
                               </button>
@@ -634,20 +507,7 @@ const Commissions = () => {
                                   onClick={() =>
                                     handleReset(commission.product_id)
                                   }
-                                  className="inline-flex items-center justify-center px-4 py-2 rounded-lg text-sm font-semibold"
-                                  style={{
-                                    backgroundColor: "#1b1b1b",
-                                    color: "#bbbbbb",
-                                    border: "1px solid #2d2d2d",
-                                  }}
-                                  onMouseEnter={(e) =>
-                                    (e.currentTarget.style.backgroundColor =
-                                      "#2a2a2a")
-                                  }
-                                  onMouseLeave={(e) =>
-                                    (e.currentTarget.style.backgroundColor =
-                                      "#1b1b1b")
-                                  }
+                                  className="inline-flex items-center justify-center px-4 py-2 rounded-lg text-sm font-semibold bg-white/5 text-white/30 border border-white/10 hover:bg-white/10 transition-colors"
                                 >
                                   <FaUndo className="mr-2" /> Reset to Default
                                 </button>

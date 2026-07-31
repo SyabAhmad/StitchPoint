@@ -10,6 +10,7 @@ import {
   FaChevronRight,
 } from "react-icons/fa";
 import { fetchWithAuth } from "../../utils/fetchWithAuth";
+import RoleDropdown from "../../components/common/RoleDropdown";
 
 const UserManagement = () => {
   const [users, setUsers] = useState([]);
@@ -303,12 +304,9 @@ const UserManagement = () => {
 
   if (loading) {
     return (
-      <div
-        className="flex justify-center items-center h-screen"
-        style={{ backgroundColor: "#000000", color: "#ffffff" }}
-      >
+      <div className="flex justify-center items-center h-screen bg-black text-white">
         <div className="flex flex-col items-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-yellow-500 mb-4"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-2 border-gold-500/20 border-t-gold-500 mb-4"></div>
           <span>Loading users...</span>
         </div>
       </div>
@@ -316,35 +314,20 @@ const UserManagement = () => {
   }
 
   return (
-    <div
-      className="p-8"
-      style={{ backgroundColor: "#000000", minHeight: "100vh" }}
-    >
+    <div className="p-8 bg-black min-h-screen">
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-3xl font-bold mb-6" style={{ color: "#d4af37" }}>
+        <h1 className="text-3xl font-bold mb-6 text-gold-500">
           User Management
         </h1>
 
-        <div
-          className="shadow overflow-hidden sm:rounded-md"
-          style={{ backgroundColor: "#1d1d1d" }}
-        >
-          <div
-            className="px-4 py-5 sm:px-6 border-b"
-            style={{ borderColor: "#2d2d2d" }}
-          >
+        <div className="bg-[#111] border border-white/5 rounded-lg shadow overflow-hidden">
+          <div className="px-4 py-5 sm:px-6 border-b border-white/5">
             <div className="flex justify-between items-center">
               <div>
-                <h3
-                  className="text-lg leading-6 font-medium"
-                  style={{ color: "#ffffff" }}
-                >
+                <h3 className="text-lg leading-6 font-medium text-white">
                   Manage Users
                 </h3>
-                <p
-                  className="mt-1 max-w-2xl text-sm"
-                  style={{ color: "#999999" }}
-                >
+                <p className="mt-1 max-w-2xl text-sm text-white/30">
                   Manage user roles and permissions
                 </p>
               </div>
@@ -354,19 +337,7 @@ const UserManagement = () => {
                   currentUser.role === "manager") && (
                   <button
                     onClick={() => setShowCreateForm((s) => !s)}
-                    className="inline-flex items-center px-3 py-1 border border-transparent text-sm leading-4 font-medium rounded-md transition-all duration-200"
-                    style={{
-                      backgroundColor: "#d4af37",
-                      color: "#000000",
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = "#b8860b";
-                      e.currentTarget.style.transform = "translateY(-1px)";
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = "#d4af37";
-                      e.currentTarget.style.transform = "translateY(0)";
-                    }}
+                    className="inline-flex items-center px-3 py-1 text-sm leading-4 font-semibold rounded-lg transition-all duration-200 bg-gold-500 text-black hover:bg-gold-600"
                   >
                     <FaPlus className="mr-2" /> Add User
                   </button>
@@ -385,18 +356,7 @@ const UserManagement = () => {
                     setNewUserData((p) => ({ ...p, name: e.target.value }))
                   }
                   placeholder="Full name"
-                  className="px-3 py-2 rounded transition-colors duration-200"
-                  style={{
-                    backgroundColor: "#2d2d2d",
-                    color: "#ffffff",
-                    border: "1px solid #3d3d3d",
-                  }}
-                  onFocus={(e) => {
-                    e.currentTarget.style.borderColor = "#d4af37";
-                  }}
-                  onBlur={(e) => {
-                    e.currentTarget.style.borderColor = "#3d3d3d";
-                  }}
+                  className="px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-gold-500/40 transition-colors"
                 />
                 <input
                   required
@@ -406,18 +366,7 @@ const UserManagement = () => {
                   }
                   placeholder="Email"
                   type="email"
-                  className="px-3 py-2 rounded transition-colors duration-200"
-                  style={{
-                    backgroundColor: "#2d2d2d",
-                    color: "#ffffff",
-                    border: "1px solid #3d3d3d",
-                  }}
-                  onFocus={(e) => {
-                    e.currentTarget.style.borderColor = "#d4af37";
-                  }}
-                  onBlur={(e) => {
-                    e.currentTarget.style.borderColor = "#3d3d3d";
-                  }}
+                  className="px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-gold-500/40 transition-colors"
                 />
                 <input
                   required
@@ -427,40 +376,17 @@ const UserManagement = () => {
                   }
                   placeholder="Password"
                   type="password"
-                  className="px-3 py-2 rounded transition-colors duration-200"
-                  style={{
-                    backgroundColor: "#2d2d2d",
-                    color: "#ffffff",
-                    border: "1px solid #3d3d3d",
-                  }}
-                  onFocus={(e) => {
-                    e.currentTarget.style.borderColor = "#d4af37";
-                  }}
-                  onBlur={(e) => {
-                    e.currentTarget.style.borderColor = "#3d3d3d";
-                  }}
+                  className="px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-gold-500/40 transition-colors"
                 />
-                <select
+                <RoleDropdown
                   value={newUserData.role}
-                  onChange={(e) =>
-                    setNewUserData((p) => ({ ...p, role: e.target.value }))
+                  onChange={(role) => setNewUserData((p) => ({ ...p, role }))}
+                  allowedRoles={
+                    currentUser && currentUser.role === "super_admin"
+                      ? ["customer", "manager", "super_admin"]
+                      : ["customer"]
                   }
-                  className="px-3 py-2 rounded transition-colors duration-200"
-                  style={{
-                    backgroundColor: "#2d2d2d",
-                    color: "#ffffff",
-                    border: "1px solid #3d3d3d",
-                  }}
-                >
-                  <option value="customer">Customer</option>
-                  {/* only super_admin can create manager or super_admin */}
-                  {currentUser && currentUser.role === "super_admin" && (
-                    <>
-                      <option value="manager">Manager</option>
-                      <option value="super_admin">Super Admin</option>
-                    </>
-                  )}
-                </select>
+                />
                 {newUserData.role === "manager" && (
                   <>
                     <input
@@ -473,18 +399,7 @@ const UserManagement = () => {
                         }))
                       }
                       placeholder="Store Name"
-                      className="px-3 py-2 rounded transition-colors duration-200"
-                      style={{
-                        backgroundColor: "#2d2d2d",
-                        color: "#ffffff",
-                        border: "1px solid #3d3d3d",
-                      }}
-                      onFocus={(e) => {
-                        e.currentTarget.style.borderColor = "#d4af37";
-                      }}
-                      onBlur={(e) => {
-                        e.currentTarget.style.borderColor = "#3d3d3d";
-                      }}
+                      className="px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-gold-500/40 transition-colors"
                     />
                     <input
                       value={newUserData.store_address}
@@ -495,18 +410,7 @@ const UserManagement = () => {
                         }))
                       }
                       placeholder="Store Address"
-                      className="px-3 py-2 rounded transition-colors duration-200"
-                      style={{
-                        backgroundColor: "#2d2d2d",
-                        color: "#ffffff",
-                        border: "1px solid #3d3d3d",
-                      }}
-                      onFocus={(e) => {
-                        e.currentTarget.style.borderColor = "#d4af37";
-                      }}
-                      onBlur={(e) => {
-                        e.currentTarget.style.borderColor = "#3d3d3d";
-                      }}
+                      className="px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-gold-500/40 transition-colors"
                     />
                     <input
                       value={newUserData.store_logo_url}
@@ -517,18 +421,7 @@ const UserManagement = () => {
                         }))
                       }
                       placeholder="Store Logo URL"
-                      className="px-3 py-2 rounded transition-colors duration-200"
-                      style={{
-                        backgroundColor: "#2d2d2d",
-                        color: "#ffffff",
-                        border: "1px solid #3d3d3d",
-                      }}
-                      onFocus={(e) => {
-                        e.currentTarget.style.borderColor = "#d4af37";
-                      }}
-                      onBlur={(e) => {
-                        e.currentTarget.style.borderColor = "#3d3d3d";
-                      }}
+                      className="px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-gold-500/40 transition-colors"
                     />
                     <input
                       value={newUserData.store_contact_number}
@@ -539,18 +432,7 @@ const UserManagement = () => {
                         }))
                       }
                       placeholder="Store Contact Number"
-                      className="px-3 py-2 rounded transition-colors duration-200"
-                      style={{
-                        backgroundColor: "#2d2d2d",
-                        color: "#ffffff",
-                        border: "1px solid #3d3d3d",
-                      }}
-                      onFocus={(e) => {
-                        e.currentTarget.style.borderColor = "#d4af37";
-                      }}
-                      onBlur={(e) => {
-                        e.currentTarget.style.borderColor = "#3d3d3d";
-                      }}
+                      className="px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-gold-500/40 transition-colors"
                     />
                     <input
                       value={newUserData.store_description}
@@ -561,18 +443,7 @@ const UserManagement = () => {
                         }))
                       }
                       placeholder="Store Description"
-                      className="px-3 py-2 rounded transition-colors duration-200"
-                      style={{
-                        backgroundColor: "#2d2d2d",
-                        color: "#ffffff",
-                        border: "1px solid #3d3d3d",
-                      }}
-                      onFocus={(e) => {
-                        e.currentTarget.style.borderColor = "#d4af37";
-                      }}
-                      onBlur={(e) => {
-                        e.currentTarget.style.borderColor = "#3d3d3d";
-                      }}
+                      className="px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-gold-500/40 transition-colors"
                     />
                   </>
                 )}
@@ -580,23 +451,11 @@ const UserManagement = () => {
                   <button
                     disabled={creating}
                     type="submit"
-                    className="px-3 py-2 rounded transition-all duration-200"
-                    style={{
-                      backgroundColor: creating ? "#555555" : "#48bb78",
-                      color: "#ffffff",
-                    }}
-                    onMouseEnter={(e) => {
-                      if (!creating) {
-                        e.currentTarget.style.backgroundColor = "#38a169";
-                        e.currentTarget.style.transform = "translateY(-1px)";
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (!creating) {
-                        e.currentTarget.style.backgroundColor = "#48bb78";
-                        e.currentTarget.style.transform = "translateY(0)";
-                      }
-                    }}
+                    className={`px-3 py-2 rounded-lg text-white transition-all duration-200 ${
+                      creating
+                        ? "bg-white/10 cursor-not-allowed"
+                        : "bg-green-600 hover:bg-green-700"
+                    }`}
                   >
                     {creating ? "Creating..." : "Create"}
                   </button>
@@ -605,121 +464,57 @@ const UserManagement = () => {
             )}
 
             <div className="mt-4 flex items-center space-x-3">
-              <FaSearch style={{ color: "#d4af37" }} />
+              <FaSearch className="text-gold-500" />
               <input
                 type="text"
                 placeholder="Search by name or email..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="px-3 py-1 rounded transition-colors duration-200"
-                style={{
-                  backgroundColor: "#2d2d2d",
-                  color: "#ffffff",
-                  border: "1px solid #3d3d3d",
-                  width: "250px",
-                }}
-                onFocus={(e) => {
-                  e.currentTarget.style.borderColor = "#d4af37";
-                }}
-                onBlur={(e) => {
-                  e.currentTarget.style.borderColor = "#3d3d3d";
-                }}
+                className="px-3 py-1 rounded-lg bg-white/5 border border-white/10 text-white text-sm w-[250px] focus:outline-none focus:border-gold-500/40 transition-colors"
               />
             </div>
 
             <div className="mt-4 flex items-center space-x-3">
-              <FaFilter style={{ color: "#d4af37" }} />
-              <span className="text-sm" style={{ color: "#cccccc" }}>
-                Filter:
-              </span>
+              <FaFilter className="text-gold-500" />
+              <span className="text-sm text-white/50">Filter:</span>
               <div className="flex space-x-2">
                 <button
                   onClick={() => setRoleFilter("all")}
-                  className={`px-2 py-1 rounded transition-colors duration-200 ${
-                    roleFilter === "all" ? "text-white" : "text-gray-400"
+                  className={`px-2 py-1 rounded text-sm transition-colors duration-200 ${
+                    roleFilter === "all"
+                      ? "bg-gold-500 text-black"
+                      : "bg-white/5 text-white/40 hover:bg-white/10"
                   }`}
-                  style={{
-                    backgroundColor:
-                      roleFilter === "all" ? "#d4af37" : "#2d2d2d",
-                  }}
-                  onMouseEnter={(e) => {
-                    if (roleFilter !== "all") {
-                      e.currentTarget.style.backgroundColor = "#3d3d3d";
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (roleFilter !== "all") {
-                      e.currentTarget.style.backgroundColor = "#2d2d2d";
-                    }
-                  }}
                 >
                   All
                 </button>
                 <button
                   onClick={() => setRoleFilter("manager")}
-                  className={`px-2 py-1 rounded transition-colors duration-200 ${
-                    roleFilter === "manager" ? "text-white" : "text-gray-400"
+                  className={`px-2 py-1 rounded text-sm transition-colors duration-200 ${
+                    roleFilter === "manager"
+                      ? "bg-gold-500 text-black"
+                      : "bg-white/5 text-white/40 hover:bg-white/10"
                   }`}
-                  style={{
-                    backgroundColor:
-                      roleFilter === "manager" ? "#d4af37" : "#2d2d2d",
-                  }}
-                  onMouseEnter={(e) => {
-                    if (roleFilter !== "manager") {
-                      e.currentTarget.style.backgroundColor = "#3d3d3d";
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (roleFilter !== "manager") {
-                      e.currentTarget.style.backgroundColor = "#2d2d2d";
-                    }
-                  }}
                 >
                   Managers
                 </button>
                 <button
                   onClick={() => setRoleFilter("super_admin")}
-                  className={`px-2 py-1 rounded transition-colors duration-200 ${
+                  className={`px-2 py-1 rounded text-sm transition-colors duration-200 ${
                     roleFilter === "super_admin"
-                      ? "text-white"
-                      : "text-gray-400"
+                      ? "bg-gold-500 text-black"
+                      : "bg-white/5 text-white/40 hover:bg-white/10"
                   }`}
-                  style={{
-                    backgroundColor:
-                      roleFilter === "super_admin" ? "#d4af37" : "#2d2d2d",
-                  }}
-                  onMouseEnter={(e) => {
-                    if (roleFilter !== "super_admin") {
-                      e.currentTarget.style.backgroundColor = "#3d3d3d";
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (roleFilter !== "super_admin") {
-                      e.currentTarget.style.backgroundColor = "#2d2d2d";
-                    }
-                  }}
                 >
                   Super Admins
                 </button>
                 <button
                   onClick={() => setRoleFilter("customer")}
-                  className={`px-2 py-1 rounded transition-colors duration-200 ${
-                    roleFilter === "customer" ? "text-white" : "text-gray-400"
+                  className={`px-2 py-1 rounded text-sm transition-colors duration-200 ${
+                    roleFilter === "customer"
+                      ? "bg-gold-500 text-black"
+                      : "bg-white/5 text-white/40 hover:bg-white/10"
                   }`}
-                  style={{
-                    backgroundColor:
-                      roleFilter === "customer" ? "#d4af37" : "#2d2d2d",
-                  }}
-                  onMouseEnter={(e) => {
-                    if (roleFilter !== "customer") {
-                      e.currentTarget.style.backgroundColor = "#3d3d3d";
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (roleFilter !== "customer") {
-                      e.currentTarget.style.backgroundColor = "#2d2d2d";
-                    }
-                  }}
                 >
                   Customers
                 </button>
@@ -728,41 +523,26 @@ const UserManagement = () => {
           </div>
           <div className="overflow-x-auto">
             <table className="min-w-full">
-              <thead style={{ backgroundColor: "#2d2d2d" }}>
+              <thead className="bg-white/5">
                 <tr>
-                  <th
-                    className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
-                    style={{ color: "#d4af37" }}
-                  >
+                  <th className="px-6 py-3 text-left text-[11px] font-medium text-white/30 uppercase tracking-wider">
                     Name
                   </th>
-                  <th
-                    className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
-                    style={{ color: "#d4af37" }}
-                  >
+                  <th className="px-6 py-3 text-left text-[11px] font-medium text-white/30 uppercase tracking-wider">
                     Email
                   </th>
-                  <th
-                    className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
-                    style={{ color: "#d4af37" }}
-                  >
+                  <th className="px-6 py-3 text-left text-[11px] font-medium text-white/30 uppercase tracking-wider">
                     Store
                   </th>
-                  <th
-                    className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
-                    style={{ color: "#d4af37" }}
-                  >
+                  <th className="px-6 py-3 text-left text-[11px] font-medium text-white/30 uppercase tracking-wider">
                     Current Role
                   </th>
-                  <th
-                    className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
-                    style={{ color: "#d4af37" }}
-                  >
+                  <th className="px-6 py-3 text-left text-[11px] font-medium text-white/30 uppercase tracking-wider">
                     Actions
                   </th>
                 </tr>
               </thead>
-              <tbody style={{ backgroundColor: "#1d1d1d" }}>
+              <tbody className="divide-y divide-white/5">
                 {users
                   .filter((user) => {
                     const matchesRole =
@@ -779,27 +559,12 @@ const UserManagement = () => {
                           .includes(debouncedSearchTerm.toLowerCase()));
                     return matchesRole && matchesSearch;
                   })
-                  .map((user, index) => (
+                  .map((user) => (
                     <tr
                       key={user.id}
-                      className="transition-colors duration-150"
-                      style={{
-                        borderBottom: "1px solid #2d2d2d",
-                        backgroundColor:
-                          index % 2 === 0 ? "#1d1d1d" : "#2d2d2d",
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = "#1f1f1f";
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor =
-                          index % 2 === 0 ? "#1d1d1d" : "#2d2d2d";
-                      }}
+                      className="transition-colors duration-150 hover:bg-white/[0.02]"
                     >
-                      <td
-                        className="px-6 py-4 whitespace-nowrap text-sm font-medium"
-                        style={{ color: "#ffffff" }}
-                      >
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">
                         {editingUser === user.id ? (
                           <input
                             value={user._editName}
@@ -812,27 +577,13 @@ const UserManagement = () => {
                                 )
                               )
                             }
-                            className="px-2 py-1 rounded w-full transition-colors duration-200"
-                            style={{
-                              backgroundColor: "#3d3d3d",
-                              color: "#ffffff",
-                              border: "1px solid #4d4d4d",
-                            }}
-                            onFocus={(e) => {
-                              e.currentTarget.style.borderColor = "#d4af37";
-                            }}
-                            onBlur={(e) => {
-                              e.currentTarget.style.borderColor = "#4d4d4d";
-                            }}
+                            className="px-2 py-1 rounded w-full bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-gold-500/40 transition-colors"
                           />
                         ) : (
                           user.name || "N/A"
                         )}
                       </td>
-                      <td
-                        className="px-6 py-4 whitespace-nowrap text-sm"
-                        style={{ color: "#cccccc" }}
-                      >
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-white/50">
                         {editingUser === user.id ? (
                           <input
                             value={user._editEmail}
@@ -845,59 +596,28 @@ const UserManagement = () => {
                                 )
                               )
                             }
-                            className="px-2 py-1 rounded w-full transition-colors duration-200"
-                            style={{
-                              backgroundColor: "#3d3d3d",
-                              color: "#ffffff",
-                              border: "1px solid #4d4d4d",
-                            }}
-                            onFocus={(e) => {
-                              e.currentTarget.style.borderColor = "#d4af37";
-                            }}
-                            onBlur={(e) => {
-                              e.currentTarget.style.borderColor = "#4d4d4d";
-                            }}
+                            className="px-2 py-1 rounded w-full bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-gold-500/40 transition-colors"
                           />
                         ) : (
                           user.email
                         )}
                       </td>
-                      <td
-                        className="px-6 py-4 whitespace-nowrap text-sm"
-                        style={{ color: "#cccccc" }}
-                      >
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-white/50">
                         {user.store ? user.store.name : "N/A"}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         {editingUser === user.id ? (
                           <div>
-                            <select
+                            <RoleDropdown
                               value={newRole}
-                              onChange={(e) => setNewRole(e.target.value)}
-                              className="block w-full px-3 py-1 rounded text-sm transition-colors duration-200"
-                              style={{
-                                backgroundColor: "#3d3d3d",
-                                color: "#ffffff",
-                                border: "1px solid #4d4d4d",
-                              }}
-                              onFocus={(e) => {
-                                e.currentTarget.style.borderColor = "#d4af37";
-                              }}
-                              onBlur={(e) => {
-                                e.currentTarget.style.borderColor = "#4d4d4d";
-                              }}
-                            >
-                              <option value="customer">Customer</option>
-                              {currentUser &&
-                                currentUser.role === "super_admin" && (
-                                  <>
-                                    <option value="manager">Manager</option>
-                                    <option value="super_admin">
-                                      Super Admin
-                                    </option>
-                                  </>
-                                )}
-                            </select>
+                              onChange={setNewRole}
+                              size="small"
+                              allowedRoles={
+                                currentUser && currentUser.role === "super_admin"
+                                  ? ["customer", "manager", "super_admin"]
+                                  : ["customer"]
+                              }
+                            />
                             <input
                               placeholder="New password (optional)"
                               value={user._editPassword}
@@ -910,72 +630,38 @@ const UserManagement = () => {
                                   )
                                 )
                               }
-                              className="mt-2 px-2 py-1 rounded w-full transition-colors duration-200"
+                              className="mt-2 px-2 py-1 rounded w-full bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-gold-500/40 transition-colors"
                               type="password"
-                              style={{
-                                backgroundColor: "#3d3d3d",
-                                color: "#ffffff",
-                                border: "1px solid #4d4d4d",
-                              }}
-                              onFocus={(e) => {
-                                e.currentTarget.style.borderColor = "#d4af37";
-                              }}
-                              onBlur={(e) => {
-                                e.currentTarget.style.borderColor = "#4d4d4d";
-                              }}
                             />
                           </div>
                         ) : (
                           <div className="flex items-center space-x-2">
                             {currentUser &&
                             currentUser.role === "super_admin" ? (
-                              <select
+                              <RoleDropdown
                                 value={user.role}
-                                onChange={(e) =>
-                                  handleRoleChange(user.id, e.target.value)
-                                }
-                                className="px-2 py-1 rounded text-sm transition-colors duration-200"
-                                style={{
-                                  backgroundColor: "#3d3d3d",
-                                  color: "#ffffff",
-                                  border: "1px solid #4d4d4d",
-                                }}
-                                onFocus={(e) => {
-                                  e.currentTarget.style.borderColor = "#d4af37";
-                                }}
-                                onBlur={(e) => {
-                                  e.currentTarget.style.borderColor = "#4d4d4d";
-                                }}
-                              >
-                                <option value="customer">Customer</option>
-                                <option value="manager">Manager</option>
-                                <option value="super_admin">Super Admin</option>
-                              </select>
+                                onChange={(role) => handleRoleChange(user.id, role)}
+                                size="small"
+                                allowedRoles={["customer", "manager", "super_admin"]}
+                              />
                             ) : (
                               <span
                                 className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
                                   user.role === "super_admin"
-                                    ? "bg-red-900 text-red-200"
+                                    ? "bg-gold-500/15 text-gold-500 border border-gold-500/20"
                                     : user.role === "manager"
-                                    ? "bg-blue-900 text-blue-200"
-                                    : "bg-green-900 text-green-200"
+                                    ? "bg-white/10 text-white/70 border border-white/10"
+                                    : "bg-white/5 text-white/40 border border-white/5"
                                 }`}
                               >
-                                {user.role}
+                                {user.role === "super_admin" ? "Super Admin" : user.role === "manager" ? "Manager" : "Customer"}
                               </span>
                             )}
                             {/* Lock/Unlock button */}
                             {user.locked ? (
                               <button
                                 onClick={() => handleLockToggle(user.id, false)}
-                                className="transition-colors duration-200"
-                                style={{ color: "#f6e05e" }}
-                                onMouseEnter={(e) => {
-                                  e.currentTarget.style.color = "#ecc94b";
-                                }}
-                                onMouseLeave={(e) => {
-                                  e.currentTarget.style.color = "#f6e05e";
-                                }}
+                                className="transition-colors duration-200 text-yellow-400 hover:text-yellow-300"
                                 title="Unlock user"
                               >
                                 <FaUnlock />
@@ -983,14 +669,7 @@ const UserManagement = () => {
                             ) : (
                               <button
                                 onClick={() => handleLockToggle(user.id, true)}
-                                className="transition-colors duration-200"
-                                style={{ color: "#fc8181" }}
-                                onMouseEnter={(e) => {
-                                  e.currentTarget.style.color = "#f56565";
-                                }}
-                                onMouseLeave={(e) => {
-                                  e.currentTarget.style.color = "#fc8181";
-                                }}
+                                className="transition-colors duration-200 text-red-400 hover:text-red-300"
                                 title="Lock user"
                               >
                                 <FaLock />
@@ -1008,27 +687,13 @@ const UserManagement = () => {
                                 if (newRole !== user.role)
                                   handleRoleChange(user.id, newRole);
                               }}
-                              className="transition-colors duration-200"
-                              style={{ color: "#d4af37" }}
-                              onMouseEnter={(e) => {
-                                e.currentTarget.style.color = "#b8860b";
-                              }}
-                              onMouseLeave={(e) => {
-                                e.currentTarget.style.color = "#d4af37";
-                              }}
+                              className="transition-colors duration-200 text-gold-500 hover:text-gold-600"
                             >
                               Save
                             </button>
                             <button
                               onClick={cancelEditing}
-                              className="transition-colors duration-200"
-                              style={{ color: "#999999" }}
-                              onMouseEnter={(e) => {
-                                e.currentTarget.style.color = "#cccccc";
-                              }}
-                              onMouseLeave={(e) => {
-                                e.currentTarget.style.color = "#999999";
-                              }}
+                              className="transition-colors duration-200 text-white/30 hover:text-white/50"
                             >
                               Cancel
                             </button>
@@ -1037,14 +702,7 @@ const UserManagement = () => {
                           <div className="flex items-center space-x-3">
                             <button
                               onClick={() => startEditing(user)}
-                              className="transition-colors duration-200"
-                              style={{ color: "#d4af37" }}
-                              onMouseEnter={(e) => {
-                                e.currentTarget.style.color = "#b8860b";
-                              }}
-                              onMouseLeave={(e) => {
-                                e.currentTarget.style.color = "#d4af37";
-                              }}
+                              className="transition-colors duration-200 text-gold-500 hover:text-gold-600"
                             >
                               <FaEdit className="inline mr-1" />
                               Edit
@@ -1054,14 +712,7 @@ const UserManagement = () => {
                               currentUser.id !== user.id && (
                                 <button
                                   onClick={() => handleDeleteUser(user.id)}
-                                  className="transition-colors duration-200"
-                                  style={{ color: "#fc8181" }}
-                                  onMouseEnter={(e) => {
-                                    e.currentTarget.style.color = "#f56565";
-                                  }}
-                                  onMouseLeave={(e) => {
-                                    e.currentTarget.style.color = "#fc8181";
-                                  }}
+                                  className="transition-colors duration-200 text-red-400 hover:text-red-300"
                                 >
                                   Delete
                                 </button>
@@ -1088,7 +739,7 @@ const UserManagement = () => {
                     .includes(debouncedSearchTerm.toLowerCase()));
               return matchesRole && matchesSearch;
             }).length === 0 && (
-              <div className="text-center py-8" style={{ color: "#999999" }}>
+              <div className="text-center py-8 text-white/30">
                 No users found for the selected filter and search term.
               </div>
             )}
@@ -1096,17 +747,10 @@ const UserManagement = () => {
 
           {/* Modern Pagination Controls */}
           {totalPages > 1 && (
-            <div
-              className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4 mt-4 rounded-xl"
-              style={{
-                background:
-                  "linear-gradient(135deg, rgba(33,33,33,0.8), rgba(17,17,17,0.95))",
-                border: "1px solid #2d2d2d",
-              }}
-            >
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-4 border-t border-white/5 bg-[#111]">
               <div className="flex items-center gap-4">
                 <div className="flex items-center gap-2">
-                  <label className="text-sm text-gray-400">
+                  <label className="text-sm text-white/30">
                     Items per page:
                   </label>
                   <select
@@ -1114,7 +758,7 @@ const UserManagement = () => {
                     onChange={(e) =>
                       handlePerPageChange(Number(e.target.value))
                     }
-                    className="px-3 py-1 rounded text-sm bg-gray-800 text-white border border-gray-600 focus:border-d4af37 focus:outline-none"
+                    className="px-3 py-1 rounded text-sm bg-white/5 text-white border border-white/10 focus:border-gold-500/40 focus:outline-none"
                   >
                     <option value={5}>5</option>
                     <option value={10}>10</option>
@@ -1122,7 +766,7 @@ const UserManagement = () => {
                     <option value={50}>50</option>
                   </select>
                 </div>
-                <div className="text-sm text-gray-400">
+                <div className="text-sm text-white/30">
                   Showing {(currentPage - 1) * perPage + 1} to{" "}
                   {Math.min(currentPage * perPage, totalItems)} of {totalItems}{" "}
                   results
@@ -1135,8 +779,8 @@ const UserManagement = () => {
                   disabled={!hasPrev}
                   className={`px-3 py-2 rounded text-sm font-medium transition-all flex items-center gap-2 ${
                     hasPrev
-                      ? "bg-gray-700 text-white hover:bg-gray-600"
-                      : "bg-gray-800 text-gray-500 cursor-not-allowed"
+                      ? "bg-white/5 text-white hover:bg-white/10"
+                      : "bg-white/5 text-white/20 cursor-not-allowed"
                   }`}
                 >
                   <FaChevronLeft /> Previous
@@ -1161,8 +805,8 @@ const UserManagement = () => {
                         onClick={() => handlePageChange(pageNum)}
                         className={`px-3 py-2 rounded text-sm font-medium transition-all ${
                           pageNum === currentPage
-                            ? "bg-d4af37 text-black"
-                            : "bg-gray-700 text-white hover:bg-gray-600"
+                            ? "bg-gold-500 text-black"
+                            : "bg-white/5 text-white hover:bg-white/10"
                         }`}
                       >
                         {pageNum}
@@ -1176,8 +820,8 @@ const UserManagement = () => {
                   disabled={!hasNext}
                   className={`px-3 py-2 rounded text-sm font-medium transition-all flex items-center gap-2 ${
                     hasNext
-                      ? "bg-gray-700 text-white hover:bg-gray-600"
-                      : "bg-gray-800 text-gray-500 cursor-not-allowed"
+                      ? "bg-white/5 text-white hover:bg-white/10"
+                      : "bg-white/5 text-white/20 cursor-not-allowed"
                   }`}
                 >
                   Next <FaChevronRight />

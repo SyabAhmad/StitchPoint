@@ -9,77 +9,41 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-const ProductViewsChart = ({ data }) => {
-  const CustomTooltip = ({ active, payload, label }) => {
-    if (active && payload && payload.length) {
-      const data = payload[0];
-      return (
-        <div
-          className="p-4 rounded-lg shadow-lg max-w-xs"
-          style={{
-            backgroundColor: "#2d2d2d",
-            border: "1px solid #3d3d3d",
-            color: "#ffffff",
-          }}
-        >
-          <p className="font-semibold text-sm mb-1">{label}</p>
-          <p className="text-lg font-bold" style={{ color: "#d4af37" }}>
-            {data.value} views
-          </p>
-          <p className="text-xs" style={{ color: "#cccccc" }}>
-            Avg time: {data.payload.avg_time_spent || 0}s
-          </p>
-        </div>
-      );
-    }
-    return null;
-  };
+const CustomTooltip = ({ active, payload, label }) => {
+  if (active && payload && payload.length) {
+    const d = payload[0];
+    return (
+      <div className="bg-[#1a1a1a] border border-white/10 rounded-lg px-4 py-3 shadow-xl">
+        <p className="font-semibold text-sm text-white mb-1">{label}</p>
+        <p className="text-lg font-bold text-gold-500">{d.value} views</p>
+        <p className="text-xs text-white/40">Avg time: {d.payload.avg_time_spent || 0}s</p>
+      </div>
+    );
+  }
+  return null;
+};
 
+const ProductViewsChart = ({ data }) => {
   return (
-    <div
-      className="shadow rounded-lg p-6"
-      style={{ backgroundColor: "#1d1d1d" }}
-    >
-      <h3 className="text-lg font-semibold mb-4" style={{ color: "#d4af37" }}>
-        Product Views Performance
-      </h3>
-      <div className="h-96">
-        <ResponsiveContainer width="100%" height="100%">
-          <BarChart
-            data={data.slice(0, 10)}
-            margin={{
-              top: 20,
-              right: 30,
-              left: 20,
-              bottom: 60,
-            }}
-          >
-            <CartesianGrid strokeDasharray="3 3" stroke="#555555" />
-            <XAxis
-              dataKey="product_name"
-              stroke="#cccccc"
-              fontSize={12}
-              angle={-45}
-              textAnchor="end"
-              height={80}
-              interval={0}
-            />
-            <YAxis stroke="#cccccc" fontSize={12} />
-            <Tooltip content={<CustomTooltip />} />
-            <Bar
-              dataKey="views"
-              fill="#d4af37"
-              radius={[4, 4, 0, 0]}
-              name="Views"
-            />
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
-      <div className="mt-4 text-center">
-        <p className="text-sm" style={{ color: "#cccccc" }}>
-          Top 10 products by view count - Hover for details
-        </p>
-      </div>
+    <div className="h-80">
+      <ResponsiveContainer width="100%" height="100%">
+        <BarChart data={data.slice(0, 10)} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
+          <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" vertical={false} />
+          <XAxis
+            dataKey="product_name"
+            stroke="rgba(255,255,255,0.2)"
+            fontSize={11}
+            tickLine={false}
+            angle={-45}
+            textAnchor="end"
+            height={70}
+            interval={0}
+          />
+          <YAxis stroke="rgba(255,255,255,0.2)" fontSize={11} tickLine={false} />
+          <Tooltip content={<CustomTooltip />} cursor={{ fill: "rgba(212,175,55,0.05)" }} />
+          <Bar dataKey="views" fill="#D4AF37" radius={[3, 3, 0, 0]} />
+        </BarChart>
+      </ResponsiveContainer>
     </div>
   );
 };

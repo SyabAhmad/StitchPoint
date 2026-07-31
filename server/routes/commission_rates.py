@@ -146,14 +146,22 @@ def update_commission_rate(rate_id):
             for existing_rate in existing_rates:
                 min_price = rate.min_price
                 max_price = rate.max_price
-                if not max_price:  # Unlimited max price
-                    if min_price >= existing_rate.min_price:
-                        return jsonify({'message': f'Price range overlaps with existing rate: {existing_rate.name}'}), 400
+                er_min = existing_rate.min_price
+                er_max = existing_rate.max_price
+                if not max_price:
+                    if not er_max:
+                        if min_price >= er_min:
+                            return jsonify({'message': f'Price range overlaps with existing rate: {existing_rate.name}'}), 400
+                    else:
+                        if min_price >= er_min:
+                            return jsonify({'message': f'Price range overlaps with existing rate: {existing_rate.name}'}), 400
                 else:
-                    if (min_price >= existing_rate.min_price and min_price < existing_rate.max_price) or \
-                       (max_price and max_price > existing_rate.min_price and max_price <= existing_rate.max_price) or \
-                       (min_price <= existing_rate.min_price and (not max_price or max_price >= existing_rate.max_price)):
-                        return jsonify({'message': f'Price range overlaps with existing rate: {existing_rate.name}'}), 400
+                    if not er_max:
+                        if max_price > er_min:
+                            return jsonify({'message': f'Price range overlaps with existing rate: {existing_rate.name}'}), 400
+                    else:
+                        if (min_price < er_max and max_price > er_min):
+                            return jsonify({'message': f'Price range overlaps with existing rate: {existing_rate.name}'}), 400
         
         rate.updated_at = datetime.utcnow()
         db.session.commit()

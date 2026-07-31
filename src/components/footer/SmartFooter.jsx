@@ -89,23 +89,11 @@ const SmartFooter = ({ variant = "default" }) => {
   // Simple footer for dashboard pages
   if (variant === "simple") {
     return (
-      <footer
-        className="px-6 py-4 border-t"
-        style={{
-          backgroundColor: "#1d1d1d",
-          borderColor: "#2d2d2d",
-        }}
-      >
-        <div className="flex items-center justify-between text-sm">
-          <div
-            className="flex items-center space-x-4"
-            style={{ color: "#cccccc" }}
-          >
-            <span>&copy; {currentYear} Naqsh Couture</span>
-            <span>•</span>
-            <span>All rights reserved</span>
-          </div>
-        </div>
+      <footer className="bg-[#111] border-t border-white/5 px-6 py-3 flex items-center justify-between">
+        <span className="text-[11px] text-white/25">
+          &copy; {currentYear} Naqsh Couture. All rights reserved.
+        </span>
+        <span className="text-[11px] text-white/15">v1.0</span>
       </footer>
     );
   }

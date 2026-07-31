@@ -145,12 +145,9 @@ const CommissionRates = () => {
 
   if (loading) {
     return (
-      <div
-        className="flex justify-center items-center h-screen"
-        style={{ backgroundColor: "#000000", color: "#ffffff" }}
-      >
+      <div className="flex justify-center items-center h-screen bg-black text-white">
         <div className="flex flex-col items-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-yellow-500 mb-4"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-2 border-gold-500/20 border-t-gold-500 mb-4"></div>
           <span>Loading commission rates...</span>
         </div>
       </div>
@@ -158,30 +155,20 @@ const CommissionRates = () => {
   }
 
   return (
-    <div
-      className="min-h-screen p-8"
-      style={{ backgroundColor: "#000000", color: "#ffffff" }}
-    >
+    <div className="min-h-screen p-8 bg-black text-white">
       <div className="max-w-6xl mx-auto">
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h1 className="text-3xl font-bold" style={{ color: "#d4af37" }}>
+            <h1 className="text-3xl font-bold text-gold-500">
               Commission Rate Management
             </h1>
-            <p className="mt-2" style={{ color: "#cccccc" }}>
+            <p className="mt-2 text-white/50">
               Manage tiered commission rates based on product prices
             </p>
           </div>
           <button
             onClick={() => setShowForm(true)}
-            className="flex items-center px-4 py-2 rounded-lg font-semibold transition-colors duration-200"
-            style={{ backgroundColor: "#d4af37", color: "#000000" }}
-            onMouseEnter={(e) =>
-              (e.currentTarget.style.backgroundColor = "#b8860b")
-            }
-            onMouseLeave={(e) =>
-              (e.currentTarget.style.backgroundColor = "#d4af37")
-            }
+            className="flex items-center px-4 py-2 rounded-lg font-semibold transition-colors duration-200 bg-gold-500 text-black hover:bg-gold-600"
           >
             <FaPlus className="mr-2" />
             Add New Rate
@@ -189,17 +176,14 @@ const CommissionRates = () => {
         </div>
 
         {/* Info Box */}
-        <div
-          className="p-4 rounded-lg mb-6"
-          style={{ backgroundColor: "#1d1d1d", border: "1px solid #2d2d2d" }}
-        >
+        <div className="p-4 rounded-lg mb-6 bg-[#111] border border-white/5">
           <div className="flex items-start">
-            <FaInfoCircle className="mr-3 mt-1" style={{ color: "#d4af37" }} />
+            <FaInfoCircle className="mr-3 mt-1 text-gold-500" />
             <div>
               <h3 className="font-semibold mb-2">
                 How Tiered Commission Works
               </h3>
-              <p style={{ color: "#cccccc" }}>
+              <p className="text-white/50">
                 Commission rates are automatically applied based on product
                 price ranges. When a product is sold, the system finds the
                 applicable rate and calculates the commission accordingly. This
@@ -210,88 +194,55 @@ const CommissionRates = () => {
         </div>
 
         {/* Commission Rates Table */}
-        <div
-          className="shadow rounded-lg overflow-hidden"
-          style={{ backgroundColor: "#1d1d1d" }}
-        >
-          <div
-            className="px-6 py-4 border-b"
-            style={{ borderColor: "#2d2d2d" }}
-          >
-            <h2 className="text-xl font-semibold" style={{ color: "#ffffff" }}>
+        <div className="bg-[#111] border border-white/5 rounded-lg overflow-hidden shadow">
+          <div className="px-6 py-4 border-b border-white/5">
+            <h2 className="text-xl font-semibold text-white">
               Current Commission Rates
             </h2>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr style={{ backgroundColor: "#2d2d2d" }}>
-                  <th
-                    className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
-                    style={{ color: "#d4af37" }}
-                  >
+                <tr className="bg-white/5">
+                  <th className="px-6 py-3 text-left text-[11px] font-medium text-white/30 uppercase tracking-wider">
                     Rate Name
                   </th>
-                  <th
-                    className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
-                    style={{ color: "#d4af37" }}
-                  >
+                  <th className="px-6 py-3 text-left text-[11px] font-medium text-white/30 uppercase tracking-wider">
                     Price Range
                   </th>
-                  <th
-                    className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
-                    style={{ color: "#d4af37" }}
-                  >
+                  <th className="px-6 py-3 text-left text-[11px] font-medium text-white/30 uppercase tracking-wider">
                     Commission %
                   </th>
-                  <th
-                    className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
-                    style={{ color: "#d4af37" }}
-                  >
+                  <th className="px-6 py-3 text-left text-[11px] font-medium text-white/30 uppercase tracking-wider">
                     Status
                   </th>
-                  <th
-                    className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
-                    style={{ color: "#d4af37" }}
-                  >
+                  <th className="px-6 py-3 text-left text-[11px] font-medium text-white/30 uppercase tracking-wider">
                     Actions
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y" style={{ borderColor: "#2d2d2d" }}>
+              <tbody className="divide-y divide-white/5">
                 {commissionRates.map((rate) => (
-                  <tr key={rate.id} className="hover:bg-gray-900">
+                  <tr key={rate.id} className="hover:bg-white/[0.02]">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
-                        <FaChartLine
-                          className="mr-3"
-                          style={{ color: "#d4af37" }}
-                        />
+                        <FaChartLine className="mr-3 text-gold-500" />
                         <div>
-                          <div
-                            className="text-sm font-medium"
-                            style={{ color: "#ffffff" }}
-                          >
+                          <div className="text-sm font-medium text-white">
                             {rate.name}
                           </div>
                         </div>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm" style={{ color: "#cccccc" }}>
+                      <div className="text-sm text-white/50">
                         ${rate.min_price} - ${rate.max_price || "Unlimited"}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
-                        <FaPercentage
-                          className="mr-2"
-                          style={{ color: "#4ecdc4" }}
-                        />
-                        <span
-                          className="text-sm font-semibold"
-                          style={{ color: "#4ecdc4" }}
-                        >
+                        <FaPercentage className="mr-2 text-teal-400" />
+                        <span className="text-sm font-semibold text-teal-400">
                           {rate.commission_percentage}%
                         </span>
                       </div>
@@ -300,15 +251,9 @@ const CommissionRates = () => {
                       <span
                         className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
                           rate.is_active
-                            ? "bg-green-100 text-green-800"
-                            : "bg-red-100 text-red-800"
+                            ? "bg-green-500/20 text-green-500"
+                            : "bg-red-500/20 text-red-500"
                         }`}
-                        style={{
-                          backgroundColor: rate.is_active
-                            ? "rgba(72, 187, 120, 0.2)"
-                            : "rgba(245, 101, 101, 0.2)",
-                          color: rate.is_active ? "#48bb78" : "#f56565",
-                        }}
                       >
                         {rate.is_active ? "Active" : "Inactive"}
                       </span>
@@ -317,33 +262,13 @@ const CommissionRates = () => {
                       <div className="flex space-x-2">
                         <button
                           onClick={() => handleEdit(rate)}
-                          className="p-2 rounded-lg transition-colors duration-200"
-                          style={{
-                            backgroundColor: "#2d2d2d",
-                            color: "#d4af37",
-                          }}
-                          onMouseEnter={(e) =>
-                            (e.currentTarget.style.backgroundColor = "#3d3d3d")
-                          }
-                          onMouseLeave={(e) =>
-                            (e.currentTarget.style.backgroundColor = "#2d2d2d")
-                          }
+                          className="p-2 rounded-lg bg-white/5 text-gold-500 hover:bg-white/10 transition-colors duration-200"
                         >
                           <FaEdit />
                         </button>
                         <button
                           onClick={() => handleDelete(rate.id)}
-                          className="p-2 rounded-lg transition-colors duration-200"
-                          style={{
-                            backgroundColor: "#2d2d2d",
-                            color: "#ef4444",
-                          }}
-                          onMouseEnter={(e) =>
-                            (e.currentTarget.style.backgroundColor = "#3d3d3d")
-                          }
-                          onMouseLeave={(e) =>
-                            (e.currentTarget.style.backgroundColor = "#2d2d2d")
-                          }
+                          className="p-2 rounded-lg bg-white/5 text-red-500 hover:bg-white/10 transition-colors duration-200"
                         >
                           <FaTrash />
                         </button>
@@ -357,34 +282,20 @@ const CommissionRates = () => {
         </div>
 
         {/* Commission Preview Calculator */}
-        <div
-          className="mt-8 p-6 rounded-lg"
-          style={{ backgroundColor: "#1d1d1d" }}
-        >
-          <h3
-            className="text-lg font-semibold mb-4"
-            style={{ color: "#d4af37" }}
-          >
+        <div className="mt-8 p-6 rounded-lg bg-[#111] border border-white/5">
+          <h3 className="text-lg font-semibold mb-4 text-gold-500">
             Commission Calculator
           </h3>
           <div className="flex items-end space-x-4">
             <div className="flex-1">
-              <label
-                className="block text-sm font-medium mb-2"
-                style={{ color: "#cccccc" }}
-              >
+              <label className="block text-sm font-medium mb-2 text-white/50">
                 Product Price
               </label>
               <input
                 type="number"
                 step="0.01"
                 placeholder="Enter product price"
-                className="w-full p-3 rounded-lg border"
-                style={{
-                  backgroundColor: "#2d2d2d",
-                  borderColor: "#3d3d3d",
-                  color: "#ffffff",
-                }}
+                className="w-full p-3 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-gold-500/40 transition-colors"
                 onChange={(e) => {
                   const price = parseFloat(e.target.value) || 0;
                   const commission = calculatePreview(price);
@@ -399,25 +310,19 @@ const CommissionRates = () => {
               />
             </div>
             <div className="text-center">
-              <div className="text-sm" style={{ color: "#cccccc" }}>
-                Commission
-              </div>
+              <div className="text-sm text-white/50">Commission</div>
               <div
-                className="text-xl font-bold"
+                className="text-xl font-bold text-teal-400"
                 id="commission-preview"
-                style={{ color: "#4ecdc4" }}
               >
                 PKR 0.00
               </div>
             </div>
             <div className="text-center">
-              <div className="text-sm" style={{ color: "#cccccc" }}>
-                Store Revenue
-              </div>
+              <div className="text-sm text-white/50">Store Revenue</div>
               <div
-                className="text-xl font-bold"
+                className="text-xl font-bold text-gold-500"
                 id="store-revenue"
-                style={{ color: "#d4af37" }}
               >
                 PKR 0.00
               </div>
@@ -428,23 +333,16 @@ const CommissionRates = () => {
         {/* Add/Edit Form Modal */}
         {showForm && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-            <div
-              className="rounded-lg p-6 w-full max-w-md"
-              style={{ backgroundColor: "#1d1d1d" }}
-            >
+            <div className="bg-[#111] border border-white/5 rounded-lg p-6 w-full max-w-md">
               <div className="flex justify-between items-center mb-4">
-                <h3
-                  className="text-lg font-semibold"
-                  style={{ color: "#d4af37" }}
-                >
+                <h3 className="text-lg font-semibold text-gold-500">
                   {editingRate
                     ? "Edit Commission Rate"
                     : "Add New Commission Rate"}
                 </h3>
                 <button
                   onClick={resetForm}
-                  className="p-2 rounded-lg transition-colors duration-200"
-                  style={{ backgroundColor: "#2d2d2d", color: "#cccccc" }}
+                  className="p-2 rounded-lg bg-white/5 text-white/50 hover:bg-white/10 transition-colors duration-200"
                 >
                   <FaTimes />
                 </button>
@@ -453,10 +351,7 @@ const CommissionRates = () => {
               <form onSubmit={handleSubmit}>
                 <div className="space-y-4">
                   <div>
-                    <label
-                      className="block text-sm font-medium mb-2"
-                      style={{ color: "#cccccc" }}
-                    >
+                    <label className="block text-sm font-medium mb-2 text-white/50">
                       Rate Name
                     </label>
                     <input
@@ -466,20 +361,12 @@ const CommissionRates = () => {
                       onChange={(e) =>
                         setFormData({ ...formData, name: e.target.value })
                       }
-                      className="w-full p-3 rounded-lg border"
-                      style={{
-                        backgroundColor: "#2d2d2d",
-                        borderColor: "#3d3d3d",
-                        color: "#ffffff",
-                      }}
+                      className="w-full p-3 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-gold-500/40 transition-colors"
                     />
                   </div>
 
                   <div>
-                    <label
-                      className="block text-sm font-medium mb-2"
-                      style={{ color: "#cccccc" }}
-                    >
+                    <label className="block text-sm font-medium mb-2 text-white/50">
                       Minimum Price (PKR)
                     </label>
                     <input
@@ -494,20 +381,12 @@ const CommissionRates = () => {
                           min_price: parseFloat(e.target.value) || 0,
                         })
                       }
-                      className="w-full p-3 rounded-lg border"
-                      style={{
-                        backgroundColor: "#2d2d2d",
-                        borderColor: "#3d3d3d",
-                        color: "#ffffff",
-                      }}
+                      className="w-full p-3 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-gold-500/40 transition-colors"
                     />
                   </div>
 
                   <div>
-                    <label
-                      className="block text-sm font-medium mb-2"
-                      style={{ color: "#cccccc" }}
-                    >
+                    <label className="block text-sm font-medium mb-2 text-white/50">
                       Maximum Price (PKR) - Leave empty for unlimited
                     </label>
                     <input
@@ -518,20 +397,12 @@ const CommissionRates = () => {
                       onChange={(e) =>
                         setFormData({ ...formData, max_price: e.target.value })
                       }
-                      className="w-full p-3 rounded-lg border"
-                      style={{
-                        backgroundColor: "#2d2d2d",
-                        borderColor: "#3d3d3d",
-                        color: "#ffffff",
-                      }}
+                      className="w-full p-3 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-gold-500/40 transition-colors"
                     />
                   </div>
 
                   <div>
-                    <label
-                      className="block text-sm font-medium mb-2"
-                      style={{ color: "#cccccc" }}
-                    >
+                    <label className="block text-sm font-medium mb-2 text-white/50">
                       Commission Percentage (%)
                     </label>
                     <input
@@ -548,12 +419,7 @@ const CommissionRates = () => {
                             parseFloat(e.target.value) || 0,
                         })
                       }
-                      className="w-full p-3 rounded-lg border"
-                      style={{
-                        backgroundColor: "#2d2d2d",
-                        borderColor: "#3d3d3d",
-                        color: "#ffffff",
-                      }}
+                      className="w-full p-3 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-gold-500/40 transition-colors"
                     />
                   </div>
                 </div>
@@ -562,21 +428,13 @@ const CommissionRates = () => {
                   <button
                     type="button"
                     onClick={resetForm}
-                    className="px-4 py-2 rounded-lg transition-colors duration-200"
-                    style={{ backgroundColor: "#2d2d2d", color: "#cccccc" }}
+                    className="px-4 py-2 rounded-lg bg-white/5 text-white/50 hover:bg-white/10 transition-colors duration-200"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="flex items-center px-4 py-2 rounded-lg font-semibold transition-colors duration-200"
-                    style={{ backgroundColor: "#d4af37", color: "#000000" }}
-                    onMouseEnter={(e) =>
-                      (e.currentTarget.style.backgroundColor = "#b8860b")
-                    }
-                    onMouseLeave={(e) =>
-                      (e.currentTarget.style.backgroundColor = "#d4af37")
-                    }
+                    className="flex items-center px-4 py-2 rounded-lg font-semibold transition-colors duration-200 bg-gold-500 text-black hover:bg-gold-600"
                   >
                     <FaSave className="mr-2" />
                     {editingRate ? "Update" : "Create"} Rate

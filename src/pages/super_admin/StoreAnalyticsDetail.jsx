@@ -70,12 +70,9 @@ const StoreAnalyticsDetail = () => {
 
   if (loading) {
     return (
-      <div
-        className="flex justify-center items-center h-screen"
-        style={{ backgroundColor: "#000000", color: "#ffffff" }}
-      >
+      <div className="flex justify-center items-center h-screen bg-black text-white">
         <div className="flex flex-col items-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-yellow-500 mb-4"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-2 border-gold-500/20 border-t-gold-500 mb-4"></div>
           <span>Loading store analytics...</span>
         </div>
       </div>
@@ -84,21 +81,15 @@ const StoreAnalyticsDetail = () => {
 
   if (!store) {
     return (
-      <div
-        className="p-8"
-        style={{ backgroundColor: "#000000", minHeight: "100vh" }}
-      >
+      <div className="p-8 bg-black min-h-screen">
         <div className="max-w-7xl mx-auto">
-          <h1 className="text-2xl font-bold" style={{ color: "#d4af37" }}>
-            Store Not Found
-          </h1>
-          <p style={{ color: "#999999" }} className="mt-4">
+          <h1 className="text-2xl font-bold text-gold-500">Store Not Found</h1>
+          <p className="text-white/30 mt-4">
             The requested store analytics could not be found.
           </p>
           <Link
             to="/super-admin-dashboard/store-analytics"
-            className="mt-4 inline-block"
-            style={{ color: "#d4af37" }}
+            className="mt-4 inline-block text-gold-500 hover:underline"
           >
             Back to Stores Analytics
           </Link>
@@ -108,24 +99,20 @@ const StoreAnalyticsDetail = () => {
   }
 
   return (
-    <div
-      className="p-8"
-      style={{ backgroundColor: "#000000", minHeight: "100vh" }}
-    >
+    <div className="p-8 bg-black min-h-screen">
       <div className="max-w-7xl mx-auto">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-3xl font-bold" style={{ color: "#d4af37" }}>
+            <h1 className="text-3xl font-bold text-gold-500">
               {store.store_name}
             </h1>
-            <p className="text-sm" style={{ color: "#999999" }}>
+            <p className="text-sm text-white/30">
               Detailed analytics and products for this store
             </p>
           </div>
           <Link
             to="/super-admin-dashboard/store-analytics"
-            className="px-3 py-1 rounded-md text-sm"
-            style={{ backgroundColor: "#d4af37", color: "#000" }}
+            className="px-3 py-1 rounded-md text-sm bg-gold-500 text-black font-semibold hover:bg-gold-600 transition-colors"
           >
             Back
           </Link>
@@ -133,18 +120,13 @@ const StoreAnalyticsDetail = () => {
 
         {/* Time Period Filter */}
         <div className="mb-6">
-          <label className="block text-sm mb-2" style={{ color: "#cccccc" }}>
+          <label className="block text-sm mb-2 text-white/50">
             Time Period:
           </label>
           <select
             value={filterDays}
             onChange={(e) => setFilterDays(Number(e.target.value))}
-            className="px-3 py-2 rounded"
-            style={{
-              backgroundColor: "#2d2d2d",
-              color: "#ffffff",
-              border: "1px solid #3d3d3d",
-            }}
+            className="px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-gold-500/40 transition-colors"
           >
             <option value={7}>Last 7 days</option>
             <option value={30}>Last 30 days</option>
@@ -153,15 +135,9 @@ const StoreAnalyticsDetail = () => {
         </div>
 
         {/* Store Summary - Full Width */}
-        <div
-          className="shadow rounded-lg p-8 mb-8 grid grid-cols-1 md:grid-cols-4 gap-8"
-          style={{ backgroundColor: "#1d1d1d" }}
-        >
+        <div className="bg-[#111] border border-white/5 rounded-lg p-8 mb-8 grid grid-cols-1 md:grid-cols-4 gap-8 shadow">
           <div>
-            <h3
-              style={{ color: "#ffffff" }}
-              className="text-lg font-semibold mb-4"
-            >
+            <h3 className="text-lg font-semibold mb-4 text-white">
               Store Summary
             </h3>
             {store.logo_url && (
@@ -172,57 +148,57 @@ const StoreAnalyticsDetail = () => {
               />
             )}
           </div>
-          <div style={{ color: "#cccccc" }} className="grid grid-cols-1 gap-2">
+          <div className="text-white/50 grid grid-cols-1 gap-2">
             <p>
-              <span style={{ color: "#d4af37" }}>Total Products:</span>{" "}
+              <span className="text-gold-500">Total Products:</span>{" "}
               {store.total_products}
             </p>
             <p>
-              <span style={{ color: "#d4af37" }}>Total Views:</span>{" "}
+              <span className="text-gold-500">Total Views:</span>{" "}
               {store.total_views}
             </p>
             <p>
-              <span style={{ color: "#d4af37" }}>Total Clicks:</span>{" "}
+              <span className="text-gold-500">Total Clicks:</span>{" "}
               {store.total_clicks}
             </p>
             <p>
-              <span style={{ color: "#d4af37" }}>Cart Adds:</span>{" "}
+              <span className="text-gold-500">Cart Adds:</span>{" "}
               {store.total_cart_adds}
             </p>
           </div>
-          <div style={{ color: "#cccccc" }} className="grid grid-cols-1 gap-2">
+          <div className="text-white/50 grid grid-cols-1 gap-2">
             <p>
-              <span style={{ color: "#d4af37" }}>Avg Time Spent:</span>{" "}
+              <span className="text-gold-500">Avg Time Spent:</span>{" "}
               {store.avg_time_spent}s
             </p>
             <p>
-              <span style={{ color: "#d4af37" }}>Total Reviews:</span>{" "}
+              <span className="text-gold-500">Total Reviews:</span>{" "}
               {store.total_reviews}
             </p>
             <p>
-              <span style={{ color: "#d4af37" }}>Avg Rating:</span>{" "}
+              <span className="text-gold-500">Avg Rating:</span>{" "}
               {store.avg_rating}
             </p>
             <p>
-              <span style={{ color: "#d4af37" }}>Total Comments:</span>{" "}
+              <span className="text-gold-500">Total Comments:</span>{" "}
               {store.total_comments}
             </p>
           </div>
-          <div style={{ color: "#cccccc" }} className="grid grid-cols-1 gap-2">
+          <div className="text-white/50 grid grid-cols-1 gap-2">
             <p>
-              <span style={{ color: "#d4af37" }}>Total Revenue:</span> PKR{" "}
+              <span className="text-gold-500">Total Revenue:</span> PKR{" "}
               {store.total_revenue || 0}
             </p>
             <p>
-              <span style={{ color: "#d4af37" }}>Units Sold:</span>{" "}
+              <span className="text-gold-500">Units Sold:</span>{" "}
               {store.total_units_sold || 0}
             </p>
             <p>
-              <span style={{ color: "#d4af37" }}>Total Costs:</span> PKR{" "}
+              <span className="text-gold-500">Total Costs:</span> PKR{" "}
               {store.total_costs || 0}
             </p>
             <p>
-              <span style={{ color: "#d4af37" }}>Total Profit:</span> PKR{" "}
+              <span className="text-gold-500">Total Profit:</span> PKR{" "}
               {store.total_profit || 0}
             </p>
           </div>
@@ -230,26 +206,14 @@ const StoreAnalyticsDetail = () => {
 
         {/* Financial Performance Charts */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-          <div
-            className="shadow rounded-lg p-6"
-            style={{ backgroundColor: "#1d1d1d" }}
-          >
-            <h3
-              style={{ color: "#ffffff" }}
-              className="text-lg font-semibold mb-4"
-            >
+          <div className="bg-[#111] border border-white/5 rounded-lg p-6 shadow">
+            <h3 className="text-lg font-semibold mb-4 text-white">
               Sales Trends
             </h3>
             <SalesChart data={financialTrends} />
           </div>
-          <div
-            className="shadow rounded-lg p-6"
-            style={{ backgroundColor: "#1d1d1d" }}
-          >
-            <h3
-              style={{ color: "#ffffff" }}
-              className="text-lg font-semibold mb-4"
-            >
+          <div className="bg-[#111] border border-white/5 rounded-lg p-6 shadow">
+            <h3 className="text-lg font-semibold mb-4 text-white">
               Profit Trends
             </h3>
             <ProfitChart data={financialTrends} />
@@ -257,26 +221,14 @@ const StoreAnalyticsDetail = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-          <div
-            className="shadow rounded-lg p-6"
-            style={{ backgroundColor: "#1d1d1d" }}
-          >
-            <h3
-              style={{ color: "#ffffff" }}
-              className="text-lg font-semibold mb-4"
-            >
+          <div className="bg-[#111] border border-white/5 rounded-lg p-6 shadow">
+            <h3 className="text-lg font-semibold mb-4 text-white">
               Cost Analysis
             </h3>
             <CostChart data={financialTrends} />
           </div>
-          <div
-            className="shadow rounded-lg p-6"
-            style={{ backgroundColor: "#1d1d1d" }}
-          >
-            <h3
-              style={{ color: "#ffffff" }}
-              className="text-lg font-semibold mb-4"
-            >
+          <div className="bg-[#111] border border-white/5 rounded-lg p-6 shadow">
+            <h3 className="text-lg font-semibold mb-4 text-white">
               Revenue Distribution
             </h3>
             <ResponsiveContainer width="100%" height={300}>
@@ -320,8 +272,8 @@ const StoreAnalyticsDetail = () => {
                 <Tooltip
                   formatter={(value) => [`PKR ${value.toFixed(2)}`, ""]}
                   contentStyle={{
-                    backgroundColor: "#2d2d2d",
-                    border: "1px solid #3d3d3d",
+                    backgroundColor: "#1d1d1d",
+                    border: "1px solid #333",
                     borderRadius: "4px",
                     color: "#ffffff",
                   }}
@@ -336,18 +288,14 @@ const StoreAnalyticsDetail = () => {
           {/* Reviews Card */}
           <Link
             to={`/super-admin-dashboard/store-analytics/${store_id}/reviews`}
-            className="shadow rounded-lg p-6 cursor-pointer transition-transform hover:scale-105"
-            style={{ backgroundColor: "#1d1d1d" }}
+            className="bg-[#111] border border-white/5 rounded-lg p-6 shadow cursor-pointer transition-transform hover:scale-105"
           >
             <div className="flex items-center justify-between">
               <div>
-                <h3
-                  style={{ color: "#d4af37" }}
-                  className="text-lg font-semibold mb-2"
-                >
+                <h3 className="text-lg font-semibold mb-2 text-gold-500">
                   Reviews
                 </h3>
-                <p style={{ color: "#cccccc" }} className="text-3xl font-bold">
+                <p className="text-3xl font-bold text-white/50">
                   {store.total_reviews}
                 </p>
               </div>
@@ -358,18 +306,14 @@ const StoreAnalyticsDetail = () => {
           {/* Comments Card */}
           <Link
             to={`/super-admin-dashboard/store-analytics/${store_id}/comments`}
-            className="shadow rounded-lg p-6 cursor-pointer transition-transform hover:scale-105"
-            style={{ backgroundColor: "#1d1d1d" }}
+            className="bg-[#111] border border-white/5 rounded-lg p-6 shadow cursor-pointer transition-transform hover:scale-105"
           >
             <div className="flex items-center justify-between">
               <div>
-                <h3
-                  style={{ color: "#d4af37" }}
-                  className="text-lg font-semibold mb-2"
-                >
+                <h3 className="text-lg font-semibold mb-2 text-gold-500">
                   Comments
                 </h3>
-                <p style={{ color: "#cccccc" }} className="text-3xl font-bold">
+                <p className="text-3xl font-bold text-white/50">
                   {store.total_comments}
                 </p>
               </div>
@@ -380,18 +324,14 @@ const StoreAnalyticsDetail = () => {
           {/* Products Card */}
           <Link
             to={`/super-admin-dashboard/store-analytics/${store_id}/products`}
-            className="shadow rounded-lg p-6 cursor-pointer transition-transform hover:scale-105"
-            style={{ backgroundColor: "#1d1d1d" }}
+            className="bg-[#111] border border-white/5 rounded-lg p-6 shadow cursor-pointer transition-transform hover:scale-105"
           >
             <div className="flex items-center justify-between">
               <div>
-                <h3
-                  style={{ color: "#d4af37" }}
-                  className="text-lg font-semibold mb-2"
-                >
+                <h3 className="text-lg font-semibold mb-2 text-gold-500">
                   Products
                 </h3>
-                <p style={{ color: "#cccccc" }} className="text-3xl font-bold">
+                <p className="text-3xl font-bold text-white/50">
                   {store.total_products}
                 </p>
               </div>

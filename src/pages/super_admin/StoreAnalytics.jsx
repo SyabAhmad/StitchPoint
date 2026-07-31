@@ -42,12 +42,9 @@ const StoreAnalytics = () => {
 
   if (loading) {
     return (
-      <div
-        className="flex justify-center items-center h-screen"
-        style={{ backgroundColor: "#000000", color: "#ffffff" }}
-      >
+      <div className="flex justify-center items-center h-screen bg-black text-white">
         <div className="flex flex-col items-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-yellow-500 mb-4"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-2 border-gold-500/20 border-t-gold-500 mb-4"></div>
           <span>Loading stores analytics...</span>
         </div>
       </div>
@@ -84,12 +81,9 @@ const StoreAnalytics = () => {
   };
 
   return (
-    <div
-      className="p-8"
-      style={{ backgroundColor: "#000000", minHeight: "100vh" }}
-    >
+    <div className="p-8 bg-black min-h-screen">
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-3xl font-bold mb-6" style={{ color: "#d4af37" }}>
+        <h1 className="text-3xl font-bold mb-6 text-gold-500">
           Store Analytics
         </h1>
 
@@ -100,21 +94,13 @@ const StoreAnalytics = () => {
             {/* Filter and Search */}
             <div className="mb-6 flex flex-col md:flex-row gap-4">
               <div className="flex-1">
-                <label
-                  className="block text-sm mb-2"
-                  style={{ color: "#cccccc" }}
-                >
+                <label className="block text-sm mb-2 text-white/50">
                   Time Period:
                 </label>
                 <select
                   value={filterDays}
                   onChange={(e) => setFilterDays(Number(e.target.value))}
-                  className="w-full px-3 py-2 rounded"
-                  style={{
-                    backgroundColor: "#2d2d2d",
-                    color: "#ffffff",
-                    border: "1px solid #3d3d3d",
-                  }}
+                  className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-gold-500/40 transition-colors"
                 >
                   <option value={7}>Last 7 days</option>
                   <option value={30}>Last 30 days</option>
@@ -122,17 +108,11 @@ const StoreAnalytics = () => {
                 </select>
               </div>
               <div className="flex-1">
-                <label
-                  className="block text-sm mb-2"
-                  style={{ color: "#cccccc" }}
-                >
+                <label className="block text-sm mb-2 text-white/50">
                   Search Store:
                 </label>
                 <div className="relative">
-                  <FaSearch
-                    className="absolute left-3 top-1/2 transform -translate-y-1/2"
-                    style={{ color: "#999999" }}
-                  />
+                  <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/30" />
                   <input
                     type="text"
                     placeholder="Search by store name..."
@@ -141,36 +121,19 @@ const StoreAnalytics = () => {
                       setSearchQuery(e.target.value);
                       setCurrentPage(1);
                     }}
-                    className="w-full pl-10 pr-3 py-2 rounded"
-                    style={{
-                      backgroundColor: "#2d2d2d",
-                      color: "#ffffff",
-                      border: "1px solid #3d3d3d",
-                    }}
+                    className="w-full pl-10 pr-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white text-sm focus:outline-none focus:border-gold-500/40 transition-colors"
                   />
                 </div>
               </div>
             </div>
 
             {/* Stores Table */}
-            <div
-              className="shadow overflow-hidden sm:rounded-md"
-              style={{ backgroundColor: "#1d1d1d" }}
-            >
-              <div
-                className="px-4 py-5 sm:px-6 border-b"
-                style={{ borderColor: "#2d2d2d" }}
-              >
-                <h3
-                  className="text-lg leading-6 font-medium"
-                  style={{ color: "#ffffff" }}
-                >
+            <div className="bg-[#111] border border-white/5 rounded-lg shadow overflow-hidden">
+              <div className="px-4 py-5 sm:px-6 border-b border-white/5">
+                <h3 className="text-lg leading-6 font-medium text-white">
                   Stores Performance
                 </h3>
-                <p
-                  className="mt-1 max-w-2xl text-sm"
-                  style={{ color: "#999999" }}
-                >
+                <p className="mt-1 max-w-2xl text-sm text-white/30">
                   Showing {indexOfFirstItem + 1}-
                   {Math.min(indexOfLastItem, filteredStores.length)} of{" "}
                   {filteredStores.length} stores
@@ -178,166 +141,90 @@ const StoreAnalytics = () => {
               </div>
               <div className="overflow-x-auto">
                 <table className="min-w-full">
-                  <thead style={{ backgroundColor: "#2d2d2d" }}>
+                  <thead className="bg-white/5">
                     <tr>
-                      <th
-                        className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
-                        style={{ color: "#d4af37" }}
-                      >
+                      <th className="px-6 py-3 text-left text-[11px] font-medium text-white/30 uppercase tracking-wider">
                         Store
                       </th>
-                      <th
-                        className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
-                        style={{ color: "#d4af37" }}
-                      >
+                      <th className="px-6 py-3 text-left text-[11px] font-medium text-white/30 uppercase tracking-wider">
                         Products
                       </th>
-                      <th
-                        className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
-                        style={{ color: "#d4af37" }}
-                      >
+                      <th className="px-6 py-3 text-left text-[11px] font-medium text-white/30 uppercase tracking-wider">
                         Views
                       </th>
-                      <th
-                        className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
-                        style={{ color: "#d4af37" }}
-                      >
+                      <th className="px-6 py-3 text-left text-[11px] font-medium text-white/30 uppercase tracking-wider">
                         Clicks
                       </th>
-                      <th
-                        className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
-                        style={{ color: "#d4af37" }}
-                      >
+                      <th className="px-6 py-3 text-left text-[11px] font-medium text-white/30 uppercase tracking-wider">
                         Cart Adds
                       </th>
-                      <th
-                        className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
-                        style={{ color: "#d4af37" }}
-                      >
+                      <th className="px-6 py-3 text-left text-[11px] font-medium text-white/30 uppercase tracking-wider">
                         Reviews
                       </th>
-                      <th
-                        className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
-                        style={{ color: "#d4af37" }}
-                      >
+                      <th className="px-6 py-3 text-left text-[11px] font-medium text-white/30 uppercase tracking-wider">
                         Rating
                       </th>
-                      <th
-                        className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
-                        style={{ color: "#d4af37" }}
-                      >
+                      <th className="px-6 py-3 text-left text-[11px] font-medium text-white/30 uppercase tracking-wider">
                         Comments
                       </th>
-                      <th
-                        className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
-                        style={{ color: "#d4af37" }}
-                      >
+                      <th className="px-6 py-3 text-left text-[11px] font-medium text-white/30 uppercase tracking-wider">
                         Revenue
                       </th>
-                      <th
-                        className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
-                        style={{ color: "#d4af37" }}
-                      >
+                      <th className="px-6 py-3 text-left text-[11px] font-medium text-white/30 uppercase tracking-wider">
                         Units Sold
                       </th>
-                      <th
-                        className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
-                        style={{ color: "#d4af37" }}
-                      >
+                      <th className="px-6 py-3 text-left text-[11px] font-medium text-white/30 uppercase tracking-wider">
                         Profit
                       </th>
                     </tr>
                   </thead>
-                  <tbody style={{ backgroundColor: "#1d1d1d" }}>
-                    {currentStores.map((store, index) => (
+                  <tbody className="divide-y divide-white/5">
+                    {currentStores.map((store) => (
                       <tr
                         key={store.store_id}
-                        className="transition-colors duration-150"
-                        style={{
-                          borderBottom: "1px solid #2d2d2d",
-                          backgroundColor:
-                            index % 2 === 0 ? "#1d1d1d" : "#2d2d2d",
-                          cursor: "pointer",
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.backgroundColor = "#3d3d3d";
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.backgroundColor =
-                            index % 2 === 0 ? "#1d1d1d" : "#2d2d2d";
-                        }}
+                        className="transition-colors duration-150 cursor-pointer hover:bg-white/[0.02]"
                         onClick={() =>
                           navigate(
                             `/super-admin-dashboard/store-analytics/${store.store_id}`
                           )
                         }
                       >
-                        <td
-                          className="px-6 py-4 whitespace-nowrap text-sm font-medium"
-                          style={{ color: "#ffffff" }}
-                        >
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">
                           {store.store_name}
                         </td>
-                        <td
-                          className="px-6 py-4 whitespace-nowrap text-sm"
-                          style={{ color: "#cccccc" }}
-                        >
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-white/50">
                           {store.total_products}
                         </td>
-                        <td
-                          className="px-6 py-4 whitespace-nowrap text-sm"
-                          style={{ color: "#cccccc" }}
-                        >
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-white/50">
                           {store.total_views}
                         </td>
-                        <td
-                          className="px-6 py-4 whitespace-nowrap text-sm"
-                          style={{ color: "#cccccc" }}
-                        >
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-white/50">
                           {store.total_clicks}
                         </td>
-                        <td
-                          className="px-6 py-4 whitespace-nowrap text-sm"
-                          style={{ color: "#cccccc" }}
-                        >
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-white/50">
                           {store.total_cart_adds}
                         </td>
-                        <td
-                          className="px-6 py-4 whitespace-nowrap text-sm"
-                          style={{ color: "#cccccc" }}
-                        >
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-white/50">
                           {store.total_reviews}
                         </td>
-                        <td
-                          className="px-6 py-4 whitespace-nowrap text-sm"
-                          style={{ color: "#cccccc" }}
-                        >
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-white/50">
                           {store.avg_rating}
                         </td>
-                        <td
-                          className="px-6 py-4 whitespace-nowrap text-sm"
-                          style={{ color: "#cccccc" }}
-                        >
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-white/50">
                           {store.total_comments}
                         </td>
-                        <td
-                          className="px-6 py-4 whitespace-nowrap text-sm"
-                          style={{ color: "#d4af37" }}
-                        >
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gold-500">
                           PKR {store.total_revenue || 0}
                         </td>
-                        <td
-                          className="px-6 py-4 whitespace-nowrap text-sm"
-                          style={{ color: "#cccccc" }}
-                        >
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-white/50">
                           {store.total_units_sold || 0}
                         </td>
                         <td
-                          className="px-6 py-4 whitespace-nowrap text-sm"
-                          style={{
-                            color:
-                              store.total_profit >= 0 ? "#4ecdc4" : "#ff6b6b",
-                          }}
+                          className={`px-6 py-4 whitespace-nowrap text-sm ${
+                            store.total_profit >= 0
+                              ? "text-teal-400"
+                              : "text-red-400"
+                          }`}
                         >
                           PKR {store.total_profit || 0}
                         </td>
@@ -346,10 +233,7 @@ const StoreAnalytics = () => {
                   </tbody>
                 </table>
                 {currentStores.length === 0 && (
-                  <div
-                    className="text-center py-8"
-                    style={{ color: "#999999" }}
-                  >
+                  <div className="text-center py-8 text-white/30">
                     No stores found matching your search.
                   </div>
                 )}
@@ -357,19 +241,11 @@ const StoreAnalytics = () => {
 
               {/* Pagination */}
               {totalPages > 1 && (
-                <div
-                  className="px-4 py-4 border-t flex items-center justify-between"
-                  style={{ borderColor: "#2d2d2d" }}
-                >
+                <div className="px-4 py-4 border-t border-white/5 flex items-center justify-between">
                   <button
                     onClick={() => handlePageChange(currentPage - 1)}
                     disabled={currentPage === 1}
-                    className="px-4 py-2 rounded text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-                    style={{
-                      backgroundColor: "#2d2d2d",
-                      color: "#ffffff",
-                      border: "1px solid #3d3d3d",
-                    }}
+                    className="px-4 py-2 rounded text-sm font-medium bg-white/5 text-white border border-white/10 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-white/10 transition-colors"
                   >
                     Previous
                   </button>
@@ -378,13 +254,11 @@ const StoreAnalytics = () => {
                       <button
                         key={i + 1}
                         onClick={() => handlePageChange(i + 1)}
-                        className="px-3 py-1 rounded text-sm font-medium"
-                        style={{
-                          backgroundColor:
-                            currentPage === i + 1 ? "#d4af37" : "#2d2d2d",
-                          color: currentPage === i + 1 ? "#000000" : "#ffffff",
-                          border: "1px solid #3d3d3d",
-                        }}
+                        className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
+                          currentPage === i + 1
+                            ? "bg-gold-500 text-black"
+                            : "bg-white/5 text-white border border-white/10 hover:bg-white/10"
+                        }`}
                       >
                         {i + 1}
                       </button>
@@ -393,12 +267,7 @@ const StoreAnalytics = () => {
                   <button
                     onClick={() => handlePageChange(currentPage + 1)}
                     disabled={currentPage === totalPages}
-                    className="px-4 py-2 rounded text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-                    style={{
-                      backgroundColor: "#2d2d2d",
-                      color: "#ffffff",
-                      border: "1px solid #3d3d3d",
-                    }}
+                    className="px-4 py-2 rounded text-sm font-medium bg-white/5 text-white border border-white/10 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-white/10 transition-colors"
                   >
                     Next
                   </button>
@@ -409,36 +278,22 @@ const StoreAnalytics = () => {
 
           {/* Right Column - Top 10 Stores Panel (1/3 width) */}
           <div className="lg:col-span-1">
-            <div
-              className="shadow rounded-lg p-4 sticky top-8"
-              style={{ backgroundColor: "#1d1d1d" }}
-            >
-              <h3
-                className="text-lg font-semibold mb-4"
-                style={{ color: "#d4af37" }}
-              >
+            <div className="bg-[#111] border border-white/5 rounded-lg p-4 shadow sticky top-8">
+              <h3 className="text-lg font-semibold mb-4 text-gold-500">
                 Top 10 Stores
               </h3>
 
               {/* Reviews Card */}
-              <div
-                className="mb-4 p-4 rounded-lg cursor-pointer transition-transform hover:scale-105"
-                style={{ backgroundColor: "#2d2d2d" }}
-                onClick={() => {
-                  // Could open a modal or navigate to filtered view
-                }}
-              >
+              <div className="mb-4 p-4 rounded-lg bg-white/5 cursor-pointer transition-transform hover:scale-105">
                 <div className="flex items-center justify-between mb-3">
-                  <h4 style={{ color: "#ffffff" }} className="font-medium">
-                    By Reviews
-                  </h4>
-                  <FaStar style={{ color: "#d4af37" }} size={20} />
+                  <h4 className="font-medium text-white">By Reviews</h4>
+                  <FaStar className="text-gold-500" size={20} />
                 </div>
                 <div className="space-y-2">
                   {topStoresByReviews.slice(0, 3).map((store) => (
                     <div
                       key={store.store_id}
-                      className="flex justify-between items-center text-sm"
+                      className="flex justify-between items-center text-sm cursor-pointer"
                       onClick={(e) => {
                         e.stopPropagation();
                         navigate(
@@ -446,13 +301,10 @@ const StoreAnalytics = () => {
                         );
                       }}
                     >
-                      <span style={{ color: "#cccccc" }} className="truncate">
+                      <span className="text-white/50 truncate">
                         {store.store_name}
                       </span>
-                      <span
-                        style={{ color: "#d4af37" }}
-                        className="font-medium"
-                      >
+                      <span className="font-medium text-gold-500">
                         {store.total_reviews}
                       </span>
                     </div>
@@ -461,24 +313,16 @@ const StoreAnalytics = () => {
               </div>
 
               {/* Comments Card */}
-              <div
-                className="mb-4 p-4 rounded-lg cursor-pointer transition-transform hover:scale-105"
-                style={{ backgroundColor: "#2d2d2d" }}
-                onClick={() => {
-                  // Could open a modal or navigate to filtered view
-                }}
-              >
+              <div className="mb-4 p-4 rounded-lg bg-white/5 cursor-pointer transition-transform hover:scale-105">
                 <div className="flex items-center justify-between mb-3">
-                  <h4 style={{ color: "#ffffff" }} className="font-medium">
-                    By Comments
-                  </h4>
-                  <FaComment style={{ color: "#d4af37" }} size={20} />
+                  <h4 className="font-medium text-white">By Comments</h4>
+                  <FaComment className="text-gold-500" size={20} />
                 </div>
                 <div className="space-y-2">
                   {topStoresByComments.slice(0, 3).map((store) => (
                     <div
                       key={store.store_id}
-                      className="flex justify-between items-center text-sm"
+                      className="flex justify-between items-center text-sm cursor-pointer"
                       onClick={(e) => {
                         e.stopPropagation();
                         navigate(
@@ -486,13 +330,10 @@ const StoreAnalytics = () => {
                         );
                       }}
                     >
-                      <span style={{ color: "#cccccc" }} className="truncate">
+                      <span className="text-white/50 truncate">
                         {store.store_name}
                       </span>
-                      <span
-                        style={{ color: "#d4af37" }}
-                        className="font-medium"
-                      >
+                      <span className="font-medium text-gold-500">
                         {store.total_comments}
                       </span>
                     </div>
@@ -501,24 +342,16 @@ const StoreAnalytics = () => {
               </div>
 
               {/* Sells (Cart Adds) Card */}
-              <div
-                className="mb-4 p-4 rounded-lg cursor-pointer transition-transform hover:scale-105"
-                style={{ backgroundColor: "#2d2d2d" }}
-                onClick={() => {
-                  // Could open a modal or navigate to filtered view
-                }}
-              >
+              <div className="mb-4 p-4 rounded-lg bg-white/5 cursor-pointer transition-transform hover:scale-105">
                 <div className="flex items-center justify-between mb-3">
-                  <h4 style={{ color: "#ffffff" }} className="font-medium">
-                    By Cart Adds
-                  </h4>
-                  <FaShoppingCart style={{ color: "#d4af37" }} size={20} />
+                  <h4 className="font-medium text-white">By Cart Adds</h4>
+                  <FaShoppingCart className="text-gold-500" size={20} />
                 </div>
                 <div className="space-y-2">
                   {topStoresBySells.slice(0, 3).map((store) => (
                     <div
                       key={store.store_id}
-                      className="flex justify-between items-center text-sm"
+                      className="flex justify-between items-center text-sm cursor-pointer"
                       onClick={(e) => {
                         e.stopPropagation();
                         navigate(
@@ -526,13 +359,10 @@ const StoreAnalytics = () => {
                         );
                       }}
                     >
-                      <span style={{ color: "#cccccc" }} className="truncate">
+                      <span className="text-white/50 truncate">
                         {store.store_name}
                       </span>
-                      <span
-                        style={{ color: "#d4af37" }}
-                        className="font-medium"
-                      >
+                      <span className="font-medium text-gold-500">
                         {store.total_cart_adds}
                       </span>
                     </div>
@@ -541,24 +371,16 @@ const StoreAnalytics = () => {
               </div>
 
               {/* Views Card */}
-              <div
-                className="p-4 rounded-lg cursor-pointer transition-transform hover:scale-105"
-                style={{ backgroundColor: "#2d2d2d" }}
-                onClick={() => {
-                  // Could open a modal or navigate to filtered view
-                }}
-              >
+              <div className="p-4 rounded-lg bg-white/5 cursor-pointer transition-transform hover:scale-105">
                 <div className="flex items-center justify-between mb-3">
-                  <h4 style={{ color: "#ffffff" }} className="font-medium">
-                    By Views
-                  </h4>
-                  <FaEye style={{ color: "#d4af37" }} size={20} />
+                  <h4 className="font-medium text-white">By Views</h4>
+                  <FaEye className="text-gold-500" size={20} />
                 </div>
                 <div className="space-y-2">
                   {topStoresByViews.slice(0, 3).map((store) => (
                     <div
                       key={store.store_id}
-                      className="flex justify-between items-center text-sm"
+                      className="flex justify-between items-center text-sm cursor-pointer"
                       onClick={(e) => {
                         e.stopPropagation();
                         navigate(
@@ -566,13 +388,10 @@ const StoreAnalytics = () => {
                         );
                       }}
                     >
-                      <span style={{ color: "#cccccc" }} className="truncate">
+                      <span className="text-white/50 truncate">
                         {store.store_name}
                       </span>
-                      <span
-                        style={{ color: "#d4af37" }}
-                        className="font-medium"
-                      >
+                      <span className="font-medium text-gold-500">
                         {store.total_views}
                       </span>
                     </div>

@@ -3,8 +3,6 @@ import {
   FaUsers,
   FaBox,
   FaShoppingCart,
-  FaEye,
-  FaMousePointer,
   FaChartLine,
   FaCog,
   FaStore,
@@ -13,14 +11,10 @@ import {
   FaStoreAlt,
   FaComments,
   FaStar,
-  FaPlus,
-  FaList,
-  FaClipboardList,
-  FaBuilding,
-  FaCalendarAlt,
   FaMoneyBillWave,
   FaBars,
   FaTimes,
+  FaCalendarAlt,
 } from "react-icons/fa";
 import { Link, Outlet, useLocation } from "react-router-dom";
 import { fetchWithAuth } from "../../utils/fetchWithAuth.js";
@@ -28,9 +22,7 @@ import CostChart from "../../components/analytics/CostChart.jsx";
 import SalesChart from "../../components/analytics/SalesChart.jsx";
 import ProfitChart from "../../components/analytics/ProfitChart.jsx";
 import CommissionChart from "../../components/analytics/CommissionChart.jsx";
-import NotificationCenter from "../../components/NotificationCenter.jsx";
 import RevenueChart from "../../components/analytics/RevenueChart.jsx";
-import AnalyticsPieChart from "../../components/analytics/AnalyticsPieChart.jsx";
 import SmartFooter from "../../components/footer/SmartFooter.jsx";
 
 const SuperAdminDashboard = () => {
@@ -48,74 +40,36 @@ const SuperAdminDashboard = () => {
     const token = localStorage.getItem("token");
     const userData = JSON.parse(localStorage.getItem("user"));
 
-    if (
-      !token ||
-      !userData ||
-      !["manager", "super_admin"].includes(userData.role)
-    ) {
+    if (!token || !userData || !["manager", "super_admin"].includes(userData.role)) {
       window.location.href = "/login";
       return;
     }
 
-    // Fetch dashboard data only if on the main dashboard route
     if (location.pathname === "/super-admin-dashboard") {
       const userData = JSON.parse(localStorage.getItem("user"));
       setUserData(userData);
 
-      // Fetch different data based on user role
       if (userData && userData.role === "super_admin") {
         Promise.all([
           fetchWithAuth("http://localhost:5000/api/dashboard/admin"),
           fetchWithAuth("http://localhost:5000/api/analytics/financial-trends"),
           fetchWithAuth("http://localhost:5000/api/dashboard/commissions"),
-          fetchWithAuth(
-            "http://localhost:5000/api/dashboard/commission-trends"
-          ),
+          fetchWithAuth("http://localhost:5000/api/dashboard/commission-trends"),
         ])
-          .then(
-            ([
-              dashboardResponse,
-              trendsResponse,
-              commissionResponse,
-              commissionTrendsResponse,
-            ]) => {
-              const responses = [
-                dashboardResponse,
-                trendsResponse,
-                commissionResponse,
-                commissionTrendsResponse,
-              ];
-              const errors = responses.filter((response) => !response.ok);
-
-              if (errors.length > 0) {
-                throw new Error(
-                  `HTTP errors: ${errors.map((e) => e.status).join(", ")}`
-                );
-              }
-
-              return Promise.all([
-                dashboardResponse.json(),
-                trendsResponse.json(),
-                commissionResponse.json(),
-                commissionTrendsResponse.json(),
-              ]);
-            }
-          )
-          .then(
-            ([
-              dashboardData,
-              trendsData,
-              commissionResponse,
-              commissionTrendsData,
-            ]) => {
-              setAnalytics(dashboardData.analytics || {});
-              setRecentOrders(dashboardData.recent_orders || []);
-              setFinancialTrends(trendsData.financial_trends || []);
-              setCommissionData(commissionResponse || {});
-              setCommissionTrends(commissionTrendsData.commission_trends || []);
-              setLoading(false);
-            }
-          )
+          .then(([dashboardResponse, trendsResponse, commissionResponse, commissionTrendsResponse]) => {
+            const responses = [dashboardResponse, trendsResponse, commissionResponse, commissionTrendsResponse];
+            const errors = responses.filter((r) => !r.ok);
+            if (errors.length > 0) throw new Error(`HTTP errors: ${errors.map((e) => e.status).join(", ")}`);
+            return Promise.all([dashboardResponse.json(), trendsResponse.json(), commissionResponse.json(), commissionTrendsResponse.json()]);
+          })
+          .then(([dashboardData, trendsData, commissionResponse, commissionTrendsData]) => {
+            setAnalytics(dashboardData.analytics || {});
+            setRecentOrders(dashboardData.recent_orders || []);
+            setFinancialTrends(trendsData.financial_trends || []);
+            setCommissionData(commissionResponse || {});
+            setCommissionTrends(commissionTrendsData.commission_trends || []);
+            setLoading(false);
+          })
           .catch((error) => {
             console.error("Error fetching dashboard data:", error);
             setAnalytics({});
@@ -126,26 +80,14 @@ const SuperAdminDashboard = () => {
             setLoading(false);
           });
       } else {
-        // Regular dashboard for managers
         Promise.all([
           fetchWithAuth("http://localhost:5000/api/dashboard/admin"),
           fetchWithAuth("http://localhost:5000/api/analytics/financial-trends"),
         ])
           .then(([dashboardResponse, trendsResponse]) => {
-            if (!dashboardResponse.ok) {
-              throw new Error(
-                `Dashboard HTTP error! status: ${dashboardResponse.status}`
-              );
-            }
-            if (!trendsResponse.ok) {
-              throw new Error(
-                `Trends HTTP error! status: ${trendsResponse.status}`
-              );
-            }
-            return Promise.all([
-              dashboardResponse.json(),
-              trendsResponse.json(),
-            ]);
+            if (!dashboardResponse.ok) throw new Error(`Dashboard HTTP error! status: ${dashboardResponse.status}`);
+            if (!trendsResponse.ok) throw new Error(`Trends HTTP error! status: ${trendsResponse.status}`);
+            return Promise.all([dashboardResponse.json(), trendsResponse.json()]);
           })
           .then(([dashboardData, trendsData]) => {
             setAnalytics(dashboardData.analytics || {});
@@ -166,685 +108,141 @@ const SuperAdminDashboard = () => {
     }
   }, [location.pathname]);
 
+  const navLinks = [
+    { to: "/super-admin-dashboard", icon: FaUsers, label: "Dashboard", exact: true },
+    { to: "/super-admin-dashboard/analytics", icon: FaChartLine, label: "Analytics" },
+    { to: "/super-admin-dashboard/user-management", icon: FaUserCog, label: "User Management" },
+    { to: "/super-admin-dashboard/products", icon: FaBox, label: "Products" },
+    { to: "/super-admin-dashboard/orders", icon: FaShoppingCart, label: "Orders" },
+    { to: "/super-admin-dashboard/product-analytics", icon: FaChartBar, label: "Product Analytics" },
+    { to: "/super-admin-dashboard/store-analytics", icon: FaStoreAlt, label: "Store Analytics", startsWith: true },
+    { to: "/super-admin-dashboard/comments", icon: FaComments, label: "Comments" },
+    { to: "/super-admin-dashboard/reviews", icon: FaStar, label: "Reviews", startsWith: true },
+  ];
+
+  if (userData && userData.role === "super_admin") {
+    navLinks.push(
+      { to: "/super-admin-dashboard/commissions", icon: FaMoneyBillWave, label: "Commissions" },
+      { to: "/super-admin-dashboard/commission-rates", icon: FaChartLine, label: "Commission Rates" }
+    );
+  }
+
+  const isActive = (link) => {
+    if (link.exact) return location.pathname === link.to;
+    if (link.startsWith) return location.pathname.startsWith(link.to);
+    return location.pathname === link.to;
+  };
+
   if (loading) {
     return (
-      <div
-        className="flex justify-center items-center h-screen"
-        style={{ backgroundColor: "#000000", color: "#ffffff" }}
-      >
+      <div className="flex justify-center items-center h-screen bg-black">
         <div className="flex flex-col items-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-yellow-500 mb-4"></div>
-          <span>Loading...</span>
+          <div className="animate-spin rounded-full h-10 w-10 border-2 border-gold-500/20 border-t-gold-500 mb-4"></div>
+          <span className="text-white/50 text-sm">Loading...</span>
         </div>
       </div>
     );
   }
 
   return (
-    <div
-      className="h-screen flex flex-col"
-      style={{ backgroundColor: "#000000" }}
-    >
-      {/* Fixed Header */}
-      <header
-        className="shadow-lg px-6 py-4 flex-shrink-0 relative z-60"
-        style={{
-          backgroundColor: "#1d1d1d",
-          borderBottom: "1px solid #2d2d2d",
-        }}
-      >
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <button
-              onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="p-2 rounded-lg transition-colors"
-              style={{ backgroundColor: "#2d2d2d", color: "#ffffff" }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = "#d4af37";
-                e.currentTarget.style.color = "#000000";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = "#2d2d2d";
-                e.currentTarget.style.color = "#ffffff";
-              }}
-            >
-              {sidebarOpen ? <FaTimes /> : <FaBars />}
-            </button>
-            <h1 className="text-white text-2xl font-bold">Naqsh Couture</h1>
-            <span style={{ color: "#cccccc" }}>Super Admin Panel</span>
-          </div>
-          <div className="flex items-center space-x-4">
-            <Link
-              to="/"
-              className="px-4 py-2 rounded-lg transition-all"
-              style={{ backgroundColor: "#d4af37", color: "#000000" }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = "#b8860b";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = "#d4af37";
-              }}
-            >
-              Home
-            </Link>
-            <Link
-              to="/shope"
-              className="px-4 py-2 rounded-lg transition-all"
-              style={{ backgroundColor: "#d4af37", color: "#000000" }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = "#b8860b";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = "#d4af37";
-              }}
-            >
-              Shop
-            </Link>
-            <Link
-              to="/super-admin-dashboard/user-management"
-              className="px-4 py-2 rounded-lg transition-all"
-              style={{ backgroundColor: "#d4af37", color: "#000000" }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = "#b8860b";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = "#d4af37";
-              }}
-            >
-              Settings
-            </Link>
-            <button
-              onClick={() => {
-                localStorage.clear();
-                window.location.href = "/login";
-              }}
-              className="px-4 py-2 rounded-lg transition-all hover:cursor-pointer"
-              style={{ backgroundColor: "#dc3545", color: "#ffffff" }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = "#c82333";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = "#dc3545";
-              }}
-            >
-              Logout
-            </button>
-          </div>
+    <div className="h-screen flex flex-col bg-black text-white">
+      {/* Header */}
+      <header className="h-14 bg-[#111] border-b border-white/10 px-5 flex items-center justify-between flex-shrink-0 z-50">
+        <div className="flex items-center gap-4">
+          <button
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            className="md:hidden text-white/50 hover:text-white transition-colors"
+          >
+            {sidebarOpen ? <FaTimes /> : <FaBars />}
+          </button>
+          <Link to="/" className="flex items-center gap-1.5">
+            <span className="text-gold-500 font-serif text-lg font-semibold">Naqsh</span>
+            <span className="text-white font-serif text-lg font-light">Couture</span>
+          </Link>
+          <span className="text-white/30 text-xs hidden sm:inline">Super Admin Panel</span>
+        </div>
+        <div className="flex items-center gap-3">
+          <Link to="/" className="text-xs text-white/50 hover:text-white transition-colors hidden sm:inline">
+            Home
+          </Link>
+          <Link to="/shop" className="text-xs text-white/50 hover:text-white transition-colors hidden sm:inline">
+            Shop
+          </Link>
+          <button
+            onClick={() => { localStorage.clear(); window.location.href = "/login"; }}
+            className="text-xs text-white/40 hover:text-red-400 transition-colors"
+          >
+            Logout
+          </button>
         </div>
       </header>
 
       {/* Mobile Overlay */}
       {sidebarOpen && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
-          onClick={() => setSidebarOpen(false)}
-        ></div>
+        <div className="fixed inset-0 bg-black/60 z-40 md:hidden" onClick={() => setSidebarOpen(false)} />
       )}
 
       <div className="flex-1 flex overflow-hidden">
-        {/* Fixed Aside */}
+        {/* Sidebar */}
         <aside
-          className={`w-64 shadow-lg overflow-y-auto md:block md:relative md:flex-shrink-0 fixed inset-y-0 left-0 z-50 transform transition-transform duration-300 ease-in-out ${
+          className={`w-56 bg-[#0a0a0a] border-r border-white/5 flex-shrink-0 overflow-y-auto sticky top-0 h-full z-40 transition-transform duration-300 md:relative md:translate-x-0 ${
             sidebarOpen ? "translate-x-0" : "-translate-x-full"
-          } md:translate-x-0 md:z-auto`}
-          style={{ backgroundColor: "#1d1d1d" }}
+          }`}
         >
-          {/* Mobile Header */}
-          <div
-            className="flex items-center justify-between p-6 border-b md:hidden"
-            style={{ borderColor: "#2d2d2d" }}
-          >
-            <h2 className="text-lg font-semibold" style={{ color: "#ffffff" }}>
-              Menu
-            </h2>
-            <button
-              onClick={() => setSidebarOpen(false)}
-              className="p-2 rounded-lg transition-colors"
-              style={{ backgroundColor: "#2d2d2d", color: "#ffffff" }}
-            >
-              <FaTimes />
-            </button>
-          </div>
-          <div className="p-6 border-b" style={{ borderColor: "#2d2d2d" }}>
-            <div className="flex items-center space-x-3">
-              <div
-                className="w-12 h-12 rounded-full flex items-center justify-center"
-                style={{ backgroundColor: "#d4af37" }}
-              >
-                <span className="text-black font-bold text-lg">
-                  {userData?.name?.charAt(0)?.toUpperCase() || "S"}
-                </span>
+          {/* User Profile */}
+          <div className="p-4 border-b border-white/5">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-full bg-gold-500 flex items-center justify-center text-black text-sm font-bold flex-shrink-0">
+                {userData?.name?.charAt(0)?.toUpperCase() || "S"}
               </div>
-              <div>
-                <p className="font-semibold" style={{ color: "#ffffff" }}>
-                  {userData?.name || "Super Admin"}
-                </p>
-                <p className="text-sm" style={{ color: "#cccccc" }}>
-                  {userData?.email}
-                </p>
+              <div className="min-w-0">
+                <p className="text-[13px] font-semibold text-white truncate">{userData?.name || "Super Admin"}</p>
+                <p className="text-[10px] text-white/25 truncate">{userData?.email}</p>
               </div>
             </div>
           </div>
 
-          <nav className="mt-6">
-            <div className="px-6 py-2">
-              <h3
-                className="text-xs font-semibold uppercase tracking-wider"
-                style={{ color: "#d4af37" }}
-              >
-                Management
-              </h3>
-              <ul className="mt-2 space-y-1">
-                <li>
-                  <Link
-                    to="/super-admin-dashboard"
-                    className={`flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
-                      location.pathname === "/super-admin-dashboard"
-                        ? "active-menu-item"
-                        : ""
-                    }`}
-                    style={{
-                      color:
-                        location.pathname === "/super-admin-dashboard"
-                          ? "#d4af37"
-                          : "#ffffff",
-                      backgroundColor:
-                        location.pathname === "/super-admin-dashboard"
-                          ? "#2d2d2d"
-                          : "transparent",
-                    }}
-                    onMouseEnter={(e) => {
-                      if (location.pathname !== "/super-admin-dashboard") {
-                        e.currentTarget.style.backgroundColor = "#2d2d2d";
-                        e.currentTarget.style.color = "#d4af37";
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (location.pathname !== "/super-admin-dashboard") {
-                        e.currentTarget.style.backgroundColor = "transparent";
-                        e.currentTarget.style.color = "#ffffff";
-                      }
-                    }}
-                  >
-                    <FaUsers className="mr-3 h-5 w-5" />
-                    Dashboard
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/super-admin-dashboard/analytics"
-                    className={`flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
-                      location.pathname === "/super-admin-dashboard/analytics"
-                        ? "active-menu-item"
-                        : ""
-                    }`}
-                    style={{
-                      color:
-                        location.pathname === "/super-admin-dashboard/analytics"
-                          ? "#d4af37"
-                          : "#ffffff",
-                      backgroundColor:
-                        location.pathname === "/super-admin-dashboard/analytics"
-                          ? "#2d2d2d"
-                          : "transparent",
-                    }}
-                    onMouseEnter={(e) => {
-                      if (
-                        location.pathname !== "/super-admin-dashboard/analytics"
-                      ) {
-                        e.currentTarget.style.backgroundColor = "#2d2d2d";
-                        e.currentTarget.style.color = "#d4af37";
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (
-                        location.pathname !== "/super-admin-dashboard/analytics"
-                      ) {
-                        e.currentTarget.style.backgroundColor = "transparent";
-                        e.currentTarget.style.color = "#ffffff";
-                      }
-                    }}
-                  >
-                    <FaChartLine className="mr-3 h-5 w-5" />
-                    Analytics
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/super-admin-dashboard/user-management"
-                    className={`flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
-                      location.pathname ===
-                      "/super-admin-dashboard/user-management"
-                        ? "active-menu-item"
-                        : ""
-                    }`}
-                    style={{
-                      color:
-                        location.pathname ===
-                        "/super-admin-dashboard/user-management"
-                          ? "#d4af37"
-                          : "#ffffff",
-                      backgroundColor:
-                        location.pathname ===
-                        "/super-admin-dashboard/user-management"
-                          ? "#2d2d2d"
-                          : "transparent",
-                    }}
-                    onMouseEnter={(e) => {
-                      if (
-                        location.pathname !==
-                        "/super-admin-dashboard/user-management"
-                      ) {
-                        e.currentTarget.style.backgroundColor = "#2d2d2d";
-                        e.currentTarget.style.color = "#d4af37";
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (
-                        location.pathname !==
-                        "/super-admin-dashboard/user-management"
-                      ) {
-                        e.currentTarget.style.backgroundColor = "transparent";
-                        e.currentTarget.style.color = "#ffffff";
-                      }
-                    }}
-                  >
-                    <FaUserCog className="mr-3 h-5 w-5" />
-                    User Management
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/super-admin-dashboard/products"
-                    className={`flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
-                      location.pathname === "/super-admin-dashboard/products"
-                        ? "active-menu-item"
-                        : ""
-                    }`}
-                    style={{
-                      color:
-                        location.pathname === "/super-admin-dashboard/products"
-                          ? "#d4af37"
-                          : "#ffffff",
-                      backgroundColor:
-                        location.pathname === "/super-admin-dashboard/products"
-                          ? "#2d2d2d"
-                          : "transparent",
-                    }}
-                    onMouseEnter={(e) => {
-                      if (
-                        location.pathname !== "/super-admin-dashboard/products"
-                      ) {
-                        e.currentTarget.style.backgroundColor = "#2d2d2d";
-                        e.currentTarget.style.color = "#d4af37";
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (
-                        location.pathname !== "/super-admin-dashboard/products"
-                      ) {
-                        e.currentTarget.style.backgroundColor = "transparent";
-                        e.currentTarget.style.color = "#ffffff";
-                      }
-                    }}
-                  >
-                    <FaBox className="mr-3 h-5 w-5" />
-                    Products
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/super-admin-dashboard/orders"
-                    className={`flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
-                      location.pathname === "/super-admin-dashboard/orders"
-                        ? "active-menu-item"
-                        : ""
-                    }`}
-                    style={{
-                      color:
-                        location.pathname === "/super-admin-dashboard/orders"
-                          ? "#d4af37"
-                          : "#ffffff",
-                      backgroundColor:
-                        location.pathname === "/super-admin-dashboard/orders"
-                          ? "#2d2d2d"
-                          : "transparent",
-                    }}
-                    onMouseEnter={(e) => {
-                      if (
-                        location.pathname !== "/super-admin-dashboard/orders"
-                      ) {
-                        e.currentTarget.style.backgroundColor = "#2d2d2d";
-                        e.currentTarget.style.color = "#d4af37";
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (
-                        location.pathname !== "/super-admin-dashboard/orders"
-                      ) {
-                        e.currentTarget.style.backgroundColor = "transparent";
-                        e.currentTarget.style.color = "#ffffff";
-                      }
-                    }}
-                  >
-                    <FaShoppingCart className="mr-3 h-5 w-5" />
-                    Orders
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/super-admin-dashboard/product-analytics"
-                    className={`flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
-                      location.pathname ===
-                      "/super-admin-dashboard/product-analytics"
-                        ? "active-menu-item"
-                        : ""
-                    }`}
-                    style={{
-                      color:
-                        location.pathname ===
-                        "/super-admin-dashboard/product-analytics"
-                          ? "#d4af37"
-                          : "#ffffff",
-                      backgroundColor:
-                        location.pathname ===
-                        "/super-admin-dashboard/product-analytics"
-                          ? "#2d2d2d"
-                          : "transparent",
-                    }}
-                    onMouseEnter={(e) => {
-                      if (
-                        location.pathname !==
-                        "/super-admin-dashboard/product-analytics"
-                      ) {
-                        e.currentTarget.style.backgroundColor = "#2d2d2d";
-                        e.currentTarget.style.color = "#d4af37";
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (
-                        location.pathname !==
-                        "/super-admin-dashboard/product-analytics"
-                      ) {
-                        e.currentTarget.style.backgroundColor = "transparent";
-                        e.currentTarget.style.color = "#ffffff";
-                      }
-                    }}
-                  >
-                    <FaChartBar className="mr-3 h-5 w-5" />
-                    Product Analytics
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/super-admin-dashboard/store-analytics"
-                    className={`flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
-                      location.pathname.startsWith(
-                        "/super-admin-dashboard/store-analytics"
-                      )
-                        ? "active-menu-item"
-                        : ""
-                    }`}
-                    style={{
-                      color: location.pathname.startsWith(
-                        "/super-admin-dashboard/store-analytics"
-                      )
-                        ? "#d4af37"
-                        : "#ffffff",
-                      backgroundColor: location.pathname.startsWith(
-                        "/super-admin-dashboard/store-analytics"
-                      )
-                        ? "#2d2d2d"
-                        : "transparent",
-                    }}
-                    onMouseEnter={(e) => {
-                      if (
-                        !location.pathname.startsWith(
-                          "/super-admin-dashboard/store-analytics"
-                        )
-                      ) {
-                        e.currentTarget.style.backgroundColor = "#2d2d2d";
-                        e.currentTarget.style.color = "#d4af37";
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (
-                        !location.pathname.startsWith(
-                          "/super-admin-dashboard/store-analytics"
-                        )
-                      ) {
-                        e.currentTarget.style.backgroundColor = "transparent";
-                        e.currentTarget.style.color = "#ffffff";
-                      }
-                    }}
-                  >
-                    <FaStoreAlt className="mr-3 h-5 w-5" />
-                    Store Analytics
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/super-admin-dashboard/comments"
-                    className={`flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
-                      location.pathname === "/super-admin-dashboard/comments"
-                        ? "active-menu-item"
-                        : ""
-                    }`}
-                    style={{
-                      color:
-                        location.pathname === "/super-admin-dashboard/comments"
-                          ? "#d4af37"
-                          : "#ffffff",
-                      backgroundColor:
-                        location.pathname === "/super-admin-dashboard/comments"
-                          ? "#2d2d2d"
-                          : "transparent",
-                    }}
-                    onMouseEnter={(e) => {
-                      if (
-                        location.pathname !== "/super-admin-dashboard/comments"
-                      ) {
-                        e.currentTarget.style.backgroundColor = "#2d2d2d";
-                        e.currentTarget.style.color = "#d4af37";
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (
-                        location.pathname !== "/super-admin-dashboard/comments"
-                      ) {
-                        e.currentTarget.style.backgroundColor = "transparent";
-                        e.currentTarget.style.color = "#ffffff";
-                      }
-                    }}
-                  >
-                    <FaComments className="mr-3 h-5 w-5" />
-                    Comments
-                  </Link>
-                </li>
-                <li>
-                  <Link
-                    to="/super-admin-dashboard/reviews"
-                    className={`flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
-                      location.pathname.startsWith(
-                        "/super-admin-dashboard/reviews"
-                      )
-                        ? "active-menu-item"
-                        : ""
-                    }`}
-                    style={{
-                      color: location.pathname.startsWith(
-                        "/super-admin-dashboard/reviews"
-                      )
-                        ? "#d4af37"
-                        : "#ffffff",
-                      backgroundColor: location.pathname.startsWith(
-                        "/super-admin-dashboard/reviews"
-                      )
-                        ? "#2d2d2d"
-                        : "transparent",
-                    }}
-                    onMouseEnter={(e) => {
-                      if (
-                        !location.pathname.startsWith(
-                          "/super-admin-dashboard/reviews"
-                        )
-                      ) {
-                        e.currentTarget.style.backgroundColor = "#2d2d2d";
-                        e.currentTarget.style.color = "#d4af37";
-                      }
-                    }}
-                    onMouseLeave={(e) => {
-                      if (
-                        !location.pathname.startsWith(
-                          "/super-admin-dashboard/reviews"
-                        )
-                      ) {
-                        e.currentTarget.style.backgroundColor = "transparent";
-                        e.currentTarget.style.color = "#ffffff";
-                      }
-                    }}
-                  >
-                    <FaStar className="mr-3 h-5 w-5" />
-                    Reviews
-                  </Link>
-                </li>
-                {userData && userData.role === "super_admin" && (
-                  <>
-                    <li>
-                      <Link
-                        to="/super-admin-dashboard/commissions"
-                        className={`flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
-                          location.pathname ===
-                          "/super-admin-dashboard/commissions"
-                            ? "active-menu-item"
-                            : ""
-                        }`}
-                        style={{
-                          color:
-                            location.pathname ===
-                            "/super-admin-dashboard/commissions"
-                              ? "#d4af37"
-                              : "#ffffff",
-                          backgroundColor:
-                            location.pathname ===
-                            "/super-admin-dashboard/commissions"
-                              ? "#2d2d2d"
-                              : "transparent",
-                        }}
-                        onMouseEnter={(e) => {
-                          if (
-                            location.pathname !==
-                            "/super-admin-dashboard/commissions"
-                          ) {
-                            e.currentTarget.style.backgroundColor = "#2d2d2d";
-                            e.currentTarget.style.color = "#d4af37";
-                          }
-                        }}
-                        onMouseLeave={(e) => {
-                          if (
-                            location.pathname !==
-                            "/super-admin-dashboard/commissions"
-                          ) {
-                            e.currentTarget.style.backgroundColor =
-                              "transparent";
-                            e.currentTarget.style.color = "#ffffff";
-                          }
-                        }}
-                      >
-                        <FaMoneyBillWave className="mr-3 h-5 w-5" />
-                        Commissions
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        to="/super-admin-dashboard/commission-rates"
-                        className={`flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200 ${
-                          location.pathname ===
-                          "/super-admin-dashboard/commission-rates"
-                            ? "active-menu-item"
-                            : ""
-                        }`}
-                        style={{
-                          color:
-                            location.pathname ===
-                            "/super-admin-dashboard/commission-rates"
-                              ? "#d4af37"
-                              : "#ffffff",
-                          backgroundColor:
-                            location.pathname ===
-                            "/super-admin-dashboard/commission-rates"
-                              ? "#2d2d2d"
-                              : "transparent",
-                        }}
-                        onMouseEnter={(e) => {
-                          if (
-                            location.pathname !==
-                            "/super-admin-dashboard/commission-rates"
-                          ) {
-                            e.currentTarget.style.backgroundColor = "#2d2d2d";
-                            e.currentTarget.style.color = "#d4af37";
-                          }
-                        }}
-                        onMouseLeave={(e) => {
-                          if (
-                            location.pathname !==
-                            "/super-admin-dashboard/commission-rates"
-                          ) {
-                            e.currentTarget.style.backgroundColor =
-                              "transparent";
-                            e.currentTarget.style.color = "#ffffff";
-                          }
-                        }}
-                      >
-                        <FaChartLine className="mr-3 h-5 w-5" />
-                        Commission Rates
-                      </Link>
-                    </li>
-                  </>
-                )}
-              </ul>
-            </div>
-            <div className="px-6 py-2">
-              <h3
-                className="text-xs font-semibold uppercase tracking-wider"
-                style={{ color: "#d4af37" }}
-              >
+          {/* Nav Links */}
+          <nav className="p-2.5">
+            <p className="text-[9px] font-bold uppercase tracking-[0.15em] text-gold-500/50 px-2.5 mb-1.5">
+              Management
+            </p>
+            <ul className="space-y-px">
+              {navLinks.map((link) => {
+                const Icon = link.icon;
+                const active = isActive(link);
+                return (
+                  <li key={link.to}>
+                    <Link
+                      to={link.to}
+                      className={`flex items-center gap-2.5 px-2.5 py-[7px] rounded-md text-[12px] font-medium transition-all duration-150 ${
+                        active
+                          ? "bg-gold-500/10 text-gold-500 border-l-2 border-gold-500 ml-0 pl-[8px]"
+                          : "text-white/40 hover:text-white/70 hover:bg-white/[0.03]"
+                      }`}
+                    >
+                      <Icon className="text-[11px] w-3.5 text-center" />
+                      {link.label}
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+
+            <div className="mt-4 pt-3 border-t border-white/5">
+              <p className="text-[9px] font-bold uppercase tracking-[0.15em] text-gold-500/50 px-2.5 mb-1.5">
                 Settings
-              </h3>
-              <ul className="mt-2 space-y-1">
+              </p>
+              <ul className="space-y-px">
                 <li>
-                  <a
-                    href="#"
-                    className="flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200"
-                    style={{ color: "#ffffff" }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = "#2d2d2d";
-                      e.currentTarget.style.color = "#d4af37";
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = "transparent";
-                      e.currentTarget.style.color = "#ffffff";
-                    }}
-                  >
-                    <FaStore className="mr-3 h-5 w-5" />
+                  <a href="#" className="flex items-center gap-2.5 px-2.5 py-[7px] rounded-md text-[12px] font-medium text-white/40 hover:text-white/70 hover:bg-white/[0.03] transition-all duration-150">
+                    <FaStore className="text-[11px] w-3.5 text-center" />
                     Store Settings
                   </a>
                 </li>
                 <li>
-                  <a
-                    href="#"
-                    className="flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200"
-                    style={{ color: "#ffffff" }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = "#2d2d2d";
-                      e.currentTarget.style.color = "#d4af37";
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = "transparent";
-                      e.currentTarget.style.color = "#ffffff";
-                    }}
-                  >
-                    <FaCog className="mr-3 h-5 w-5" />
+                  <a href="#" className="flex items-center gap-2.5 px-2.5 py-[7px] rounded-md text-[12px] font-medium text-white/40 hover:text-white/70 hover:bg-white/[0.03] transition-all duration-150">
+                    <FaCog className="text-[11px] w-3.5 text-center" />
                     System Config
                   </a>
                 </li>
@@ -853,483 +251,197 @@ const SuperAdminDashboard = () => {
           </nav>
         </aside>
 
-        {/* Scrollable Main Content */}
-        <main className="flex-1 p-8 overflow-y-auto">
-          <div className="max-w-7xl mx-auto">
+        {/* Main Content */}
+        <main className="flex-1 overflow-y-auto">
+          <div className="max-w-6xl mx-auto p-6">
             {location.pathname === "/super-admin-dashboard" ? (
               <>
-                {/* Financial Metrics Cards */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                  <div
-                    className="shadow rounded-lg p-6"
-                    style={{ backgroundColor: "#1d1d1d" }}
-                  >
-                    <div className="flex items-center">
-                      <FaShoppingCart
-                        className="h-8 w-8"
-                        style={{ color: "#d4af37" }}
-                      />
-                      <div className="ml-4">
-                        <p
-                          className="text-sm font-medium"
-                          style={{ color: "#cccccc" }}
-                        >
-                          Total Units Sold
-                        </p>
-                        <p
-                          className="text-2xl font-bold"
-                          style={{ color: "#ffffff" }}
-                        >
-                          {analytics.total_units_sold || 0}
-                        </p>
+                {/* Metric Cards */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                  <div className="bg-[#111] border border-white/5 rounded-lg p-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-lg bg-gold-500/10 flex items-center justify-center">
+                        <FaShoppingCart className="text-gold-500" />
+                      </div>
+                      <div>
+                        <p className="text-[11px] text-white/40 uppercase tracking-wider">Units Sold</p>
+                        <p className="text-xl font-bold text-white">{analytics.total_units_sold || 0}</p>
                       </div>
                     </div>
                   </div>
-                  <div
-                    className="shadow rounded-lg p-6"
-                    style={{ backgroundColor: "#1d1d1d" }}
-                  >
-                    <div className="flex items-center">
-                      <FaMoneyBillWave
-                        className="h-8 w-8"
-                        style={{ color: "#ef4444" }}
-                      />
-                      <div className="ml-4">
-                        <p
-                          className="text-sm font-medium"
-                          style={{ color: "#cccccc" }}
-                        >
-                          Total Costs
-                        </p>
-                        <p
-                          className="text-2xl font-bold"
-                          style={{ color: "#ffffff" }}
-                        >
-                          PKR {analytics.total_costs?.toLocaleString() || 0}
-                        </p>
+                  <div className="bg-[#111] border border-white/5 rounded-lg p-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-lg bg-red-500/10 flex items-center justify-center">
+                        <FaMoneyBillWave className="text-red-400" />
+                      </div>
+                      <div>
+                        <p className="text-[11px] text-white/40 uppercase tracking-wider">Total Costs</p>
+                        <p className="text-xl font-bold text-white">PKR {analytics.total_costs?.toLocaleString() || 0}</p>
                       </div>
                     </div>
                   </div>
-                  <div
-                    className="shadow rounded-lg p-6"
-                    style={{ backgroundColor: "#1d1d1d" }}
-                  >
-                    <div className="flex items-center">
-                      <FaChartLine
-                        className="h-8 w-8"
-                        style={{ color: "#10b981" }}
-                      />
-                      <div className="ml-4">
-                        <p
-                          className="text-sm font-medium"
-                          style={{ color: "#cccccc" }}
-                        >
-                          Total Profit
-                        </p>
-                        <p
-                          className="text-2xl font-bold"
-                          style={{ color: "#ffffff" }}
-                        >
-                          PKR {analytics.total_profit?.toLocaleString() || 0}
-                        </p>
+                  <div className="bg-[#111] border border-white/5 rounded-lg p-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-lg bg-emerald-500/10 flex items-center justify-center">
+                        <FaChartLine className="text-emerald-400" />
+                      </div>
+                      <div>
+                        <p className="text-[11px] text-white/40 uppercase tracking-wider">Total Profit</p>
+                        <p className="text-xl font-bold text-white">PKR {analytics.total_profit?.toLocaleString() || 0}</p>
                       </div>
                     </div>
                   </div>
-
-                  {/* Commission Revenue Card - Only for Super Admin */}
                   {userData && userData.role === "super_admin" && (
-                    <div
-                      className="shadow rounded-lg p-6"
-                      style={{ backgroundColor: "#1d1d1d" }}
-                    >
-                      <div className="flex items-center">
-                        <FaMoneyBillWave
-                          className="h-8 w-8"
-                          style={{ color: "#4ecdc4" }}
-                        />
-                        <div className="ml-4">
-                          <p
-                            className="text-sm font-medium"
-                            style={{ color: "#cccccc" }}
-                          >
-                            Commission Revenue
-                          </p>
-                          <p
-                            className="text-2xl font-bold"
-                            style={{ color: "#ffffff" }}
-                          >
-                            PKR{" "}
-                            {analytics.total_commission_revenue?.toLocaleString() ||
-                              0}
-                          </p>
+                    <div className="bg-[#111] border border-white/5 rounded-lg p-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-lg bg-cyan-500/10 flex items-center justify-center">
+                          <FaMoneyBillWave className="text-cyan-400" />
+                        </div>
+                        <div>
+                          <p className="text-[11px] text-white/40 uppercase tracking-wider">Commission Revenue</p>
+                          <p className="text-xl font-bold text-white">PKR {analytics.total_commission_revenue?.toLocaleString() || 0}</p>
                         </div>
                       </div>
                     </div>
                   )}
                 </div>
 
-                {/* Financial Charts */}
+                {/* Charts */}
                 {userData && userData.role === "super_admin" ? (
-                  /* Super Admin Charts with Commission Data */
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-                    <div
-                      className="shadow rounded-lg p-6"
-                      style={{ backgroundColor: "#1d1d1d" }}
-                    >
-                      <h3
-                        className="text-lg font-medium mb-4"
-                        style={{ color: "#ffffff" }}
-                      >
-                        Sales & Profit Trends
-                      </h3>
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+                    <div className="bg-[#111] border border-white/5 rounded-lg p-5">
+                      <h3 className="text-sm font-semibold text-white mb-4">Sales & Profit Trends</h3>
                       <SalesChart data={financialTrends} />
                     </div>
-                    <div
-                      className="shadow rounded-lg p-6"
-                      style={{ backgroundColor: "#1d1d1d" }}
-                    >
-                      <h3
-                        className="text-lg font-medium mb-4"
-                        style={{ color: "#ffffff" }}
-                      >
-                        Commission Earnings
-                      </h3>
+                    <div className="bg-[#111] border border-white/5 rounded-lg p-5">
+                      <h3 className="text-sm font-semibold text-white mb-4">Commission Earnings</h3>
                       <CommissionChart data={commissionTrends} />
                     </div>
-                    <div
-                      className="shadow rounded-lg p-6"
-                      style={{ backgroundColor: "#1d1d1d" }}
-                    >
-                      <h3
-                        className="text-lg font-medium mb-4"
-                        style={{ color: "#ffffff" }}
-                      >
-                        Cost Analysis
-                      </h3>
+                    <div className="bg-[#111] border border-white/5 rounded-lg p-5">
+                      <h3 className="text-sm font-semibold text-white mb-4">Cost Analysis</h3>
                       <CostChart data={financialTrends} />
                     </div>
-                    <div
-                      className="shadow rounded-lg p-6"
-                      style={{ backgroundColor: "#1d1d1d" }}
-                    >
-                      <h3
-                        className="text-lg font-medium mb-4"
-                        style={{ color: "#ffffff" }}
-                      >
-                        Revenue Performance
-                      </h3>
+                    <div className="bg-[#111] border border-white/5 rounded-lg p-5">
+                      <h3 className="text-sm font-semibold text-white mb-4">Revenue Performance</h3>
                       <RevenueChart data={financialTrends} />
                     </div>
                   </div>
                 ) : (
-                  /* Manager Charts - Standard Financial Dashboard */
-                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-                    <div
-                      className="shadow rounded-lg p-6"
-                      style={{ backgroundColor: "#1d1d1d" }}
-                    >
-                      <h3
-                        className="text-lg font-medium mb-4"
-                        style={{ color: "#ffffff" }}
-                      >
-                        Sales Trends
-                      </h3>
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
+                    <div className="bg-[#111] border border-white/5 rounded-lg p-5">
+                      <h3 className="text-sm font-semibold text-white mb-4">Sales Trends</h3>
                       <SalesChart data={financialTrends} />
                     </div>
-                    <div
-                      className="shadow rounded-lg p-6"
-                      style={{ backgroundColor: "#1d1d1d" }}
-                    >
-                      <h3
-                        className="text-lg font-medium mb-4"
-                        style={{ color: "#ffffff" }}
-                      >
-                        Cost Trends
-                      </h3>
+                    <div className="bg-[#111] border border-white/5 rounded-lg p-5">
+                      <h3 className="text-sm font-semibold text-white mb-4">Cost Trends</h3>
                       <CostChart data={financialTrends} />
                     </div>
-                    <div
-                      className="shadow rounded-lg p-6"
-                      style={{ backgroundColor: "#1d1d1d" }}
-                    >
-                      <h3
-                        className="text-lg font-medium mb-4"
-                        style={{ color: "#ffffff" }}
-                      >
-                        Profit Trends
-                      </h3>
+                    <div className="bg-[#111] border border-white/5 rounded-lg p-5">
+                      <h3 className="text-sm font-semibold text-white mb-4">Profit Trends</h3>
                       <ProfitChart data={financialTrends} />
                     </div>
                   </div>
                 )}
 
-                {/* Commission Analytics Section - Only for Super Admin */}
-                {userData &&
-                  userData.role === "super_admin" &&
-                  commissionData && (
-                    <div className="mb-8">
-                      <h2
-                        className="text-2xl font-bold mb-6"
-                        style={{ color: "#d4af37" }}
-                      >
-                        Commission Analytics
-                      </h2>
-                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <div
-                          className="shadow rounded-lg p-6"
-                          style={{ backgroundColor: "#1d1d1d" }}
-                        >
-                          <h3
-                            className="text-lg font-medium mb-4"
-                            style={{ color: "#ffffff" }}
-                          >
-                            Store Performance
-                          </h3>
-                          <div className="space-y-4">
-                            {commissionData.store_breakdown &&
-                              commissionData.store_breakdown
-                                .slice(0, 5)
-                                .map((store, index) => (
-                                  <div
-                                    key={index}
-                                    className="flex justify-between items-center p-3 rounded"
-                                    style={{ backgroundColor: "#2d2d2d" }}
-                                  >
-                                    <div>
-                                      <p
-                                        className="font-medium"
-                                        style={{ color: "#ffffff" }}
-                                      >
-                                        {store.store_name}
-                                      </p>
-                                      <p
-                                        className="text-sm"
-                                        style={{ color: "#cccccc" }}
-                                      >
-                                        {store.total_products} Products •{" "}
-                                        {store.total_units_sold} Units Sold
-                                      </p>
-                                    </div>
-                                    <div className="text-right">
-                                      <p
-                                        className="font-bold"
-                                        style={{ color: "#4ecdc4" }}
-                                      >
-                                        PKR{" "}
-                                        {store.total_revenue.toLocaleString()}
-                                      </p>
-                                    </div>
-                                  </div>
-                                ))}
-                          </div>
-                        </div>
-
-                        <div
-                          className="shadow rounded-lg p-6"
-                          style={{ backgroundColor: "#1d1d1d" }}
-                        >
-                          <h3
-                            className="text-lg font-medium mb-4"
-                            style={{ color: "#ffffff" }}
-                          >
-                            Top Commission Earners
-                          </h3>
-                          <div className="space-y-4">
-                            {commissionData.commission_summary &&
-                              commissionData.commission_summary
-                                .slice(0, 5)
-                                .map((item, index) => (
-                                  <div
-                                    key={index}
-                                    className="flex justify-between items-center p-3 rounded"
-                                    style={{ backgroundColor: "#2d2d2d" }}
-                                  >
-                                    <div>
-                                      <p
-                                        className="font-medium"
-                                        style={{ color: "#ffffff" }}
-                                      >
-                                        {item.product_name}
-                                      </p>
-                                      <p
-                                        className="text-sm"
-                                        style={{ color: "#cccccc" }}
-                                      >
-                                        {item.store_name} •{" "}
-                                        {item.commission_type === "percentage"
-                                          ? `${item.commission_value}%`
-                                          : `PKR ${item.commission_value}`}
-                                      </p>
-                                    </div>
-                                    <div className="text-right">
-                                      <p
-                                        className="font-bold"
-                                        style={{ color: "#d4af37" }}
-                                      >
-                                        PKR{" "}
-                                        {item.commission_earned.toLocaleString()}
-                                      </p>
-                                    </div>
-                                  </div>
-                                ))}
-                          </div>
+                {/* Commission Analytics */}
+                {userData && userData.role === "super_admin" && commissionData && (
+                  <div className="mb-6">
+                    <h2 className="text-sm font-semibold text-gold-500 uppercase tracking-wider mb-4">Commission Analytics</h2>
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                      <div className="bg-[#111] border border-white/5 rounded-lg p-5">
+                        <h3 className="text-sm font-semibold text-white mb-4">Store Performance</h3>
+                        <div className="space-y-2.5">
+                          {commissionData.store_breakdown?.slice(0, 5).map((store, i) => (
+                            <div key={i} className="flex justify-between items-center p-3 rounded-lg bg-white/[0.03]">
+                              <div className="min-w-0">
+                                <p className="text-sm font-medium text-white truncate">{store.store_name}</p>
+                                <p className="text-[11px] text-white/30">{store.total_products} Products &bull; {store.total_units_sold} Units</p>
+                              </div>
+                              <p className="text-sm font-bold text-cyan-400 ml-3 whitespace-nowrap">PKR {store.total_revenue.toLocaleString()}</p>
+                            </div>
+                          ))}
                         </div>
                       </div>
-                    </div>
-                  )}
-
-                {/* Recent Orders */}
-                <div
-                  className="shadow overflow-hidden sm:rounded-md"
-                  style={{ backgroundColor: "#1d1d1d" }}
-                >
-                  <div
-                    className="px-4 py-5 sm:px-6 border-b"
-                    style={{ borderColor: "#2d2d2d" }}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h3
-                          className="text-lg leading-6 font-medium"
-                          style={{ color: "#ffffff" }}
-                        >
-                          Recent Orders
-                        </h3>
-                        <p
-                          className="mt-1 max-w-2xl text-sm"
-                          style={{ color: "#999999" }}
-                        >
-                          Latest orders from customers
-                        </p>
+                      <div className="bg-[#111] border border-white/5 rounded-lg p-5">
+                        <h3 className="text-sm font-semibold text-white mb-4">Top Commission Earners</h3>
+                        <div className="space-y-2.5">
+                          {commissionData.commission_summary?.slice(0, 5).map((item, i) => (
+                            <div key={i} className="flex justify-between items-center p-3 rounded-lg bg-white/[0.03]">
+                              <div className="min-w-0">
+                                <p className="text-sm font-medium text-white truncate">{item.product_name}</p>
+                                <p className="text-[11px] text-white/30">{item.store_name} &bull; {item.commission_type === "percentage" ? `${item.commission_value}%` : `PKR ${item.commission_value}`}</p>
+                              </div>
+                              <p className="text-sm font-bold text-gold-500 ml-3 whitespace-nowrap">PKR {item.commission_earned.toLocaleString()}</p>
+                            </div>
+                          ))}
+                        </div>
                       </div>
-                      <button
-                        className="px-3 py-1 rounded-md text-sm transition-colors duration-200"
-                        style={{
-                          backgroundColor: "#d4af37",
-                          color: "#000000",
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.backgroundColor = "#b8860b";
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.backgroundColor = "#d4af37";
-                        }}
-                      >
-                        View All
-                      </button>
                     </div>
                   </div>
-                  <ul className="divide-y" style={{ borderColor: "#2d2d2d" }}>
-                    {recentOrders.length > 0 ? (
-                      recentOrders.map((order, index) => (
-                        <li
-                          key={order.id}
-                          className="transition-colors duration-150"
-                          style={{
-                            backgroundColor:
-                              index % 2 === 0 ? "#1d1d1d" : "#2d2d2d",
-                          }}
-                          onMouseEnter={(e) => {
-                            e.currentTarget.style.backgroundColor = "#1f1f1f";
-                          }}
-                          onMouseLeave={(e) => {
-                            e.currentTarget.style.backgroundColor =
-                              index % 2 === 0 ? "#1d1d1d" : "#2d2d2d";
-                          }}
-                        >
-                          <div className="px-4 py-4 sm:px-6">
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center">
-                                <p
-                                  className="text-sm font-medium truncate mr-2 transition-colors duration-200"
-                                  style={{ color: "#d4af37" }}
-                                >
-                                  Order #{order.id}
-                                </p>
-                                <p className="flex-shrink-0 flex">
-                                  <span
-                                    className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
-                                    style={{
-                                      backgroundColor:
-                                        order.status === "delivered"
-                                          ? "rgba(72, 187, 120, 0.2)"
-                                          : order.status === "shipped"
-                                          ? "rgba(66, 153, 225, 0.2)"
-                                          : order.status === "processing"
-                                          ? "rgba(237, 137, 54, 0.2)"
-                                          : "rgba(160, 174, 192, 0.2)",
-                                      color:
-                                        order.status === "delivered"
-                                          ? "#48bb78"
-                                          : order.status === "shipped"
-                                          ? "#4299e1"
-                                          : order.status === "processing"
-                                          ? "#ed8936"
-                                          : "#a0aec0",
-                                    }}
-                                  >
-                                    {order.status}
-                                  </span>
-                                </p>
-                              </div>
-                              <div className="ml-2 flex-shrink-0 flex">
-                                <p
-                                  className="text-sm font-medium"
-                                  style={{ color: "#ffffff" }}
-                                >
-                                  PKR {order.total_amount}
-                                </p>
-                              </div>
-                            </div>
-                            <div className="mt-2 sm:flex sm:justify-between">
-                              <div className="sm:flex">
-                                <p
-                                  className="flex items-center text-sm"
-                                  style={{ color: "#cccccc" }}
-                                >
-                                  By{" "}
-                                  <span
-                                    className="font-medium ml-1"
-                                    style={{ color: "#ffffff" }}
-                                  >
-                                    {order.user_email}
-                                  </span>{" "}
-                                  •{" "}
-                                  <span className="ml-1 flex items-center">
-                                    <FaCalendarAlt
-                                      className="mr-1"
-                                      style={{ color: "#d4af37" }}
-                                    />
-                                    {new Date(
-                                      order.created_at
-                                    ).toLocaleDateString()}
-                                  </span>
-                                </p>
-                              </div>
-                            </div>
-                          </div>
-                        </li>
-                      ))
-                    ) : (
-                      <li>
-                        <div className="px-4 py-8 sm:px-6 text-center">
-                          <p className="text-sm" style={{ color: "#999999" }}>
-                            No recent orders
-                          </p>
-                        </div>
-                      </li>
-                    )}
-                  </ul>
+                )}
+
+                {/* Recent Orders */}
+                <div className="bg-[#111] border border-white/5 rounded-lg overflow-hidden">
+                  <div className="px-5 py-4 border-b border-white/5 flex items-center justify-between">
+                    <div>
+                      <h3 className="text-sm font-semibold text-white">Recent Orders</h3>
+                      <p className="text-[11px] text-white/30 mt-0.5">Latest orders from customers</p>
+                    </div>
+                    <Link to="/super-admin-dashboard/orders" className="text-xs text-gold-500 hover:text-gold-600 font-medium transition-colors">
+                      View All
+                    </Link>
+                  </div>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b border-white/5">
+                          <th className="text-left px-5 py-3 text-[11px] font-medium text-white/30 uppercase tracking-wider">Order</th>
+                          <th className="text-left px-5 py-3 text-[11px] font-medium text-white/30 uppercase tracking-wider">Customer</th>
+                          <th className="text-left px-5 py-3 text-[11px] font-medium text-white/30 uppercase tracking-wider">Status</th>
+                          <th className="text-left px-5 py-3 text-[11px] font-medium text-white/30 uppercase tracking-wider">Date</th>
+                          <th className="text-right px-5 py-3 text-[11px] font-medium text-white/30 uppercase tracking-wider">Amount</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-white/5">
+                        {recentOrders.length > 0 ? (
+                          recentOrders.map((order) => (
+                            <tr key={order.id} className="hover:bg-white/[0.02] transition-colors">
+                              <td className="px-5 py-3 text-gold-500 font-medium">#{order.id}</td>
+                              <td className="px-5 py-3 text-white/60 truncate max-w-[200px]">{order.user_email}</td>
+                              <td className="px-5 py-3">
+                                <span className={`inline-block px-2 py-0.5 rounded text-[11px] font-medium ${
+                                  order.status === "delivered" ? "bg-emerald-500/10 text-emerald-400" :
+                                  order.status === "shipped" ? "bg-blue-500/10 text-blue-400" :
+                                  order.status === "processing" ? "bg-amber-500/10 text-amber-400" :
+                                  "bg-white/5 text-white/40"
+                                }`}>
+                                  {order.status}
+                                </span>
+                              </td>
+                              <td className="px-5 py-3 text-white/40 text-xs">
+                                <FaCalendarAlt className="inline mr-1 text-gold-500/50" />
+                                {new Date(order.created_at).toLocaleDateString()}
+                              </td>
+                              <td className="px-5 py-3 text-right font-semibold text-white">PKR {order.total_amount}</td>
+                            </tr>
+                          ))
+                        ) : (
+                          <tr>
+                            <td colSpan="5" className="px-5 py-8 text-center text-white/30 text-sm">No recent orders</td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               </>
             ) : (
               <Outlet />
             )}
           </div>
+          <SmartFooter variant="simple" />
         </main>
       </div>
-
-      <SmartFooter variant="simple" />
     </div>
   );
 };
