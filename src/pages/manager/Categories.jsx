@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { FaEdit, FaTrash, FaPlus, FaSearch } from "react-icons/fa";
+import toast from "react-hot-toast";
 
 const ManagerCategories = () => {
   const [categories, setCategories] = useState([]);
@@ -7,33 +8,19 @@ const ManagerCategories = () => {
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingCategory, setEditingCategory] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [formData, setFormData] = useState({
-    name: "",
-    description: "",
-    parent_id: "",
-  });
+  const [formData, setFormData] = useState({ name: "", description: "", parent_id: "" });
 
-  useEffect(() => {
-    fetchCategories();
-  }, []);
+  useEffect(() => { fetchCategories(); }, []);
 
-  useEffect(() => {
-    fetchCategories(searchTerm);
-  }, [searchTerm]);
+  useEffect(() => { fetchCategories(searchTerm); }, [searchTerm]);
 
   const fetchCategories = async (search = "") => {
     try {
       const token = localStorage.getItem("token");
       const url = search
-        ? `http://localhost:5000/api/categories?search=${encodeURIComponent(
-            search
-          )}`
+        ? `http://localhost:5000/api/categories?search=${encodeURIComponent(search)}`
         : "http://localhost:5000/api/categories";
-      const response = await fetch(url, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
       const data = await response.json();
       setCategories(data.categories || []);
       setLoading(false);
@@ -51,246 +38,113 @@ const ManagerCategories = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const token = localStorage.getItem("token");
-
     try {
       const url = editingCategory
         ? `http://localhost:5000/api/categories/${editingCategory.id}`
         : "http://localhost:5000/api/categories";
       const method = editingCategory ? "PUT" : "POST";
-
       const response = await fetch(url, {
         method,
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify(formData),
       });
-
       if (response.ok) {
         fetchCategories();
         setShowAddForm(false);
         setEditingCategory(null);
         setFormData({ name: "", description: "", parent_id: "" });
-        alert(editingCategory ? "Category updated!" : "Category added!");
+        toast.success(editingCategory ? "Category updated!" : "Category added!");
       } else {
         const errorData = await response.json();
-        alert(`Error saving category: ${errorData.message || "Unknown error"}`);
+        toast.error(`Error: ${errorData.message || "Unknown error"}`);
       }
     } catch (error) {
       console.error("Error saving category:", error);
-      alert("Error saving category");
+      toast.error("Error saving category");
     }
   };
 
   const handleEdit = (category) => {
     setEditingCategory(category);
-    setFormData({
-      name: category.name,
-      description: category.description || "",
-      parent_id: category.parent_id || "",
-    });
+    setFormData({ name: category.name, description: category.description || "", parent_id: category.parent_id || "" });
     setShowAddForm(true);
   };
 
   const handleDelete = async (categoryId) => {
-    if (!confirm("Are you sure you want to delete this category?")) return;
-
+    if (!window.confirm("Are you sure you want to delete this category?")) return;
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(
-        `http://localhost:5000/api/categories/${categoryId}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
+      const response = await fetch(`http://localhost:5000/api/categories/${categoryId}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
       if (response.ok) {
         fetchCategories();
-        alert("Category deleted!");
+        toast.success("Category deleted!");
       } else {
-        alert("Error deleting category");
+        toast.error("Error deleting category");
       }
     } catch (error) {
       console.error("Error deleting category:", error);
-      alert("Error deleting category");
+      toast.error("Error deleting category");
     }
   };
 
   if (loading) {
     return (
-      <div
-        className="flex justify-center items-center h-screen"
-        style={{ backgroundColor: "#000000", color: "#ffffff" }}
-      >
+      <div className="flex justify-center items-center h-64">
         <div className="flex flex-col items-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-yellow-500 mb-4"></div>
-          <span>Loading categories...</span>
+          <div className="animate-spin rounded-full h-8 w-8 border-2 border-gold-500/20 border-t-gold-500 mb-3"></div>
+          <span className="text-white/40 text-sm">Loading categories...</span>
         </div>
       </div>
     );
   }
 
+  const inputClass = "w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm placeholder:text-white/20 focus:outline-none focus:border-gold-500/40 transition-all";
+
   return (
-    <div className="max-w-7xl mx-auto">
+    <div>
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold" style={{ color: "#d4af37" }}>
-          Categories Management
-        </h2>
+        <h2 className="text-xl font-bold" style={{ color: "#D4AF37" }}>Categories Management</h2>
         <button
-          onClick={() => {
-            setShowAddForm(true);
-            setEditingCategory(null);
-            setFormData({ name: "", description: "" });
-          }}
-          className="flex items-center px-4 py-2 rounded-md transition-all duration-200"
-          style={{
-            backgroundColor: "#d4af37",
-            color: "#000000",
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = "#b8860b";
-            e.currentTarget.style.transform = "translateY(-1px)";
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = "#d4af37";
-            e.currentTarget.style.transform = "translateY(0)";
-          }}
+          onClick={() => { setShowAddForm(true); setEditingCategory(null); setFormData({ name: "", description: "", parent_id: "" }); }}
+          className="flex items-center gap-2 px-4 py-2 text-sm font-semibold rounded-lg transition-colors"
+          style={{ backgroundColor: "#D4AF37", color: "#000000" }}
         >
-          <FaPlus className="mr-2" />
-          Add Category
+          <FaPlus size={12} /> Add Category
         </button>
       </div>
 
       {showAddForm && (
-        <div
-          className="mb-6 p-6 rounded-lg"
-          style={{ backgroundColor: "#1d1d1d" }}
-        >
-          <h3 className="text-lg font-medium mb-4" style={{ color: "#d4af37" }}>
+        <div className="mb-6 p-6 bg-[#111] border border-white/5 rounded-lg">
+          <h3 className="text-sm font-semibold mb-4" style={{ color: "#D4AF37" }}>
             {editingCategory ? "Edit Category" : "Add New Category"}
           </h3>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label
-                className="block text-sm font-medium mb-2"
-                style={{ color: "#ffffff" }}
-              >
-                Category Name *
-              </label>
-              <input
-                type="text"
-                name="name"
-                value={formData.name}
-                onChange={handleInputChange}
-                className="w-full px-3 py-2 rounded transition-colors duration-200"
-                style={{
-                  backgroundColor: "#2d2d2d",
-                  color: "#ffffff",
-                  border: "1px solid #3d3d3d",
-                }}
-                onFocus={(e) => {
-                  e.currentTarget.style.borderColor = "#d4af37";
-                }}
-                onBlur={(e) => {
-                  e.currentTarget.style.borderColor = "#3d3d3d";
-                }}
-                required
-              />
+              <label className="block text-[11px] text-white/40 uppercase tracking-wider mb-1.5">Category Name *</label>
+              <input type="text" name="name" value={formData.name} onChange={handleInputChange} className={inputClass} required />
             </div>
             <div>
-              <label
-                className="block text-sm font-medium mb-2"
-                style={{ color: "#ffffff" }}
-              >
-                Description
-              </label>
-              <textarea
-                name="description"
-                value={formData.description}
-                onChange={handleInputChange}
-                rows={3}
-                className="w-full px-3 py-2 rounded transition-colors duration-200"
-                style={{
-                  backgroundColor: "#2d2d2d",
-                  color: "#ffffff",
-                  border: "1px solid #3d3d3d",
-                }}
-                onFocus={(e) => {
-                  e.currentTarget.style.borderColor = "#d4af37";
-                }}
-                onBlur={(e) => {
-                  e.currentTarget.style.borderColor = "#3d3d3d";
-                }}
-              />
+              <label className="block text-[11px] text-white/40 uppercase tracking-wider mb-1.5">Description</label>
+              <textarea name="description" value={formData.description} onChange={handleInputChange} rows={3} className={inputClass} />
             </div>
             <div>
-              <label
-                className="block text-sm font-medium mb-2"
-                style={{ color: "#ffffff" }}
-              >
-                Parent Category
-              </label>
-              <select
-                name="parent_id"
-                value={formData.parent_id}
-                onChange={handleInputChange}
-                className="w-full px-3 py-2 rounded transition-colors duration-200"
-                style={{
-                  backgroundColor: "#2d2d2d",
-                  color: "#ffffff",
-                  border: "1px solid #3d3d3d",
-                }}
-                onFocus={(e) => {
-                  e.currentTarget.style.borderColor = "#d4af37";
-                }}
-                onBlur={(e) => {
-                  e.currentTarget.style.borderColor = "#3d3d3d";
-                }}
-              >
-                <option value="">None (Top Level)</option>
+              <label className="block text-[11px] text-white/40 uppercase tracking-wider mb-1.5">Parent Category</label>
+              <select name="parent_id" value={formData.parent_id} onChange={handleInputChange} className={inputClass}>
+                <option value="" className="bg-[#111]">None (Top Level)</option>
                 {categories.map((category) => (
-                  <option key={category.id} value={category.id}>
-                    {category.name}
-                  </option>
+                  <option key={category.id} value={category.id} className="bg-[#111]">{category.name}</option>
                 ))}
               </select>
             </div>
-            <div className="flex justify-end space-x-4">
-              <button
-                type="button"
-                onClick={() => {
-                  setShowAddForm(false);
-                  setEditingCategory(null);
-                  setFormData({ name: "", description: "" });
-                }}
-                className="px-4 py-2 rounded transition-colors duration-200"
-                style={{
-                  backgroundColor: "#555555",
-                  color: "#ffffff",
-                }}
-              >
+            <div className="flex justify-end gap-3">
+              <button type="button" onClick={() => { setShowAddForm(false); setEditingCategory(null); setFormData({ name: "", description: "", parent_id: "" }); }}
+                className="px-4 py-2 bg-white/5 text-white/60 text-sm rounded-lg hover:bg-white/10 transition-colors">
                 Cancel
               </button>
-              <button
-                type="submit"
-                className="px-4 py-2 rounded transition-all duration-200"
-                style={{
-                  backgroundColor: "#d4af37",
-                  color: "#000000",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = "#b8860b";
-                  e.currentTarget.style.transform = "translateY(-1px)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = "#d4af37";
-                  e.currentTarget.style.transform = "translateY(0)";
-                }}
-              >
+              <button type="submit" className="px-4 py-2 text-sm font-semibold rounded-lg transition-colors" style={{ backgroundColor: "#D4AF37", color: "#000000" }}>
                 {editingCategory ? "Update" : "Add"} Category
               </button>
             </div>
@@ -298,150 +152,48 @@ const ManagerCategories = () => {
         </div>
       )}
 
-      <div
-        className="shadow overflow-hidden sm:rounded-md"
-        style={{ backgroundColor: "#1d1d1d" }}
-      >
-        <div
-          className="px-4 py-5 sm:px-6 border-b"
-          style={{ borderColor: "#2d2d2d" }}
-        >
-          <div className="flex justify-between items-center">
-            <div>
-              <h3
-                className="text-lg leading-6 font-medium"
-                style={{ color: "#ffffff" }}
-              >
-                Manage Categories
-              </h3>
-              <p
-                className="mt-1 max-w-2xl text-sm"
-                style={{ color: "#999999" }}
-              >
-                View and manage all categories
-              </p>
-            </div>
-            <div className="flex items-center">
-              <div className="relative">
-                <FaSearch
-                  className="absolute left-3 top-1/2 transform -translate-y-1/2"
-                  style={{ color: "#999999" }}
-                />
-                <input
-                  type="text"
-                  placeholder="Search categories..."
-                  value={searchTerm}
-                  onChange={(e) => {
-                    setSearchTerm(e.target.value);
-                  }}
-                  className="pl-10 pr-4 py-2 rounded-md transition-colors duration-200"
-                  style={{
-                    backgroundColor: "#2d2d2d",
-                    color: "#ffffff",
-                    border: "1px solid #3d3d3d",
-                  }}
-                  onFocus={(e) => {
-                    e.currentTarget.style.borderColor = "#d4af37";
-                  }}
-                  onBlur={(e) => {
-                    e.currentTarget.style.borderColor = "#3d3d3d";
-                  }}
-                />
-              </div>
-            </div>
+      <div className="bg-[#111] border border-white/5 rounded-lg overflow-hidden">
+        <div className="px-5 py-4 border-b border-white/5 flex items-center justify-between">
+          <div>
+            <h3 className="text-sm font-semibold text-white">Manage Categories</h3>
+            <p className="text-[11px] text-white/30 mt-0.5">View and manage all categories</p>
+          </div>
+          <div className="relative">
+            <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-white/20" size={12} />
+            <input type="text" placeholder="Search categories..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-9 pr-3 py-1.5 bg-white/5 border border-white/10 rounded-lg text-white text-sm placeholder:text-white/20 focus:outline-none focus:border-gold-500/40 w-48" />
           </div>
         </div>
         <div className="overflow-x-auto">
-          <table className="min-w-full">
-            <thead style={{ backgroundColor: "#2d2d2d" }}>
-              <tr>
-                <th
-                  className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
-                  style={{ color: "#d4af37" }}
-                >
-                  Name
-                </th>
-                <th
-                  className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
-                  style={{ color: "#d4af37" }}
-                >
-                  Description
-                </th>
-                <th
-                  className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider"
-                  style={{ color: "#d4af37" }}
-                >
-                  Actions
-                </th>
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-white/5">
+                <th className="text-left px-5 py-3 text-[11px] font-medium text-white/30 uppercase tracking-wider">Name</th>
+                <th className="text-left px-5 py-3 text-[11px] font-medium text-white/30 uppercase tracking-wider">Description</th>
+                <th className="text-left px-5 py-3 text-[11px] font-medium text-white/30 uppercase tracking-wider">Actions</th>
               </tr>
             </thead>
-            <tbody style={{ backgroundColor: "#1d1d1d" }}>
-              {categories.map((category, index) => (
-                <tr
-                  key={category.id}
-                  className="transition-colors duration-150"
-                  style={{
-                    borderBottom: "1px solid #2d2d2d",
-                    backgroundColor: index % 2 === 0 ? "#1d1d1d" : "#2d2d2d",
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = "#1f1f1f";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor =
-                      index % 2 === 0 ? "#1d1d1d" : "#2d2d2d";
-                  }}
-                >
-                  <td
-                    className="px-6 py-4 whitespace-nowrap text-sm font-medium"
-                    style={{ color: "#ffffff" }}
-                  >
-                    {category.name}
-                  </td>
-                  <td
-                    className="px-6 py-4 text-sm"
-                    style={{ color: "#cccccc" }}
-                  >
-                    {category.description || "No description"}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <button
-                      onClick={() => handleEdit(category)}
-                      className="mr-4 transition-colors duration-200"
-                      style={{ color: "#d4af37" }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.color = "#b8860b";
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.color = "#d4af37";
-                      }}
-                    >
-                      <FaEdit className="inline mr-1" />
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => handleDelete(category.id)}
-                      className="transition-colors duration-200"
-                      style={{ color: "#e53e3e" }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.color = "#c53030";
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.color = "#e53e3e";
-                      }}
-                    >
-                      <FaTrash className="inline mr-1" />
-                      Delete
-                    </button>
+            <tbody className="divide-y divide-white/5">
+              {categories.map((category) => (
+                <tr key={category.id} className="hover:bg-white/[0.02] transition-colors">
+                  <td className="px-5 py-3 text-white font-medium">{category.name}</td>
+                  <td className="px-5 py-3 text-white/50">{category.description || "No description"}</td>
+                  <td className="px-5 py-3">
+                    <div className="flex items-center gap-3">
+                      <button onClick={() => handleEdit(category)} className="text-xs font-medium transition-colors" style={{ color: "#D4AF37" }}>
+                        <FaEdit className="inline mr-1" size={11} />Edit
+                      </button>
+                      <button onClick={() => handleDelete(category.id)} className="text-red-400 hover:text-red-500 text-xs font-medium transition-colors">
+                        <FaTrash className="inline mr-1" size={11} />Delete
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
           {categories.length === 0 && (
-            <div className="text-center py-8" style={{ color: "#999999" }}>
-              No categories found. Add your first category to get started.
-            </div>
+            <div className="text-center py-8 text-white/30 text-sm">No categories found. Add your first category to get started.</div>
           )}
         </div>
       </div>

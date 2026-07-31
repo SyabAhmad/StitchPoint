@@ -1,12 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  FaEye,
-  FaTruck,
-  FaCheckCircle,
-  FaClock,
-  FaBox,
-  FaTimes,
-} from "react-icons/fa";
+import { FaEye, FaTruck, FaCheckCircle, FaClock, FaBox, FaTimes } from "react-icons/fa";
 import toast from "react-hot-toast";
 
 const ManagerOrders = () => {
@@ -18,54 +11,31 @@ const ManagerOrders = () => {
 
   const fetchOrders = () => {
     const token = localStorage.getItem("token");
-
     fetch("http://localhost:5000/api/orders/manager/all", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      headers: { Authorization: `Bearer ${token}` },
     })
       .then((response) => response.json())
-      .then((data) => {
-        setOrders(Array.isArray(data) ? data : []);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error("Error fetching orders:", error);
-        toast.error("Failed to load orders");
-        setLoading(false);
-      });
+      .then((data) => { setOrders(Array.isArray(data) ? data : []); setLoading(false); })
+      .catch((error) => { console.error("Error fetching orders:", error); toast.error("Failed to load orders"); setLoading(false); });
   };
 
-  useEffect(() => {
-    fetchOrders();
-  }, []);
+  useEffect(() => { fetchOrders(); }, []);
 
   const handleStatusChange = async (orderId, status) => {
     setUpdating(true);
     const token = localStorage.getItem("token");
-
     try {
-      const response = await fetch(
-        `http://localhost:5000/api/orders/${orderId}`,
-        {
-          method: "PUT",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ status }),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to update order status");
-      }
-
+      const response = await fetch(`http://localhost:5000/api/orders/${orderId}`, {
+        method: "PUT",
+        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+        body: JSON.stringify({ status }),
+      });
+      if (!response.ok) throw new Error("Failed to update order status");
       toast.success(`Order status updated to ${status}`);
       setSelectedOrder(null);
       setNewStatus("");
       setUpdating(false);
-      fetchOrders(); // Refresh orders
+      fetchOrders();
     } catch (error) {
       console.error("Error updating status:", error);
       toast.error("Failed to update order status");
@@ -75,13 +45,10 @@ const ManagerOrders = () => {
 
   if (loading) {
     return (
-      <div
-        className="flex justify-center items-center h-screen"
-        style={{ backgroundColor: "#000000", color: "#ffffff" }}
-      >
+      <div className="flex justify-center items-center h-64">
         <div className="flex flex-col items-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-yellow-500 mb-4"></div>
-          <span>Loading orders...</span>
+          <div className="animate-spin rounded-full h-8 w-8 border-2 border-gold-500/20 border-t-gold-500 mb-3"></div>
+          <span className="text-white/40 text-sm">Loading orders...</span>
         </div>
       </div>
     );
@@ -89,294 +56,117 @@ const ManagerOrders = () => {
 
   const getStatusIcon = (status) => {
     switch (status) {
-      case "delivered":
-        return <FaCheckCircle />;
-      case "shipped":
-        return <FaTruck />;
-      case "processing":
-        return <FaBox />;
-      default:
-        return <FaClock />;
-    }
-  };
-
-  const getStatusStyle = (status) => {
-    switch (status) {
-      case "delivered":
-        return {
-          backgroundColor: "rgba(72, 187, 120, 0.2)",
-          color: "#48bb78",
-        };
-      case "shipped":
-        return {
-          backgroundColor: "rgba(66, 153, 225, 0.2)",
-          color: "#4299e1",
-        };
-      case "processing":
-        return {
-          backgroundColor: "rgba(237, 137, 54, 0.2)",
-          color: "#ed8936",
-        };
-      default:
-        return {
-          backgroundColor: "rgba(160, 174, 192, 0.2)",
-          color: "#a0aec0",
-        };
+      case "delivered": return <FaCheckCircle />;
+      case "shipped": return <FaTruck />;
+      case "processing": return <FaBox />;
+      default: return <FaClock />;
     }
   };
 
   return (
-    <div className="max-w-7xl mx-auto p-4">
-      <h2 className="text-2xl font-bold mb-6" style={{ color: "#d4af37" }}>
-        📦 Orders Management
-      </h2>
+    <div>
+      <h2 className="text-xl font-bold text-gold-500 mb-6">Orders Management</h2>
 
-      <div
-        className="shadow overflow-hidden sm:rounded-md"
-        style={{ backgroundColor: "#1d1d1d" }}
-      >
-        <div
-          className="px-4 py-5 sm:px-6 border-b"
-          style={{ borderColor: "#2d2d2d" }}
-        >
-          <h3
-            className="text-lg leading-6 font-medium"
-            style={{ color: "#ffffff" }}
-          >
-            Manage Orders
-          </h3>
-          <p className="mt-1 max-w-2xl text-sm" style={{ color: "#999999" }}>
-            👇 Click on any order to view details and update status
-          </p>
+      <div className="bg-[#111] border border-white/5 rounded-lg overflow-hidden">
+        <div className="px-5 py-4 border-b border-white/5">
+          <h3 className="text-sm font-semibold text-white">Manage Orders</h3>
+          <p className="text-[11px] text-white/30 mt-0.5">Click on any order to view details and update status</p>
         </div>
-        <ul className="divide-y" style={{ borderColor: "#2d2d2d" }}>
+        <div className="divide-y divide-white/5">
           {orders.length > 0 ? (
-            orders.map((order, index) => (
-              <li
-                key={order.id}
-                className="transition-colors duration-150 cursor-pointer"
-                style={{
-                  backgroundColor: index % 2 === 0 ? "#1d1d1d" : "#2d2d2d",
-                }}
-                onClick={() => {
-                  setSelectedOrder(order);
-                  setNewStatus(order.status);
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = "#262626";
-                  e.currentTarget.style.transform = "scale(1.01)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor =
-                    index % 2 === 0 ? "#1d1d1d" : "#2d2d2d";
-                  e.currentTarget.style.transform = "scale(1)";
-                }}
-              >
-                <div className="px-4 py-4 sm:px-6">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center">
-                      <p
-                        className="text-sm font-medium truncate mr-2 transition-colors duration-200"
-                        style={{ color: "#d4af37" }}
-                      >
-                        Order #{order.id}
-                      </p>
-                      <span
-                        className="px-2 py-1 text-xs leading-5 font-semibold rounded-full flex items-center"
-                        style={getStatusStyle(order.status)}
-                      >
-                        <span className="mr-1">
-                          {getStatusIcon(order.status)}
-                        </span>
-                        {order.status}
-                      </span>
-                    </div>
-                    <div className="ml-2 flex-shrink-0 flex items-center">
-                      <p
-                        className="text-sm font-medium mr-4"
-                        style={{ color: "#ffffff" }}
-                      >
-                        PKR {order.total_amount}
-                      </p>
-                      <FaEye style={{ color: "#d4af37" }} />
-                    </div>
+            orders.map((order) => (
+              <div key={order.id}
+                className="px-5 py-4 hover:bg-white/[0.02] transition-colors cursor-pointer"
+                onClick={() => { setSelectedOrder(order); setNewStatus(order.status); }}>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <span className="text-gold-500 font-medium text-sm">Order #{order.id}</span>
+                    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-medium ${
+                      order.status === "delivered" ? "bg-emerald-500/10 text-emerald-400" :
+                      order.status === "shipped" ? "bg-blue-500/10 text-blue-400" :
+                      order.status === "processing" ? "bg-amber-500/10 text-amber-400" :
+                      order.status === "cancelled" ? "bg-red-500/10 text-red-400" :
+                      "bg-white/5 text-white/40"
+                    }`}>
+                      {getStatusIcon(order.status)} {order.status}
+                    </span>
                   </div>
-                  <div className="mt-2 sm:flex sm:justify-between">
-                    <div className="sm:flex">
-                      <p
-                        className="flex items-center text-sm"
-                        style={{ color: "#cccccc" }}
-                      >
-                        By{" "}
-                        <span
-                          className="font-medium ml-1"
-                          style={{ color: "#ffffff" }}
-                        >
-                          {order.customer_name}
-                        </span>{" "}
-                        •{" "}
-                        <span className="ml-1">
-                          {new Date(order.created_at).toLocaleDateString()}
-                        </span>
-                      </p>
-                    </div>
+                  <div className="flex items-center gap-4">
+                    <span className="text-sm font-semibold text-white">PKR {order.total_amount}</span>
+                    <FaEye className="text-gold-500/50" size={14} />
                   </div>
                 </div>
-              </li>
+                <div className="mt-1.5">
+                  <span className="text-xs text-white/40">
+                    By <span className="text-white/60">{order.customer_name}</span> &bull; {new Date(order.created_at).toLocaleDateString()}
+                  </span>
+                </div>
+              </div>
             ))
           ) : (
-            <li>
-              <div className="px-4 py-8 sm:px-6 text-center">
-                <p className="text-sm" style={{ color: "#999999" }}>
-                  No orders found
-                </p>
-              </div>
-            </li>
+            <div className="px-5 py-8 text-center text-white/30 text-sm">No orders found</div>
           )}
-        </ul>
+        </div>
       </div>
 
       {/* Order Detail Modal */}
       {selectedOrder && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
-          onClick={() => setSelectedOrder(null)}
-        >
-          <div
-            className="bg-gray-900 rounded-lg shadow-lg p-6 max-w-2xl w-full max-h-screen overflow-y-auto"
-            style={{ backgroundColor: "#1d1d1d" }}
-            onClick={(e) => e.stopPropagation()}
-          >
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center p-4 z-50" onClick={() => setSelectedOrder(null)}>
+          <div className="bg-[#111] border border-white/5 rounded-lg shadow-lg p-6 max-w-2xl w-full max-h-screen overflow-y-auto" onClick={(e) => e.stopPropagation()}>
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-2xl font-bold" style={{ color: "#d4af37" }}>
-                Order #{selectedOrder.id}
-              </h3>
-              <button
-                onClick={() => setSelectedOrder(null)}
-                className="text-gray-400 hover:text-white transition"
-              >
-                <FaTimes size={24} />
+              <h3 className="text-lg font-bold text-gold-500">Order #{selectedOrder.id}</h3>
+              <button onClick={() => setSelectedOrder(null)} className="text-white/30 hover:text-white transition-colors">
+                <FaTimes size={18} />
               </button>
             </div>
 
-            {/* Customer Info */}
-            <div
-              className="mb-6 pb-4"
-              style={{ borderBottom: "1px solid #2d2d2d" }}
-            >
-              <p style={{ color: "#cccccc" }} className="mb-2">
-                <span style={{ color: "#d4af37" }} className="font-semibold">
-                  Customer:
-                </span>{" "}
-                {selectedOrder.customer_name}
-              </p>
-              <p style={{ color: "#cccccc" }} className="mb-2">
-                <span style={{ color: "#d4af37" }} className="font-semibold">
-                  Email:
-                </span>{" "}
-                {selectedOrder.customer_email}
-              </p>
-              <p style={{ color: "#cccccc" }}>
-                <span style={{ color: "#d4af37" }} className="font-semibold">
-                  Order Date:
-                </span>{" "}
-                {new Date(selectedOrder.created_at).toLocaleDateString()}
-              </p>
+            <div className="mb-5 pb-4 border-b border-white/5">
+              <p className="text-sm text-white/60 mb-1"><span className="text-gold-500 font-medium">Customer:</span> {selectedOrder.customer_name}</p>
+              <p className="text-sm text-white/60 mb-1"><span className="text-gold-500 font-medium">Email:</span> {selectedOrder.customer_email}</p>
+              <p className="text-sm text-white/60"><span className="text-gold-500 font-medium">Order Date:</span> {new Date(selectedOrder.created_at).toLocaleDateString()}</p>
             </div>
 
-            {/* Items */}
-            <div
-              className="mb-6 pb-4"
-              style={{ borderBottom: "1px solid #2d2d2d" }}
-            >
-              <h4 style={{ color: "#d4af37" }} className="font-bold mb-3">
-                📦 Items:
-              </h4>
-              <div>
+            <div className="mb-5 pb-4 border-b border-white/5">
+              <h4 className="text-sm font-semibold text-gold-500 mb-3">Items</h4>
+              <div className="space-y-2">
                 {selectedOrder.items && selectedOrder.items.length > 0 ? (
                   selectedOrder.items.map((item, idx) => (
-                    <div
-                      key={idx}
-                      style={{ color: "#cccccc", backgroundColor: "#2d2d2d" }}
-                      className="mb-3 p-2 rounded"
-                    >
-                      <p className="font-semibold">
-                        Product ID: {item.product_id}
-                      </p>
-                      <p>Quantity: {item.quantity}</p>
-                      <p>Price: PKR {item.price}</p>
+                    <div key={idx} className="p-3 bg-white/[0.03] rounded-lg text-sm">
+                      <p className="text-white font-medium">Product ID: {item.product_id}</p>
+                      <p className="text-white/50">Qty: {item.quantity} &bull; PKR {item.price}</p>
                     </div>
                   ))
                 ) : (
-                  <p style={{ color: "#999999" }}>No items in this order</p>
+                  <p className="text-sm text-white/30">No items in this order</p>
                 )}
               </div>
             </div>
 
-            {/* Address */}
-            <div
-              className="mb-6 pb-4"
-              style={{ borderBottom: "1px solid #2d2d2d" }}
-            >
-              <h4 style={{ color: "#d4af37" }} className="font-bold mb-2">
-                📍 Shipping Address:
-              </h4>
-              <p style={{ color: "#cccccc" }}>
-                {selectedOrder.shipping_address || "No address provided"}
-              </p>
+            <div className="mb-5 pb-4 border-b border-white/5">
+              <h4 className="text-sm font-semibold text-gold-500 mb-2">Shipping Address</h4>
+              <p className="text-sm text-white/60">{selectedOrder.shipping_address || "No address provided"}</p>
             </div>
 
-            {/* Status Update */}
-            <div
-              className="mb-6 pb-4"
-              style={{ borderBottom: "1px solid #2d2d2d" }}
-            >
-              <h4 style={{ color: "#d4af37" }} className="font-bold mb-3">
-                🔄 Update Status:
-              </h4>
-              <select
-                value={newStatus}
-                onChange={(e) => setNewStatus(e.target.value)}
-                className="w-full px-3 py-2 rounded mb-3"
-                style={{
-                  backgroundColor: "#2d2d2d",
-                  color: "#ffffff",
-                  border: "1px solid #3d3d3d",
-                }}
-              >
-                <option value="pending">⏳ Pending</option>
-                <option value="processing">⚙️ Processing</option>
-                <option value="shipped">🚚 Shipped</option>
-                <option value="delivered">✅ Delivered</option>
-                <option value="cancelled">❌ Cancelled</option>
+            <div className="mb-5 pb-4 border-b border-white/5">
+              <h4 className="text-sm font-semibold text-gold-500 mb-3">Update Status</h4>
+              <select value={newStatus} onChange={(e) => setNewStatus(e.target.value)}
+                className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm focus:outline-none focus:border-gold-500/40 mb-3">
+                <option value="pending" className="bg-[#111]">Pending</option>
+                <option value="processing" className="bg-[#111]">Processing</option>
+                <option value="shipped" className="bg-[#111]">Shipped</option>
+                <option value="delivered" className="bg-[#111]">Delivered</option>
+                <option value="cancelled" className="bg-[#111]">Cancelled</option>
               </select>
-              <button
-                onClick={() => handleStatusChange(selectedOrder.id, newStatus)}
+              <button onClick={() => handleStatusChange(selectedOrder.id, newStatus)}
                 disabled={updating || newStatus === selectedOrder.status}
-                className="w-full px-4 py-2 rounded font-semibold transition"
-                style={{
-                  backgroundColor: updating ? "#666666" : "#d4af37",
-                  color: "#000000",
-                  opacity:
-                    updating || newStatus === selectedOrder.status ? 0.6 : 1,
-                  cursor:
-                    updating || newStatus === selectedOrder.status
-                      ? "not-allowed"
-                      : "pointer",
-                }}
-              >
-                {updating ? "⏳ Updating..." : "✨ Update Status"}
+                className="w-full px-4 py-2 bg-gold-500 text-black text-sm font-semibold rounded-lg hover:bg-gold-600 transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
+                {updating ? "Updating..." : "Update Status"}
               </button>
             </div>
 
-            {/* Total */}
-            <div className="text-right bg-gradient-to-r from-yellow-600 to-yellow-800 p-3 rounded">
-              <p style={{ color: "#ffffff" }} className="text-sm mb-1">
-                Total Amount
-              </p>
-              <p className="text-2xl font-bold" style={{ color: "#d4af37" }}>
-                PKR {selectedOrder.total_amount}
-              </p>
+            <div className="text-right p-3 bg-gold-500/10 rounded-lg">
+              <p className="text-[11px] text-white/40 uppercase tracking-wider mb-0.5">Total Amount</p>
+              <p className="text-lg font-bold text-gold-500">PKR {selectedOrder.total_amount}</p>
             </div>
           </div>
         </div>

@@ -171,14 +171,14 @@ const ProductDetails = ({ product: propProduct, onAddToCart: propOnAddToCart, on
     finally { setSubmittingReview(false); }
   };
 
-  const inputClass = "w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-sm placeholder:text-white/20 focus:outline-none focus:border-gold-500/40 transition-all";
+  const inputClass = "w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-gray-900 text-sm placeholder:text-gray-400 focus:outline-none focus:border-gold-500 focus:ring-1 focus:ring-gold-500/20 transition-all";
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-black">
+      <div className="min-h-screen flex items-center justify-center bg-white">
         <div className="flex flex-col items-center gap-3">
           <div className="animate-spin rounded-full h-8 w-8 border-2 border-gold-500/20 border-t-gold-500"></div>
-          <span className="text-white/30 text-sm">Loading product...</span>
+          <span className="text-gray-400 text-sm">Loading product...</span>
         </div>
       </div>
     );
@@ -186,9 +186,9 @@ const ProductDetails = ({ product: propProduct, onAddToCart: propOnAddToCart, on
 
   if (error || !product) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-black">
+      <div className="min-h-screen flex items-center justify-center bg-white">
         <div className="text-center">
-          <p className="text-red-400 mb-4">{error || "Product not found"}</p>
+          <p className="text-red-500 mb-4">{error || "Product not found"}</p>
           <button onClick={() => navigate("/collections")} className="px-6 py-2 bg-gold-500 text-black rounded-lg text-sm font-semibold hover:bg-gold-600 transition-colors">
             Back to Collections
           </button>
@@ -202,29 +202,29 @@ const ProductDetails = ({ product: propProduct, onAddToCart: propOnAddToCart, on
     : null;
 
   return (
-    <div className="min-h-screen bg-black">
+    <div className="min-h-screen bg-white">
       {/* Breadcrumb */}
-      <div className="border-b border-white/5">
+      <div className="border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 py-3">
-          <nav className="flex items-center gap-2 text-xs text-white/30">
-            <Link to="/" className="flex items-center gap-1 hover:text-white/60 transition-colors"><FaHome /> Home</Link>
+          <nav className="flex items-center gap-2 text-xs text-gray-400">
+            <Link to="/" className="flex items-center gap-1 hover:text-gold-500 transition-colors"><FaHome /> Home</Link>
             <FaChevronRight className="text-[8px]" />
-            <Link to="/collections" className="hover:text-white/60 transition-colors">Collections</Link>
+            <Link to="/collections" className="hover:text-gold-500 transition-colors">Collections</Link>
             <FaChevronRight className="text-[8px]" />
-            <span className="text-white/60 truncate">{product.name}</span>
+            <span className="text-gray-600 truncate">{product.name}</span>
           </nav>
         </div>
       </div>
 
       {/* Top bar */}
-      <div className="border-b border-white/5">
+      <div className="border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-          <button onClick={() => navigate("/collections")} className="flex items-center gap-2 text-white/40 hover:text-white text-xs transition-colors">
+          <button onClick={() => navigate("/collections")} className="flex items-center gap-2 text-gray-400 hover:text-gold-500 text-xs transition-colors">
             <FaArrowLeft /> Back to Collections
           </button>
           <div className="flex items-center gap-2">
-            <button className="p-2 text-white/30 hover:text-white/60 rounded-lg hover:bg-white/5 transition-colors"><FaShare size={14} /></button>
-            <button onClick={handleAddToWishlist} className={`p-2 rounded-lg transition-colors ${inWishlist ? "text-red-400 bg-red-500/10" : "text-white/30 hover:text-white/60 hover:bg-white/5"}`}>
+            <button className="p-2 text-gray-400 hover:text-gold-500 rounded-lg hover:bg-gray-100 transition-colors"><FaShare size={14} /></button>
+            <button onClick={handleAddToWishlist} className={`p-2 rounded-lg transition-colors ${inWishlist ? "text-red-500 bg-red-50" : "text-gray-400 hover:text-red-400 hover:bg-gray-100"}`}>
               <FaHeart size={14} />
             </button>
           </div>
@@ -236,7 +236,7 @@ const ProductDetails = ({ product: propProduct, onAddToCart: propOnAddToCart, on
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
           {/* Image */}
           <div className="space-y-4">
-            <div className="aspect-square bg-[#111] border border-white/5 rounded-xl overflow-hidden">
+            <div className="aspect-square bg-gray-50 border border-gray-200 rounded-xl overflow-hidden">
               <img
                 src={images[selectedImage] ? `${API_BASE}${images[selectedImage]}` : product.image_url ? `${API_BASE}${product.image_url}` : "/placeholder-image.jpg"}
                 alt={product.name}
@@ -247,7 +247,7 @@ const ProductDetails = ({ product: propProduct, onAddToCart: propOnAddToCart, on
             {images.length > 1 && (
               <div className="flex gap-2 overflow-x-auto pb-1">
                 {images.map((img, i) => (
-                  <div key={i} className={`flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden cursor-pointer border transition-all ${selectedImage === i ? "border-gold-500" : "border-white/10 hover:border-white/20"}`}
+                  <div key={i} className={`flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden cursor-pointer border transition-all ${selectedImage === i ? "border-gold-500 ring-2 ring-gold-500/20" : "border-gray-200 hover:border-gray-300"}`}
                     onClick={() => setSelectedImage(i)}>
                     <img src={`${API_BASE}${img}`} alt="" className="w-full h-full object-cover" />
                   </div>
@@ -259,16 +259,16 @@ const ProductDetails = ({ product: propProduct, onAddToCart: propOnAddToCart, on
           {/* Details */}
           <div className="space-y-5">
             <div>
-              <h1 className="text-2xl lg:text-3xl font-bold text-white mb-2">{product.name}</h1>
+              <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-2">{product.name}</h1>
               <div className="flex items-center gap-3 text-sm">
                 <div className="flex items-center gap-1">
                   {[...Array(5)].map((_, i) => (
-                    <FaStar key={i} className={i < Math.floor(product.average_rating || 0) ? "text-gold-500" : "text-white/10"} size={13} />
+                    <FaStar key={i} className={i < Math.floor(product.average_rating || 0) ? "text-gold-500" : "text-gray-300"} size={13} />
                   ))}
                 </div>
-                <span className="text-white/40">{product.average_rating ? `${product.average_rating}` : "No rating"} ({reviews.length} reviews)</span>
-                <span className="text-white/15">|</span>
-                <span className="text-white/30">{product.category || "General"}</span>
+                <span className="text-gray-500">{product.average_rating ? `${product.average_rating}` : "No rating"} ({reviews.length} reviews)</span>
+                <span className="text-gray-300">|</span>
+                <span className="text-gray-500">{product.category || "General"}</span>
               </div>
             </div>
 
@@ -276,33 +276,33 @@ const ProductDetails = ({ product: propProduct, onAddToCart: propOnAddToCart, on
             <div>
               {discountedPrice ? (
                 <div className="flex items-center gap-3">
-                  <span className="text-3xl font-bold text-gold-500">PKR {discountedPrice}</span>
-                  <span className="text-lg text-white/30 line-through">PKR {product.price}</span>
-                  <span className="text-xs font-semibold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full">{product.sale_discount_percentage}% OFF</span>
+                  <span className="text-3xl font-bold text-gold-600">PKR {discountedPrice}</span>
+                  <span className="text-lg text-gray-400 line-through">PKR {product.price}</span>
+                  <span className="text-xs font-semibold text-red-500 bg-red-50 px-2 py-0.5 rounded-full border border-red-200">{product.sale_discount_percentage}% OFF</span>
                 </div>
               ) : (
-                <span className="text-3xl font-bold text-gold-500">PKR {product.price}</span>
+                <span className="text-3xl font-bold text-gold-600">PKR {product.price}</span>
               )}
             </div>
 
             {/* Stock */}
             <div className="flex items-center gap-3 text-sm">
-              <span className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${product.stock_quantity > 0 ? "bg-emerald-500/10 text-emerald-400" : "bg-red-500/10 text-red-400"}`}>
-                <span className={`w-1.5 h-1.5 rounded-full ${product.stock_quantity > 0 ? "bg-emerald-400" : "bg-red-400"}`}></span>
+              <span className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${product.stock_quantity > 0 ? "bg-emerald-50 text-emerald-700 border border-emerald-200" : "bg-red-50 text-red-600 border border-red-200"}`}>
+                <span className={`w-1.5 h-1.5 rounded-full ${product.stock_quantity > 0 ? "bg-emerald-500" : "bg-red-500"}`}></span>
                 {product.stock_quantity > 0 ? "In Stock" : "Out of Stock"}
               </span>
-              {product.stock_quantity > 0 && <span className="text-white/30">{product.stock_quantity} available</span>}
+              {product.stock_quantity > 0 && <span className="text-gray-500">{product.stock_quantity} available</span>}
             </div>
 
             {/* Quantity */}
             <div className="flex items-center gap-3">
-              <span className="text-xs text-white/40 uppercase tracking-wider">Quantity</span>
-              <div className="flex items-center bg-white/5 border border-white/10 rounded-lg overflow-hidden">
-                <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="px-3 py-2 text-white/40 hover:text-white hover:bg-white/5 transition-colors" disabled={quantity <= 1}>
+              <span className="text-xs text-gray-500 uppercase tracking-wider font-medium">Quantity</span>
+              <div className="flex items-center bg-white border border-gray-300 rounded-lg overflow-hidden">
+                <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="px-3 py-2 text-gray-400 hover:text-gray-700 hover:bg-gray-50 transition-colors" disabled={quantity <= 1}>
                   <FaMinus size={12} />
                 </button>
-                <span className="px-4 py-2 text-sm font-medium text-white min-w-[40px] text-center">{quantity}</span>
-                <button onClick={() => setQuantity(quantity + 1)} className="px-3 py-2 text-white/40 hover:text-white hover:bg-white/5 transition-colors" disabled={quantity >= product.stock_quantity}>
+                <span className="px-4 py-2 text-sm font-medium text-gray-900 min-w-[40px] text-center">{quantity}</span>
+                <button onClick={() => setQuantity(quantity + 1)} className="px-3 py-2 text-gray-400 hover:text-gray-700 hover:bg-gray-50 transition-colors" disabled={quantity >= product.stock_quantity}>
                   <FaPlus size={12} />
                 </button>
               </div>
@@ -315,7 +315,7 @@ const ProductDetails = ({ product: propProduct, onAddToCart: propOnAddToCart, on
                 <FaShoppingCart size={16} /> Add to Cart
               </button>
               <button onClick={handleAddToWishlist}
-                className={`flex items-center justify-center gap-2 px-6 py-3 rounded-lg text-sm font-semibold transition-colors ${inWishlist ? "bg-red-500/10 text-red-400 border border-red-500/20" : "bg-white/5 text-white/50 border border-white/10 hover:bg-white/10 hover:text-white"}`}>
+                className={`flex items-center justify-center gap-2 px-6 py-3 rounded-lg text-sm font-semibold transition-colors ${inWishlist ? "bg-red-50 text-red-500 border border-red-200" : "bg-white text-gray-600 border border-gray-300 hover:bg-gray-50 hover:text-gray-900"}`}>
                 <FaHeart size={16} /> {inWishlist ? "Wishlisted" : "Wishlist"}
               </button>
             </div>
@@ -327,16 +327,16 @@ const ProductDetails = ({ product: propProduct, onAddToCart: propOnAddToCart, on
                 { icon: FaShieldAlt, label: "2 Year Warranty" },
                 { icon: FaUndo, label: "30 Day Returns" },
               ].map((f) => (
-                <div key={f.label} className="flex flex-col items-center gap-1.5 p-3 bg-white/[0.02] border border-white/5 rounded-lg">
-                  <f.icon className="text-gold-500/60" size={16} />
-                  <span className="text-[11px] text-white/30 text-center">{f.label}</span>
+                <div key={f.label} className="flex flex-col items-center gap-1.5 p-3 bg-gray-50 border border-gray-200 rounded-lg">
+                  <f.icon className="text-gold-500" size={16} />
+                  <span className="text-[11px] text-gray-500 text-center">{f.label}</span>
                 </div>
               ))}
             </div>
 
             {/* Store info */}
             {product.store_name && (
-              <div className="flex items-center justify-between p-4 bg-white/[0.02] border border-white/5 rounded-lg">
+              <div className="flex items-center justify-between p-4 bg-gray-50 border border-gray-200 rounded-lg">
                 <div className="flex items-center gap-3">
                   <div className="w-9 h-9 bg-gold-500/10 rounded-full flex items-center justify-center overflow-hidden">
                     {product.store_logo_url ? (
@@ -344,11 +344,11 @@ const ProductDetails = ({ product: propProduct, onAddToCart: propOnAddToCart, on
                     ) : <FaUser className="text-gold-500" size={14} />}
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-white">{product.store_name}</p>
-                    <p className="text-[11px] text-white/30">{product.store_products_sold || 0} products sold</p>
+                    <p className="text-sm font-medium text-gray-900">{product.store_name}</p>
+                    <p className="text-[11px] text-gray-500">{product.store_products_sold || 0} products sold</p>
                   </div>
                 </div>
-                <button onClick={() => navigate(`/store/${product.store_id}`)} className="text-xs text-gold-500 hover:text-gold-600 transition-colors">Visit Store</button>
+                <button onClick={() => navigate(`/store/${product.store_id}`)} className="text-xs text-gold-600 hover:text-gold-700 font-medium transition-colors">Visit Store</button>
               </div>
             )}
           </div>
@@ -356,17 +356,17 @@ const ProductDetails = ({ product: propProduct, onAddToCart: propOnAddToCart, on
 
         {/* Tabs */}
         <div className="mb-10">
-          <div className="flex gap-1 border-b border-white/5 mb-5">
+          <div className="flex gap-1 border-b border-gray-200 mb-5">
             {[{ key: "description", label: "Description" }, { key: "specifications", label: "Specifications" }].map((t) => (
               <button key={t.key} onClick={() => setActiveTab(t.key)}
-                className={`px-4 py-2.5 text-sm font-medium transition-colors ${activeTab === t.key ? "text-gold-500 border-b-2 border-gold-500" : "text-white/30 hover:text-white/60"}`}>
+                className={`px-4 py-2.5 text-sm font-medium transition-colors ${activeTab === t.key ? "text-gold-600 border-b-2 border-gold-500" : "text-gray-400 hover:text-gray-600"}`}>
                 {t.label}
               </button>
             ))}
           </div>
-          <div className="bg-[#111] border border-white/5 rounded-xl p-6">
+          <div className="bg-white border border-gray-200 rounded-xl p-6">
             {activeTab === "description" && (
-              <p className="text-sm text-white/50 leading-relaxed">{product.description || "No description available."}</p>
+              <p className="text-sm text-gray-600 leading-relaxed">{product.description || "No description available."}</p>
             )}
             {activeTab === "specifications" && (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -383,12 +383,12 @@ const ProductDetails = ({ product: propProduct, onAddToCart: propOnAddToCart, on
                    product.weight && { label: "Weight", value: product.weight },
                    product.care_instructions && { label: "Care", value: product.care_instructions },
                   ].filter(Boolean).map((s) => (
-                    <div key={s.label} className="bg-white/[0.03] p-3 rounded-lg">
-                      <p className="text-[10px] text-white/25 uppercase tracking-wider mb-0.5">{s.label}</p>
-                      <p className="text-sm text-white/60">{s.value}</p>
+                    <div key={s.label} className="bg-gray-50 p-3 rounded-lg border border-gray-100">
+                      <p className="text-[10px] text-gray-400 uppercase tracking-wider mb-0.5">{s.label}</p>
+                      <p className="text-sm text-gray-700">{s.value}</p>
                     </div>
                   ))
-                ) : <p className="text-sm text-white/20 text-center py-6">No specifications available.</p>}
+                ) : <p className="text-sm text-gray-400 text-center py-6">No specifications available.</p>}
               </div>
             )}
           </div>
@@ -396,17 +396,17 @@ const ProductDetails = ({ product: propProduct, onAddToCart: propOnAddToCart, on
 
         {/* Reviews */}
         <div className="mb-10">
-          <h3 className="text-lg font-bold text-white mb-4">Reviews</h3>
-          <div className="bg-[#111] border border-white/5 rounded-xl p-5">
-            <form onSubmit={submitReview} className="mb-6 pb-6 border-b border-white/5">
+          <h3 className="text-lg font-bold text-gray-900 mb-4">Reviews</h3>
+          <div className="bg-white border border-gray-200 rounded-xl p-5">
+            <form onSubmit={submitReview} className="mb-6 pb-6 border-b border-gray-200">
               <div className="flex flex-wrap items-center gap-3 mb-3">
                 <select value={reviewForm.rating} onChange={(e) => setReviewForm((s) => ({ ...s, rating: e.target.value }))}
-                  className="px-2 py-1.5 bg-white/5 border border-white/10 rounded-lg text-white text-sm focus:outline-none focus:border-gold-500/40">
-                  <option value={5} className="bg-black">5 Stars</option>
-                  <option value={4} className="bg-black">4 Stars</option>
-                  <option value={3} className="bg-black">3 Stars</option>
-                  <option value={2} className="bg-black">2 Stars</option>
-                  <option value={1} className="bg-black">1 Star</option>
+                  className="px-2 py-1.5 bg-white border border-gray-300 rounded-lg text-gray-900 text-sm focus:outline-none focus:border-gold-500 focus:ring-1 focus:ring-gold-500/20">
+                  <option value={5}>5 Stars</option>
+                  <option value={4}>4 Stars</option>
+                  <option value={3}>3 Stars</option>
+                  <option value={2}>2 Stars</option>
+                  <option value={1}>1 Star</option>
                 </select>
                 {!localStorage.getItem("token") && (
                   <input type="text" placeholder="Your name" value={reviewForm.user_name}
@@ -424,26 +424,26 @@ const ProductDetails = ({ product: propProduct, onAddToCart: propOnAddToCart, on
             </form>
 
             {reviews.length === 0 ? (
-              <p className="text-sm text-white/20 text-center py-4">No reviews yet. Be the first to review this product.</p>
+              <p className="text-sm text-gray-400 text-center py-4">No reviews yet. Be the first to review this product.</p>
             ) : (
               <div className="space-y-3">
                 {reviews.map((review) => (
-                  <div key={review.id} className="p-4 bg-white/[0.02] border border-white/5 rounded-lg">
+                  <div key={review.id} className="p-4 bg-gray-50 border border-gray-100 rounded-lg">
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-2">
                         <div className="w-7 h-7 bg-gold-500/10 rounded-full flex items-center justify-center">
                           <FaUser className="text-gold-500" size={11} />
                         </div>
                         <div>
-                          <p className="text-sm font-medium text-white">{review.user_name || "Anonymous"}</p>
-                          <p className="text-[10px] text-white/20">{review.created_at ? new Date(review.created_at).toLocaleDateString() : ""}</p>
+                          <p className="text-sm font-medium text-gray-900">{review.user_name || "Anonymous"}</p>
+                          <p className="text-[10px] text-gray-400">{review.created_at ? new Date(review.created_at).toLocaleDateString() : ""}</p>
                         </div>
                       </div>
                       <div className="flex gap-0.5">
                         {[...Array(review.rating)].map((_, i) => <FaStar key={i} className="text-gold-500" size={11} />)}
                       </div>
                     </div>
-                    <p className="text-sm text-white/50">{review.comment}</p>
+                    <p className="text-sm text-gray-600">{review.comment}</p>
                   </div>
                 ))}
               </div>
@@ -453,9 +453,9 @@ const ProductDetails = ({ product: propProduct, onAddToCart: propOnAddToCart, on
 
         {/* Comments */}
         <div className="mb-10">
-          <h3 className="text-lg font-bold text-white mb-4">Comments</h3>
-          <div className="bg-[#111] border border-white/5 rounded-xl p-5">
-            <form onSubmit={submitComment} className="mb-6 pb-6 border-b border-white/5">
+          <h3 className="text-lg font-bold text-gray-900 mb-4">Comments</h3>
+          <div className="bg-white border border-gray-200 rounded-xl p-5">
+            <form onSubmit={submitComment} className="mb-6 pb-6 border-b border-gray-200">
               {!localStorage.getItem("token") && (
                 <input type="text" placeholder="Your name" value={commentForm.user_name}
                   onChange={(e) => setCommentForm((s) => ({ ...s, user_name: e.target.value }))} className={`${inputClass} mb-3`} />
@@ -471,19 +471,19 @@ const ProductDetails = ({ product: propProduct, onAddToCart: propOnAddToCart, on
             </form>
 
             {comments.length === 0 ? (
-              <p className="text-sm text-white/20 text-center py-4">No comments yet.</p>
+              <p className="text-sm text-gray-400 text-center py-4">No comments yet.</p>
             ) : (
               <div className="space-y-3">
                 {comments.map((comment) => (
-                  <div key={comment.id} className="p-4 bg-white/[0.02] border border-white/5 rounded-lg">
+                  <div key={comment.id} className="p-4 bg-gray-50 border border-gray-100 rounded-lg">
                     <div className="flex items-center gap-2 mb-2">
                       <div className="w-6 h-6 bg-gold-500/10 rounded-full flex items-center justify-center">
                         <FaUser className="text-gold-500" size={10} />
                       </div>
-                      <p className="text-sm font-medium text-white">{comment.user_name || "Anonymous"}</p>
-                      <span className="text-[10px] text-white/15">{comment.created_at ? new Date(comment.created_at).toLocaleDateString() : ""}</span>
+                      <p className="text-sm font-medium text-gray-900">{comment.user_name || "Anonymous"}</p>
+                      <span className="text-[10px] text-gray-400">{comment.created_at ? new Date(comment.created_at).toLocaleDateString() : ""}</span>
                     </div>
-                    <p className="text-sm text-white/50">{comment.comment}</p>
+                    <p className="text-sm text-gray-600">{comment.comment}</p>
                   </div>
                 ))}
               </div>
@@ -494,24 +494,24 @@ const ProductDetails = ({ product: propProduct, onAddToCart: propOnAddToCart, on
         {/* Recommendations */}
         {recommendations.length > 0 && (
           <div>
-            <h3 className="text-lg font-bold text-white mb-4">You Might Also Like</h3>
+            <h3 className="text-lg font-bold text-gray-900 mb-4">You Might Also Like</h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               {recommendations.map((rec) => (
                 <div key={rec.id} onClick={() => navigate(`/product/${rec.id}`)}
-                  className="bg-[#111] border border-white/5 rounded-xl overflow-hidden cursor-pointer hover:border-white/10 transition-all">
-                  <div className="aspect-square bg-white/[0.02]">
+                  className="bg-white border border-gray-200 rounded-xl overflow-hidden cursor-pointer hover:shadow-md hover:border-gray-300 transition-all">
+                  <div className="aspect-square bg-gray-50">
                     <img src={rec.image_url ? `${API_BASE}${rec.image_url}` : "/placeholder-image.jpg"} alt={rec.name}
                       className="w-full h-full object-cover" onError={(e) => { e.target.src = "/placeholder-image.jpg"; }} />
                   </div>
                   <div className="p-3">
-                    <p className="text-sm text-white font-medium truncate">{rec.name}</p>
+                    <p className="text-sm text-gray-900 font-medium truncate">{rec.name}</p>
                     {rec.sale_type && rec.sale_discount_percentage ? (
                       <div className="flex items-center gap-2 mt-1">
-                        <span className="text-sm font-bold text-gold-500">PKR {(rec.price * (1 - rec.sale_discount_percentage / 100)).toFixed(0)}</span>
-                        <span className="text-[10px] text-white/20 line-through">PKR {rec.price}</span>
+                        <span className="text-sm font-bold text-gold-600">PKR {(rec.price * (1 - rec.sale_discount_percentage / 100)).toFixed(0)}</span>
+                        <span className="text-[10px] text-gray-400 line-through">PKR {rec.price}</span>
                       </div>
                     ) : (
-                      <p className="text-sm font-bold text-gold-500 mt-1">PKR {rec.price}</p>
+                      <p className="text-sm font-bold text-gold-600 mt-1">PKR {rec.price}</p>
                     )}
                   </div>
                 </div>

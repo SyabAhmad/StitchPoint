@@ -1,9 +1,17 @@
+@theme {
+  --color-gold-500: #D4AF37;
+  --color-gold-600: #B8860B;
+  --color-black-silk: #000000;
+  --color-gray-silk: #2D2D2D;
+  --font-family-serif: "Playfair Display", serif;
+  --font-family-sans: "Inter", sans-serif;
+}
+
 @import "./styles/colors.css";
 @import "tailwindcss";
 
 /* Additional global styles (index-level) */
 .nc-logo:hover img {
-  /* kept here for compatibility; colors.css contains the same rule but keeping it global is harmless */
   filter: drop-shadow(0 0 2px rgba(212, 175, 55, 0.5));
   transform: scale(1.02);
   transition: all 0.3s ease;
