@@ -128,7 +128,7 @@ export default function CraftsmanshipStory() {
             </h2>
 
             <p className="text-white/45 text-sm md:text-[15px] leading-relaxed mt-5 max-w-lg mx-auto lg:mx-0">
-              Every Naqsh Couture piece begins as a single thread in the hands of our master
+              Every Naqsh Studio piece begins as a single thread in the hands of our master
               artisans. From intricate zardozi to delicate resham, each garment is a quiet
               collaboration between heritage technique and modern design — finished, inspected,
               and perfected by hand.

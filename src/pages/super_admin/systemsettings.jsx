@@ -22,7 +22,7 @@ const SystemSettings = () => {
 
   // General settings
   const [generalSettings, setGeneralSettings] = useState({
-    site_name: "StitchPoint",
+    site_name: "Naqsh Studio",
     site_description: "Your one-stop shop for all stitching needs",
     maintenance_mode: false,
     maintenance_message: "We are currently undergoing maintenance. Please check back later.",
@@ -40,7 +40,7 @@ const SystemSettings = () => {
     password: "",
     encryption: "tls",
     from_email: "",
-    from_name: "StitchPoint",
+    from_name: "Naqsh Studio",
   });
 
   // Security settings

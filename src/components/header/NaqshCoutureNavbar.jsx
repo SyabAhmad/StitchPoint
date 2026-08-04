@@ -22,12 +22,12 @@ import { getCart } from "../../utils/cartUtils";
 import { getWishlist } from "../../utils/wishlistUtils";
 
 const CONTACT = {
-  email: "support@stitchpoint.com",
+  email: "support@naqshstudio.com",
   phone: "+1 (555) 123-4567",
-  address: "123 Fashion Street, Textile City",
+  address: "Saidu Sharif, Swat, Pakistan",
   social: [
-    { platform: "Facebook", url: "https://facebook.com/stitchpoint", Icon: FaFacebookF },
-    { platform: "Instagram", url: "https://instagram.com/stitchpoint", Icon: FaInstagram },
+    { platform: "Facebook", url: "https://facebook.com/naqshstudio", Icon: FaFacebookF },
+    { platform: "Instagram", url: "https://instagram.com/naqshstudio", Icon: FaInstagram },
   ],
 };
 
@@ -260,7 +260,7 @@ const NaqshCoutureNavbar = () => {
             Naqsh
           </span>
           <span className="text-white font-serif text-lg font-light">
-            Couture
+            Studio
           </span>
         </Link>
 

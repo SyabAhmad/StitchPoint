@@ -104,7 +104,7 @@ export default function Footer() {
           <div className="lg:col-span-1">
             <div className="mb-6">
               <h3 className="text-2xl font-bold text-white mb-4">
-                Naqsh Couture
+                Naqsh Studio
               </h3>
               <p className="text-gray-300 leading-relaxed mb-6">
                 Crafting timeless elegance through bespoke fashion. Where
@@ -259,9 +259,9 @@ export default function Footer() {
                 <MapPinIcon />
                 <div>
                   <p className="text-gray-300 text-sm leading-relaxed">
-                    123 Fashion Street
+                    Saidu Sharif
                     <br />
-                    Lahore, Punjab 54000
+                    Swat, Khyber Pakhtunkhwa
                     <br />
                     Pakistan
                   </p>
@@ -281,10 +281,10 @@ export default function Footer() {
               <div className="flex items-center space-x-3">
                 <MailIcon />
                 <a
-                  href="mailto:info@naqshcouture.com"
+                  href="mailto:info@naqshstudio.com"
                   className="text-gray-300 hover:text-white transition-colors duration-300"
                 >
-                  info@naqshcouture.com
+                  info@naqshstudio.com
                 </a>
               </div>
             </div>
@@ -311,7 +311,7 @@ export default function Footer() {
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <div className="flex items-center space-x-2 text-gray-300">
               <span>
-                &copy; {currentYear} Naqsh Couture. All rights reserved.
+                &copy; {currentYear} Naqsh Studio. All rights reserved.
               </span>
               <HeartIcon className="w-4 h-4 text-red-400" />
             </div>

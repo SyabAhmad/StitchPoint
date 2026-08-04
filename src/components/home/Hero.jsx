@@ -9,7 +9,7 @@ import sunlitParkEditorial from "../../assets/sunlit_park_fashion_editorial.webp
 import { FaChevronDown, FaChevronLeft, FaChevronRight } from "react-icons/fa";
 
 const SLIDES = [
-  { image: heroImage, title: "Naqsh Couture", subtitle: "Premium Pakistani Fashion" },
+  { image: heroImage, title: "Naqsh Studio", subtitle: "Premium Pakistani Fashion" },
   { image: bohoGardenGroup, title: "The Boho Garden", subtitle: "Free-spirited silhouettes" },
   { image: bohoFashionEditorial, title: "Editorial Boho", subtitle: "Fashion that wanders" },
   { image: bohoMeadowWalk, title: "Meadow Walk", subtitle: "Soft fabrics, open skies" },

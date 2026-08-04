@@ -35,7 +35,7 @@ def get_system_settings():
     """Get system settings (stub)"""
     return jsonify({
         'general_settings': {
-            'site_name': 'Naqsh Couture',
+            'site_name': 'Naqsh Studio',
             'site_description': 'Premium Pakistani Tailoring & Fashion',
             'maintenance_mode': False,
         },

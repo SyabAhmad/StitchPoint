@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <defs>
+    <linearGradient id="mahBg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f3ece1"/>
+      <stop offset="1" stop-color="#e3d3b5"/>
+    </linearGradient>
+    <linearGradient id="mahHair" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#4a382a"/>
+      <stop offset="1" stop-color="#2a1f14"/>
+    </linearGradient>
+    <linearGradient id="mahTop" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#273b31"/>
+      <stop offset="1" stop-color="#14211b"/>
+    </linearGradient>
+  </defs>
+  <rect width="200" height="200" fill="url(#mahBg)"/>
+  <circle cx="100" cy="104" r="72" fill="none" stroke="#c9a24b" stroke-opacity="0.4" stroke-width="1.5"/>
+  <circle cx="100" cy="104" r="60" fill="none" stroke="#c9a24b" stroke-opacity="0.25" stroke-width="1"/>
+
+  <path d="M30 200 C34 156 64 136 100 136 C136 136 166 156 170 200 Z" fill="url(#mahTop)"/>
+  <path d="M72 141 l10 4 -10 4 z" fill="#c9a24b"/>
+  <path d="M128 141 l-10 4 10 4 z" fill="#c9a24b"/>
+
+  <path d="M100 22 C58 22 46 54 52 88 C54 104 50 118 48 126 L152 126 C150 118 146 104 148 88 C154 54 142 22 100 22 Z" fill="url(#mahHair)"/>
+  <rect x="91" y="116" width="18" height="24" rx="8" fill="#e0a87c"/>
+  <circle cx="77" cy="98" r="7" fill="#e0a87c"/>
+  <circle cx="123" cy="98" r="7" fill="#e0a87c"/>
+  <circle cx="77" cy="98" r="1.6" fill="#c9a24b"/>
+  <circle cx="123" cy="98" r="1.6" fill="#c9a24b"/>
+  <ellipse cx="100" cy="98" rx="31" ry="37" fill="#eab88f"/>
+  <ellipse cx="112" cy="99" rx="13" ry="33" fill="#dc9f74" opacity="0.45"/>
+
+  <path d="M70 62 L130 62 C124 38 108 30 100 30 C92 30 76 38 70 62 Z" fill="url(#mahHair)"/>
+  <path d="M62 90 C58 118 62 140 68 148 C66 130 68 108 72 96 Z" fill="url(#mahHair)"/>
+  <path d="M138 90 C142 118 138 140 132 148 C134 130 132 108 128 96 Z" fill="url(#mahHair)"/>
+
+  <ellipse cx="88" cy="95" rx="3" ry="3.8" fill="#2f2318"/>
+  <ellipse cx="112" cy="95" rx="3" ry="3.8" fill="#2f2318"/>
+  <path d="M95 110 Q100 114 105 110" stroke="#b0714d" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <circle cx="100" cy="119" r="1.6" fill="#b0714d"/>
+</svg>

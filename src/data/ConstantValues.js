@@ -79,24 +79,24 @@ const APP_DATA = {
 
   // Contact information
   contact: {
-    email: "support@stitchpoint.com",
+    email: "support@naqshstudio.com",
     phone: "+1 (555) 123-4567",
     address: "123 Fashion Street, Textile City, TC 12345",
     hours: "Mon-Fri: 9AM-6PM, Sat: 10AM-4PM, Sun: Closed",
     social: [
       {
         platform: "Instagram",
-        url: "https://instagram.com/stitchpoint",
+        url: "https://instagram.com/naqshstudio",
         icon: "fab fa-instagram",
       },
       {
         platform: "Facebook",
-        url: "https://facebook.com/stitchpoint",
+        url: "https://facebook.com/naqshstudio",
         icon: "fab fa-facebook",
       },
       {
         platform: "Twitter",
-        url: "https://twitter.com/stitchpoint",
+        url: "https://twitter.com/naqshstudio",
         icon: "fab fa-twitter",
       },
     ],
