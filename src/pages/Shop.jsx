@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect, useRef } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { addToCart } from "../utils/cartUtils";
 import { addToWishlist, getWishlist, removeFromWishlist } from "../utils/wishlistUtils";
 import toast from "react-hot-toast";
@@ -7,20 +7,37 @@ import ShopFilters from "../components/shop/ShopFilters";
 import ShopProductCard from "../components/shop/ShopProductCard";
 import ShopPagination from "../components/shop/ShopPagination";
 
+const PER_PAGE = 24;
+
 export default function Shop() {
+  const [searchParams] = useSearchParams();
   const [products, setProducts] = useState([]);
+  const [total, setTotal] = useState(0);
+  const [categories, setCategories] = useState([]);
+  const [districts, setDistricts] = useState([]);
+  const [maxPrice, setMaxPrice] = useState(10000);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState(
+    searchParams.get("category") || ""
+  );
   const [selectedDistrict, setSelectedDistrict] = useState("");
   const [priceRange, setPriceRange] = useState([0, 10000]);
-  const [maxPrice, setMaxPrice] = useState(10000);
   const [sortBy, setSortBy] = useState("name");
   const [currentPage, setCurrentPage] = useState(1);
-  const [perPage] = useState(24);
   const [wishlistItems, setWishlistItems] = useState([]);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const q = searchParams.get("search");
+    if (q) setSearchTerm(q);
+  }, [searchParams]);
+
+  const debouncedSearch = useDebounce(searchTerm, 400);
+  const debouncedPriceRange = useDebounce(priceRange, 400);
+  const requestIdRef = useRef(0);
+  const priceTouched = useRef(false);
 
   useEffect(() => {
     const init = async () => {
@@ -28,68 +45,58 @@ export default function Shop() {
         const items = await getWishlist();
         setWishlistItems(items);
       } catch {}
-
-      try {
-        const res = await fetch(`http://127.0.0.1:5000/api/products?page=1&per_page=200`);
-        if (!res.ok) throw new Error("Failed to fetch products");
-        const data = await res.json();
-        const prods = data.products || [];
-        setProducts(prods);
-
-        if (prods.length > 0) {
-          const prices = prods.map((p) => Number(p.price) || 0);
-          const max = Math.min(Math.ceil(Math.max(...prices) / 10) * 10, 100000);
-          setMaxPrice(max);
-          setPriceRange([0, max]);
-        }
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
     };
     init();
   }, []);
 
-  const categories = useMemo(() => [...new Set(products.map((p) => p.category).filter(Boolean))], [products]);
-  const districts = useMemo(() => [...new Set(products.map((p) => p.district).filter(Boolean))], [products]);
+  useEffect(() => {
+    const fetchProducts = async () => {
+      setLoading(true);
+      setError(null);
+      const requestId = ++requestIdRef.current;
+      try {
+        const params = new URLSearchParams({
+          page: String(currentPage),
+          per_page: String(PER_PAGE),
+          sort_by: sortBy,
+        });
+        if (debouncedSearch) params.set("search", debouncedSearch);
+        if (selectedCategory) params.set("category", selectedCategory);
+        if (selectedDistrict) params.set("district", selectedDistrict);
+        if (priceRange[0] > 0) params.set("min_price", String(priceRange[0]));
+        if (priceRange[1] < maxPrice) params.set("max_price", String(priceRange[1]));
 
-  const filteredProducts = useMemo(() => {
-    let filtered = products;
-
-    if (searchTerm) {
-      const term = searchTerm.toLowerCase();
-      filtered = filtered.filter(
-        (p) =>
-          (p.name || "").toLowerCase().includes(term) ||
-          (p.description || "").toLowerCase().includes(term)
-      );
-    }
-    if (selectedCategory) {
-      filtered = filtered.filter((p) => p.category === selectedCategory);
-    }
-    if (selectedDistrict) {
-      filtered = filtered.filter((p) => p.district === selectedDistrict);
-    }
-    filtered = filtered.filter((p) => p.price >= priceRange[0] && p.price <= priceRange[1]);
-
-    filtered.sort((a, b) => {
-      if (sortBy === "name") return a.name.localeCompare(b.name);
-      if (sortBy === "price-low") return a.price - b.price;
-      if (sortBy === "price-high") return b.price - a.price;
-      if (sortBy === "newest") return new Date(b.created_at) - new Date(a.created_at);
-      return 0;
-    });
-
-    return filtered;
-  }, [products, searchTerm, selectedCategory, selectedDistrict, priceRange, sortBy]);
-
-  const totalPages = Math.ceil(filteredProducts.length / perPage);
-  const paginatedProducts = filteredProducts.slice((currentPage - 1) * perPage, currentPage * perPage);
+        const res = await fetch(`http://127.0.0.1:5000/api/products?${params.toString()}`);
+        if (!res.ok) throw new Error("Failed to fetch products");
+        const data = await res.json();
+        if (requestId !== requestIdRef.current) return;
+        setProducts(data.products || []);
+        setTotal(data.total || 0);
+        if (data.categories?.length) setCategories(data.categories);
+        if (data.districts?.length) setDistricts(data.districts);
+        if (data.max_price) {
+          setMaxPrice(data.max_price);
+          if (
+            !priceTouched.current &&
+            (priceRange[0] !== 0 || priceRange[1] !== data.max_price)
+          ) {
+            setPriceRange([0, data.max_price]);
+          }
+        }
+      } catch (err) {
+        if (requestId !== requestIdRef.current) return;
+        setError(err.message);
+      } finally {
+        if (requestId === requestIdRef.current) setLoading(false);
+      }
+    };
+    fetchProducts();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedSearch, selectedCategory, selectedDistrict, debouncedPriceRange, sortBy, currentPage]);
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, selectedCategory, selectedDistrict, priceRange, sortBy]);
+  }, [debouncedSearch, selectedCategory, selectedDistrict, debouncedPriceRange, sortBy]);
 
   const clearAllFilters = () => {
     setSearchTerm("");
@@ -126,7 +133,9 @@ export default function Shop() {
     }
   };
 
-  if (loading) {
+  const totalPages = Math.ceil(total / PER_PAGE);
+
+  if (loading && products.length === 0) {
     return (
       <div className="min-h-screen bg-white">
         <div className="max-w-6xl mx-auto px-6 py-16">
@@ -152,7 +161,7 @@ export default function Shop() {
     );
   }
 
-  if (error) {
+  if (error && products.length === 0) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
@@ -189,18 +198,34 @@ export default function Shop() {
           selectedDistrict={selectedDistrict}
           setSelectedDistrict={setSelectedDistrict}
           priceRange={priceRange}
-          setPriceRange={setPriceRange}
+          setPriceRange={(range) => {
+            priceTouched.current = true;
+            setPriceRange(range);
+          }}
           maxPrice={maxPrice}
           sortBy={sortBy}
           setSortBy={setSortBy}
           clearAllFilters={clearAllFilters}
-          resultCount={filteredProducts.length}
+          resultCount={total}
         />
 
         {/* Product Grid */}
-        {paginatedProducts.length > 0 ? (
+        {loading ? (
+          <div className="animate-pulse grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 mt-6">
+            {[...Array(8)].map((_, i) => (
+              <div key={i} className="rounded-xl overflow-hidden border border-black/5">
+                <div className="aspect-[3/4] bg-black/5" />
+                <div className="p-3.5 space-y-2">
+                  <div className="h-3 bg-black/5 rounded w-1/3" />
+                  <div className="h-4 bg-black/5 rounded w-2/3" />
+                  <div className="h-3 bg-black/5 rounded w-1/2" />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : products.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-            {paginatedProducts.map((product) => (
+            {products.map((product) => (
               <ShopProductCard
                 key={product.id}
                 product={product}
@@ -226,4 +251,22 @@ export default function Shop() {
       </div>
     </div>
   );
+}
+
+function useDebounce(value, delay) {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+  const first = useRef(true);
+
+  useEffect(() => {
+    if (first.current) {
+      first.current = false;
+      setDebouncedValue(value);
+      return;
+    }
+    const handler = setTimeout(() => setDebouncedValue(value), delay);
+    return () => clearTimeout(handler);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value, delay]);
+
+  return debouncedValue;
 }

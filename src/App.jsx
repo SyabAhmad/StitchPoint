@@ -1,6 +1,6 @@
 import "./App.css";
 
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import Layout from "./components/Layout.jsx";
 import HomePage from "./pages/HomePage.jsx";
@@ -20,6 +20,7 @@ import CustomerProfile from "./pages/customer/Profile.jsx";
 import CustomerOrders from "./pages/customer/Orders.jsx";
 import ManagerDashboard from "./pages/manager/Dashboard.jsx";
 import ManagerProfile from "./pages/manager/Profile.jsx";
+import ManagerSettings from "./pages/manager/Settings.jsx";
 import ManagerProducts from "./pages/manager/Products.jsx";
 import ManagerOrders from "./pages/manager/Orders.jsx";
 import ManagerCategories from "./pages/manager/Categories.jsx";
@@ -43,6 +44,7 @@ import Reviews from "./pages/super_admin/Reviews.jsx";
 import ReviewDetails from "./pages/super_admin/ReviewDetails.jsx";
 import CommissionRates from "./pages/super_admin/CommissionRates.jsx";
 import Commissions from "./pages/super_admin/Commissions.jsx";
+import Settings from "./pages/super_admin/Settings.jsx";
 
 function App() {
   return (
@@ -80,6 +82,7 @@ function App() {
           <Route path="comments" element={<ManagerComments />} />
           <Route path="reviews" element={<ManagerReviews />} />
           <Route path="profile" element={<ManagerProfile />} />
+          <Route path="settings" element={<ManagerSettings />} />
         </Route>
         <Route path="super-admin-dashboard" element={<SuperAdminDashboard />}>
           <Route index element={<QuickActions />} />
@@ -110,6 +113,9 @@ function App() {
           <Route path="reviews/:review_id" element={<ReviewDetails />} />
           <Route path="commission-rates" element={<CommissionRates />} />
           <Route path="commissions" element={<Commissions />} />
+          <Route path="settings" element={<Settings />} />
+          <Route path="store-config" element={<Navigate to="/super-admin-dashboard/settings" replace />} />
+          <Route path="system-settings" element={<Navigate to="/super-admin-dashboard/settings" replace />} />
         </Route>
       </Routes>
     </Router>

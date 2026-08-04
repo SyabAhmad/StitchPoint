@@ -46,6 +46,7 @@ def get_products():
     stock = request.args.get('stock', '')
     page = request.args.get('page', type=int, default=1)
     per_page = request.args.get('per_page', type=int, default=10)
+    sort_by = request.args.get('sort_by', 'name')
 
     # Build query
     query = Product.query
@@ -74,6 +75,16 @@ def get_products():
 
     # Get total count before pagination
     total = query.count()
+
+    # Apply sorting
+    if sort_by == 'price-low':
+        query = query.order_by(Product.price.asc(), Product.name.asc())
+    elif sort_by == 'price-high':
+        query = query.order_by(Product.price.desc(), Product.name.asc())
+    elif sort_by == 'newest':
+        query = query.order_by(Product.created_at.desc())
+    else:
+        query = query.order_by(Product.name.asc())
 
     # Apply pagination
     products = query.offset((page - 1) * per_page).limit(per_page).all()
@@ -109,7 +120,28 @@ def get_products():
             'average_rating': avg_rating,
             'review_count': review_count
         })
-    return jsonify({'products': product_list, 'total': total, 'page': page, 'per_page': per_page}), 200
+    # Facets for filtering UI (distinct values across all products)
+    categories = [
+        c[0] for c in db.session.query(Product.category)
+        .filter(Product.category.isnot(None), Product.category != '')
+        .distinct().order_by(Product.category.asc()).all()
+    ]
+    districts = [
+        d[0] for d in db.session.query(Product.district)
+        .filter(Product.district.isnot(None), Product.district != '')
+        .distinct().order_by(Product.district.asc()).all()
+    ]
+    max_price = db.session.query(func.max(Product.price)).scalar() or 0
+
+    return jsonify({
+        'products': product_list,
+        'total': total,
+        'page': page,
+        'per_page': per_page,
+        'categories': categories,
+        'districts': districts,
+        'max_price': max_price
+    }), 200
 
 @products_bp.route('/products', methods=['POST'])
 @jwt_required()

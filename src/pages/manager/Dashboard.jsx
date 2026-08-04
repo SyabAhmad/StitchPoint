@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   FaUsers, FaBox, FaShoppingCart, FaChartLine, FaCog, FaStore,
   FaUserCog, FaStar, FaMoneyBillWave, FaBars, FaTimes, FaCalendarAlt,
-  FaComment,
+  FaComment, FaHome, FaChevronDown, FaTachometerAlt, FaSignOutAlt,
 } from "react-icons/fa";
 import { Link, Outlet, useLocation } from "react-router-dom";
 import { fetchWithAuth } from "../../utils/fetchWithAuth.js";
@@ -14,11 +14,33 @@ import SmartFooter from "../../components/footer/SmartFooter.jsx";
 const ManagerDashboard = () => {
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const userMenuRef = useRef(null);
   const [loading, setLoading] = useState(true);
   const [analytics, setAnalytics] = useState({});
   const [recentOrders, setRecentOrders] = useState([]);
   const [financialTrends, setFinancialTrends] = useState([]);
   const [userData, setUserData] = useState(null);
+
+  const headerUser = (() => {
+    try {
+      return JSON.parse(localStorage.getItem("user")) || null;
+    } catch {
+      return null;
+    }
+  })();
+
+  useEffect(() => {
+    setUserMenuOpen(false);
+  }, [location.pathname]);
+
+  useEffect(() => {
+    const onDocClick = (e) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target)) setUserMenuOpen(false);
+    };
+    document.addEventListener("mousedown", onDocClick);
+    return () => document.removeEventListener("mousedown", onDocClick);
+  }, []);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -89,29 +111,99 @@ const ManagerDashboard = () => {
   return (
     <div className="h-screen flex flex-col bg-black text-white">
       {/* Header */}
-      <header className="h-14 bg-[#111] border-b border-white/10 px-5 flex items-center justify-between flex-shrink-0 z-50">
-        <div className="flex items-center gap-4">
+      <header className="h-16 bg-[#111] border-b border-white/10 px-4 md:px-5 flex items-center justify-between flex-shrink-0 z-50">
+        <div className="flex items-center gap-3 md:gap-4">
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
             className="md:hidden text-white/50 hover:text-white transition-colors"
+            aria-label="Toggle sidebar"
           >
             {sidebarOpen ? <FaTimes /> : <FaBars />}
           </button>
-          <Link to="/" className="flex items-center gap-1.5">
-            <span className="text-gold-500 font-serif text-lg font-semibold">Naqsh</span>
-            <span className="text-white font-serif text-lg font-light">Couture</span>
+          <Link to="/" className="flex items-center gap-0.5">
+            <span className="text-gold-500 font-serif text-lg md:text-xl font-semibold">Naqsh</span>
+            <span className="text-white font-serif text-lg md:text-xl font-light">Couture</span>
           </Link>
-          <span className="text-white/30 text-xs hidden sm:inline">Manager Panel</span>
+          <span className="hidden lg:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-gold-500/10 border border-gold-500/20 text-gold-500 text-[10px] font-semibold uppercase tracking-[0.15em]">
+            <FaTachometerAlt className="text-[10px]" />
+            Manager Panel
+          </span>
         </div>
-        <div className="flex items-center gap-3">
-          <Link to="/" className="text-xs text-white/50 hover:text-white transition-colors hidden sm:inline">Home</Link>
-          <Link to="/shop" className="text-xs text-white/50 hover:text-white transition-colors hidden sm:inline">Shop</Link>
-          <button
-            onClick={() => { localStorage.clear(); window.location.href = "/login"; }}
-            className="text-xs text-white/40 hover:text-red-400 transition-colors"
+
+        <div className="flex items-center gap-2 md:gap-4">
+          <Link
+            to="/"
+            className="hidden md:flex items-center gap-1.5 text-xs text-white/50 hover:text-gold-500 transition-colors"
           >
-            Logout
-          </button>
+            <FaHome className="text-[11px]" />
+            Home
+          </Link>
+          <Link
+            to="/shop"
+            className="hidden md:flex items-center gap-1.5 text-xs text-white/50 hover:text-gold-500 transition-colors"
+          >
+            <FaStore className="text-[11px]" />
+            Shop
+          </Link>
+
+          <span className="hidden md:block w-px h-5 bg-white/10" />
+
+          {/* User dropdown */}
+          <div className="relative" ref={userMenuRef}>
+            <button
+              onClick={() => setUserMenuOpen((prev) => !prev)}
+              className="flex items-center gap-2 py-1 pl-1 pr-2 rounded-full border border-white/10 hover:border-gold-500/50 transition-colors"
+              title={headerUser?.name || "Manager"}
+            >
+              <span className="w-7 h-7 rounded-full bg-gold-500 text-black text-[11px] font-bold flex items-center justify-center">
+                {headerUser?.name?.charAt(0)?.toUpperCase() || "M"}
+              </span>
+              <span className="hidden lg:block text-left">
+                <span className="block text-[11px] text-white/80 leading-tight max-w-28 truncate">
+                  {headerUser?.name || "Manager"}
+                </span>
+                <span className="block text-[9px] uppercase tracking-wider text-gold-500 leading-tight">
+                  {headerUser?.role === "manager" ? "Manager" : headerUser?.role || "Manager"}
+                </span>
+              </span>
+              <FaChevronDown
+                className={`text-[9px] text-white/50 transition-transform duration-200 ${userMenuOpen ? "rotate-180" : ""}`}
+              />
+            </button>
+
+            {userMenuOpen && (
+              <div className="nc-dropdown absolute right-0 top-[calc(100%+10px)] w-60 bg-[#141414] border border-white/10 rounded-lg shadow-2xl shadow-black/60 py-2 z-50">
+                <div className="px-4 py-2.5 border-b border-white/10 mb-1">
+                  <p className="text-[13px] text-white font-medium truncate">{headerUser?.name || "Manager"}</p>
+                  <p className="text-[11px] text-white/40 truncate">{headerUser?.email}</p>
+                </div>
+                <Link
+                  to="/manager-dashboard"
+                  className="flex items-center gap-2.5 px-4 py-2 text-[13px] text-white/70 hover:text-gold-500 hover:bg-white/5 transition-colors"
+                >
+                  <FaTachometerAlt className="text-xs" /> Dashboard
+                </Link>
+                <Link
+                  to="/manager-dashboard/profile"
+                  className="flex items-center gap-2.5 px-4 py-2 text-[13px] text-white/70 hover:text-gold-500 hover:bg-white/5 transition-colors"
+                >
+                  <FaUserCog className="text-xs" /> Profile
+                </Link>
+                <Link
+                  to="/manager-dashboard/settings"
+                  className="flex items-center gap-2.5 px-4 py-2 text-[13px] text-white/70 hover:text-gold-500 hover:bg-white/5 transition-colors"
+                >
+                  <FaCog className="text-xs" /> Settings
+                </Link>
+                <button
+                  onClick={() => { localStorage.clear(); window.location.href = "/login"; }}
+                  className="w-full flex items-center gap-2.5 px-4 py-2 text-[13px] text-red-400 hover:bg-red-500/10 transition-colors"
+                >
+                  <FaSignOutAlt className="text-xs" /> Logout
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </header>
 
@@ -173,16 +265,17 @@ const ManagerDashboard = () => {
               </p>
               <ul className="space-y-px">
                 <li>
-                  <Link to="/manager-dashboard/profile" className="flex items-center gap-2.5 px-2.5 py-[7px] rounded-md text-[12px] font-medium text-white/40 hover:text-white/70 hover:bg-white/[0.03] transition-all duration-150">
-                    <FaStore className="text-[11px] w-3.5 text-center" />
-                    Store Settings
-                  </Link>
-                </li>
-                <li>
-                  <a href="#" className="flex items-center gap-2.5 px-2.5 py-[7px] rounded-md text-[12px] font-medium text-white/40 hover:text-white/70 hover:bg-white/[0.03] transition-all duration-150">
+                  <Link
+                    to="/manager-dashboard/settings"
+                    className={`flex items-center gap-2.5 px-2.5 py-[7px] rounded-md text-[12px] font-medium transition-all duration-150 ${
+                      location.pathname.startsWith("/manager-dashboard/settings")
+                        ? "bg-gold-500/10 text-gold-500 border-l-2 border-gold-500 pl-[8px]"
+                        : "text-white/40 hover:text-white/70 hover:bg-white/[0.03]"
+                    }`}
+                  >
                     <FaCog className="text-[11px] w-3.5 text-center" />
-                    System Config
-                  </a>
+                    Settings
+                  </Link>
                 </li>
               </ul>
             </div>
