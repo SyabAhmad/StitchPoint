@@ -207,9 +207,9 @@ const NaqshCoutureNavbar = () => {
   return (
     <nav className={`fixed top-0 left-0 right-0 z-50 bg-black ${scrolled ? "shadow-lg shadow-black/40" : ""}`}>
       {/* ── Top info bar ─────────────────────────────── */}
-      <div className="bg-[#141414] border-b border-white/5 h-9">
+      <div className="bg-[#141414] border-b border-white/5 h-8">
         <div className="max-w-7xl mx-auto px-5 h-full flex items-center justify-between gap-4">
-          <div className="flex items-center gap-5 text-white/55 text-[11px] whitespace-nowrap overflow-hidden">
+          <div className="flex items-center gap-5 text-white/55 text-[10.5px] whitespace-nowrap overflow-hidden">
             <a
               href={`mailto:${CONTACT.email}`}
               className="hidden sm:flex items-center gap-1.5 hover:text-gold-500 transition-colors"
@@ -253,13 +253,13 @@ const NaqshCoutureNavbar = () => {
       </div>
 
       {/* ── Main navbar ──────────────────────────────── */}
-      <div className="max-w-7xl mx-auto px-5 h-16 flex items-center justify-between gap-6">
+      <div className="max-w-7xl mx-auto px-5 h-14 flex items-center justify-between gap-6">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-0.5 shrink-0">
-          <span className="text-gold-500 font-serif text-xl font-semibold tracking-wide">
+          <span className="text-gold-500 font-serif text-lg font-semibold tracking-wide">
             Naqsh
           </span>
-          <span className="text-white font-serif text-xl font-light">
+          <span className="text-white font-serif text-lg font-light">
             Couture
           </span>
         </Link>
@@ -407,7 +407,7 @@ const NaqshCoutureNavbar = () => {
           megaOpen ? "opacity-100 translate-y-0 pointer-events-auto" : "opacity-0 -translate-y-2 pointer-events-none"
         }`}
       >
-        <div className="max-w-7xl mx-auto px-5 py-8 grid grid-cols-4 gap-10">
+        <div className="max-w-7xl mx-auto px-5 py-6 grid grid-cols-4 gap-8">
           <div className="col-span-3">
             <p className="text-[10px] uppercase tracking-[0.25em] text-gold-500 font-semibold mb-4">
               Shop by Category
@@ -450,7 +450,7 @@ const NaqshCoutureNavbar = () => {
 
       {/* ── Mobile Menu ──────────────────────────────── */}
       {isMenuOpen && (
-        <div className="md:hidden bg-black border-t border-white/10 max-h-[calc(100vh-100px)] overflow-y-auto">
+        <div className="md:hidden bg-black border-t border-white/10 max-h-[calc(100vh-88px)] overflow-y-auto">
           <div className="max-w-7xl mx-auto px-5 py-4">
             <form onSubmit={handleSearch} className="flex items-center bg-white/5 border border-white/10 rounded-full px-4 h-9 mb-4 focus-within:border-gold-500/60">
               <FaSearch className="text-[11px] text-white/40 shrink-0" />

@@ -46,10 +46,27 @@ const Profile = () => {
     is_default: false,
   });
   const [editingPayment, setEditingPayment] = useState(null);
+  const [paymentErrors, setPaymentErrors] = useState({});
+
+  const CARD_TYPE_PREFIXES = {
+    Visa: /^4/,
+    MasterCard: /^(5[1-5]|2[2-7])/,
+    "American Express": /^3[47]/,
+    Discover: /^(6011|65)/,
+  };
+
+  const formatCardNumber = (value) => {
+    const digits = value.replace(/\D/g, "").slice(0, 19);
+    return digits.replace(/(.{4})/g, "$1 ").trim();
+  };
+
+  const updatePaymentField = (key, value) => {
+    setPaymentForm((prev) => ({ ...prev, [key]: value }));
+    setPaymentErrors({});
+  };
 
   useEffect(() => {
     fetchProfile();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchProfile = async () => {
@@ -165,7 +182,7 @@ const Profile = () => {
                 } else {
                   toast.error("Failed to delete address");
                 }
-              } catch (error) {
+              } catch {
                 toast.error("Error deleting address");
               }
             }}
@@ -183,15 +200,59 @@ const Profile = () => {
 
   const handlePaymentSubmit = async (e) => {
     e.preventDefault();
+    const errors = {};
+    const now = new Date();
+
+    const cardholderName = paymentForm.cardholder_name.trim();
+    if (!cardholderName) {
+      errors.cardholder_name = "Cardholder name is required";
+    } else if (cardholderName.length < 3) {
+      errors.cardholder_name = "Cardholder name must be at least 3 characters";
+    } else if (!/^[a-zA-Z\s.'-]+$/.test(cardholderName)) {
+      errors.cardholder_name = "Cardholder name can only contain letters";
+    }
+
     const cardNumber = paymentForm.card_number.replace(/\s/g, "");
-    if (cardNumber.length < 13 || cardNumber.length > 19) {
-      toast.error("Card number must be between 13 and 19 digits");
+    if (!cardNumber) {
+      errors.card_number = "Card number is required";
+    } else if (!/^\d+$/.test(cardNumber)) {
+      errors.card_number = "Card number must contain only digits";
+    } else if (cardNumber.length < 13) {
+      errors.card_number = `Card number is too short — must be at least 13 digits (${cardNumber.length} entered)`;
+    } else if (cardNumber.length > 19) {
+      errors.card_number = `Card number is too long — must be at most 19 digits (${cardNumber.length} entered)`;
+    } else if (
+      paymentForm.card_type &&
+      CARD_TYPE_PREFIXES[paymentForm.card_type] &&
+      !CARD_TYPE_PREFIXES[paymentForm.card_type].test(cardNumber)
+    ) {
+      errors.card_number = `Card number does not match ${paymentForm.card_type} format`;
+    }
+
+    if (!paymentForm.card_type) {
+      errors.card_type = "Please select a card type";
+    }
+
+    if (!paymentForm.expiry_month) {
+      errors.expiry_month = "Select a month";
+    }
+    if (!paymentForm.expiry_year) {
+      errors.expiry_year = "Select a year";
+    }
+    const expYear = Number(paymentForm.expiry_year);
+    const expMonth = Number(paymentForm.expiry_month);
+    if (expYear && expMonth) {
+      if (expYear < now.getFullYear() || (expYear === now.getFullYear() && expMonth < now.getMonth() + 1)) {
+        errors.expiry_year = "Card has expired";
+      }
+    }
+
+    if (Object.keys(errors).length > 0) {
+      setPaymentErrors(errors);
+      toast.error("Please fix the highlighted card details");
       return;
     }
-    if (!/^\d+$/.test(cardNumber)) {
-      toast.error("Card number must contain only digits");
-      return;
-    }
+    setPaymentErrors({});
 
     const url = editingPayment
       ? `http://localhost:5000/api/dashboard/profile/payments/${editingPayment.id}`
@@ -230,6 +291,7 @@ const Profile = () => {
       is_default: payment.is_default,
     });
     setEditingPayment(payment);
+    setPaymentErrors({});
     setShowPaymentForm(true);
   };
 
@@ -249,7 +311,7 @@ const Profile = () => {
                 } else {
                   toast.error("Failed to delete payment method");
                 }
-              } catch (error) {
+              } catch {
                 toast.error("Error deleting payment method");
               }
             }}
@@ -278,33 +340,45 @@ const Profile = () => {
 
   const inputClass = "w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-lg text-sm text-gray-900 placeholder-gray-400 focus:border-gold-500 focus:ring-1 focus:ring-gold-500 outline-none transition-colors";
 
+  const fieldClass = (field) =>
+    paymentErrors[field]
+      ? "w-full px-4 py-2.5 bg-red-50 border border-red-400 rounded-lg text-sm text-gray-900 placeholder-gray-400 focus:border-red-500 focus:ring-1 focus:ring-red-400 outline-none transition-colors"
+      : inputClass;
+
+  const fieldError = (field) =>
+    paymentErrors[field] ? (
+      <p className="mt-1 text-xs text-red-500">{paymentErrors[field]}</p>
+    ) : null;
+
   return (
-    <div>
-      {/* Header */}
+    <div className="max-w-5xl mx-auto">
+      {/* Page header */}
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">Your Profile</h1>
+        <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-gold-600 mb-1">Account</p>
+        <h1 className="text-2xl font-bold text-gray-900">My Profile</h1>
         <p className="text-sm text-gray-500 mt-1">Manage your personal information, addresses, and payment methods</p>
       </div>
 
-      {/* Profile section */}
-      <div className="bg-white border border-gray-200 rounded-lg mb-6">
-        <div className="p-6">
-          <div className="flex justify-between items-start">
-            <div className="flex items-center gap-4">
+      {/* Profile card */}
+      <div className="bg-white border border-gray-200 rounded-xl overflow-hidden mb-6 shadow-sm">
+        <div className="h-20 bg-gradient-to-r from-gold-500/25 via-gold-500/10 to-gold-500/5 border-b border-gray-100" />
+        <div className="px-6 pb-6 -mt-12">
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <div className="flex items-end gap-4">
               {profile.user.profile_picture ? (
                 <img
                   key={profile.user.profile_picture}
-                  className="h-16 w-16 rounded-full object-cover border-2 border-gold-500"
+                  className="h-20 w-20 rounded-full object-cover ring-4 ring-white shadow-md"
                   src={profile.user.profile_picture}
                   alt="Profile"
                   onError={(e) => { e.target.src = "/placeholder-avatar.svg"; }}
                 />
               ) : (
-                <div className="h-16 w-16 rounded-full bg-gray-200 border-2 border-gold-500 flex items-center justify-center">
-                  <FaUser className="text-gray-400 text-xl" />
+                <div className="h-20 w-20 rounded-full bg-gray-100 ring-4 ring-white shadow-md flex items-center justify-center">
+                  <FaUser className="text-gray-400 text-2xl" />
                 </div>
               )}
-              <div>
+              <div className="pb-0.5">
                 <h2 className="text-xl font-bold text-gray-900">{profile.user.name || "User"}</h2>
                 <p className="text-sm text-gray-500">{profile.user.email}</p>
                 <p className="text-xs text-gray-400 mt-1">
@@ -376,27 +450,30 @@ const Profile = () => {
       </div>
 
       {/* Addresses */}
-      <div className="bg-white border border-gray-200 rounded-lg mb-6">
-        <div className="p-6">
-          <div className="flex justify-between items-center mb-4">
+      <div className="bg-white border border-gray-200 rounded-xl overflow-hidden mb-6 shadow-sm">
+        <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
+          <div className="flex items-center gap-3">
+            <span className="w-9 h-9 rounded-lg bg-gold-500/10 text-gold-600 flex items-center justify-center">
+              <FaMapMarkerAlt />
+            </span>
             <div>
-              <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                <FaMapMarkerAlt /> Delivery Addresses
-              </h3>
-              <p className="text-xs text-gray-500 mt-1">Manage your delivery addresses</p>
+              <h3 className="font-bold text-gray-900">Delivery Addresses</h3>
+              <p className="text-xs text-gray-500 mt-0.5">Manage your delivery addresses</p>
             </div>
-            <button
-              onClick={() => {
-                setShowAddressForm(!showAddressForm);
-                setEditingAddress(null);
-                setAddressForm({ name: "", street_address: "", city: "", state: "", postal_code: "", country: "", is_default: false });
-              }}
-              className="px-4 py-2 rounded-lg text-sm font-semibold bg-gold-500 text-black hover:bg-gold-600 transition-colors"
-            >
-              {showAddressForm ? <><FaTimes className="inline mr-1" /> Cancel</> : <><FaPlus className="inline mr-1" /> Add Address</>}
-            </button>
           </div>
+          <button
+            onClick={() => {
+              setShowAddressForm(!showAddressForm);
+              setEditingAddress(null);
+              setAddressForm({ name: "", street_address: "", city: "", state: "", postal_code: "", country: "", is_default: false });
+            }}
+            className="px-4 py-2 rounded-lg text-sm font-semibold bg-gold-500 text-black hover:bg-gold-600 transition-colors"
+          >
+            {showAddressForm ? <><FaTimes className="inline mr-1" /> Cancel</> : <><FaPlus className="inline mr-1" /> Add Address</>}
+          </button>
+        </div>
 
+        <div className="p-6">
           {showAddressForm && (
             <form onSubmit={handleAddressSubmit} className="mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -477,70 +554,106 @@ const Profile = () => {
               </div>
             )}
           </div>
+          </div>
         </div>
-      </div>
 
       {/* Payment Methods */}
-      <div className="bg-white border border-gray-200 rounded-lg">
-        <div className="p-6">
-          <div className="flex justify-between items-center mb-4">
+      <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
+        <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
+          <div className="flex items-center gap-3">
+            <span className="w-9 h-9 rounded-lg bg-gold-500/10 text-gold-600 flex items-center justify-center">
+              <FaCreditCard />
+            </span>
             <div>
-              <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                <FaCreditCard /> Payment Methods
-              </h3>
-              <p className="text-xs text-gray-500 mt-1">Secure payment information</p>
+              <h3 className="font-bold text-gray-900">Payment Methods</h3>
+              <p className="text-xs text-gray-500 mt-0.5">Secure payment information</p>
             </div>
-            <button
-              onClick={() => {
-                setShowPaymentForm(!showPaymentForm);
-                setEditingPayment(null);
-                setPaymentForm({ cardholder_name: "", card_number: "", card_type: "", expiry_month: "", expiry_year: "", is_default: false });
-              }}
-              className="px-4 py-2 rounded-lg text-sm font-semibold bg-gold-500 text-black hover:bg-gold-600 transition-colors"
-            >
-              {showPaymentForm ? <><FaTimes className="inline mr-1" /> Cancel</> : <><FaPlus className="inline mr-1" /> Add Card</>}
-            </button>
           </div>
+          <button
+            onClick={() => {
+              setShowPaymentForm(!showPaymentForm);
+              setEditingPayment(null);
+              setPaymentErrors({});
+              setPaymentForm({ cardholder_name: "", card_number: "", card_type: "", expiry_month: "", expiry_year: "", is_default: false });
+            }}
+            className="px-4 py-2 rounded-lg text-sm font-semibold bg-gold-500 text-black hover:bg-gold-600 transition-colors"
+          >
+            {showPaymentForm ? <><FaTimes className="inline mr-1" /> Cancel</> : <><FaPlus className="inline mr-1" /> Add Card</>}
+          </button>
+        </div>
 
+        <div className="p-6">
           {showPaymentForm && (
             <form onSubmit={handlePaymentSubmit} className="mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <div className="sm:col-span-2">
                   <label className="block text-sm font-medium text-gray-700 mb-1">Cardholder Name</label>
-                  <input type="text" value={paymentForm.cardholder_name} onChange={(e) => setPaymentForm({ ...paymentForm, cardholder_name: e.target.value })} placeholder="John Doe" className={inputClass} required />
+                  <input
+                    type="text"
+                    value={paymentForm.cardholder_name}
+                    onChange={(e) => updatePaymentField("cardholder_name", e.target.value)}
+                    placeholder="John Doe"
+                    className={fieldClass("cardholder_name")}
+                    maxLength={60}
+                  />
+                  {fieldError("cardholder_name")}
                 </div>
                 <div className="sm:col-span-2">
                   <label className="block text-sm font-medium text-gray-700 mb-1">Card Number</label>
-                  <input type="text" value={paymentForm.card_number} onChange={(e) => setPaymentForm({ ...paymentForm, card_number: e.target.value })} placeholder="1234 5678 9012 3456" className={`${inputClass} font-mono`} required />
+                  <input
+                    type="text"
+                    value={paymentForm.card_number}
+                    onChange={(e) => updatePaymentField("card_number", formatCardNumber(e.target.value))}
+                    placeholder="1234 5678 9012 3456"
+                    inputMode="numeric"
+                    className={`${fieldClass("card_number")} font-mono`}
+                    maxLength={23}
+                  />
+                  {fieldError("card_number")}
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Card Type</label>
-                  <select value={paymentForm.card_type} onChange={(e) => setPaymentForm({ ...paymentForm, card_type: e.target.value })} className={inputClass} required>
+                  <select
+                    value={paymentForm.card_type}
+                    onChange={(e) => updatePaymentField("card_type", e.target.value)}
+                    className={fieldClass("card_type")}
+                  >
                     <option value="">Select card type</option>
                     <option value="Visa">Visa</option>
                     <option value="MasterCard">MasterCard</option>
                     <option value="American Express">American Express</option>
                     <option value="Discover">Discover</option>
                   </select>
+                  {fieldError("card_type")}
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Expiry Month</label>
-                    <select value={paymentForm.expiry_month} onChange={(e) => setPaymentForm({ ...paymentForm, expiry_month: e.target.value })} className={inputClass} required>
+                    <select
+                      value={paymentForm.expiry_month}
+                      onChange={(e) => updatePaymentField("expiry_month", e.target.value)}
+                      className={fieldClass("expiry_month")}
+                    >
                       <option value="">MM</option>
                       {Array.from({ length: 12 }, (_, i) => i + 1).map((month) => (
                         <option key={month} value={month}>{month.toString().padStart(2, "0")}</option>
                       ))}
                     </select>
+                    {fieldError("expiry_month")}
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Expiry Year</label>
-                    <select value={paymentForm.expiry_year} onChange={(e) => setPaymentForm({ ...paymentForm, expiry_year: e.target.value })} className={inputClass} required>
+                    <select
+                      value={paymentForm.expiry_year}
+                      onChange={(e) => updatePaymentField("expiry_year", e.target.value)}
+                      className={fieldClass("expiry_year")}
+                    >
                       <option value="">YYYY</option>
                       {Array.from({ length: 10 }, (_, i) => new Date().getFullYear() + i).map((year) => (
                         <option key={year} value={year}>{year}</option>
                       ))}
                     </select>
+                    {fieldError("expiry_year")}
                   </div>
                 </div>
                 <div className="sm:col-span-2 flex items-center gap-2">
@@ -596,8 +709,8 @@ const Profile = () => {
               </div>
             )}
           </div>
+          </div>
         </div>
-      </div>
     </div>
   );
 };

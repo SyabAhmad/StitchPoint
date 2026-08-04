@@ -8,7 +8,7 @@ const Layout = () => {
     <div className="app-root">
       {/* Top header (main) - fixed, so reserve its height with a spacer */}
       <NaqshCoutureNavbar />
-      <div className="h-[100px]" aria-hidden="true" />
+      <div className="h-[88px]" aria-hidden="true" />
 
       {/* Flexible main area - grows to fill available space and push footer down */}
       <main className="app-content">

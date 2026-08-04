@@ -145,3 +145,75 @@
     transform: translateY(0);
   }
 }
+
+/* Announcement marquee */
+.marquee-container {
+  overflow: hidden;
+  padding: 1.75rem 0;
+  margin: -1.75rem 0;
+  background: transparent;
+}
+.marquee-bar {
+  background: linear-gradient(90deg, #c9a227, #e8cc5c, #c9a227);
+  transform: rotate(-1.3deg) scale(1.02);
+  padding: 0.6rem 0;
+  overflow: hidden;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee-scroll 30s linear infinite;
+}
+.marquee-bar:hover .marquee-track {
+  animation-play-state: paused;
+}
+.marquee-item {
+  font-family: var(--font-family-serif, "Playfair Display", serif);
+  font-style: italic;
+  font-weight: 600;
+  font-size: 0.95rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #111;
+  padding-right: 3rem;
+  white-space: nowrap;
+}
+.marquee-sep {
+  margin-left: 3rem;
+  color: #111;
+  font-style: normal;
+}
+@keyframes marquee-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* Rotating atelier seal */
+.nc-seal {
+  animation: nc-spin 16s linear infinite;
+}
+@keyframes nc-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Hero caption entrance */
+.nc-hero-caption {
+  animation: nc-hero-up 0.9s ease-out both;
+}
+@keyframes nc-hero-up {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

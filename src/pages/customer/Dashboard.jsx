@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate, useLocation, Outlet } from "react-router-dom";
 import {
   FaBars,
@@ -11,6 +11,7 @@ import {
   FaStore,
   FaHome,
   FaSignOutAlt,
+  FaChevronDown,
 } from "react-icons/fa";
 import { fetchWithAuth } from "../../utils/fetchWithAuth.js";
 import SmartFooter from "../../components/footer/SmartFooter.jsx";
@@ -19,6 +20,8 @@ const CustomerDashboard = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const userMenuRef = useRef(null);
   const [orders, setOrders] = useState([]);
   const [cartItems, setCartItems] = useState([]);
   const [wishlistItems, setWishlistItems] = useState([]);
@@ -57,6 +60,18 @@ const CustomerDashboard = () => {
       .catch(() => {
         setLoading(false);
       });
+  }, []);
+
+  useEffect(() => {
+    setUserMenuOpen(false);
+  }, [location.pathname]);
+
+  useEffect(() => {
+    const onDocClick = (e) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target)) setUserMenuOpen(false);
+    };
+    document.addEventListener("mousedown", onDocClick);
+    return () => document.removeEventListener("mousedown", onDocClick);
   }, []);
 
   if (loading) {
@@ -162,32 +177,108 @@ const CustomerDashboard = () => {
   return (
     <div className="h-screen flex flex-col bg-gray-50">
       {/* Header */}
-      <header className="h-14 bg-white border-b border-gray-200 px-6 flex items-center justify-between flex-shrink-0 z-50">
-        <div className="flex items-center gap-4">
+      <header className="h-14 bg-white border-b border-gray-200 px-4 md:px-6 flex items-center justify-between flex-shrink-0 z-50">
+        <div className="flex items-center gap-3 md:gap-4">
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
             className="p-2 rounded-lg text-gray-600 hover:bg-gray-100 lg:hidden"
+            aria-label="Toggle sidebar"
           >
             {sidebarOpen ? <FaTimes /> : <FaBars />}
           </button>
-          <h1 className="text-lg font-bold text-gray-900">Naqsh Couture</h1>
-          <span className="text-sm text-gray-500 hidden sm:inline">Customer Dashboard</span>
+          <Link to="/" className="flex items-center gap-0.5">
+            <span className="text-gold-500 font-serif text-lg font-semibold">Naqsh</span>
+            <span className="text-gray-900 font-serif text-lg font-light">Couture</span>
+          </Link>
+          <span className="hidden lg:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-gold-500/10 border border-gold-500/20 text-gold-600 text-[10px] font-semibold uppercase tracking-[0.15em]">
+            <FaTachometerAlt className="text-[10px]" />
+            Customer Panel
+          </span>
         </div>
-        <div className="flex items-center gap-3">
-          <Link to="/" className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
-            <FaHome className="inline mr-2" />
+
+        <div className="flex items-center gap-2 md:gap-4">
+          <Link
+            to="/"
+            className="hidden md:flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+          >
+            <FaHome className="text-[11px]" />
             Home
           </Link>
-          <Link to="/shop" className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
+          <Link
+            to="/shop"
+            className="hidden md:flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+          >
+            <FaStore className="text-[11px]" />
             Shop
           </Link>
-          <button
-            onClick={() => { localStorage.clear(); window.location.href = "/login"; }}
-            className="px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-          >
-            <FaSignOutAlt className="inline mr-2" />
-            Logout
-          </button>
+
+          <span className="hidden md:block w-px h-5 bg-gray-200" />
+
+          {/* User dropdown */}
+          <div className="relative" ref={userMenuRef}>
+            <button
+              onClick={() => setUserMenuOpen((prev) => !prev)}
+              className="flex items-center gap-2 py-1 pl-1 pr-2 rounded-full border border-gray-200 hover:border-gold-500/50 transition-colors"
+              title={userData?.name || "Customer"}
+            >
+              {profilePicture || userData?.profile_picture ? (
+                <img
+                  src={profilePicture || userData?.profile_picture}
+                  alt="Profile"
+                  className="w-7 h-7 rounded-full object-cover"
+                  onError={(e) => { e.target.src = "/placeholder-avatar.svg"; }}
+                />
+              ) : (
+                <span className="w-7 h-7 rounded-full bg-gold-500 text-black text-[11px] font-bold flex items-center justify-center">
+                  {userData?.name?.charAt(0)?.toUpperCase() || "C"}
+                </span>
+              )}
+              <span className="hidden lg:block text-left">
+                <span className="block text-[11px] text-gray-800 leading-tight max-w-28 truncate">
+                  {userData?.name || "Customer"}
+                </span>
+                <span className="block text-[9px] uppercase tracking-wider text-gold-600 leading-tight">
+                  Customer
+                </span>
+              </span>
+              <FaChevronDown
+                className={`text-[9px] text-gray-400 transition-transform duration-200 ${userMenuOpen ? "rotate-180" : ""}`}
+              />
+            </button>
+
+            {userMenuOpen && (
+              <div className="nc-dropdown absolute right-0 top-[calc(100%+10px)] w-60 bg-white border border-gray-200 rounded-lg shadow-xl shadow-black/10 py-2 z-50">
+                <div className="px-4 py-2.5 border-b border-gray-100 mb-1">
+                  <p className="text-[13px] text-gray-900 font-medium truncate">{userData?.name || "Customer"}</p>
+                  <p className="text-[11px] text-gray-500 truncate">{userData?.email}</p>
+                </div>
+                <Link
+                  to="/customer-dashboard"
+                  className="flex items-center gap-2.5 px-4 py-2 text-[13px] text-gray-600 hover:text-gold-600 hover:bg-gray-50 transition-colors"
+                >
+                  <FaTachometerAlt className="text-xs" /> Overview
+                </Link>
+                <Link
+                  to="/customer-dashboard/orders"
+                  className="flex items-center gap-2.5 px-4 py-2 text-[13px] text-gray-600 hover:text-gold-600 hover:bg-gray-50 transition-colors"
+                >
+                  <FaBoxOpen className="text-xs" /> My Orders
+                </Link>
+                <Link
+                  to="/customer-dashboard/profile"
+                  className="flex items-center gap-2.5 px-4 py-2 text-[13px] text-gray-600 hover:text-gold-600 hover:bg-gray-50 transition-colors"
+                >
+                  <FaUserCog className="text-xs" /> Profile Settings
+                </Link>
+                <button
+                  onClick={() => { localStorage.clear(); window.location.href = "/login"; }}
+                  className="w-full flex items-center gap-2.5 px-4 py-2 text-[13px] text-red-600 hover:bg-red-50 transition-colors"
+                >
+                  <FaSignOutAlt className="text-xs" /> Logout
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </header>
 
