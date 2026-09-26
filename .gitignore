@@ -39,7 +39,7 @@ __pycache__/
 *.sqlite3
 
 uploads
-Scripts
+/Scripts
 TODO.md
 
 check_profile.py
@@ -47,7 +47,7 @@ test.jpg
 test.svg
 test2.svg
 
-migrations
+/migrations
 
 .github
 memory-bank

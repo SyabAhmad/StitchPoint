@@ -122,7 +122,8 @@ app.register_blueprint(commissions_bp)
 app.register_blueprint(misc_bp)
 
 with app.app_context():
-	ensure_default_commission_rates()
+	if db.inspect(db.engine).has_table('commission_rate'):
+		ensure_default_commission_rates()
 
 @app.route('/uploads/<path:filename>')
 def serve_uploaded_file(filename):
