@@ -26,9 +26,9 @@ def create_review():
         user_id = int(get_jwt_identity())
         
         # Get form data
-        product_id = request.form.get('product_id')
-        order_id = request.form.get('order_id')
-        order_item_id = request.form.get('order_item_id')
+        product_id = request.form.get('product_id', type=int)
+        order_id = request.form.get('order_id', type=int)
+        order_item_id = request.form.get('order_item_id', type=int)
         rating = request.form.get('rating', type=int)
         comment = request.form.get('comment', '')
 
