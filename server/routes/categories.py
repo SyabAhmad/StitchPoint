@@ -109,7 +109,7 @@ def create_category():
     data = request.get_json()
     name = data.get('name')
     description = data.get('description')
-    parent_id = data.get('parent_id')
+    parent_id = data.get('parent_id') or None
 
     if not name:
         return jsonify({'message': 'Name is required'}), 400
@@ -156,7 +156,7 @@ def update_category(category_id):
     data = request.get_json()
     name = data.get('name')
     description = data.get('description')
-    parent_id = data.get('parent_id')
+    parent_id = data.get('parent_id') or None
 
     if not name:
         return jsonify({'message': 'Name is required'}), 400
