@@ -23,7 +23,7 @@ def allowed_file(filename):
 def create_review():
     """Create a review for a product from an order"""
     try:
-        user_id = get_jwt_identity()
+        user_id = int(get_jwt_identity())
         
         # Get form data
         product_id = request.form.get('product_id')
@@ -114,7 +114,7 @@ def create_review():
 def get_pending_reviews(order_id):
     """Get products in a delivered order that haven't been reviewed yet"""
     try:
-        user_id = get_jwt_identity()
+        user_id = int(get_jwt_identity())
 
         # Verify order exists and belongs to user
         order = Order.query.filter_by(id=order_id, user_id=user_id).first()
@@ -180,7 +180,7 @@ def get_review(review_id):
 def delete_review(review_id):
     """Delete a review (only by owner)"""
     try:
-        user_id = get_jwt_identity()
+        user_id = int(get_jwt_identity())
         review = Review.query.get(review_id)
 
         if not review:
