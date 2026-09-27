@@ -12,8 +12,8 @@ logger = logging.getLogger(__name__)
 def create_order():
     """Create orders for items, grouped by store"""
     try:
-        user_id = get_jwt_identity()
-        user = User.query.get(int(user_id))
+        user_id = int(get_jwt_identity())
+        user = User.query.get(user_id)
         data = request.get_json()
 
         # Validate required fields
@@ -141,7 +141,7 @@ def create_order():
 def get_orders():
     """Get all orders for current user"""
     try:
-        user_id = get_jwt_identity()
+        user_id = int(get_jwt_identity())
         orders = Order.query.filter_by(user_id=user_id).order_by(Order.created_at.desc()).all()
 
         orders_data = []
@@ -181,7 +181,7 @@ def get_orders():
 def get_order(order_id):
     """Get specific order details"""
     try:
-        user_id = get_jwt_identity()
+        user_id = int(get_jwt_identity())
         order = Order.query.filter_by(id=order_id, user_id=user_id).first()
 
         if not order:
@@ -222,7 +222,7 @@ def get_order(order_id):
 def update_order_status(order_id):
     """Update order status (admin/store only)"""
     try:
-        user_id = get_jwt_identity()
+        user_id = int(get_jwt_identity())
         user = User.query.get(user_id)
         data = request.get_json()
 
@@ -256,7 +256,7 @@ def update_order_status(order_id):
 def cancel_order(order_id):
     """Cancel an order"""
     try:
-        user_id = get_jwt_identity()
+        user_id = int(get_jwt_identity())
         order = Order.query.filter_by(id=order_id, user_id=user_id).first()
 
         if not order:
@@ -287,7 +287,7 @@ def cancel_order(order_id):
 def get_manager_orders():
     """Get all orders for manager's store"""
     try:
-        user_id = get_jwt_identity()
+        user_id = int(get_jwt_identity())
         user = User.query.get(user_id)
 
         # Check if user is a manager
@@ -332,7 +332,7 @@ def get_manager_orders():
 def get_admin_orders():
     """Get all orders for super admin"""
     try:
-        user_id = get_jwt_identity()
+        user_id = int(get_jwt_identity())
         user = User.query.get(user_id)
 
         # Check if user is super admin
@@ -380,7 +380,7 @@ def get_admin_orders():
 def confirm_delivery(order_id):
     """Confirm that customer received the package"""
     try:
-        user_id = get_jwt_identity()
+        user_id = int(get_jwt_identity())
         
         # Get order
         order = Order.query.filter_by(id=order_id, user_id=user_id).first()
